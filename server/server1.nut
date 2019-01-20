@@ -353,9 +353,12 @@ function tab_down(playerid)
 		{
 			local plate = getVehiclePlateText(vehicleid)
 
-			for (local id3 = 0; id3 < max_inv; id3++)
+			if (plate.tointeger() != 0)
 			{
-				triggerClientEvent( playerid, "event_inv_load", "car", id3, array_car_1[plate][id3], array_car_2[plate][id3] )
+				for (local id3 = 0; id3 < max_inv; id3++)
+				{
+					triggerClientEvent( playerid, "event_inv_load", "car", id3, array_car_1[plate][id3], array_car_2[plate][id3] )
+				}
 			}
 		}
 
@@ -403,14 +406,14 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 				setVehicleFuel(vehicleid, 0.0)
 				return
 			}
-		}
 
-		local result = sqlite3( "SELECT * FROM car_db WHERE carnumber = '"+plate+"'" )
-		if (result[1]["fuel"] <= 1)
-		{
-			sendPlayerMessage(playerid, "[ERROR] Бак пуст", red[0], red[1], red[2])
-			setVehicleFuel(vehicleid, 0.0)
-			return
+			local result = sqlite3( "SELECT * FROM car_db WHERE carnumber = '"+plate+"'" )
+			if (result[1]["fuel"] <= 1)
+			{
+				sendPlayerMessage(playerid, "[ERROR] Бак пуст", red[0], red[1], red[2])
+				setVehicleFuel(vehicleid, 0.0)
+				return
+			}
 		}
 
 		if (search_inv_player(playerid, 6, plate.tointeger()) != 0 && search_inv_player(playerid, 2, playername) != 0)
@@ -545,7 +548,7 @@ function(playerid, id)
 {
 	local pos = getPlayerPosition( playerid )
 	local vehicleid = createVehicle( id.tointeger(), pos[0] + 2.0, pos[1], pos[2] + 1.0, 0.0, 0.0, 0.0 )
-	setVehiclePlateText(vehicleid, "admin")
+	setVehiclePlateText(vehicleid, "0")
 })
 
 addCommandHandler( "poz",
@@ -577,16 +580,12 @@ function(command, params)
 
 	if(command == "z")
 	{
-		/*local table = {}
+		local table = {"1":1, "2":2}
 
-		for (local i = 0; i < 10; i++) {
-			table[i] <- i
-			table[5] <- null
-
-			if (table[i]) {
-				print(table[i])
-			}
-		}*/
+		foreach (idx, value in table) {
+			print(idx+" "+value)
+		}
+		print(table)
 
 		/*for (local i = 0; i < 10; i++) 
 		{
