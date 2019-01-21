@@ -7,31 +7,36 @@ local dxDrawTexture_width_height = 0.78
 local pos_x_3d_image = (screen[0]/2)-(width/2)
 local pos_y_3d_image = (screen[1]/2)-(height/2)
 
-local gui_earth = 0//1 открыт, 0 закрыт
-local state_inv_gui = false//инв-рь открыт или закрыт
-local gui_select = false//выделение пнг
+local gridlist_table = {}//С‚Р°Р±Р»РёС†Р° СЃРѕР·РґР°РЅРЅС‹С… РѕРєРѕРЅ
+local gridlist_window = 0//РѕРєРЅРѕ РІ РєРѕС‚РѕСЂРѕРј РІС‹РґРµР»СЏРµС‚СЃСЏ С‚РµРєСЃС‚
+local gridlist_lable = 0//С‚РµРєСЃС‚ РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ РІС‹РґРµР»СЏС‚СЊСЃСЏ
+local gridlist_select = false//РІС‹РґРµР»РµРЅРёРµ С‚РµРєСЃС‚Р°
 
-local state_inv_player = false//состояние ин-ря игрока
-local state_inv_car = false//состояние ин-ря тс
-local state_inv_house = false//состояние ин-ря дома
+local gui_earth = 0//1 РѕС‚РєСЂС‹С‚, 0 Р·Р°РєСЂС‹С‚
+local state_inv_gui = false//РёРЅРІ-СЂСЊ РѕС‚РєСЂС‹С‚ РёР»Рё Р·Р°РєСЂС‹С‚
+local gui_select = false//РІС‹РґРµР»РµРЅРёРµ РїРЅРі
 
-local info_tab = ""//положение картинки в табе
-local info3 = 0//слот
-local info1 = 0//пнг
-local info2 = 0//число
+local state_inv_player = false//СЃРѕСЃС‚РѕСЏРЅРёРµ РёРЅ-СЂСЏ РёРіСЂРѕРєР°
+local state_inv_car = false//СЃРѕСЃС‚РѕСЏРЅРёРµ РёРЅ-СЂСЏ С‚СЃ
+local state_inv_house = false//СЃРѕСЃС‚РѕСЏРЅРёРµ РёРЅ-СЂСЏ РґРѕРјР°
 
-local plate = ""//если в тс
-local house = ""//если около дома
+local info_tab = ""//РїРѕР»РѕР¶РµРЅРёРµ РєР°СЂС‚РёРЅРєРё РІ С‚Р°Р±Рµ
+local info3 = 0//СЃР»РѕС‚
+local info1 = 0//РїРЅРі
+local info2 = 0//С‡РёСЃР»Рѕ
+
+local plate = ""//РµСЃР»Рё РІ С‚СЃ
+local house = ""//РµСЃР»Рё РѕРєРѕР»Рѕ РґРѕРјР°
 
 local no_use_subject = [-1,0,1]
 
-//--перемещение картинки
-local lmb = 0//--лкм
-local info3_selection_1 = -1// --слот картинки
-local info1_selection_1 = -1// --номер картинки
-local info2_selection_1 = -1// --значение картинки
+//--РїРµСЂРµРјРµС‰РµРЅРёРµ РєР°СЂС‚РёРЅРєРё
+local lmb = 0//--Р»РєРј
+local info3_selection_1 = -1// --СЃР»РѕС‚ РєР°СЂС‚РёРЅРєРё
+local info1_selection_1 = -1// --РЅРѕРјРµСЂ РєР°СЂС‚РёРЅРєРё
+local info2_selection_1 = -1// --Р·РЅР°С‡РµРЅРёРµ РєР°СЂС‚РёРЅРєРё
 
-//загрузка картинок для отображения на земле
+//Р·Р°РіСЂСѓР·РєР° РєР°СЂС‚РёРЅРѕРє РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РЅР° Р·РµРјР»Рµ
 local image = array(33+1,0)
 
 for (local i = 0; i < image.len(); i++)
@@ -41,21 +46,21 @@ for (local i = 0; i < image.len(); i++)
 
 local mouse = dxLoadTexture("mouse.png")
 
-//----цвета----
-local color_tips = [168,228,160]//--бабушкины яблоки
-local yellow = [255,255,0]//--желтый
-local red = [255,0,0]//--красный
-local blue = [0,150,255]//--синий
-local white = [255,255,255]//--белый
-local green = [0,255,0]//--зеленый
-local turquoise = [0,255,255]//--бирюзовый
-local orange = [255,100,0]//--оранжевый
-local orange_do = [255,150,0]//--оранжевый do
-local pink = [255,100,255]//--розовый
-local lyme = [130,255,0]//--лайм админский цвет
-local svetlo_zolotoy = [255,255,130]//--светло-золотой
+//----С†РІРµС‚Р°----
+local color_tips = [168,228,160]//--Р±Р°Р±СѓС€РєРёРЅС‹ СЏР±Р»РѕРєРё
+local yellow = [255,255,0]//--Р¶РµР»С‚С‹Р№
+local red = [255,0,0]//--РєСЂР°СЃРЅС‹Р№
+local blue = [0,150,255]//--СЃРёРЅРёР№
+local white = [255,255,255]//--Р±РµР»С‹Р№
+local green = [0,255,0]//--Р·РµР»РµРЅС‹Р№
+local turquoise = [0,255,255]//--Р±РёСЂСЋР·РѕРІС‹Р№
+local orange = [255,100,0]//--РѕСЂР°РЅР¶РµРІС‹Р№
+local orange_do = [255,150,0]//--РѕСЂР°РЅР¶РµРІС‹Р№ do
+local pink = [255,100,255]//--СЂРѕР·РѕРІС‹Р№
+local lyme = [130,255,0]//--Р»Р°Р№Рј Р°РґРјРёРЅСЃРєРёР№ С†РІРµС‚
+local svetlo_zolotoy = [255,255,130]//--СЃРІРµС‚Р»Рѕ-Р·РѕР»РѕС‚РѕР№
 
-local inv_slot_player = [//инв-рь игрока {пнг картинка 0, значение 1}
+local inv_slot_player = [//РёРЅРІ-СЂСЊ РёРіСЂРѕРєР° {РїРЅРі РєР°СЂС‚РёРЅРєР° 0, Р·РЅР°С‡РµРЅРёРµ 1}
 	[0,0],
 	[0,0],
 	[0,0],
@@ -82,7 +87,7 @@ local inv_slot_player = [//инв-рь игрока {пнг картинка 0, значение 1}
 	[0,0]
 ]
 
-local inv_slot_car = [//инв-рь игрока {пнг картинка 0, значение 1}
+local inv_slot_car = [//РёРЅРІ-СЂСЊ РёРіСЂРѕРєР° {РїРЅРі РєР°СЂС‚РёРЅРєР° 0, Р·РЅР°С‡РµРЅРёРµ 1}
 	[0,0],
 	[0,0],
 	[0,0],
@@ -109,7 +114,7 @@ local inv_slot_car = [//инв-рь игрока {пнг картинка 0, значение 1}
 	[0,0]
 ]
 
-local inv_slot_house = [//инв-рь игрока {пнг картинка 0, значение 1}
+local inv_slot_house = [//РёРЅРІ-СЂСЊ РёРіСЂРѕРєР° {РїРЅРі РєР°СЂС‚РёРЅРєР° 0, Р·РЅР°С‡РµРЅРёРµ 1}
 	[0,0],
 	[0,0],
 	[0,0],
@@ -136,7 +141,7 @@ local inv_slot_house = [//инв-рь игрока {пнг картинка 0, значение 1}
 	[0,0]
 ]
 
-local inv_pos = [//позиция слотов {слот 0, позиция х 1, позиция у 2}
+local inv_pos = [//РїРѕР·РёС†РёСЏ СЃР»РѕС‚РѕРІ {СЃР»РѕС‚ 0, РїРѕР·РёС†РёСЏ С… 1, РїРѕР·РёС†РёСЏ Сѓ 2}
 	[0,10.0,10.0],
 	[0,70.0,10.0],
 	[0,130.0,10.0],
@@ -166,16 +171,16 @@ local inv_pos = [//позиция слотов {слот 0, позиция х 1, позиция у 2}
 	[0,310.0,190.0]
 ]
 
-local button_pos = [//позиция кнопок
-	[0,"ИГРОК",10.0,15.0],
-	[0,"АВТО",70.0,15.0],
-	[0,"ДОМ",130.0,15.0]
+local button_pos = [//РїРѕР·РёС†РёСЏ РєРЅРѕРїРѕРє
+	[0,"PLAYER",10.0,15.0],
+	[0,"CAR",70.0,15.0],
+	[0,"HOUSE",130.0,15.0]
 ]
 
-gui_earth = guiCreateElement( 2, "", 0.0, 0.0, screen[0], screen[1], false )//гуи чтобы выкинуть предмет
+gui_earth = guiCreateElement( 2, "", 0.0, 0.0, screen[0], screen[1], false )//РіСѓРё С‡С‚РѕР±С‹ РІС‹РєРёРЅСѓС‚СЊ РїСЂРµРґРјРµС‚
 guiSetAlpha(gui_earth, 0.0)
 
-//создание инв-ря и кнопок
+//СЃРѕР·РґР°РЅРёРµ РёРЅРІ-СЂСЏ Рё РєРЅРѕРїРѕРє
 for (local i = 0; i < max_inv; i++) 
 {
 	inv_pos[i][0] = guiCreateElement( 2, "", (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), 50.0, 50.0, false, gui_earth )
@@ -253,7 +258,7 @@ function getFuel()
 	}
 }
 
-local house_bussiness_radius = 0//--радиус размещения бизнесов и домов
+local house_bussiness_radius = 0//--СЂР°РґРёСѓСЃ СЂР°Р·РјРµС‰РµРЅРёСЏ Р±РёР·РЅРµСЃРѕРІ Рё РґРѕРјРѕРІ
 local house_pos = {}
 local business_pos = {}
 local job_pos = {}
@@ -280,11 +285,12 @@ addEventHandler("onClientScriptInit",
 function() 
 {
 	bindKey( "tab", "down", tab_down )
+	bindKey( "f1", "down", f1_down )
 })
 
 function zamena_img()
 {
-//--------------------------------------------------------------замена куда нажал 1 раз----------------------------------------------------------------------------
+//--------------------------------------------------------------Р·Р°РјРµРЅР° РєСѓРґР° РЅР°Р¶Р°Р» 1 СЂР°Р·----------------------------------------------------------------------------
 	if (info_tab == "player")
 	{
 		triggerServerEvent( "event_inv_server_load", "player", info3_selection_1, info1, info2, playerid )
@@ -323,6 +329,7 @@ function( post )
 	dxdrawtext( "info3_selection_1 "+info3_selection_1, 10.0, 195.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
 	dxdrawtext( "info1_selection_1 "+info1_selection_1, 10.0, 210.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
 	dxdrawtext( "info2_selection_1 "+info2_selection_1, 10.0, 225.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
+	dxdrawtext( "lmb "+lmb, 10.0, 240.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
 
 
 	foreach (k, v in house_pos)
@@ -330,13 +337,13 @@ function( post )
 		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], v[0],v[1],v[2], house_bussiness_radius))
 		{
 			local coords = getScreenFromWorld( v[0], v[1], v[2]+1.0 )
-			local dimensions = dxGetTextDimensions ( "Дом #"+k+"", 1.0, "tahoma-bold" )
-			dxdrawtext ( "Дом #"+k+"", coords[0]-(dimensions[0]/2), coords[1], fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
+			local dimensions = dxGetTextDimensions ( "House #"+k+"", 1.0, "tahoma-bold" )
+			dxdrawtext ( "House #"+k+"", coords[0]-(dimensions[0]/2), coords[1], fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
 	}
 
 
-	if (state_inv_gui)//инв-рь
+	if (state_inv_gui)//РёРЅРІ-СЂСЊ
 	{
 		dxDrawRectangle( pos_x_3d_image, (pos_y_3d_image-(10.0+button_pos[0][3])), width, (10.0+button_pos[0][3]), fromRGB( 0, 0, 0, 255 ) )
 		dxDrawRectangle( pos_x_3d_image, pos_y_3d_image, width, height, fromRGB( 0, 0, 0, 255 ) )
@@ -372,7 +379,7 @@ function( post )
 		}
 
 
-		if (gui_select)//выделение пнг
+		if (gui_select)//РІС‹РґРµР»РµРЅРёРµ РїРЅРі
 		{
 			if (info_tab == "player" && state_inv_player || info_tab == "car" && state_inv_car || info_tab == "house" && state_inv_house)
 			{
@@ -420,9 +427,21 @@ function( post )
 		local pos = getMousePosition()
 		dxDrawTexture(mouse, pos[0], pos[1], 0.73, 1.0, 0.0, 0.0, 0.0, 255)
 	}
+
+
+	if (gridlist_select)
+	{
+		local guiPos_window = guiGetPosition( gridlist_window )
+		local guiSize_window = guiGetSize( gridlist_window )
+
+		local guiPos_lable = guiGetPosition( gridlist_lable )
+		local guiSize_lable = guiGetSize( gridlist_lable )
+
+		dxDrawRectangle( guiPos_window[0]+guiPos_lable[0]-10.0, guiPos_window[1]+guiPos_lable[1]+5.0, guiSize_lable[0], guiSize_lable[1], fromRGB( 0, 150, 255, 150 ) )
+	}
 })
 
-function tab_down_fun()//инв-рь игрока
+function tab_down_fun()//РёРЅРІ-СЂСЊ РёРіСЂРѕРєР°
 {
 	if (state_inv_gui)
 	{
@@ -485,7 +504,7 @@ function tab_down_fun()//инв-рь игрока
 }
 addEventHandler( "event_tab_down_fun", tab_down_fun)
 
-function tab_down()//инв-рь игрока
+function tab_down()//РёРЅРІ-СЂСЊ РёРіСЂРѕРєР°
 {
 	if(isMainMenuShowing())
 	{
@@ -530,7 +549,7 @@ function( element )
 				}
 				else
 				{
-					//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
+					//--------------------------------------------------------------Р·Р°РјРµРЅР° РєСѓРґР° РЅР°Р¶Р°Р» 2 СЂР°Р·----------------------------------------------------------------------------
 					if (inv_slot_player[info3][0] != 0)
 					{
 						foreach (idx, v in no_use_subject)
@@ -585,7 +604,7 @@ function( element )
 				}
 				else
 				{
-					//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
+					//--------------------------------------------------------------Р·Р°РјРµРЅР° РєСѓРґР° РЅР°Р¶Р°Р» 2 СЂР°Р·----------------------------------------------------------------------------
 					if (inv_slot_car[info3][0] != 0)
 					{
 						foreach (idx, v in no_use_subject)
@@ -640,7 +659,7 @@ function( element )
 				}
 				else
 				{
-					//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
+					//--------------------------------------------------------------Р·Р°РјРµРЅР° РєСѓРґР° РЅР°Р¶Р°Р» 2 СЂР°Р·----------------------------------------------------------------------------
 					if (inv_slot_house[info3][0] != 0)
 					{
 						foreach (idx, v in no_use_subject)
@@ -674,6 +693,7 @@ function( element )
 		}
 	}
 
+
 	if (button_pos[0][0] == element)
 	{
 		state_inv_player = true
@@ -691,6 +711,18 @@ function( element )
 		state_inv_player = false
 		state_inv_car = false
 		state_inv_house = true
+	}
+
+
+	foreach (idx, value in gridlist_table) 
+	{	
+		if (element != value)
+		{
+			gridlist_window = value
+			gridlist_lable = element
+			gridlist_select = true
+			break
+		}
 	}
 })
 
@@ -727,7 +759,7 @@ function( value, id3, id1, id2 )
 	}
 })
 
-function tab_load (value, text)//загрузка надписей в табе
+function tab_load (value, text)//Р·Р°РіСЂСѓР·РєР° РЅР°РґРїРёСЃРµР№ РІ С‚Р°Р±Рµ
 {
 	if (value == "car")
 	{
@@ -739,3 +771,74 @@ function tab_load (value, text)//загрузка надписей в табе
 	}
 }
 addEventHandler ( "event_tab_load", tab_load )
+
+local cursor_b = false
+function f1_down()
+{
+	showCursor( !cursor_b )
+	cursor_b = !cursor_b
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////РіСЂР°Р№РґР»РёСЃС‚
+function guiCreateGridList (x,y, width, height)
+{
+	local window = guiCreateElement( 5, "", x,y, width, height+10.0, false )
+	gridlist_table[gridlist_table.len()] <- window
+
+	if (window)
+	{
+		return window
+	}
+	else 
+	{
+		return false
+	}
+}
+
+function guiGridListAddRow (window, slot, text)
+{
+	local guiSize_window = guiGetSize( window )
+	local text_gui = guiCreateElement( 6, text, 10.0, (15.0*slot), guiSize_window[0], 15.0, false, window )
+
+	if (text_gui)
+	{
+		return true
+	}
+	else 
+	{
+		return false
+	}
+}
+
+function guiGridListGetItemText (element)
+{
+	local text = guiGetText(element)
+	if (text != "")
+	{
+		return text
+	}
+	else 
+	{
+		return false
+	}
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+local mayoralty_shop = {
+		[0] = "РїСЂР°РІР°",
+		[1] = "Р»РёС†РµРЅР·РёСЏ РЅР° РѕСЂСѓР¶РёРµ", 
+		[2] = "Р»РёС†РµРЅР·РёСЏ С‚Р°РєСЃРёСЃС‚Р°",
+		[3] = "Р»РёС†РµРЅР·РёСЏ РёРЅРєР°СЃР°С‚РѕСЂР°", 
+		[4] = "Р»РёС†РµРЅР·РёСЏ РґР°Р»СЊРЅРѕР±РѕР№С‰РёРєР°",
+		[5] = "Р»РёС†РµРЅР·РёСЏ РІРѕРґРёС‚РµР»СЏ РјСѓСЃРѕСЂРѕРІРѕР·Р°",
+		[6] = "РєРІРёС‚Р°РЅС†РёСЏ РґР»СЏ РѕРїР»Р°С‚С‹ РґРѕРјР° РЅР° ",
+		[7] = "РєРІРёС‚Р°РЅС†РёСЏ РґР»СЏ РѕРїР»Р°С‚С‹ Р±РёР·РЅРµСЃР° РЅР°",
+		[8] = "РєРІРёС‚Р°РЅС†РёСЏ РґР»СЏ РѕРїР»Р°С‚С‹ С‚/СЃ РЅР° "
+	}
+
+	local test = guiCreateGridList(200.0, 100.0, 300.0, 135.0)
+
+	foreach (k,v in mayoralty_shop)
+	{
+		guiGridListAddRow (test, k, v)
+	}
