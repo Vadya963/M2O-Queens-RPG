@@ -8,15 +8,32 @@ local gridlist_select = false//выделение текста
 
 function guiCreateGridList (x,y, width, height)
 {
-	local window = guiCreateElement( 5, "", x,y, width, height, false )
+	local window = guiCreateElement( 5, "", x,y, width, height+10.0, false )
 	gridlist_table[gridlist_table.len()] <- window
-	return window
+
+	if (window)
+	{
+		return window
+	}
+	else 
+	{
+		return false
+	}
 }
 
 function guiGridListAddRow (window, slot, text)
 {
 	local guiSize_window = guiGetSize( window )
-	local text_gui = guiCreateElement( 6, text, 10.0, (15.0*slot)+5.0, guiSize_window[0], 15.0, false, window )
+	local text_gui = guiCreateElement( 6, text, 10.0, (15.0*slot), guiSize_window[0], 15.0, false, window )
+
+	if (text_gui)
+	{
+		return true
+	}
+	else 
+	{
+		return false
+	}
 }
 
 function guiGridListGetItemText (element)
@@ -28,7 +45,7 @@ function guiGridListGetItemText (element)
 	}
 	else 
 	{
-		return "false"
+		return false
 	}
 }
 
@@ -46,25 +63,6 @@ function( post )
 		dxDrawRectangle( guiPos_window[0]+guiPos_lable[0]-10.0, guiPos_window[1]+guiPos_lable[1]+5.0, guiSize_lable[0], guiSize_lable[1], fromRGB( 0, 150, 255, 150 ) )
 	}
 })
-
-	local mayoralty_shop = {
-		[0] = "права",
-		[1] = "лицензия на оружие", 
-		[2] = "лицензия таксиста",
-		[3] = "лицензия инкасатора", 
-		[4] = "лицензия дальнобойщика",
-		[5] = "лицензия водителя мусоровоза",
-		[6] = "квитанция для оплаты дома на ",
-		[7] = "квитанция для оплаты бизнеса на",
-		[8] = "квитанция для оплаты т/с на "
-	}
-
-	local test = guiCreateGridList(200.0, 100.0, 300.0, 145.0)
-
-	foreach (k,v in mayoralty_shop)
-	{
-		guiGridListAddRow (test, k, v)
-	}
 
 addEventHandler( "onGuiElementClick",
 function( element )
