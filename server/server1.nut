@@ -31,6 +31,8 @@ local array_player_2 = array(getMaxPlayers(), 0)
 
 local state_inv_gui = array(getMaxPlayers(), 0)
 local logged = array(getMaxPlayers(), 0)
+local sead = array(getMaxPlayers(), 0);
+local dviglo = array(getMaxPlayers(), 0);
 //--нужды
 local alcohol = array(getMaxPlayers(), 0)
 local satiety = array(getMaxPlayers(), 0)
@@ -165,9 +167,43 @@ function house_bussiness_job_pos_load( playerid )
 	}
 }
 
+function EngineState()//двигатель вкл или выкл
+{
+	foreach(i, playername in getPlayers()) 
+	{
+		local vehicleid = getPlayerVehicle(i);
+		local plate = getVehiclePlateText(vehicleid);
+			
+		if( isPlayerInVehicle( i ) )
+		{
+			if(sead[i] == 0)
+			{
+				if(dviglo[i] == 1)
+				{
+					if(getVehicleFuel(vehicleid) < 1)
+					{
+						setVehicleFuel(vehicleid, 0.0);
+					}
+					else
+					{
+						setVehicleFuel(vehicleid, getVehicleFuel(vehicleid));
+					}
+				}
+				else
+				{
+					setVehicleEngineState(vehicleid, false);
+					setVehicleSpeed( vehicleid, 0.0,0.0,0.0 );
+				}
+			}
+		}
+	}
+}
+
 addEventHandler( "onScriptInit",
 function()
 {	
+	timer( EngineState, 500, -1 );//двигатель машины
+
 	local house_number = 0
 	foreach (idx, value in sqlite3( "SELECT * FROM house_db" )) 
 	{
@@ -213,6 +249,8 @@ function( playerid, name, ip, serial )
 
 	state_inv_gui[playerid] = 0
 	logged[playerid] = 0
+	sead[playerid] = 0;
+	dviglo[playerid] = 0;
 	//--нужды
 	alcohol[playerid] = 0
 	satiety[playerid] = 0
@@ -393,6 +431,7 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 {
 	local playername = getPlayerName ( playerid )
 	local plate = getVehiclePlateText(vehicleid)
+	sead[playerid] = seat
 
 	if (seat == 0)
 	{
@@ -403,7 +442,7 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 			if (result[1]["nalog"] <= 0)
 			{
 				sendPlayerMessage(playerid, "[ERROR] Т/с арестован за уклонение от уплаты налогов", red[0], red[1], red[2])
-				setVehicleFuel(vehicleid, 0.0)
+				dviglo[playerid] = 0;
 				return
 			}
 
@@ -411,7 +450,7 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 			if (result[1]["fuel"] <= 1)
 			{
 				sendPlayerMessage(playerid, "[ERROR] Бак пуст", red[0], red[1], red[2])
-				setVehicleFuel(vehicleid, 0.0)
+				dviglo[playerid] = 0;
 				return
 			}
 		}
@@ -435,10 +474,12 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 			{
 				local result = sqlite3( "SELECT * FROM car_db WHERE carnumber = '"+plate+"'" )
 				setVehicleFuel(vehicleid, result[1]["fuel"])
+				dviglo[playerid] = 1;
 			}
 			else 
 			{
 				setVehicleFuel(vehicleid, 50.0)
+				dviglo[playerid] = 1;
 			}
 		}
 		else
@@ -446,7 +487,7 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 			sendPlayerMessage(playerid, "[ERROR] Чтобы завести т/с надо выполнить 2 пункта:", red[0], red[1], red[2])
 			sendPlayerMessage(playerid, "[ERROR] 1) нужно иметь ключ от т/с", red[0], red[1], red[2])
 			sendPlayerMessage(playerid, "[ERROR] 2) иметь права на свое имя", red[0], red[1], red[2])
-			setVehicleFuel(vehicleid, 0.0)
+			dviglo[playerid] = 0;
 		}
 	}
 }
