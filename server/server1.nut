@@ -506,10 +506,7 @@ function PlayerVehicleExit( playerid, vehicleid, seat )
 		local result = sqlite3( "SELECT COUNT() FROM car_db WHERE carnumber = '"+plate+"'" )
 		if (result[1]["COUNT()"] == 1)
 		{	
-			if (gas > 1)
-			{
-				sqlite3( "UPDATE car_db SET x = '"+carpos[0]+"', y = '"+carpos[1]+"', z = '"+carpos[2]+"', rot = '"+carrot[0]+"', fuel = '"+gas+"' WHERE carnumber = '"+plate+"'")
-			}
+			sqlite3( "UPDATE car_db SET x = '"+carpos[0]+"', y = '"+carpos[1]+"', z = '"+carpos[2]+"', rot = '"+carrot[0]+"', fuel = '"+gas+"' WHERE carnumber = '"+plate+"'")
 		}
 
 		triggerClientEvent( playerid, "event_tab_load", "car", "" )
