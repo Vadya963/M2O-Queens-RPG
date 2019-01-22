@@ -436,6 +436,10 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 				local result = sqlite3( "SELECT * FROM car_db WHERE carnumber = '"+plate+"'" )
 				setVehicleFuel(vehicleid, result[1]["fuel"])
 			}
+			else 
+			{
+				setVehicleFuel(vehicleid, 50.0)
+			}
 		}
 		else
 		{
@@ -580,12 +584,12 @@ function(command, params)
 
 	if(command == "z")
 	{
-		local table = {"1":1, "2":2}
+		local table = {}
 
-		foreach (idx, value in table) {
-			print(idx+" "+value)
-		}
-		print(table)
+		table[1] <- {}
+
+		print(table.tostring())
+		print(table[1].tostring())
 
 		/*for (local i = 0; i < 10; i++) 
 		{
