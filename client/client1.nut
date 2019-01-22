@@ -438,7 +438,7 @@ function( post )
 		local guiPos_lable = guiGetPosition( gridlist_lable )
 		local guiSize_lable = guiGetSize( gridlist_lable )
 
-		dxDrawRectangle( guiPos_window[0]+guiPos_lable[0]-10.0, guiPos_window[1]+guiPos_lable[1]+5.0, guiSize_lable[0], guiSize_lable[1], fromRGB( 0, 150, 255, 150 ) )
+		dxDrawRectangle( guiPos_window[0]+guiPos_lable[0]-10.0, guiPos_window[1]+guiPos_lable[1]+2.0, guiSize_lable[0], guiSize_lable[1], fromRGB( 81, 101, 204, 150 ) )
 	}
 })
 
@@ -787,7 +787,7 @@ function f1_down()
 ///////////////////////////////////////////////////////////////////////////////////////////////////грайдлист
 function guiCreateGridList (x,y, width, height)
 {
-	local window = guiCreateElement( 5, "", x,y, width, height+10.0, false )
+	local window = guiCreateElement( 5, "", x,y, width, height+4.0, false )
 
 	if (window)
 	{
@@ -831,7 +831,7 @@ function guiGridListGetItemText (element)
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-local mayoralty_shop = {
+/*local mayoralty_shop = {
 		[0] = "права",
 		[1] = "лицензия на оружие", 
 		[2] = "лицензия таксиста",
@@ -848,4 +848,4 @@ local mayoralty_shop = {
 	foreach (k,v in mayoralty_shop)
 	{
 		guiGridListAddRow (test, k, v)
-	}
+	}*/
