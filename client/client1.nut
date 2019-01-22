@@ -7,7 +7,8 @@ local dxDrawTexture_width_height = 0.78
 local pos_x_3d_image = (screen[0]/2)-(width/2)
 local pos_y_3d_image = (screen[1]/2)-(height/2)
 
-local gridlist_table = {}//таблица созданных окон
+local gridlist_table_window = {}//таблица созданных окон
+local gridlist_table_text = {}//таблица созданных текстов
 local gridlist_window = 0//окно в котором выделяется текст
 local gridlist_lable = 0//текст который будет выделяться
 local gridlist_select = false//выделение текста
@@ -457,6 +458,7 @@ function tab_down_fun()//инв-рь игрока
 		info3_selection_1 = -1
 		info1_selection_1 = -1
 		info2_selection_1 = -1
+		lmb = 0
 		showCursor( false )
 
 		guiSetVisible( gui_earth, false )
@@ -714,14 +716,17 @@ function( element )
 	}
 
 
-	foreach (idx, value in gridlist_table) 
+	foreach (idx, value in gridlist_table_window) 
 	{	
-		if (element != value)
-		{
-			gridlist_window = value
-			gridlist_lable = element
-			gridlist_select = true
-			break
+		foreach (idx2, value2 in gridlist_table_text[idx])
+		{	
+			if (element == value2)
+			{
+				gridlist_window = gridlist_table_window[idx]
+				gridlist_lable = element
+				gridlist_select = true
+				break
+			}
 		}
 	}
 })
@@ -783,11 +788,12 @@ function f1_down()
 function guiCreateGridList (x,y, width, height)
 {
 	local window = guiCreateElement( 5, "", x,y, width, height+10.0, false )
-	gridlist_table[gridlist_table.len()] <- window
 
 	if (window)
 	{
-		return window
+		gridlist_table_window[gridlist_table_window.len()] <- window
+		gridlist_table_text[gridlist_table_window.len()-1] <- {}
+		return [window,gridlist_table_window.len()-1]
 	}
 	else 
 	{
@@ -797,11 +803,12 @@ function guiCreateGridList (x,y, width, height)
 
 function guiGridListAddRow (window, slot, text)
 {
-	local guiSize_window = guiGetSize( window )
-	local text_gui = guiCreateElement( 6, text, 10.0, (15.0*slot), guiSize_window[0], 15.0, false, window )
+	local guiSize_window = guiGetSize( window[0] )
+	local text_gui = guiCreateElement( 6, text, 10.0, (15.0*slot), guiSize_window[0], 15.0, false, window[0] )
 
 	if (text_gui)
 	{
+		gridlist_table_text[ window[1] ][ gridlist_table_text[window[1]].len() ] <- text_gui
 		return true
 	}
 	else 
