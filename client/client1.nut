@@ -6,6 +6,7 @@ local height = 250.0
 local dxDrawTexture_width_height = 0.78
 local pos_x_3d_image = (screen[0]/2)-(width/2)
 local pos_y_3d_image = (screen[1]/2)-(height/2)
+local time_game = 0//--сколько минут играешь
 
 local gridlist_table_window = {}//таблица созданных окон
 local gridlist_table_text = {}//таблица созданных текстов
@@ -60,6 +61,12 @@ local orange_do = [255,150,0]//--оранжевый do
 local pink = [255,100,255]//--розовый
 local lyme = [130,255,0]//--лайм админский цвет
 local svetlo_zolotoy = [255,255,130]//--светло-золотой
+
+//---------------------таймеры-------------------------------------------------------------
+timer(function () {
+	time_game = time_game+1
+}, 60000, 0);
+//-----------------------------------------------------------------------------------------
 
 local inv_slot_player = [//инв-рь игрока {пнг картинка 0, значение 1}
 	[0,0],
@@ -306,10 +313,32 @@ function zamena_img()
 	}
 }
 
+local lastTick = getTickCount()
+local framesRendered = 0
+local FPS = 0
 addEventHandler( "onClientFrameRender",
 function( post )
 {
 	local myPos = getPlayerPosition(playerid)
+
+	local currentTick = getTickCount()
+	local elapsedTime = currentTick - lastTick
+
+	if (elapsedTime >= 500)
+	{
+		FPS = framesRendered
+		lastTick = currentTick
+		framesRendered = 0
+	}
+	else
+	{
+		framesRendered++
+	}
+
+	local client_time = getDateTime()
+	local serial = 0
+	local text = "FPS: "+FPS+" Ping: "+getPlayerPing(playerid)+" ID: "+playerid+" | Serial: "+serial+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | "+client_time
+	dxdrawtext ( text, 2.0, 0.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 
 	dxdrawtext( "gui_earth "+gui_earth, 10.0, 15.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
 	dxdrawtext( "state_inv_gui "+state_inv_gui, 10.0, 30.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
@@ -808,7 +837,7 @@ function guiGridListAddRow (window, slot, text)
 
 	if (text_gui)
 	{
-		gridlist_table_text[ window[1] ][ gridlist_table_text[window[1]].len() ] <- text_gui
+		gridlist_table_text[ window[1] ][ gridlist_table_text[ window[1] ].len() ] <- text_gui
 		return true
 	}
 	else 
@@ -817,11 +846,11 @@ function guiGridListAddRow (window, slot, text)
 	}
 }
 
-function guiGridListGetItemText (element)
+function guiGridListGetItemText ()
 {
-	local text = guiGetText(element)
-	if (text != "")
+	if (gridlist_lable != 0)
 	{
+		local text = guiGetText(gridlist_lable)
 		return text
 	}
 	else 
