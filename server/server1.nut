@@ -6,6 +6,9 @@ local earth = {}//--слоты земли
 local max_earth = 0
 local me_radius = 10.0//--радиус отображения действий игрока в чате
 local max_fuel = 50.0//--объем бака авто
+local max_heal = 720.0//--макс здоровье игрока
+local house_bussiness_radius = 5.0//--радиус размещения бизнесов и домов
+local max_blip = 250.0//--радиус блипов
 
 function sqlite3(text)
 {
@@ -348,10 +351,6 @@ local interior_business = [
 	[4, "Автомастерская", 14],
 	[5, "Закусочная", 1]
 ]
-
-local max_heal = 720.0//--макс здоровье игрока
-local house_bussiness_radius = 5.0//--радиус размещения бизнесов и домов
-local max_blip = 250//--радиус блипов
 
 //слоты игрока
 local max_inv = 24
