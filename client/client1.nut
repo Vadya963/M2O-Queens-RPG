@@ -1,4 +1,4 @@
-local playerid = getLocalPlayer()
+local playerid = -1
 local screen = getScreenSize()
 local max_inv = 24
 local width = 370.0
@@ -7,16 +7,27 @@ local dxDrawTexture_width_height = 0.78
 local pos_x_3d_image = (screen[0]/2)-(width/2)
 local pos_y_3d_image = (screen[1]/2)-(height/2)
 local time_game = 0//--сколько минут играешь
+local element_data = {}
+local isCursorShowing = false
+local blip_data = {//ud блипа[0] x[1] y[2] категория[3] ид[4] радиус[5] отображение[6] //бд блипов
+	//[1] = [0, 0,0, 0,1, 5, false]
+}
+local sync_timer = false
 
+//---------------------грайдлист-------------------------
 local gridlist_table_window = {}//таблица созданных окон
 local gridlist_table_text = {}//таблица созданных текстов
-local gridlist_window = 0//окно в котором выделяется текст
-local gridlist_lable = 0//текст который будет выделяться
+local gridlist_window = false//окно в котором выделяется текст
+local gridlist_lable = false//текст который будет выделяться
+local gridlist_row = -1//номер текста который будет выделяться
 local gridlist_select = false//выделение текста
+//-------------------------------------------------------
 
-local gui_earth = 0//1 открыт, 0 закрыт
+local gui_fon = 0//1 открыт, 0 закрыт
+local gui_use = 0//использовать
+local gui_drop = 0//выкинуть
 local state_inv_gui = false//инв-рь открыт или закрыт
-local gui_select = false//выделение пнг
+local gui_selection = false//выделение пнг
 
 local state_inv_player = false//состояние ин-ря игрока
 local state_inv_car = false//состояние ин-ря тс
@@ -65,7 +76,36 @@ local svetlo_zolotoy = [255,255,130]//--светло-золотой
 //---------------------таймеры-------------------------------------------------------------
 timer(function () {
 	time_game = time_game+1
-}, 60000, 0);
+}, 60000, -1)
+
+timer(function () {
+	sync_timer = true
+}, 2000, 1)
+
+timer(function () {
+	local myPos = getPlayerPosition(playerid)
+
+	foreach (k, v in blip_data) 
+	{	
+		if ( isPointInCircle2D(myPos[0], myPos[1], v[1].tofloat(), v[2].tofloat(), v[5].tofloat()) )
+		{	
+			if (!v[6])
+			{
+				blip_data[k][0] = createBlip(v[1].tofloat(), v[2].tofloat(), v[3], v[4])
+				blip_data[k][6] = true
+			}
+		}
+		else 
+		{
+			if (v[6])
+			{
+				destroyBlip(v[0])
+				blip_data[k][6] = false
+			}
+		}
+	}
+
+}, 500, -1)
 //-----------------------------------------------------------------------------------------
 
 local inv_slot_player = [//инв-рь игрока {пнг картинка 0, значение 1}
@@ -185,23 +225,26 @@ local button_pos = [//позиция кнопок
 	[0,"HOUSE",130.0,15.0]
 ]
 
-gui_earth = guiCreateElement( 2, "", 0.0, 0.0, screen[0], screen[1], false )//гуи чтобы выкинуть предмет
-guiSetAlpha(gui_earth, 0.0)
+gui_fon = guiCreateElement( 13, "low_fon1.png", 0.0, 0.0, screen[0], screen[1], false )//фон для гуи
+guiSetAlpha(gui_fon, 0.0)
+
+gui_use = guiCreateElement( 2, "", 0.0, 0.0, pos_x_3d_image, screen[1], false, gui_fon )//использовать предмет
+gui_drop = guiCreateElement( 2, "", (screen[0]-pos_x_3d_image), 0.0, pos_x_3d_image, screen[1], false, gui_fon )//выкинуть предмет
 
 //создание инв-ря и кнопок
 for (local i = 0; i < max_inv; i++) 
 {
-	inv_pos[i][0] = guiCreateElement( 2, "", (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), 50.0, 50.0, false, gui_earth )
+	inv_pos[i][0] = guiCreateElement( 2, "", (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), 50.0, 50.0, false, gui_fon )
 	guiSetVisible( inv_pos[i][0], false )
 }
 
 for (local i = 0; i < button_pos.len(); i++)
 {
-	button_pos[i][0] = guiCreateElement( 2, "", (button_pos[i][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[i][3]), 50.0, button_pos[i][3], false, gui_earth )
+	button_pos[i][0] = guiCreateElement( 2, "", (button_pos[i][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[i][3]), 50.0, button_pos[i][3], false, gui_fon )
 	guiSetVisible( button_pos[i][0], false )
 }
 
-guiSetVisible( gui_earth, false )
+guiSetVisible( gui_fon, false )
 
 function dxdrawtext(text, x, y, color, shadow, font, scale)
 {	
@@ -266,6 +309,32 @@ function getFuel()
 	}
 }
 
+function getElementData (key)
+{	
+	if (element_data[key])
+	{
+		//print("getElementData["+key+"] = "+element_data[playerid][key])
+		return element_data[key]
+	}
+	else 
+	{
+		return "0"
+	}
+}
+
+function element_data_push_client(key, value)
+{
+	element_data[key] <- value
+	//print("event_element_data_push_client["+key+"] = "+value)
+}
+addEventHandler ( "event_element_data_push_client", element_data_push_client )
+
+function blip_create(x, y, lib, icon, r)
+{
+	blip_data[ blip_data.len() ] <- [0, x, y, lib, icon, r, false]
+}
+addEventHandler ( "event_blip_create", blip_create )
+
 local house_bussiness_radius = 0//--радиус размещения бизнесов и домов
 local house_pos = {}
 local business_pos = {}
@@ -289,11 +358,47 @@ function bussines_house_fun (i, x,y,z, value, radius, text, radius1)
 }
 addEventHandler ( "event_bussines_house_fun", bussines_house_fun )
 
+local earth = {}//--слоты земли
+
+//-----------эвенты------------------------------------------------------------------------
+function earth_load (value, i, x, y, z, id1, id2)//--изменения слотов земли
+{
+	if (value != "nil")
+	{
+		earth[i] <- [x,y,z,id1,id2]
+	}
+	else
+	{
+		earth = {}
+	}
+}
+addEventHandler ( "event_earth_load", earth_load )
+
+//сохранение действий игрока
+function save_player_action (text)
+{
+	print(text)
+}
+addEventHandler ( "event_save_player_action", save_player_action )
+
+function fone1() 
+{
+	openMap()
+}
+
+function fone2() 
+{
+	showChat( true )
+}
+
 addEventHandler("onClientScriptInit", 
 function() 
 {
 	bindKey( "tab", "down", tab_down )
 	bindKey( "f1", "down", f1_down )
+	bindKey( "m", "down", fone1 )
+	bindKey( "m", "up", fone2 )
+	bindKey( "e", "down", e_down )
 })
 
 function zamena_img()
@@ -319,6 +424,26 @@ local FPS = 0
 addEventHandler( "onClientFrameRender",
 function( post )
 {
+	local local_param = {
+		[0] = "state_inv_gui "+state_inv_gui,
+		[1] = "gui_selection "+gui_selection,
+		[2] = "state_inv_player "+state_inv_player,
+		[3] = "state_inv_car "+state_inv_car,
+		[4] = "state_inv_house "+state_inv_house,
+		[5] = "info_tab "+info_tab,
+		[6] = "info3 "+info3,
+		[7] = "info1 "+info1,
+		[8] = "info2 "+info2,
+		[9] = "plate "+plate,
+		[10] = "house "+house,
+		[11] = "lmb "+lmb,
+		[12] = "info3_selection_1 "+info3_selection_1,
+		[13] = "info1_selection_1 "+info1_selection_1,
+		[14] = "info2_selection_1 "+info2_selection_1
+	}
+
+	playerid = getLocalPlayer()
+
 	local myPos = getPlayerPosition(playerid)
 
 	local currentTick = getTickCount()
@@ -335,31 +460,30 @@ function( post )
 		framesRendered++
 	}
 
-	local client_time = getDateTime()
-	local serial = 0
-	local text = "FPS: "+FPS+" Ping: "+getPlayerPing(playerid)+" ID: "+playerid+" | Serial: "+serial+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | "+client_time
-	dxdrawtext ( text, 2.0, 0.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+	if (sync_timer)
+	{
+		local client_time = getDateTime()
+		local text = "FPS: "+FPS+" Ping: "+getPlayerPing(playerid)+" ID: "+playerid+" | Serial: "+getElementData("serial")+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | Time: "+getElementData("timeserver")+" | "+client_time
+		dxdrawtext ( text, 2.0, 0.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+		
+		for (local i = 0; i < 5; i++) 
+		{	
+			dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+		}
+	}
 
-	dxdrawtext( "gui_earth "+gui_earth, 10.0, 15.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-	dxdrawtext( "state_inv_gui "+state_inv_gui, 10.0, 30.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-	dxdrawtext( "gui_select "+gui_select, 10.0, 45.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
 
-	dxdrawtext( "state_inv_player "+state_inv_player, 10.0, 60.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-	dxdrawtext( "state_inv_car "+state_inv_car, 10.0, 75.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-	dxdrawtext( "state_inv_house "+state_inv_house, 10.0, 90.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
+	if (isCursorShowing)
+	{
+		local pos = getMousePosition()
+		dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+	}
 
-	dxdrawtext( "info_tab "+info_tab, 10.0, 105.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-	dxdrawtext( "info3 "+info3, 10.0, 120.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-	dxdrawtext( "info1 "+info1, 10.0, 135.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-	dxdrawtext( "info2 "+info2, 10.0, 150.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
 
-	dxdrawtext( "plate "+plate, 10.0, 165.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-	dxdrawtext( "house "+house, 10.0, 180.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-
-	dxdrawtext( "info3_selection_1 "+info3_selection_1, 10.0, 195.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-	dxdrawtext( "info1_selection_1 "+info1_selection_1, 10.0, 210.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-	dxdrawtext( "info2_selection_1 "+info2_selection_1, 10.0, 225.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
-	dxdrawtext( "lmb "+lmb, 10.0, 240.0, fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
+	for (local i = 0; i < local_param.len(); i++) 
+	{	
+		dxdrawtext ( local_param[i], 610.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+	}
 
 
 	foreach (k, v in house_pos)
@@ -409,7 +533,7 @@ function( post )
 		}
 
 
-		if (gui_select)//выделение пнг
+		if (gui_selection)//выделение пнг
 		{
 			if (info_tab == "player" && state_inv_player || info_tab == "car" && state_inv_car || info_tab == "house" && state_inv_house)
 			{
@@ -469,6 +593,21 @@ function( post )
 
 		dxDrawRectangle( guiPos_window[0]+guiPos_lable[0]-10.0, guiPos_window[1]+guiPos_lable[1]+2.0, guiSize_lable[0], guiSize_lable[1], fromRGB( 81, 101, 204, 150 ) )
 	}
+
+	foreach (k, v in earth)//--отображение предметов на земле
+	{
+		local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], v[0], v[1], v[2], 20.0 )
+
+		if (area)
+		{
+			local coords = getScreenFromWorld( v[0], v[1], v[2] )
+			dxDrawTexture(image[v[3]], coords[0]-(57/2), coords[1], dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
+
+			local coords = getScreenFromWorld( v[0], v[1], v[2]+0.2 )
+			local dimensions = dxGetTextDimensions("Press E to take", 1.0, "tahoma-bold" )
+			dxdrawtext ( "Press E to take", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+		}
+	}
 })
 
 function tab_down_fun()//инв-рь игрока
@@ -479,7 +618,7 @@ function tab_down_fun()//инв-рь игрока
 		state_inv_player = false
 		state_inv_car = false
 		state_inv_house = false
-		gui_select = false
+		gui_selection = false
 		info3 = 0
 		info1 = 0
 		info2 = 0
@@ -490,7 +629,7 @@ function tab_down_fun()//инв-рь игрока
 		lmb = 0
 		showCursor( false )
 
-		guiSetVisible( gui_earth, false )
+		guiSetVisible( gui_fon, false )
 		guiSetVisible( button_pos[0][0], false )
 
 		for (local i = 0; i < max_inv; i++) 
@@ -514,7 +653,7 @@ function tab_down_fun()//инв-рь игрока
 		state_inv_player = true
 		showCursor( true )
 
-		guiSetVisible( gui_earth, true )
+		guiSetVisible( gui_fon, true )
 		guiSetVisible( button_pos[0][0], true )
 
 		for (local i = 0; i < max_inv; i++) 
@@ -545,6 +684,26 @@ function tab_down()//инв-рь игрока
 	triggerServerEvent( "event_tab_down" )
 }
 
+function e_down()//поднять предмет
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+
+	triggerServerEvent( "event_e_down" )
+}
+
+local test_button = 0
+local test_button2 = 0
+local test_button3 = 0
+local test = 0
+
+local test_button11 = 0
+local test_button22 = 0
+local test_button33 = 0
+local test1 = 0
+
 addEventHandler( "onGuiElementClick",
 function( element )
 {
@@ -566,12 +725,12 @@ function( element )
 						if (v == info1)
 						{
 							lmb = 0
-							gui_select = false
+							gui_selection = false
 							return
 						}
 					}
 
-					gui_select = true
+					gui_selection = true
 					info_tab = "player"
 					info3_selection_1 = info3
 					info1_selection_1 = info1
@@ -588,7 +747,7 @@ function( element )
 							if (v == info1)
 							{
 								lmb = 0
-								gui_select = false
+								gui_selection = false
 								return
 							}
 						}
@@ -604,7 +763,7 @@ function( element )
 
 					zamena_img()
 
-					gui_select = false
+					gui_selection = false
 					info_tab = ""
 					lmb = 0
 				}
@@ -621,12 +780,12 @@ function( element )
 						if (v == info1)
 						{
 							lmb = 0
-							gui_select = false
+							gui_selection = false
 							return
 						}
 					}
 
-					gui_select = true
+					gui_selection = true
 					info_tab = "car"
 					info3_selection_1 = info3
 					info1_selection_1 = info1
@@ -643,7 +802,7 @@ function( element )
 							if (v == info1)
 							{
 								lmb = 0
-								gui_select = false
+								gui_selection = false
 								return
 							}
 						}
@@ -659,7 +818,7 @@ function( element )
 
 					zamena_img()
 
-					gui_select = false
+					gui_selection = false
 					info_tab = ""
 					lmb = 0
 				}
@@ -676,12 +835,12 @@ function( element )
 						if (v == info1)
 						{
 							lmb = 0
-							gui_select = false
+							gui_selection = false
 							return
 						}
 					}
 
-					gui_select = true
+					gui_selection = true
 					info_tab = "house"
 					info3_selection_1 = info3
 					info1_selection_1 = info1
@@ -698,7 +857,7 @@ function( element )
 							if (v == info1)
 							{
 								lmb = 0
-								gui_select = false
+								gui_selection = false
 								return
 							}
 						}
@@ -714,7 +873,7 @@ function( element )
 
 					zamena_img()
 
-					gui_select = false
+					gui_selection = false
 					info_tab = ""
 					lmb = 0
 				}
@@ -744,19 +903,110 @@ function( element )
 		state_inv_house = true
 	}
 
+	if (gui_use == element)
+	{
+		if (lmb == 1)
+		{
+			local no_use_subject_1 = [-1,0]
+			foreach (k, v in no_use_subject_1) 
+			{
+				if (v == info1)
+				{
+					return
+				}
+			}
+
+			if (info_tab == "player" && state_inv_player)
+			{
+				triggerServerEvent( "event_use_inv", "player", info3, info1, info2 )
+			}
+
+			gui_selection = false
+			info_tab = ""
+			info1 = -1
+			info2 = -1
+			info3 = -1
+			lmb = 0
+		}
+	}
+	else if (gui_drop == element) 
+	{
+		if (lmb == 1)
+		{
+			foreach (k, v in no_use_subject) 
+			{
+				if (v == info1)
+				{
+					return
+				}
+			}
+
+			if (info_tab == "player" && state_inv_player)
+			{
+				triggerServerEvent( "event_throw_earth_server", "player", info3, info1, info2, playerid )
+			}
+			else if (info_tab == "car" && state_inv_car)
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					triggerServerEvent( "event_throw_earth_server", "car", info3, info1, info2, plate )
+				}
+			}
+			else if (info_tab == "house" && state_inv_house)
+			{
+				triggerServerEvent( "event_throw_earth_server", "house", info3, info1, info2, house )
+			}
+
+			gui_selection = false
+			info_tab = ""
+			info1 = -1
+			info2 = -1
+			info3 = -1
+			lmb = 0
+		}
+	}
+
 
 	foreach (idx, value in gridlist_table_window) 
 	{	
 		foreach (idx2, value2 in gridlist_table_text[idx])
 		{	
-			if (element == value2)
+			if (element == value2[0])
 			{
 				gridlist_window = gridlist_table_window[idx]
 				gridlist_lable = element
+				gridlist_row = value2[1]
 				gridlist_select = true
 				break
 			}
 		}
+	}
+
+//-------------------------------------тестирование разных функций---------------------------------
+	if (element == test_button)
+	{
+		sendMessage("test_button - "+guiGridListGetSelectedItem ().tostring())
+	}
+	if (element == test_button2)
+	{
+		sendMessage("test_button2 - "+guiSetVisibleGridList (test, false).tostring())
+	}
+	if (element == test_button3)
+	{
+		sendMessage("test_button3 - "+guiSetVisibleGridList (test, true).tostring())
+	}
+
+	if (element == test_button11)
+	{
+		sendMessage("test_button11 - "+guiGridListGetItemText().tostring())
+	}
+	if (element == test_button22)
+	{
+		sendMessage("test_button22 - "+guiSetVisibleGridList (test1, false).tostring())
+	}
+	if (element == test_button33)
+	{
+		sendMessage("test_button33 - "+guiSetVisibleGridList (test1, true).tostring())
 	}
 })
 
@@ -798,31 +1048,74 @@ function tab_load (value, text)//загрузка надписей в табе
 	if (value == "car")
 	{
 		plate = text
+
+		if (state_inv_gui)
+		{
+			if (plate != "") 
+			{
+				guiSetVisible( button_pos[1][0], true )
+			}
+			else 
+			{
+				guiSetVisible( button_pos[1][0], false )
+
+				state_inv_player = true
+				state_inv_car = false
+				gui_selection = false
+				info_tab = ""
+				info1 = -1
+				info2 = -1
+				info3 = -1
+				lmb = 0
+			}
+		}
 	}
 	else if (value == "house")
 	{
 		house = text
+
+		if (state_inv_gui)
+		{
+			if (house != "") 
+			{
+				guiSetVisible( button_pos[2][0], true )
+			}
+			else 
+			{
+				guiSetVisible( button_pos[2][0], false )
+
+				state_inv_player = true
+				state_inv_house = false
+				gui_selection = false
+				info_tab = ""
+				info1 = -1
+				info2 = -1
+				info3 = -1
+				lmb = 0
+			}
+		}
 	}
 }
 addEventHandler ( "event_tab_load", tab_load )
 
-local cursor_b = false
 function f1_down()
 {
-	showCursor( !cursor_b )
-	cursor_b = !cursor_b
+	showCursor( !isCursorShowing )
+	isCursorShowing = !isCursorShowing
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////грайдлист
+//--------------------------------------------грайдлист--------------------------------------------
 function guiCreateGridList (x,y, width, height)
 {
 	local window = guiCreateElement( 5, "", x,y, width, height+4.0, false )
 
 	if (window)
 	{
-		gridlist_table_window[gridlist_table_window.len()] <- window
-		gridlist_table_text[gridlist_table_window.len()-1] <- {}
-		return [window,gridlist_table_window.len()-1]
+		local table_len = gridlist_table_window.len()
+
+		gridlist_table_window[table_len] <- window
+		gridlist_table_text[table_len] <- {}
+		return [window,table_len]
 	}
 	else 
 	{
@@ -830,14 +1123,15 @@ function guiCreateGridList (x,y, width, height)
 	}
 }
 
-function guiGridListAddRow (window, slot, text)
+function guiGridListAddRow (window, text)
 {
-	local guiSize_window = guiGetSize( window[0] )
-	local text_gui = guiCreateElement( 6, text, 10.0, (15.0*slot), guiSize_window[0], 15.0, false, window[0] )
-
-	if (text_gui)
+	if (window[0])
 	{
-		gridlist_table_text[ window[1] ][ gridlist_table_text[ window[1] ].len() ] <- text_gui
+		local table_len = gridlist_table_text[ window[1] ].len()
+		local guiSize_window = guiGetSize( window[0] )
+		local text_gui = guiCreateElement( 6, text, 10.0, (15.0*table_len), guiSize_window[0], 15.0, false, window[0] )
+
+		gridlist_table_text[ window[1] ][ table_len ] <- [text_gui,table_len]
 		return true
 	}
 	else 
@@ -848,7 +1142,7 @@ function guiGridListAddRow (window, slot, text)
 
 function guiGridListGetItemText ()
 {
-	if (gridlist_lable != 0)
+	if (gridlist_lable)
 	{
 		local text = guiGetText(gridlist_lable)
 		return text
@@ -858,8 +1152,46 @@ function guiGridListGetItemText ()
 		return false
 	}
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
+function guiGridListGetSelectedItem ()
+{
+	if (gridlist_row != -1)
+	{
+		return gridlist_row
+	}
+	else 
+	{
+		return false
+	}
+}
+
+function guiSetVisibleGridList (window, bool)
+{
+	if (window)
+	{		
+		guiSetVisible( window[0], bool )
+
+		foreach (idx, value in gridlist_table_text[ window[1] ]) 
+		{
+			guiSetVisible( value[0], bool )
+		}
+
+		gridlist_window = false
+		gridlist_lable = false
+		gridlist_row = -1
+		gridlist_select = false
+
+		return true
+	}
+	else 
+	{
+		return false
+	}
+}
+//-------------------------------------------------------------------------------------------------
+
+
+//-------------------------------------тестирование разных функций---------------------------------
 /*local mayoralty_shop = {
 		[0] = "права",
 		[1] = "лицензия на оружие", 
@@ -872,9 +1204,33 @@ function guiGridListGetItemText ()
 		[8] = "квитанция для оплаты т/с на "
 	}
 
-	local test = guiCreateGridList(200.0, 100.0, 300.0, 135.0)
+	test = guiCreateGridList(200.0, 100.0, 300.0, 135.0)
 
 	foreach (k,v in mayoralty_shop)
 	{
-		guiGridListAddRow (test, k, v)
-	}*/
+		guiGridListAddRow (test, v)
+	}
+
+	test_button = guiCreateElement( 2, "вывод", 200.0, 100.0+140.0, 50.0, 50.0, false )
+	test_button2 = guiCreateElement( 2, "скрыть", 250.0, 100.0+140.0, 50.0, 50.0, false )
+	test_button3 = guiCreateElement( 2, "показать", 300.0, 100.0+140.0, 50.0, 50.0, false )
+
+local mayoralty_shop = {
+		[0] = "день",
+		[1] = "деньги",
+		[2] = "права на имя",
+		[3] = "сигареты Big Break Red",
+		[4] = "аптечка",
+		[5] = "канистра с"
+	}
+
+	test1 = guiCreateGridList(550.0, 100.0, 300.0, 135.0)
+
+	foreach (k,v in mayoralty_shop)
+	{
+		guiGridListAddRow (test1, v)
+	}
+
+	test_button11 = guiCreateElement( 2, "вывод", 550.0, 100.0+140.0, 50.0, 50.0, false )
+	test_button22 = guiCreateElement( 2, "скрыть", 600.0, 100.0+140.0, 50.0, 50.0, false )
+	test_button33 = guiCreateElement( 2, "показать", 650.0, 100.0+140.0, 50.0, 50.0, false )*/
