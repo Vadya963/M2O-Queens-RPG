@@ -554,6 +554,21 @@ function inv_car_delet(playerid, id1, id2)//--удаления предмета 
 
 	return false
 }
+
+function getSpeed(playerid)
+{
+	if (isPlayerInVehicle(playerid))
+	{
+		local vehicleid = getPlayerVehicle(playerid)
+		local velo = getVehicleSpeed(vehicleid)
+		local speed = getDistanceBetweenPoints3D(0.0,0.0,0.0, velo[0],velo[1],velo[2])
+		return speed*2.27*1.6
+	}
+	else
+	{
+		return 0
+	}
+}
 //-------------------------------------------------------------------------------------------------
 
 //------------------------------------Element Data-------------------------------------------------
@@ -1164,10 +1179,10 @@ function e_down (playerid)//--подбор предметов с земли
 
 		if (area) 
 		{
-			/*if (v[4] == 48 || v[4] == 24 || v[4] == 62 || v[4] == 67 || v[4] == 68 || v[4] == 69 || v[4] == 70 || v[4] == 71) && search_inv_player(playerid, v[4], search_inv_player_2_parameter(playerid, v[4])) >= 1 {
-				sendMessage(playerid, "[ERROR] Можно переносить только один предмет", red[1], red[2], red[3])
+			if ((v[3] == 24) && search_inv_player(playerid, v[3], search_inv_player_2_parameter(playerid, v[3])) >= 1) {
+				sendMessage(playerid, "[ERROR] Можно переносить только один предмет", red[0], red[1], red[2])
 				return
-			}*/
+			}
 
 			if (inv_player_empty(playerid, v[3], v[4])) 
 			{
@@ -1242,10 +1257,46 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 	if (value == "player")
 	{
-		if (id1 == 6 || id1 == 2)//--ключ авто, права
+		if (id1 == 6 || id1 == 2 || id1 == 25)//--ключ авто, права
 		{
 			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 			return
+		}
+		else if (id1 == 5) 
+		{
+			if (isPlayerInVehicle(playerid))
+			{
+				local plate = getVehiclePlateText ( vehicleid )
+				local gas = getVehicleFuel(vehicleid)
+
+				if (getSpeed(playerid) < 5)
+				{
+					if (gas+id2 <= max_fuel)
+					{
+						setVehicleFuel(vehicleid, (gas+id2))
+
+						sqlite3( "UPDATE car_db SET fuel = '"+(gas+id2)+"' WHERE carnumber = '"+plate+"'")
+
+						me_chat(playerid, playername+" заправил(а) машину из канистры")
+						id2 = 0
+					}
+					else
+					{
+						sendMessage(playerid, "[ERROR] Максимальная вместимость бака "+max_fuel+" литров", red[0], red[1], red[2])
+						return
+					}
+				}
+				else
+				{
+					sendMessage(playerid, "[ERROR] Остановите т/с", red[0], red[1], red[2])
+					return
+				}
+			}
+			else
+			{
+				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
+				return
+			}
 		}
 		else 
 		{
@@ -1266,6 +1317,171 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 }
 addEventHandler( "event_use_inv", use_inv )
 
+addCommandHandler( "sms",//смс
+function( playerid, id, ...)
+{
+	local playername = getPlayerName ( playerid )
+	local id = id.tointeger()
+
+	if(logged[playerid] == 0)
+	{
+		return
+	}
+
+	if (!isPlayerConnected(id))
+	{
+		sendMessage(playerid, "[ERROR] Такого игрока нет", red[0], red[1], red[2])
+		return
+	}
+
+	if(logged[id] == 0)
+	{
+		sendMessage(playerid, "[ERROR] Такого игрока нет", red[0], red[1], red[2])
+		return
+	}
+	
+	local text = ""
+	for(local i = 0; i < vargv.len(); i++)
+	{
+		text = text+vargv[i]+" "
+	}
+
+	local player_name = getPlayerName ( id )
+
+	sendMessage(playerid, "[SMS TO] "+player_name+" ["+playerid+"]: "+text, yellow[0], yellow[1], yellow[2])
+	sendMessage(id, "[SMS FROM] "+playername+" ["+id+"]: "+text, yellow[0], yellow[1], yellow[2])
+})
+
+addCommandHandler("pay",//--передача денег
+function (playerid, id, cash)
+{
+	local playername = getPlayerName ( playerid )
+	local myPos = getPlayerPosition(playerid)
+	local cash = cash.tointeger()
+	local id = id.tointeger()
+
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	if (cash < 1)
+	{
+		return
+	}
+
+	if (cash > array_player_2[playerid][0])
+	{
+		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red[0], red[1], red[2])
+		return
+	}
+
+	if (isPlayerConnected(id))
+	{
+		local player_name = getPlayerName ( id )
+		if (logged[id] == 0)
+		{
+			sendMessage(playerid, "[ERROR] Такого игрока нет", red[0], red[1], red[2])
+			return
+		}
+
+		local Pos = getPlayerPosition(id)
+		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], 10.0))
+		{
+			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playerid )
+
+			inv_server_load( id, "player", 0, 1, array_player_2[id][0]+cash, id )
+
+			me_chat(playerid, playername+" передал(а) "+player_name+" "+cash+"$")
+
+			save_player_action(playerid, "[pay] "+playername+" give money "+player_name+" [-"+cash+"$, "+array_player_2[playerid][0]+"$]")
+			save_player_action(id, "[pay] "+playername+" give money "+player_name+" [+"+cash+"$, "+array_player_2[id][0]+"$]")
+		}
+		else
+		{
+			sendMessage(playerid, "[ERROR] Игрок далеко", red[0], red[1], red[2])
+		}
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Такого игрока нет", red[0], red[1], red[2])
+	}
+})
+
+addCommandHandler("evacuationcar",//-эвакуция авто
+function (playerid, id)
+{
+	local playername = getPlayerName( playerid )
+	local myPos = getPlayerPosition(playerid)
+	local id = id.tointeger()
+	local cash = 100
+
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	if (cash <= array_player_2[playerid][0]) 
+	{
+		foreach (k, vehicleid in getVehicles())
+		{
+			local plate = getVehiclePlateText(vehicleid)
+			if (id == plate.tointeger())
+			{
+				local result = sqlite3( "SELECT COUNT() FROM car_db WHERE carnumber = '"+plate+"'" )
+				if (result[1]["COUNT()"] == 1) 
+				{
+					if (result[1]["frozen"] == 0)
+					{
+						if (search_inv_player(playerid, 6, id) != 0) 
+						{
+							foreach (player, playername in getPlayers())
+							{
+								local vehicle = getPlayerVehicle(player)
+								if (vehicle == vehicleid)
+								{
+									removePlayerFromVehicle ( player )
+								}
+							}
+
+							setVehiclePosition(vehicleid, myPos[0]+5, myPos[1], myPos[2]+1)
+							setVehicleRotation(vehicleid, 0.0, 0.0, 0.0)
+
+							sqlite3( "UPDATE car_db SET x = '"+(myPos[0]+5)+"', y = '"+myPos[1]+"', z = '"+(myPos[2]+1)+"' WHERE carnumber = '"+plate+"'")
+
+							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playerid )
+
+							sendMessage(playerid, "Вы эвакуировали т/с за "+cash+"$", orange[0], orange[1], orange[2])
+
+							save_player_action(playerid, "[evacuationcar] "+playername+" [-"+cash+"$, "+array_player_2[playerid][0]+"$]")
+						}
+						else
+						{
+							sendMessage(playerid, "[ERROR] У вас нет ключей от этого т/с", red[0], red[1], red[2])
+						}
+					}
+					else 
+					{
+						sendMessage(playerid, "[ERROR] Т/с на штрафстоянке", red[0], red[1], red[2])
+					}
+				}
+				else
+				{
+					sendMessage(playerid, "[ERROR] Т/с не найдено", red[0], red[1], red[2])
+				}
+
+				return
+			}
+		}
+
+		sendMessage(playerid, "[ERROR] Т/с не найдено", red[0], red[1], red[2])
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Нужно иметь "+cash+"$", red[0], red[1], red[2])
+	}
+})
+
 addCommandHandler("sub",//выдача предмета и кол-во
 function(playerid, id1, id2)
 {
@@ -1274,7 +1490,7 @@ function(playerid, id1, id2)
 
 	if (inv_player_empty(playerid, val1, val2))
 	{
-		sendPlayerMessage(playerid, "Вы создали "+info_png[val1][0]+" "+val2+" "+info_png[val1][1], lyme[0], lyme[1], lyme[2])
+		sendMessage(playerid, "Вы создали "+info_png[val1][0]+" "+val2+" "+info_png[val1][1], lyme[0], lyme[1], lyme[2])
 	}
 	else
 	{
@@ -1297,26 +1513,26 @@ function (playerid, id1, id2 )
 
 	if (val1 > info_png.len() || val1 < 2)
 	{
-		sendPlayerMessage(playerid, "[ERROR] от 2 до "+info_png.len(), red[0], red[1], red[2])
+		sendMessage(playerid, "[ERROR] от 2 до "+info_png.len(), red[0], red[1], red[2])
 		return
 	}
 
 	if (!isPlayerInVehicle(playerid)) 
 	{
-		sendPlayerMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
+		sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 		return
 	}
 
 	if (inv_car_empty(playerid, val1, val2))
 	{
-		sendPlayerMessage(playerid, "Вы создали "+info_png[val1][0]+" "+val2+" "+info_png[val1][1], lyme[0], lyme[1], lyme[2])
+		sendMessage(playerid, "Вы создали "+info_png[val1][0]+" "+val2+" "+info_png[val1][1], lyme[0], lyme[1], lyme[2])
 	}
 	else
 	{
 		sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
 	}
 
-	//save_admin_action(playerid, "[admin_subcar] "..playername.." ["..val1..", "..val2.."]")
+	//save_admin_action(playerid, "[admin_subcar] "+playername+" ["+val1+", "+val2+"]")
 })
 
 addCommandHandler("v",
