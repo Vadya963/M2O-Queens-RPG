@@ -8,7 +8,7 @@ local pos_x_3d_image = (screen[0]/2)-(width/2)
 local pos_y_3d_image = (screen[1]/2)-(height/2)
 local time_game = 0//--сколько минут играешь
 local element_data = {}
-local isCursorShowing = false
+local isCursorShowing = false//+дебагинфа
 local blip_data = {//ud блипа[0] x[1] y[2] категория[3] ид[4] радиус[5] отображение[6] //бд блипов
 	//[1] = [0, 0,0, 0,1, 5, false]
 }
@@ -466,23 +466,21 @@ function( post )
 		local text = "FPS: "+FPS+" Ping: "+getPlayerPing(playerid)+" ID: "+playerid+" | Serial: "+getElementData("serial")+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | Time: "+getElementData("timeserver")+" | "+client_time
 		dxdrawtext ( text, 2.0, 0.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		
-		for (local i = 0; i < 5; i++) 
-		{	
-			dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+		if (isCursorShowing)
+		{
+			local pos = getMousePosition()
+			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+		
+			for (local i = 0; i < 5; i++) 
+			{	
+				dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+			}
+
+			for (local i = 0; i < local_param.len(); i++) 
+			{	
+				dxdrawtext ( local_param[i], 610.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+			}
 		}
-	}
-
-
-	if (isCursorShowing)
-	{
-		local pos = getMousePosition()
-		dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-	}
-
-
-	for (local i = 0; i < local_param.len(); i++) 
-	{	
-		dxdrawtext ( local_param[i], 610.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 	}
 
 
@@ -601,11 +599,11 @@ function( post )
 		if (area)
 		{
 			local coords = getScreenFromWorld( v[0], v[1], v[2] )
-			dxDrawTexture(image[v[3]], coords[0]-(57/2), coords[1], dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
+			dxDrawTexture(image[v[3]], coords[0]-(57/2), coords[1], 0.88, 0.88, 0.0, 0.0, 0.0, 255)
 
 			local coords = getScreenFromWorld( v[0], v[1], v[2]+0.2 )
-			local dimensions = dxGetTextDimensions("Press E to take", 1.0, "tahoma-bold" )
-			dxdrawtext ( "Press E to take", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+			local dimensions = dxGetTextDimensions("Press E", 1.0, "tahoma-bold" )
+			dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
 		}
 	}
 })
