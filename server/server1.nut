@@ -354,21 +354,25 @@ local interior_business = [
 ]
 
 //-места поднятия предметов
-local up_car_subject = [//--{x,y,z, радиус, ид пнг, ид тс, зп}
+local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, зп 6}
 	[-632.282,955.495,-17.7324, 15.0, 24, 37, 50],//--сигаретный завод
 ]
 
-local up_player_subject = [//--{x,y,z, радиус, ид пнг, зп, скин}
+local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, скин 6}
 	[-427.786,-737.652,-21.7381, 5.0 24, 20, 0],//--порт
 ]
 
 //--места сброса предметов
-local down_car_subject = [//--{x,y,z, радиус, ид пнг, ид тс}
+local down_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5}
 	[-411.778,-827.907,-21.7456, 15.0, 24, 37],//--порт
 ]
 
-local down_player_subject = [//--{x,y,z, радиус, ид пнг} также нужно прописать ид пнг в throw_earth_server
+local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4} также нужно прописать ид пнг в throw_earth_server
 	[-411.778,-827.907,-21.7456, 5.0, 24],//--порт
+]
+
+local anim_player_subject = [//--{x,y,z, радиус 3, ид пнг1 4, ид пнг2 5, зп 6, время работы анимации 7}
+	[-350.47,-726.813,-14.4206, 2.0, 24, 24, 40, 5],//офис дерека
 ]
 
 //слоты игрока
@@ -995,7 +999,7 @@ function reg_or_login(playerid)
 		drugs[playerid] = result[1]["drugs"]
 
 		setPlayerHealth( playerid, result[1]["heal"] )
-
+		setPlayerModel(playerid, result[1]["skin"])
 		setPlayerPosition( playerid, -393.265,905.334,-20.0026 )
 
 		sendMessage(playerid, "Вы удачно зарегистрировались!", turquoise[0], turquoise[1], turquoise[2])
@@ -1032,8 +1036,8 @@ function reg_or_login(playerid)
 		drugs[playerid] = result[1]["drugs"]
 
 		setPlayerPosition( playerid, result[1]["x"],result[1]["y"],result[1]["z"] )
-
 		setPlayerHealth( playerid, result[1]["heal"] )
+		setPlayerModel(playerid, result[1]["skin"])
 
 		sendMessage(playerid, "Вы удачно зашли!", turquoise[0], turquoise[1], turquoise[2])
 
@@ -1211,7 +1215,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 				inv_server_load( playerid, value, id3, 0, 0, tabpanel )
 				inv_server_load( playerid, value, 0, 1, array_player_2[playerid][0]+id2, tabpanel )
 
-				sendPlayerMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], yellow[0], yellow[1], yellow[2])
+				sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], yellow[0], yellow[1], yellow[2])
 
 				save_player_action(playerid, "[throw_earth_job] "+playername+" [+"+id2+"$, "+array_player_2[playerid][0]+"$] ["+info_png[id1][0]+", "+id2+"]")
 
@@ -1219,33 +1223,36 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 			}
 		}
 
-		/*for k,v in pairs(anim_player_subject) do
-			if isPointInCircle3D(x,y,z, v[1],v[2],v[3], v[4]) and id1 == v[5] and not vehicleid then--обработка предметов
-				local randomize = math.random(1,v[7])
+		foreach (k, v in anim_player_subject) 
+		{
+			if (isPointInCircle3D(x,y,z, v[0],v[1],v[2], v[3]) && id1 == v[4] && !isPlayerInVehicle(playerid))//--обработка предметов
+			{
+				local randomize = random(1,v[6])
 
 				inv_server_load( playerid, value, id3, 0, 0, tabpanel )
 
-				inv_server_load( playerid, value, id3, v[6], randomize, tabpanel )
+				inv_server_load( playerid, value, id3, v[5], randomize, tabpanel )
 
-				sendPlayerMessage(playerid, "Вы получили "+info_png[v[6]][1]+" "+randomize+" "+info_png[v[6]][2], svetlo_zolotoy[1], svetlo_zolotoy[2], svetlo_zolotoy[3])
+				sendMessage(playerid, "Вы получили "+info_png[v[5]][0]+" "+randomize+" "+info_png[v[5]][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
 
-				if id1 == 67 then--предмет для работы
+				/*if id1 == 67 then--предмет для работы
 					object_attach(playerid, 341, 12, 0,0,0, 0,-90,0, (v[12]*1000))
 				elseif id1 == 70 then
 					object_attach(playerid, 337, 12, 0,0,0, 0,-90,0, (v[12]*1000))
-				end
+				end*/
 
-				setPedAnimation(playerid, v[8], v[9], -1, true, false, false, false)
+				togglePlayerControls( playerid, true )
 
-				setTimer(function ()
-					if isElement(playerid) then
-						setPedAnimation(playerid, nil, nil)
-					end
-				end, (v[12]*1000), 1)
+				sendMessage(playerid, "[TIPS] Не открывайте чат", color_tips[0], color_tips[1], color_tips[2])
+
+				timer(function ()
+				{
+					togglePlayerControls( playerid, false )
+				}, (v[7]*1000), 1)
 
 				return
-			end
-		end*/
+			}
+		}
 	}
 
 	max_earth = max_earth+1
@@ -1311,7 +1318,7 @@ function e_down (playerid)//--подбор предметов с земли
 				{
 					if (getPlayerModel(playerid) != v[6])
 					{
-						sendPlayerMessage(playerid, "[ERROR] Вы должны быть в одежде "+v[6], red[0], red[1], red[2])
+						sendMessage(playerid, "[ERROR] Вы должны быть в одежде "+v[6], red[0], red[1], red[2])
 						return
 					}
 				}
@@ -1328,7 +1335,7 @@ function e_down (playerid)//--подбор предметов с земли
 				{
 					if (getVehicleModel(vehicleid) != down_car_subject[0][5])
 					{
-						sendPlayerMessage(playerid, "[ERROR] Вы должны быть в "+"getVehicleNameFromModel ( down_car_subject[0][5] )"+"("+down_car_subject[0][5]+")", red[0], red[1], red[2])
+						sendMessage(playerid, "[ERROR] Вы должны быть в "+"getVehicleNameFromModel ( down_car_subject[0][5] )"+"("+down_car_subject[0][5]+")", red[0], red[1], red[2])
 						return
 					}
 				}
@@ -1345,7 +1352,7 @@ function e_down (playerid)//--подбор предметов с земли
 				{
 					if (getVehicleModel(vehicleid) != v[5])
 					{
-						sendPlayerMessage(playerid, "[ERROR] Вы должны быть в "+"getVehicleNameFromModel ( v[5] )"+"("+v[5]+")", red[0], red[1], red[2])
+						sendMessage(playerid, "[ERROR] Вы должны быть в "+"getVehicleNameFromModel ( v[5] )"+"("+v[5]+")", red[0], red[1], red[2])
 						return
 					}
 				}
@@ -1936,7 +1943,7 @@ function ( playerid, ... )
 	}
 
 	local result = sqlite3( "INSERT INTO position (description, pos) VALUES ('"+text+"', '"+pos[0]+","+pos[1]+","+pos[2]+"')" )
-	sendPlayerMessage(playerid, "save pos "+text, lyme[0], lyme[1], lyme[2])
+	sendMessage(playerid, "save pos "+text, lyme[0], lyme[1], lyme[2])
 })
 
 addCommandHandler( "poz",
