@@ -359,7 +359,7 @@ local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, 
 ]
 
 local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, скин 6}
-	[-427.786,-737.652,-21.7381, 5.0 24, 20, 0],//--порт
+	[-427.786,-737.652,-21.7381, 5.0, 24, 20, 0],//--порт
 ]
 
 //--места сброса предметов
@@ -367,12 +367,12 @@ local down_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5
 	[-411.778,-827.907,-21.7456, 15.0, 24, 37],//--порт
 ]
 
-local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4} также нужно прописать ид пнг в throw_earth_server
+local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4}
 	[-411.778,-827.907,-21.7456, 5.0, 24],//--порт
 ]
 
 local anim_player_subject = [//--{x,y,z, радиус 3, ид пнг1 4, ид пнг2 5, зп 6, время работы анимации 7}
-	[-350.47,-726.813,-14.4206, 2.0, 24, 24, 40, 5],//офис дерека
+	//[-350.47,-726.813,-14.4206, 2.0, 24, 24, 40, 5],//офис дерека
 ]
 
 //слоты игрока
@@ -949,14 +949,24 @@ function( playerid )
 
 		foreach (k, v in down_car_subject)
 		{
-			triggerClientEvent( playerid, "event_blip_create", v[0], v[1], 0,1, 5000.0 )
-			//triggerClientEvent( playerid, "event_blip_create", v[0], v[1], 12,0, max_blip )
+			triggerClientEvent( playerid, "event_blip_create", v[0], v[1], 0,4, max_blip )
+			triggerClientEvent( playerid, "event_blip_create", v[0], v[1], 10,0, max_blip )
+		}
+
+		foreach (k, v in down_player_subject)
+		{
+			triggerClientEvent( playerid, "event_blip_create", v[0], v[1], 0,4, max_blip )
+			triggerClientEvent( playerid, "event_blip_create", v[0], v[1], 10,0, max_blip )
 		}
 
 		foreach (k, v in up_car_subject)
 		{
-			triggerClientEvent( playerid, "event_blip_create", v[0], v[1], 0,1, 5000.0 )
-			//triggerClientEvent( playerid, "event_blip_create", v[0], v[1], 12,0, max_blip )
+			triggerClientEvent( playerid, "event_blip_create", v[0], v[1], 0,2, max_blip )
+		}
+
+		foreach (k, v in up_player_subject)
+		{
+			triggerClientEvent( playerid, "event_blip_create", v[0], v[1], 0,2, max_blip )
 		}
 	}
 	else 
@@ -982,7 +992,7 @@ function reg_or_login(playerid)
 			return
 		}
 		
-		local result = sqlite3( "INSERT INTO account (name, ban, reason, x, y, z, reg_ip, reg_serial, heal, alcohol, satiety, hygiene, sleep, drugs, skin, arrest, crimes, slot_0_1, slot_0_2, slot_1_1, slot_1_2, slot_2_1, slot_2_2, slot_3_1, slot_3_2, slot_4_1, slot_4_2, slot_5_1, slot_5_2, slot_6_1, slot_6_2, slot_7_1, slot_7_2, slot_8_1, slot_8_2, slot_9_1, slot_9_2, slot_10_1, slot_10_2, slot_11_1, slot_11_2, slot_12_1, slot_12_2, slot_13_1, slot_13_2, slot_14_1, slot_14_2, slot_15_1, slot_15_2, slot_16_1, slot_16_2, slot_17_1, slot_17_2, slot_18_1, slot_18_2, slot_19_1, slot_19_2, slot_20_1, slot_20_2, slot_21_1, slot_21_2, slot_22_1, slot_22_2, slot_23_1, slot_23_2) VALUES ('"+playername+"', '0', '0', '0', '0', '0', '"+ip+"', '"+serial+"', '"+max_heal+"', '0', '100', '100', '100', '0', '26', '0', '-1', '1', '500', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')" )
+		local result = sqlite3( "INSERT INTO account (name, ban, reason, x, y, z, reg_ip, reg_serial, heal, alcohol, satiety, hygiene, sleep, drugs, skin, arrest, crimes, slot_0_1, slot_0_2, slot_1_1, slot_1_2, slot_2_1, slot_2_2, slot_3_1, slot_3_2, slot_4_1, slot_4_2, slot_5_1, slot_5_2, slot_6_1, slot_6_2, slot_7_1, slot_7_2, slot_8_1, slot_8_2, slot_9_1, slot_9_2, slot_10_1, slot_10_2, slot_11_1, slot_11_2, slot_12_1, slot_12_2, slot_13_1, slot_13_2, slot_14_1, slot_14_2, slot_15_1, slot_15_2, slot_16_1, slot_16_2, slot_17_1, slot_17_2, slot_18_1, slot_18_2, slot_19_1, slot_19_2, slot_20_1, slot_20_2, slot_21_1, slot_21_2, slot_22_1, slot_22_2, slot_23_1, slot_23_2) VALUES ('"+playername+"', '0', '0', '0', '0', '0', '"+ip+"', '"+serial+"', '"+max_heal+"', '0', '100', '100', '100', '0', '81', '0', '-1', '1', '500', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')" )
 
 		local result = sqlite3( "SELECT * FROM account WHERE name = '"+playername+"'" )
 		for (local i = 0; i < max_inv; i++) 
@@ -1932,7 +1942,7 @@ function ( playerid, ... )
 	local pos = getPlayerPosition( playerid )
 	local text = ""
 
-	if (logged[playername] == 0)
+	if (logged[playerid] == 0)
 	{
 		return
 	}
