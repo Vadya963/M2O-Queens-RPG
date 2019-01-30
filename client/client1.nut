@@ -111,6 +111,20 @@ local pink = [255,100,255]//--розовый
 local lyme = [130,255,0]//--лайм админский цвет
 local svetlo_zolotoy = [255,255,130]//--светло-золотой
 
+local text_3d = [//--3d text
+	//up_car_subject
+	[-632.282,955.495,-17.7324, 15.0, "Cigarette factory (to Load the goods - E)"],
+
+	//up_player_subject
+	[-427.786,-737.652,-21.7381, 5.0, "Press E to take the empty box"],
+
+	//down_car_subject
+	[-411.778,-827.907,-21.7456, 15.0, "Port (to Unload the goods - E)"],
+
+	//down_player_subject
+	[-411.778,-827.907,-21.6456, 5.0, "Throw away a box of products to make a profit"],
+]
+
 //---------------------таймеры-------------------------------------------------------------
 timer(function () {
 	time_game = time_game+1
@@ -642,6 +656,18 @@ function( post )
 			local coords = getScreenFromWorld( v[0], v[1], v[2]+0.2 )
 			local dimensions = dxGetTextDimensions("Press E", 1.0, "tahoma-bold" )
 			dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+		}
+	}
+
+	foreach (k, v in text_3d)//--отображение 3д надписей
+	{
+		local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], v[0], v[1], v[2], v[3] )
+
+		if (area)
+		{
+			local coords = getScreenFromWorld( v[0], v[1], v[2]+1 )
+			local dimensions = dxGetTextDimensions(v[4], 1.0, "tahoma-bold" )
+			dxdrawtext ( v[4], coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
 		}
 	}
 })
