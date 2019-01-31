@@ -353,6 +353,18 @@ local interior_business = [
 	[5, "Закусочная", 1]
 ]
 
+local weapon = {
+	[9] = [11, info_png[11][0]],
+	[12] = [2, info_png[12][0]],
+	[13] = [4, info_png[13][0]],
+	[14] = [5, info_png[14][0]],
+	[15] = [8, info_png[15][0]],
+	[16] = [10, info_png[16][0]],
+	[17] = [3, info_png[17][0]],
+	[18] = [6, info_png[18][0]],
+	[19] = [9, info_png[19][0]],
+}
+
 //-места поднятия предметов
 local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, зп 6}
 	[-632.282,955.495,-17.7324, 15.0, 24, 37, 50],//--сигаретный завод
@@ -1680,6 +1692,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 				return
 			}
+		}
+		else if (weapon[id1])//оружие
+		{
+			givePlayerWeapon(playerid, weapon[id1][0], id2)
+			me_chat(playerid, playername+" взял(а) в руку "+weapon[id1][1])
+			id2 = 0
 		}
 		else 
 		{
