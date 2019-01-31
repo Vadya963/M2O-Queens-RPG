@@ -1,5 +1,6 @@
 <meta>
 	<script type="client">client1.nut</script>
+	<script type="client">3d_text.nut</script>
 	
 	<script type="server">server1.nut</script>
 	
@@ -37,7 +38,9 @@
 	<file>31.png</file>
 	<file>32.png</file>
 	<file>33.png</file>
+	<file>34.png</file>
 
 	<file>mouse.png</file>
+	<file>low_fon1.png</file>
 
 </meta>
