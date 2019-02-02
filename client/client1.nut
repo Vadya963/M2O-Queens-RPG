@@ -249,7 +249,7 @@ local weapon = {
 local weapon_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in weapon)
 {
-	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+	local text = v[0]+" 25 "+info_png[k][1]+" "+v[2]+"$"
 	guiGridListAddRow (weapon_menu, text)
 }
 guiSetVisibleGridList (weapon_menu, false)
