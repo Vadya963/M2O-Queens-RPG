@@ -13,6 +13,14 @@ local blip_data = {//ud блипа[0] x[1] y[2] категория[3] ид[4] р
 	//[1] = [0, 0,0, 0,1, 5, false]
 }
 local sync_timer = false
+local number_business = -1//номер бизнеса
+local value_business = -1//тип бизнеса
+local width_need = (screen[0]/5.04)//--ширина нужд 271
+local height_need = (screen[1]/5.68)//--высота нужд 135
+local screenWidth = screen[0]
+local zakon_nalog_car = 500
+local zakon_nalog_house = 1000
+local zakon_nalog_business = 2000
 
 //---------------------грайдлист-------------------------
 local gridlist_table_window = {}//таблица созданных окон
@@ -84,8 +92,283 @@ local info_png = {
 	[31] = ["шеврон Лейтенанта", "шт"],
 	[32] = ["шеврон Капитан", "шт"],
 	[33] = ["шеврон Шефа полиции", "шт"],
-	[34] = ["лицензия дальнобойщика на имя", ""],
+	[34] = ["лицензия дальнобойщика", "шт"],
+	[35] = ["лом", "процентов"],
+	[36] = ["документы на", "бизнес"],
+	[37] = ["админский жетон", "шт"],
+	[38] = ["риэлторская лицензия", "шт"],
+	[39] = ["тушка свиньи", "$ за штуку"],
+	[40] = ["молоток", "шт"],
+	[41] = ["лицензия на оружие", ""],
+	[42] = ["бургер", "шт"],
+	[43] = ["пицца", "шт"],
+	[44] = ["мыло", "процентов"],
+	[45] = ["пижама", "процентов"],
+	[46] = ["алкотестер", "шт"],
+	[47] = ["наркотестер", "шт"],
+	[48] = ["квитанция для оплаты дома на", "дней"],
+	[49] = ["квитанция для оплаты бизнеса на", "дней"],
+	[50] = ["квитанция для оплаты т/с на", "дней"],
+	[51] = ["коробка с продуктами", "$ за штуку"],
+	[52] = ["компос", "шт"],
+	[53] = ["лицензия таксиста", "шт"],
+	[54] = ["инкасаторская сумка", "$ в сумке"],
+	[55] = ["лицензия инкассатора", "шт"],
+	[56] = ["бензопила", "шт"],
+	[57] = ["дрова", "кг"],
+	[58] = ["пустая коробка", "шт"],
+	[59] = ["кирка", "шт"],
+	[60] = ["руда", "кг"],
+	[61] = ["бочка с нефтью", "$ за штуку"],
+	[62] = ["лицензия водителя мусоровоза", "шт"],
+	[63] = ["мусор", "кг"],
+	[64] = ["антипохмелин", "шт"],
 }
+
+//--------------------------------------------грайдлист--------------------------------------------
+function guiCreateGridList (x,y, width, height)
+{
+	local window = guiCreateElement( 5, "", x,y, width, height+4.0, false )
+
+	if (window)
+	{
+		local table_len = gridlist_table_window.len()
+
+		gridlist_table_window[table_len] <- window
+		gridlist_table_text[table_len] <- {}
+		return [window,table_len]
+	}
+	else 
+	{
+		return false
+	}
+}
+
+function guiGridListAddRow (window, text)
+{
+	if (window[0])
+	{
+		local table_len = gridlist_table_text[ window[1] ].len()
+		local guiSize_window = guiGetSize( window[0] )
+		local text_gui = guiCreateElement( 6, text, 10.0, (15.0*table_len), guiSize_window[0], 15.0, false, window[0] )
+
+		gridlist_table_text[ window[1] ][ table_len ] <- [text_gui,table_len]
+		return true
+	}
+	else 
+	{
+		return false
+	}
+}
+
+function guiGridListGetItemText ()
+{
+	if (gridlist_lable)
+	{
+		local text = guiGetText(gridlist_lable)
+		return text
+	}
+	else 
+	{
+		return false
+	}
+}
+
+function guiGridListGetSelectedItem ()
+{
+	if (gridlist_row != -1)
+	{
+		return gridlist_row
+	}
+	else 
+	{
+		return false
+	}
+}
+
+function guiSetVisibleGridList (window, bool)
+{
+	if (window)
+	{		
+		guiSetVisible( window[0], bool )
+
+		foreach (idx, value in gridlist_table_text[ window[1] ]) 
+		{
+			guiSetVisible( value[0], bool )
+		}
+
+		gridlist_window = false
+		gridlist_lable = false
+		gridlist_row = -1
+		gridlist_select = false
+
+		return true
+	}
+	else 
+	{
+		return false
+	}
+}
+//-------------------------------------------------------------------------------------------------
+
+
+local shop = {
+	[3] = [info_png[3][0], 20, 5],
+	[4] = [info_png[4][0], 1, 250],
+	[7] = [info_png[7][0], 20, 10],
+	[8] = [info_png[8][0], 20, 15],
+	[11] = [info_png[11][0], 1, 100],
+	[26] = [info_png[26][0], 1, 10000],
+	[35] = [info_png[35][0], 10, 500],
+	[44] = [info_png[44][0], 100, 50],
+	[45] = [info_png[45][0], 100, 100],
+	[46] = [info_png[46][0], 1, 100],
+	[47] = [info_png[47][0], 1, 100],
+	[52] = [info_png[52][0], 1, 100],
+	[64] = [info_png[64][0], 1, 250],
+}
+local shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
+foreach (k,v in shop)
+{
+	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+	guiGridListAddRow (shop_menu, text)
+}
+guiSetVisibleGridList (shop_menu, false)
+
+local weapon = {
+	[9] = [info_png[9][0], 11, 4700],
+	[12] = [info_png[12][0], 2, 630],
+	[13] = [info_png[13][0], 4, 1230],
+	[14] = [info_png[14][0], 5, 2700],
+	[15] = [info_png[15][0], 8, 4000],
+	[16] = [info_png[16][0], 10, 2190],
+	[17] = [info_png[17][0], 3, 1050],
+	[18] = [info_png[18][0], 6, 1500],
+	[19] = [info_png[19][0], 9, 1990]
+}
+local weapon_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
+foreach (k,v in weapon)
+{
+	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+	guiGridListAddRow (weapon_menu, text)
+}
+guiSetVisibleGridList (weapon_menu, false)
+
+local gas = {
+	[5] = [info_png[5][0], 20, 250],
+}
+local gas_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
+foreach (k,v in gas)
+{
+	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+	guiGridListAddRow (gas_menu, text)
+}
+guiSetVisibleGridList (gas_menu, false)
+
+local repair_shop = {
+	[23] = [info_png[23][0], 1, 100],
+}
+local repair_shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
+foreach (k,v in repair_shop)
+{
+	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+	guiGridListAddRow (repair_shop_menu, text)
+}
+guiSetVisibleGridList (repair_shop_menu, false)
+
+local eda = {
+	[21] = [info_png[21][0], 1, 45],
+	[22] = [info_png[22][0], 1, 60],
+	[42] = [info_png[42][0], 1, 100],
+	[43] = [info_png[43][0], 1, 50],
+}
+local eda_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
+foreach (k,v in eda)
+{
+	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+	guiGridListAddRow (eda_menu, text)
+}
+guiSetVisibleGridList (eda_menu, false)
+
+local day_nalog = 7
+local mayoralty_shop = {
+	[2] = ["права", 1, 1000],
+	[41] = ["лицензия на оружие", 1, 10000],
+	[53] = ["лицензия таксиста", 1, 5000],
+	[55] = ["лицензия инкасатора", 1, 10000],
+	[34] = ["лицензия дальнобойщика", 1, 15000],
+	[62] = ["лицензия водителя мусоровоза", 1, 20000],
+	[48] = ["квитанция для оплаты дома на "+day_nalog+" дней", day_nalog, (zakon_nalog_house*day_nalog)],
+	[49] = ["квитанция для оплаты бизнеса на "+day_nalog+" дней", day_nalog, (zakon_nalog_business*day_nalog)],
+	[50] = ["квитанция для оплаты т/с на "+day_nalog+" дней", day_nalog, (zakon_nalog_car*day_nalog)],
+}
+local mayoralty_shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
+foreach (k,v in mayoralty_shop)
+{
+	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+	guiGridListAddRow (mayoralty_shop_menu, text)
+}
+guiSetVisibleGridList (mayoralty_shop_menu, false)
+
+local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2)+4.0, 400.0, 30.0, false )
+guiSetVisible( shop_menu_button, false )
+
+function tune_close ()//--закрытие окна
+{
+	number_business = -1
+	value_business = -1
+
+	showCursor( false )
+	guiSetVisible( shop_menu_button, false )
+
+	guiSetVisibleGridList (shop_menu, false)
+	guiSetVisibleGridList (weapon_menu, false)
+	guiSetVisibleGridList (gas_menu, false)
+	guiSetVisibleGridList (repair_shop_menu, false)
+	guiSetVisibleGridList (eda_menu, false)
+	guiSetVisibleGridList (mayoralty_shop_menu, false)
+}
+addEventHandler ( "event_gui_delet", tune_close )
+
+function shop_menu_fun(number, value)//--создание окна магазина
+{
+	number_business = number
+	value_business = value
+
+	showCursor( true )
+	guiSetVisible( shop_menu_button, true )
+
+	if (value_business == 0)
+	{
+		guiSetVisibleGridList (weapon_menu, true)
+	}
+	else if (value_business == 2)
+	{
+		guiSetVisibleGridList (shop_menu, true)
+	}
+	else if (value_business == 3)
+	{
+		guiSetVisibleGridList (gas_menu, true)
+	}
+	else if (value_business == 4)
+	{
+		guiSetVisibleGridList (repair_shop_menu, true)
+	}
+	else if (value_business == 5)
+	{
+		guiSetVisibleGridList (eda_menu, true)
+	}
+	else if (value_business == "pd")
+	{
+		guiSetVisibleGridList (weapon_menu, true)
+	}
+	else if (value_business == "mer")
+	{
+		guiSetVisibleGridList (mayoralty_shop_menu, true)
+	}
+}
+addEventHandler ( "event_shop_menu_fun", shop_menu_fun )
+
 
 //загрузка картинок для отображения на земле
 local image = array(info_png.len(),0)
@@ -284,6 +567,14 @@ for (local i = 0; i < button_pos.len(); i++)
 
 guiSetVisible( gui_fon, false )
 
+
+guiCreateElement( 13, "health.png", screen[0]-30.0, height_need-7.5, 30.0, 30.0, false )
+guiCreateElement( 13, "alcohol.png", screen[0]-30.0, height_need-7.5+(20+7.5)*1, 30.0, 30.0, false )
+guiCreateElement( 13, "drugs.png", screen[0]-30.0, height_need-7.5+(20+7.5)*2, 30.0, 30.0, false )
+guiCreateElement( 13, "satiety.png", screen[0]-30.0, height_need-7.5+(20+7.5)*3, 30.0, 30.0, false )
+guiCreateElement( 13, "hygiene.png", screen[0]-30.0, height_need-7.5+(20+7.5)*4, 30.0, 30.0, false )
+guiCreateElement( 13, "sleep.png", screen[0]-30.0, height_need-7.5+(20+7.5)*5, 30.0, 30.0, false )
+
 function dxdrawtext(text, x, y, color, shadow, font, scale)
 {	
 	if (shadow)
@@ -373,31 +664,7 @@ function blip_create(x, y, lib, icon, r)
 }
 addEventHandler ( "event_blip_create", blip_create )
 
-local house_bussiness_radius = 0//--радиус размещения бизнесов и домов
-local house_pos = {}
-local business_pos = {}
-local job_pos = {}
-function bussines_house_fun (i, x,y,z, value, radius, text, radius1)
-{
-	if (value == "biz")
-	{
-		business_pos[i] <- [x,y,z]
-	}
-	else if (value == "house")
-	{
-		house_pos[i] <- [x,y,z]
-	}
-	else if (value == "job")
-	{
-		job_pos[i] <- [x,y,z, text, radius1]
-	}
-
-	house_bussiness_radius = radius
-}
-addEventHandler ( "event_bussines_house_fun", bussines_house_fun )
-
 local earth = {}//--слоты земли
-
 //-----------эвенты------------------------------------------------------------------------
 function earth_load (value, i, x, y, z, id1, id2)//--изменения слотов земли
 {
@@ -437,6 +704,7 @@ function()
 	bindKey( "m", "down", fone1 )
 	bindKey( "m", "up", fone2 )
 	bindKey( "e", "down", e_down )
+	bindKey( "x", "down", x_down )
 })
 
 function zamena_img()
@@ -477,7 +745,9 @@ function( post )
 		[11] = "lmb "+lmb,
 		[12] = "info3_selection_1 "+info3_selection_1,
 		[13] = "info1_selection_1 "+info1_selection_1,
-		[14] = "info2_selection_1 "+info2_selection_1
+		[14] = "info2_selection_1 "+info2_selection_1,
+		[15] = "number_business "+number_business,
+		[16] = "value_business "+value_business,
 	}
 
 	playerid = getLocalPlayer()
@@ -500,6 +770,13 @@ function( post )
 
 	if (sync_timer)
 	{
+		local alcohol = getElementData ( "alcohol_data" ).tofloat()//--макс 500
+		local satiety = getElementData ( "satiety_data" ).tofloat()//--макс 100
+		local hygiene = getElementData ( "hygiene_data" ).tofloat()//--макс 100
+		local sleep = getElementData ( "sleep_data" ).tofloat()//--макс 100
+		local drugs = getElementData ( "drugs_data" ).tofloat()//--макс 100
+		local heal_player = split(getPlayerHealth(playerid).tostring(), ".")
+
 		local client_time = getDateTime()
 		local text = "FPS: "+FPS+" Ping: "+getPlayerPing(playerid)+" ID: "+playerid+" | Serial: "+getElementData("serial")+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | Time: "+getElementData("timeserver")+" | "+client_time
 		dxdrawtext ( text, 2.0, 0.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
@@ -509,7 +786,7 @@ function( post )
 			local pos = getMousePosition()
 			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		
-			for (local i = 0; i < 5; i++) 
+			for (local i = 0; i < 6; i++) 
 			{	
 				dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			}
@@ -518,18 +795,33 @@ function( post )
 			{	
 				dxdrawtext ( local_param[i], 610.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			}
-		}
-	}
 
-
-	foreach (k, v in house_pos)
-	{
-		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], v[0],v[1],v[2], house_bussiness_radius))
-		{
-			local coords = getScreenFromWorld( v[0], v[1], v[2]+1.0 )
-			local dimensions = dxGetTextDimensions ( "House #"+k+"", 1.0, "tahoma-bold" )
-			dxdrawtext ( "House #"+k+"", coords[0]-(dimensions[0]/2), coords[1], fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
+			dxdrawtext ( heal_player[0], screenWidth-width_need-30-30, height_need, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+			dxdrawtext ( (alcohol/100).tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*1, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+			dxdrawtext ( drugs.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*2, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+			dxdrawtext ( satiety.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*3, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+			dxdrawtext ( hygiene.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*4, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+			dxdrawtext ( sleep.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*5, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
+
+		dxDrawRectangle( screenWidth-width_need-30, height_need, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
+		dxDrawRectangle( screenWidth-width_need-30, height_need, (width_need/720)*getPlayerHealth(playerid), 15.0, fromRGB ( 90, 151, 107, 255 ) )
+
+		//--нужды
+		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*1, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
+		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*1, ((width_need/500.0)*alcohol), 15.0, fromRGB ( 90, 151, 107, 255 ) )
+
+		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*2, width_need, 15.0 fromRGB ( 0, 0, 0, 200 ) )
+		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*2, ((width_need/100.0)*drugs), 15.0, fromRGB ( 90, 151, 107, 255 ) )
+
+		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*3, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
+		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*3,( (width_need/100.0)*satiety), 15.0, fromRGB ( 90, 151, 107, 255 ) )
+
+		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*4, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
+		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*4, ((width_need/100.0)*hygiene), 15.0, fromRGB ( 90, 151, 107, 255 ) )
+
+		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*5, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
+		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*5, ((width_need/100.0)*sleep), 15.0, fromRGB ( 90, 151, 107, 255 ) )
 	}
 
 
@@ -728,6 +1020,16 @@ function e_down()//поднять предмет
 	}
 
 	triggerServerEvent( "event_e_down" )
+}
+
+function x_down()//меню магазинов и зданий
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+
+	triggerServerEvent( "event_x_down" )
 }
 
 local test_button = 0
@@ -1017,10 +1319,22 @@ function( element )
 		}
 	}
 
+
+	if (element == shop_menu_button)
+	{	
+		if (guiGridListGetItemText())
+		{
+			triggerServerEvent( "event_buy_subject_fun", guiGridListGetItemText(), number_business, value_business )
+
+			//sendMessage("shop_menu_button - "+guiGridListGetItemText().tostring())
+		}
+	}
+
+
 //-------------------------------------тестирование разных функций---------------------------------
 	if (element == test_button)
 	{
-		sendMessage("test_button - "+guiGridListGetSelectedItem ().tostring())
+		sendMessage("test_button - "+guiGridListGetSelectedItem().tostring())
 	}
 	if (element == test_button2)
 	{
@@ -1138,92 +1452,6 @@ function f1_down()
 	showCursor( !isCursorShowing )
 	isCursorShowing = !isCursorShowing
 }
-
-//--------------------------------------------грайдлист--------------------------------------------
-function guiCreateGridList (x,y, width, height)
-{
-	local window = guiCreateElement( 5, "", x,y, width, height+4.0, false )
-
-	if (window)
-	{
-		local table_len = gridlist_table_window.len()
-
-		gridlist_table_window[table_len] <- window
-		gridlist_table_text[table_len] <- {}
-		return [window,table_len]
-	}
-	else 
-	{
-		return false
-	}
-}
-
-function guiGridListAddRow (window, text)
-{
-	if (window[0])
-	{
-		local table_len = gridlist_table_text[ window[1] ].len()
-		local guiSize_window = guiGetSize( window[0] )
-		local text_gui = guiCreateElement( 6, text, 10.0, (15.0*table_len), guiSize_window[0], 15.0, false, window[0] )
-
-		gridlist_table_text[ window[1] ][ table_len ] <- [text_gui,table_len]
-		return true
-	}
-	else 
-	{
-		return false
-	}
-}
-
-function guiGridListGetItemText ()
-{
-	if (gridlist_lable)
-	{
-		local text = guiGetText(gridlist_lable)
-		return text
-	}
-	else 
-	{
-		return false
-	}
-}
-
-function guiGridListGetSelectedItem ()
-{
-	if (gridlist_row != -1)
-	{
-		return gridlist_row
-	}
-	else 
-	{
-		return false
-	}
-}
-
-function guiSetVisibleGridList (window, bool)
-{
-	if (window)
-	{		
-		guiSetVisible( window[0], bool )
-
-		foreach (idx, value in gridlist_table_text[ window[1] ]) 
-		{
-			guiSetVisible( value[0], bool )
-		}
-
-		gridlist_window = false
-		gridlist_lable = false
-		gridlist_row = -1
-		gridlist_select = false
-
-		return true
-	}
-	else 
-	{
-		return false
-	}
-}
-//-------------------------------------------------------------------------------------------------
 
 
 //-------------------------------------тестирование разных функций---------------------------------
