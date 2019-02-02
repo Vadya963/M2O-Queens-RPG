@@ -445,6 +445,13 @@ local interior_business = [
 	[5, "Закусочная", 1]
 ]
 
+//--здания для работ и фракций
+local interior_job = [//--12
+//   0              1                 2       3      4        5      6           7      
+	[0, "Полицейский департамент", -378.987,654.699,-11.5013, 24, "0", 5.0],
+	[1, "Мерия", -115.11,-63.1035,-12.041, 23, "0", 5.0],
+]
+
 local weapon = {
 	[9] = [info_png[9][0], 11, 4700],
 	[12] = [info_png[12][0], 2, 630],
@@ -765,6 +772,11 @@ function house_bussiness_job_pos_load( playerid )
 	foreach (idx, v in sqlite3( "SELECT * FROM business_db" )) 
 	{
 		triggerClientEvent( playerid, "event_bussines_house_fun", v["number"], v["x"], v["y"], v["z"], "biz", house_bussiness_radius, 0, 0 )
+	}
+
+	foreach (idx, v in interior_job) 
+	{
+		triggerClientEvent( playerid, "event_bussines_house_fun", idx, v[2], v[3], v[4], "job", house_bussiness_radius, v[6], v[7] )
 	}
 }
 
@@ -1549,6 +1561,12 @@ function( playerid )
 			setWeather( pogoda_string_false )
 		}
 
+		foreach (k, v in sqlite3( "SELECT * FROM house_db" )) 
+		{
+			triggerClientEvent( playerid, "event_blip_create", v["x"], v["y"], 0,4, max_blip )
+			triggerClientEvent( playerid, "event_blip_create", v["x"], v["y"], 6,0, max_blip )
+		}
+
 		foreach (k, v in sqlite3( "SELECT * FROM business_db" )) 
 		{
 			triggerClientEvent( playerid, "event_blip_create", v["x"], v["y"], 0,4, max_blip )
@@ -1586,6 +1604,11 @@ function( playerid )
 		foreach (k, v in anim_player_subject)
 		{
 			triggerClientEvent( playerid, "event_blip_create", v[0], v[1], 0,2, max_blip )
+		}
+
+		foreach (k, v in interior_job)
+		{
+			triggerClientEvent( playerid, "event_blip_create", v[2], v[3], v[5],0, max_blip )
 		}
 	}
 	else 
@@ -2110,13 +2133,13 @@ function x_down (playerid)
 				}
 			}
 
-			if ( isPointInCircle3D(x,y,z, -378.987,654.699,-11.5013, 5.0) )//пд
+			if ( isPointInCircle3D(x,y,z, interior_job[0][2],interior_job[0][3],interior_job[0][4], interior_job[0][7]) )//пд
 			{
 				triggerClientEvent( playerid, "event_shop_menu_fun", -1, "pd" )
 				state_gui_window[playerid] = 1
 				return
 			}
-			else if ( isPointInCircle3D(x,y,z, -115.11,-63.1035,-11.041, 5.0) )//мерия
+			else if ( isPointInCircle3D(x,y,z, interior_job[1][2],interior_job[1][3],interior_job[1][4], interior_job[1][7]) )//мерия
 			{
 				triggerClientEvent( playerid, "event_shop_menu_fun", -1, "mer" )
 				state_gui_window[playerid] = 1
