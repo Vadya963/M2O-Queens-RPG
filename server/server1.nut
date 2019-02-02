@@ -447,7 +447,7 @@ local interior_business = [
 
 //--здания для работ и фракций
 local interior_job = [//--12
-//   0              1                 2       3      4        5      6           7      
+//   0              1                 2       3      4        5    6    7      
 	[0, "Полицейский департамент", -378.987,654.699,-11.5013, 24, "0", 5.0],
 	[1, "Мерия", -115.11,-63.1035,-12.041, 23, "0", 5.0],
 ]
@@ -813,7 +813,7 @@ function buy_subject_fun( playerid, text, number, value )
 	{
 		foreach (k, v in weapon)
 		{
-			local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+			local text1 = v[0]+" 25 "+info_png[k][1]+" "+v[2]+"$"
 			if (text1 == text)
 			{
 				if (inv_player_empty(playerid, k, 25))
@@ -931,7 +931,7 @@ function buy_subject_fun( playerid, text, number, value )
 			{
 				foreach (k, v in weapon)
 				{
-					local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+					local text1 = v[0]+" 25 "+info_png[k][1]+" "+v[2]+"$"
 					if (text1 == text)
 					{
 						if (cash*v[2] <= array_player_2[playerid][0])
@@ -1550,6 +1550,8 @@ function( playerid )
 {
 	if (logged[playerid] == 0) 
 	{
+		sendMessage(playerid, "[TIPS] Если у вас нету счетчика FPS, перезайдите!", color_tips[0], color_tips[1], color_tips[2])
+
 		reg_or_login(playerid)
 
 		if (pogoda)
