@@ -12,6 +12,11 @@ local max_blip = 250.0//--радиус блипов
 local zakon_nalog_car = 500
 local zakon_nalog_house = 1000
 local zakon_nalog_business = 2000
+local max_alcohol = 500
+local max_satiety = 100
+local max_hygiene = 100
+local max_sleep = 100
+local max_drugs = 100
 
 function sqlite3(text)
 {
@@ -527,6 +532,7 @@ local state_gui_window = array(getMaxPlayers(), 0)//--состояние гуи 
 local logged = array(getMaxPlayers(), 0)
 local sead = array(getMaxPlayers(), 0)
 local dviglo = array(getMaxPlayers(), 0)
+local crimes = array(getMaxPlayers(), 0)
 //--нужды
 local alcohol = array(getMaxPlayers(), 0)
 local satiety = array(getMaxPlayers(), 0)
@@ -1252,6 +1258,7 @@ function debuginfo ()
 		setElementData(playerid, "3", "dviglo[playerid] "+dviglo[playerid])
 		setElementData(playerid, "4", "max_earth "+max_earth)
 		setElementData(playerid, "5", "state_gui_window[playerid] "+state_gui_window[playerid])
+		setElementData(playerid, "6", "crimes[playerid] "+crimes[playerid])
 
 		setElementData(playerid, "serial", getPlayerSerial(playerid))
 
@@ -1506,6 +1513,7 @@ function( playerid, name, ip, serial )
 	logged[playerid] = 0
 	sead[playerid] = 0
 	dviglo[playerid] = 0
+	crimes[playerid] = 0
 	//--нужды
 	alcohol[playerid] = 0
 	satiety[playerid] = 0
@@ -1525,7 +1533,7 @@ function playerDisconnect( playerid, reason )
 
 		if (myPos[0] != 0 && myPos[1] != 0 && myPos[2] != 0)
 		{
-			sqlite3( "UPDATE account SET x = '"+myPos[0]+"', y = '"+myPos[1]+"', z = '"+myPos[2]+"', heal = '"+heal+"', alcohol = '"+alcohol[playerid]+"', satiety = '"+satiety[playerid]+"', hygiene = '"+hygiene[playerid]+"', sleep = '"+sleep[playerid]+"', drugs = '"+drugs[playerid]+"' WHERE name = '"+playername+"'")
+			sqlite3( "UPDATE account SET x = '"+myPos[0]+"', y = '"+myPos[1]+"', z = '"+myPos[2]+"', heal = '"+heal+"', crimes = '"+crimes[playerid]+"', alcohol = '"+alcohol[playerid]+"', satiety = '"+satiety[playerid]+"', hygiene = '"+hygiene[playerid]+"', sleep = '"+sleep[playerid]+"', drugs = '"+drugs[playerid]+"' WHERE name = '"+playername+"'")
 		}
 
 		state_inv_player[playerid] = 0
@@ -1533,6 +1541,7 @@ function playerDisconnect( playerid, reason )
 		logged[playerid] = 0
 		sead[playerid] = 0
 		dviglo[playerid] = 0
+		crimes[playerid] = 0
 		//--нужды
 		alcohol[playerid] = 0
 		satiety[playerid] = 0
@@ -1682,7 +1691,7 @@ function reg_or_login(playerid)
 
 		logged[playerid] = 1
 		//arrest[playerid] = result[1]["arrest"]
-		//crimes[playerid] = result[1]["crimes"]
+		crimes[playerid] = result[1]["crimes"]
 		alcohol[playerid] = result[1]["alcohol"]
 		satiety[playerid] = result[1]["satiety"]
 		hygiene[playerid] = result[1]["hygiene"]
@@ -2396,6 +2405,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 			return
 		}
+		//-----------------------------------------------------------------------------------------
 		else if (id1 == 3 || id1 == 7 || id1 == 8)//--сигареты
 		{
 			local satiety_minys = 5
@@ -2435,6 +2445,41 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			me_chat(playerid, playername+" выкурил(а) сигарету")
 		}
+		else if (id1 == 4)//--аптечка
+		{
+			if (getPlayerHealth(playerid) == max_heal)
+			{
+				sendMessage(playerid, "[ERROR] У вас полное здоровье", red[0], red[1], red[2])
+				return
+			}
+
+			id2 = id2 - 1
+
+			setPlayerHealth(playerid, max_heal)
+			sendMessage(playerid, "+"+max_heal+" хп", yellow[0], yellow[1], yellow[2])
+
+			me_chat(playerid, playername+" использовал(а) аптечку")
+		}
+		else if (id1 == 43)//--бургер, пицца
+		{
+			id2 = id2 - 1
+
+			if (id1 == 43)
+			{
+				local satiety_plus = 50
+
+				if (satiety[playerid]+satiety_plus > max_satiety)
+				{
+					sendMessage(playerid, "[ERROR] Вы не голодны", red[0], red[1], red[2])
+					return
+				}
+
+				satiety[playerid] = satiety[playerid]+satiety_plus
+				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow[0], yellow[1], yellow[2])
+				me_chat(playerid, playername+" съел(а) "+info_png[id1][0])
+			}
+		}
+		//-----------------------------------------------------------------------------------------
 		else if (id1 == 5) 
 		{
 			if (isPlayerInVehicle(playerid))
@@ -2470,6 +2515,44 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 				return
 			}
+		}
+		else if (id1 == 23)//--ремонтный набор
+		{
+			if (isPlayerInVehicle(playerid))
+			{
+				if (getSpeed(vehicleid) > 5)
+				{
+					sendMessage(playerid, "[ERROR] Остановите т/с", red[0], red[1], red[2])
+					return
+				}
+
+				id2 = id2 - 1
+
+				repairVehicle ( vehicleid )
+
+				me_chat(playerid, playername+" починил(а) т/с")
+			}
+			else
+			{
+				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
+				return
+			}
+		}
+		else if (id1 == 54) //--инкасаторский сумка
+		{
+			local randomize = id2
+
+			id2 = 0
+
+			me_chat(playerid, playername+" открыл(а) "+info_png[id1][0])
+
+			sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
+
+			local crimes_plus = 1
+			crimes[playerid] = crimes[playerid]+crimes_plus
+			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+(crimes[playerid]+1), yellow[0], yellow[1], yellow[2])
+
+			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 		}
 		else if (id1 == 9 || id1 == 12 || id1 == 13 || id1 == 14 || id1 == 15 || id1 == 16 || id1 == 17 || id1 == 18 || id1 == 19)//оружие
 		{
