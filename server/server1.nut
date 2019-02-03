@@ -2146,6 +2146,12 @@ function x_down (playerid)
 
 			if ( isPointInCircle3D(x,y,z, interior_job[0][2],interior_job[0][3],interior_job[0][4], interior_job[0][7]) )//пд
 			{
+				if (search_inv_player(playerid, 10, 1) == 0)
+				{
+					sendMessage(playerid, "[ERROR] Вы не полицейский", red[0], red[1], red[2])
+					return
+				}
+
 				triggerClientEvent( playerid, "event_shop_menu_fun", -1, "pd" )
 				state_gui_window[playerid] = 1
 				return
@@ -2520,7 +2526,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if (isPlayerInVehicle(playerid))
 			{
-				if (getSpeed(vehicleid) > 5)
+				if (getSpeed(playerid) > 5)
 				{
 					sendMessage(playerid, "[ERROR] Остановите т/с", red[0], red[1], red[2])
 					return
