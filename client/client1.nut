@@ -786,7 +786,7 @@ function( post )
 			local pos = getMousePosition()
 			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		
-			for (local i = 0; i < 6; i++) 
+			for (local i = 0; i < 7; i++) 
 			{	
 				dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			}
@@ -837,6 +837,21 @@ function( post )
 				local dimensions = dxGetTextDimensions( inv_slot_player[i][1].tostring(), 1.0, "tahoma-bold" )
 				dxDrawTexture(image[inv_slot_player[i][0]], (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
 				dxdrawtext( inv_slot_player[i][1].tostring(), (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+35), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
+			
+				/*local scale = 1.0
+				local formyla = (50.0/dimensions[0])
+
+				if ( formyla <= scale )
+				{
+					scale = formyla
+					local slp = split(inv_slot_player[i][1].tostring(), "_")
+					dxdrawtext( slp[0].tostring(), (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+20), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
+					dxdrawtext( slp[1].tostring(), (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+35), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
+				}
+				else 
+				{
+					dxdrawtext( inv_slot_player[i][1].tostring(), (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+35), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
+				}*/
 			}
 		}
 
@@ -1078,9 +1093,10 @@ function( element )
 				else
 				{
 					//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
-					if (inv_slot_player[info3][0] != 0)
-					{
-						foreach (idx, v in no_use_subject)
+					/*if (inv_slot_player[info3][0] != 0)
+					{*/
+						local no_use_subject_1 = [-1,1]
+						foreach (idx, v in no_use_subject_1)
 						{
 							if (v == info1)
 							{
@@ -1090,12 +1106,12 @@ function( element )
 							}
 						}
 
-						info_tab = "player"
+						/*info_tab = "player"
 						info3_selection_1 = info3
 						info1_selection_1 = info1
 						info2_selection_1 = info2
 						return
-					}
+					}*/
 
 					triggerServerEvent( "event_inv_server_load", "player", info3, info1_selection_1, info2_selection_1, playerid )
 
@@ -1133,9 +1149,10 @@ function( element )
 				else
 				{
 					//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
-					if (inv_slot_car[info3][0] != 0)
-					{
-						foreach (idx, v in no_use_subject)
+					/*if (inv_slot_car[info3][0] != 0)
+					{*/
+						local no_use_subject_1 = [-1,1]
+						foreach (idx, v in no_use_subject_1)
 						{
 							if (v == info1)
 							{
@@ -1145,12 +1162,12 @@ function( element )
 							}
 						}
 
-						info_tab = "car"
+						/*info_tab = "car"
 						info3_selection_1 = info3
 						info1_selection_1 = info1
 						info2_selection_1 = info2
 						return
-					}
+					}*/
 
 					triggerServerEvent( "event_inv_server_load", "car", info3, info1_selection_1, info2_selection_1, plate )
 
@@ -1188,9 +1205,10 @@ function( element )
 				else
 				{
 					//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
-					if (inv_slot_house[info3][0] != 0)
-					{
-						foreach (idx, v in no_use_subject)
+					/*if (inv_slot_house[info3][0] != 0)
+					{*/
+						local no_use_subject_1 = [-1,1]
+						foreach (idx, v in no_use_subject_1)
 						{
 							if (v == info1)
 							{
@@ -1200,12 +1218,12 @@ function( element )
 							}
 						}
 
-						info_tab = "house"
+						/*info_tab = "house"
 						info3_selection_1 = info3
 						info1_selection_1 = info1
 						info2_selection_1 = info2
 						return
-					}
+					}*/
 
 					triggerServerEvent( "event_inv_server_load", "house", info3, info1_selection_1, info2_selection_1, house )
 
