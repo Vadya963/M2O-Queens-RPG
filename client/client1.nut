@@ -666,12 +666,42 @@ addEventHandler ( "event_save_player_action", save_player_action )
 
 function fone1() 
 {
+	if(isMainMenuShowing())
+	{
+		return
+	}
+
 	openMap()
 }
 
 function fone2() 
 {
+	if(isMainMenuShowing())
+	{
+		return
+	}
+	
 	showChat( true )
+}
+
+function down_down() 
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+
+	triggerServerEvent( "down_chat" )
+}
+
+function up_down() 
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+
+	triggerServerEvent( "up_chat" )
 }
 
 addEventHandler("onClientScriptInit", 
@@ -683,6 +713,8 @@ function()
 	bindKey( "m", "up", fone2 )
 	bindKey( "e", "down", e_down )
 	bindKey( "x", "down", x_down )
+	bindKey( "page_up", "down", up_down )
+	bindKey( "page_down", "down", down_down )
 })
 
 function zamena_img()
@@ -770,7 +802,7 @@ function( post )
 			local pos = getMousePosition()
 			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		
-			for (local i = 0; i < 7; i++) 
+			for (local i = 0; i < 9; i++) 
 			{	
 				dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			}
