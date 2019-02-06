@@ -1220,16 +1220,6 @@ function fuel_down()//--система топлива авто
 			setVehicleFuel(vehicle, max_fuel)
 		}
 	}
-
-	foreach(playerid, playername in getPlayers()) 
-	{
-		local vehicleid = getPlayerVehicle(playerid)
-		if (isPlayerInVehicle(playerid))
-		{
-			local veh = getVehiclePlateText(vehicleid)
-			setElementData ( playerid, "fuel_data", fuel[veh] )
-		}
-	}
 }
 
 function timer_earth_clear()
@@ -1287,6 +1277,13 @@ function debuginfo ()
 		setElementData(playerid, "hygiene_data", hygiene[playerid])
 		setElementData(playerid, "sleep_data", sleep[playerid])
 		setElementData(playerid, "drugs_data", drugs[playerid])
+
+		local vehicleid = getPlayerVehicle(playerid)
+		if (isPlayerInVehicle(playerid))
+		{
+			local veh = getVehiclePlateText(vehicleid)
+			setElementData ( playerid, "fuel_data", fuel[veh] )
+		}
 	}
 }
 
@@ -1542,7 +1539,9 @@ function( playerid, name, ip, serial )
 	sleep[playerid] = 0
 	drugs[playerid] = 0
 
-	print("serial "+getPlayerSerial(playerid))
+	setElementData ( playerid, "fuel_data", 0 )
+
+	print("[serial] "+getPlayerSerial(playerid))
 })
 
 function playerDisconnect( playerid, reason )
