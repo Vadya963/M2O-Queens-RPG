@@ -611,31 +611,9 @@ function dxdrawline_w (x1,y1, x2,y2, color, scale)
 
 function getSpeed()
 {
-	if (isPlayerInVehicle(playerid))
-	{
-		local vehicleid = getPlayerVehicle(playerid)
-		local velo = getVehicleSpeed(vehicleid)
-		local speed = getDistanceBetweenPoints3D(0.0,0.0,0.0, velo[0],velo[1],velo[2])
-		return speed*2.27*1.6
-	}
-	else
-	{
-		return 0
-	}
-}
-
-function getFuel()
-{
-	if (isPlayerInVehicle(playerid))
-	{
-		local vehicleid = getPlayerVehicle(playerid)
-		local gas = getVehicleFuel(vehicleid)
-		return gas
-	}
-	else
-	{
-		return 0
-	}
+	local velo = getVehicleSpeed(vehicleid)
+	local speed = getDistanceBetweenPoints3D(0.0,0.0,0.0, velo[0],velo[1],velo[2])
+	return speed*2.27*1.6
 }
 
 function getElementData (key)
@@ -778,8 +756,14 @@ function( post )
 		local heal_player = split(getPlayerHealth(playerid).tostring(), ".")
 
 		local client_time = getDateTime()
-		local text = "FPS: "+FPS+" Ping: "+getPlayerPing(playerid)+" ID: "+playerid+" | Serial: "+getElementData("serial")+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | Time: "+getElementData("timeserver")+" | "+client_time
+		local text = "FPS: "+FPS+" | Ping: "+getPlayerPing(playerid)+" | ID: "+playerid+" | Serial: "+getElementData("serial")+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | Time: "+getElementData("timeserver")+" | "+client_time
 		dxdrawtext ( text, 2.0, 0.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+
+		if (getPlayerVehicle(playerid) != -1)
+		{
+			local speed_vehicle = "plate "+plate+" | fuel "+getElementData("fuel_data")
+			dxdrawtext ( speed_vehicle, 2.0, screen[1]-16.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+		}
 		
 		if (isCursorShowing)
 		{
