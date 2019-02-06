@@ -18,22 +18,6 @@ local max_hygiene = 100
 local max_sleep = 100
 local max_drugs = 100
 
-function sqlite3(text)
-{
-	local result = database.query(text)
-	return result
-}
-
-function sendMessage(playerid, text, r, g, b)
-{
-	local date = split(getDateTime(), ": ")//установка времени
-	local chas = date[3].tointeger()
-	local min = date[4].tointeger()
-	local sec = date[5].tointeger()
-
-	sendPlayerMessage(playerid, "[ "+chas+":"+min+":"+sec+" ] "+text, r, g, b)
-}
-
 //----цвета----
 local color_tips = [168,228,160]//--бабушкины яблоки
 local yellow = [255,255,0]//--желтый
@@ -539,6 +523,12 @@ local hygiene = array(getMaxPlayers(), 0)
 local sleep = array(getMaxPlayers(), 0)
 local drugs = array(getMaxPlayers(), 0)
 
+//для истории сообщений
+local max_message = 15//максимально отображаемое число сообщений
+local max_chat = array(getMaxPlayers(), max_message)
+local min_chat = array(getMaxPlayers(), 0)
+local message = {}
+
 //слоты тс
 local array_car_1 = {}
 local array_car_2 = {}
@@ -548,6 +538,36 @@ local dviglo = {}//--топливный бак
 //слоты дома
 local array_house_1 = {}
 local array_house_2 = {}
+
+function sqlite3(text)
+{
+	local result = database.query(text)
+	return result
+}
+
+function sendMessage(playerid, text, r, g, b)
+{
+	local date = split(getDateTime(), ": ")//установка времени
+	local chas = date[3].tointeger()
+	local min = date[4].tointeger()
+	local sec = date[5].tointeger()
+
+	for (local i = min_chat[playerid]; i < message[playerid].len(); i++) 
+	{
+		sendPlayerMessage(playerid, message[playerid][i][0], message[playerid][i][1],message[playerid][i][2], message[playerid][i][3] )
+	}
+
+	sendPlayerMessage(playerid, "[ "+chas+":"+min+":"+sec+" ] "+text, r, g, b)
+	message_chat(playerid, "[ "+chas+":"+min+":"+sec+" ] "+text, r,g,b)
+
+	max_chat[playerid] = message[playerid].len()
+	min_chat[playerid] = max_chat[playerid] - max_message
+}
+
+function sendMessage_log(playerid, text, r, g, b)
+{
+	sendPlayerMessage(playerid, text, r, g, b)
+}
 
 //сохранение действий игрока
 function save_player_action (playerid, text)
@@ -601,6 +621,68 @@ function random(min=0, max=RAND_MAX)
 	srand(getTickCount() * rand())
 	return (rand() % ((max + 1) - min)) + min//функция для получения рандомных чисел
 }
+
+function message_chat(playerid, say, r,g,b) 
+{
+	local table_len = message[playerid].len()
+	message[playerid][table_len] <- [say, r,g,b]
+}
+
+//чат
+addEventHandler("onPlayerChat",
+function(playerid, text)
+{
+	if(logged[playerid] == 0)
+	{
+		return
+	}
+
+	local say = getPlayerName( playerid )+" ["+playerid+"]: " + text
+
+	foreach(i, playername in getPlayers())
+	{
+		if(logged[i] == 1)
+		{
+			sendMessage( i, say, white[0], white[1], white[2] )
+		}
+	}
+
+	print("[CHAT] "+say)
+})
+
+addEventHandler("up_chat",
+function(playerid)
+{
+	if(min_chat[playerid] == 0)
+	{
+		return
+	}
+
+	max_chat[playerid] -= 1
+	min_chat[playerid] -= 1
+
+	for (local i = min_chat[playerid]; i < max_chat[playerid]; i++)
+	{
+		sendMessage_log( playerid, message[playerid][i][0], message[playerid][i][1],message[playerid][i][2], message[playerid][i][3] )
+	}
+})
+
+addEventHandler("down_chat",
+function(playerid)
+{
+	if(max_chat[playerid] == message[playerid].len())
+	{
+		return
+	}
+		
+	max_chat[playerid] += 1
+	min_chat[playerid] += 1
+
+	for (local i = min_chat[playerid]; i < max_chat[playerid]; i++)
+	{
+		sendMessage_log( playerid, message[playerid][i][0], message[playerid][i][1],message[playerid][i][2], message[playerid][i][3] )
+	}
+})
 
 //---------------------------------------игрок------------------------------------------------------------
 function search_inv_player( playerid, id1, id2 )//--цикл по поиску предмета в инв-ре игрока
@@ -1196,24 +1278,24 @@ function fuel_down()//--система топлива авто
 {
 	foreach(i, vehicle in getVehicles()) 
 	{
-		local veh = getVehiclePlateText(vehicle)
+		local plate = getVehiclePlateText(vehicle)
 		local fuel_down_number = 0.0002
 
-		if (dviglo[veh] == 1)
+		if (dviglo[plate] == 1)
 		{
-			if (fuel[veh] <= 0)
+			if (fuel[plate] <= 0)
 			{
-				dviglo[veh] <- 0
+				dviglo[plate] <- 0
 			}
 			else
 			{
 				if (getSpeed(vehicle) == 0)
 				{
-					fuel[veh] <- fuel[veh] - fuel_down_number
+					fuel[plate] <- fuel[plate] - fuel_down_number
 				}
 				else
 				{
-					fuel[veh] <- fuel[veh] - (fuel_down_number*getSpeed(vehicle))
+					fuel[plate] <- fuel[plate] - (fuel_down_number*getSpeed(vehicle))
 				}
 			}
 
@@ -1267,6 +1349,8 @@ function debuginfo ()
 		setElementData(playerid, "4", "max_earth "+max_earth)
 		setElementData(playerid, "5", "state_gui_window[playerid] "+state_gui_window[playerid])
 		setElementData(playerid, "6", "crimes[playerid] "+crimes[playerid])
+		setElementData(playerid, "7", "min_chat[playerid] "+min_chat[playerid])
+		setElementData(playerid, "8", "max_chat[playerid] "+max_chat[playerid])
 
 		setElementData(playerid, "serial", getPlayerSerial(playerid))
 
@@ -1281,8 +1365,8 @@ function debuginfo ()
 		local vehicleid = getPlayerVehicle(playerid)
 		if (isPlayerInVehicle(playerid))
 		{
-			local veh = getVehiclePlateText(vehicleid)
-			setElementData ( playerid, "fuel_data", fuel[veh] )
+			local plate = getVehiclePlateText(vehicleid)
+			setElementData ( playerid, "fuel_data", fuel[plate] )
 		}
 	}
 }
@@ -1523,6 +1607,12 @@ addEventHandler( "onPlayerConnect",
 function( playerid, name, ip, serial )
 {
 	element_data[playerid] <- {}
+	message[playerid] <- {}
+
+	for (local i = 0; i < 15; i++)//заполнение 15 пустых строк
+	{
+		message_chat(playerid, "", 255,255,255)
+	}
 
 	array_player_1[playerid] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	array_player_2[playerid] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -2506,7 +2596,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					}
 					else
 					{
-						sendPlayerMessage(playerid, "[ERROR] Максимальная вместимость бака "+max_fuel+" литров", red[0], red[1], red[2])
+						sendMessage(playerid, "[ERROR] Максимальная вместимость бака "+max_fuel+" литров", red[0], red[1], red[2])
 						return
 					}
 				}
@@ -2898,11 +2988,13 @@ function ( playerid, ... )
 	sendMessage(playerid, "save pos "+text, lyme[0], lyme[1], lyme[2])
 })
 
-addCommandHandler( "poz",
+addCommandHandler( "chat",
 function( playerid )
 {
-	local pos = getPlayerPosition( playerid )
-	log("[COORD] "+pos[0]+","+pos[1]+","+pos[2])
+	for (local i = 0; i < 15; i++) 
+	{
+		sendMessage(playerid, "test "+i, 255, 255, 255)
+	}
 })
 
 addCommandHandler( "go",
@@ -2926,7 +3018,7 @@ function(command, params)
 	log( "Commands - " +command )
 
 	if(command == "z")
-	{
+	{	
 		/*local table = {}
 
 		table[1] <- 145
