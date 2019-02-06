@@ -531,7 +531,6 @@ local state_inv_player = array(getMaxPlayers(), 0)
 local state_gui_window = array(getMaxPlayers(), 0)//--состояние гуи окна 0-выкл, 1-вкл
 local logged = array(getMaxPlayers(), 0)
 local sead = array(getMaxPlayers(), 0)
-local dviglo = array(getMaxPlayers(), 0)
 local crimes = array(getMaxPlayers(), 0)
 //--нужды
 local alcohol = array(getMaxPlayers(), 0)
@@ -543,6 +542,8 @@ local drugs = array(getMaxPlayers(), 0)
 //слоты тс
 local array_car_1 = {}
 local array_car_2 = {}
+local fuel = {}//--топливный бак
+local dviglo = {}//--топливный бак
 
 //слоты дома
 local array_house_1 = {}
@@ -727,19 +728,11 @@ function inv_car_delet(playerid, id1, id2)//--удаления предмета 
 	return false
 }
 
-function getSpeed(playerid)
+function getSpeed(vehicleid)
 {
-	if (isPlayerInVehicle(playerid))
-	{
-		local vehicleid = getPlayerVehicle(playerid)
-		local velo = getVehicleSpeed(vehicleid)
-		local speed = getDistanceBetweenPoints3D(0.0,0.0,0.0, velo[0],velo[1],velo[2])
-		return speed*2.27*1.6
-	}
-	else
-	{
-		return 0
-	}
+	local velo = getVehicleSpeed(vehicleid)
+	local speed = getDistanceBetweenPoints3D(0.0,0.0,0.0, velo[0],velo[1],velo[2])
+	return speed*2.27*1.6
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -1184,32 +1177,57 @@ function till_fun( playerid, number, money, value )
 
 function EngineState()//двигатель вкл или выкл
 {
-	foreach(i, playername in getPlayers()) 
+	foreach(i, vehicleid in getVehicles()) 
 	{
-		local vehicleid = getPlayerVehicle(i)
 		local plate = getVehiclePlateText(vehicleid)
 			
-		if( isPlayerInVehicle( i ) )
+		if(dviglo[plate] == 1)
 		{
-			if(sead[i] == 0)
+		}
+		else
+		{
+			setVehicleEngineState(vehicleid, false)
+			setVehicleSpeed( vehicleid, 0.0,0.0,0.0 )
+		}
+	}
+}
+
+function fuel_down()//--система топлива авто
+{
+	foreach(i, vehicle in getVehicles()) 
+	{
+		local veh = getVehiclePlateText(vehicle)
+		local fuel_down_number = 0.0002
+
+		if (dviglo[veh] == 1)
+		{
+			if (fuel[veh] <= 0)
 			{
-				if(dviglo[i] == 1)
+				dviglo[veh] <- 0
+			}
+			else
+			{
+				if (getSpeed(vehicle) == 0)
 				{
-					if(getVehicleFuel(vehicleid) < 1)
-					{
-						setVehicleFuel(vehicleid, 0.0)
-					}
-					else
-					{
-						setVehicleFuel(vehicleid, getVehicleFuel(vehicleid))
-					}
+					fuel[veh] <- fuel[veh] - fuel_down_number
 				}
 				else
 				{
-					setVehicleEngineState(vehicleid, false)
-					setVehicleSpeed( vehicleid, 0.0,0.0,0.0 )
+					fuel[veh] <- fuel[veh] - (fuel_down_number*getSpeed(vehicle))
 				}
 			}
+
+			setVehicleFuel(vehicle, max_fuel)
+		}
+	}
+
+	foreach(playerid, playername in getPlayers()) 
+	{
+		local vehicleid = getPlayerVehicle(playerid)
+		if (isPlayerInVehicle(playerid))
+		{
+			local veh = getVehiclePlateText(vehicleid)
+			setElementData ( playerid, "fuel_data", fuel[veh] )
 		}
 	}
 }
@@ -1255,7 +1273,7 @@ function debuginfo ()
 		setElementData(playerid, "0", "state_inv_player[playerid] "+state_inv_player[playerid])
 		setElementData(playerid, "1", "logged[playerid] "+logged[playerid])
 		setElementData(playerid, "2", "sead[playerid] "+sead[playerid])
-		setElementData(playerid, "3", "dviglo[playerid] "+dviglo[playerid])
+		setElementData(playerid, "3", "0 "+0)
 		setElementData(playerid, "4", "max_earth "+max_earth)
 		setElementData(playerid, "5", "state_gui_window[playerid] "+state_gui_window[playerid])
 		setElementData(playerid, "6", "crimes[playerid] "+crimes[playerid])
@@ -1451,6 +1469,7 @@ function()
 	setSummer(pogoda)
 
 	timer( EngineState, 500, -1 )//двигатель машины
+	timer( fuel_down, 1000, -1 )//система топлива
 	timer( debuginfo, 1000, -1)//--дебагинфа
 	timer( element_data_push_client, 1000, -1)//--элементдата
 	timer( timeserver, 1000, -1 )//время сервера 1 игровой час = 1 мин реальных
@@ -1480,19 +1499,22 @@ function()
 	foreach (idx, value in sqlite3( "SELECT * FROM car_db" )) 
 	{
 		local color = toRGBA(value["car_rgb"])
-		local vehicleid = createVehicle( value["carmodel"], value["x"], value["y"], value["z"] + 1.0, value["rot"], 0.0, 0.0 )
+		local vehicleid = createVehicle( value["model"], value["x"], value["y"], value["z"] + 1.0, value["rot"], 0.0, 0.0 )
 
-		setVehiclePlateText(vehicleid, value["carnumber"])
+		setVehiclePlateText(vehicleid, value["number"])
 		setVehicleColour(vehicleid, color[0], color[1], color[2], color[0], color[1], color[2])
 		setVehicleTuningTable(vehicleid, value["tune"])
 
-		array_car_1[value["carnumber"]] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-		array_car_2[value["carnumber"]] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		array_car_1[value["number"]] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		array_car_2[value["number"]] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+		fuel[value["number"].tostring()] <- value["fuel"]
+		dviglo[value["number"].tostring()] <- 0
 
 		for (local i = 0; i < max_inv; i++) 
 		{
-			array_car_1[value["carnumber"]][i] = value["slot_"+i+"_1"]
-			array_car_2[value["carnumber"]][i] = value["slot_"+i+"_2"]
+			array_car_1[value["number"]][i] = value["slot_"+i+"_1"]
+			array_car_2[value["number"]][i] = value["slot_"+i+"_2"]
 		}
 
 		car_number++
@@ -1512,7 +1534,6 @@ function( playerid, name, ip, serial )
 	state_gui_window[playerid] = 0
 	logged[playerid] = 0
 	sead[playerid] = 0
-	dviglo[playerid] = 0
 	crimes[playerid] = 0
 	//--нужды
 	alcohol[playerid] = 0
@@ -1520,6 +1541,8 @@ function( playerid, name, ip, serial )
 	hygiene[playerid] = 0
 	sleep[playerid] = 0
 	drugs[playerid] = 0
+
+	print("serial "+getPlayerSerial(playerid))
 })
 
 function playerDisconnect( playerid, reason )
@@ -1540,7 +1563,6 @@ function playerDisconnect( playerid, reason )
 		state_gui_window[playerid] = 0
 		logged[playerid] = 0
 		sead[playerid] = 0
-		dviglo[playerid] = 0
 		crimes[playerid] = 0
 		//--нужды
 		alcohol[playerid] = 0
@@ -1677,10 +1699,10 @@ function reg_or_login(playerid)
 	{
 		local result = sqlite3( "SELECT * FROM account WHERE name = '"+playername+"'" )
 
-		if (result[1]["reg_serial"] != serial) 
+		if (result[1]["reg_serial"] != serial)
 		{
-			kickPlayer(playerid)
-			return
+			//kickPlayer(playerid)
+			//return
 		}
 
 		for (local i = 0; i < max_inv; i++) 
@@ -1777,32 +1799,32 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 
 	if (seat == 0)
 	{
-		local result = sqlite3( "SELECT COUNT() FROM car_db WHERE carnumber = '"+plate+"'" )
+		local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
 		if (result[1]["COUNT()"] == 1)
 		{
-			local result = sqlite3( "SELECT * FROM car_db WHERE carnumber = '"+plate+"'" )
+			local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
 			if (result[1]["nalog"] <= 0)
 			{
 				sendMessage(playerid, "[ERROR] Т/с арестован за уклонение от уплаты налогов", red[0], red[1], red[2])
-				dviglo[playerid] = 0
+				dviglo[plate] <- 0
 				return
 			}
 
-			local result = sqlite3( "SELECT * FROM car_db WHERE carnumber = '"+plate+"'" )
-			if (result[1]["fuel"] <= 1)
+			local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
+			if (fuel[plate] <= 1)
 			{
 				sendMessage(playerid, "[ERROR] Бак пуст", red[0], red[1], red[2])
-				dviglo[playerid] = 0
+				dviglo[plate] <- 0
 				return
 			}
 		}
 
 		if (search_inv_player(playerid, 6, plate.tointeger()) != 0 && search_inv_player(playerid, 2, 1) != 0)
 		{
-			local result = sqlite3( "SELECT COUNT() FROM car_db WHERE carnumber = '"+plate+"'" )
+			local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
 			if (result[1]["COUNT()"] == 1)
 			{
-				local result = sqlite3( "SELECT * FROM car_db WHERE carnumber = '"+plate+"'" )
+				local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
 				sendMessage(playerid, "Налог т/с оплачен на "+result[1]["nalog"]+" дней", yellow[0], yellow[1], yellow[2])
 			}
 
@@ -1811,25 +1833,14 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 				triggerClientEvent( playerid, "event_tab_load", "car", plate )
 			}
 
-			local result = sqlite3( "SELECT COUNT() FROM car_db WHERE carnumber = '"+plate+"'" )
-			if (result[1]["COUNT()"] == 1)
-			{
-				local result = sqlite3( "SELECT * FROM car_db WHERE carnumber = '"+plate+"'" )
-				setVehicleFuel(vehicleid, result[1]["fuel"])
-				dviglo[playerid] = 1
-			}
-			else 
-			{
-				setVehicleFuel(vehicleid, 50.0)
-				dviglo[playerid] = 1
-			}
+			dviglo[plate] <- 1
 		}
 		else
 		{
 			sendMessage(playerid, "[ERROR] Чтобы завести т/с надо выполнить 2 пункта:", red[0], red[1], red[2])
 			sendMessage(playerid, "[ERROR] 1) нужно иметь ключ от т/с", red[0], red[1], red[2])
 			sendMessage(playerid, "[ERROR] 2) иметь права", red[0], red[1], red[2])
-			dviglo[playerid] = 0
+			dviglo[plate] <- 0
 		}
 	}
 }
@@ -1839,28 +1850,20 @@ addEventHandler ("onPlayerVehicleEnter", playerEnteredVehicle)
 function PlayerVehicleExit( playerid, vehicleid, seat )
 {
 	local plate = getVehiclePlateText(vehicleid)
-	local gas = getVehicleFuel(vehicleid)
 	local carpos = getVehiclePosition(vehicleid)
 	local carrot = getVehicleRotation(vehicleid)
 
 	if (seat == 0)
 	{
-		local result = sqlite3( "SELECT COUNT() FROM car_db WHERE carnumber = '"+plate+"'" )
+		local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
 		if (result[1]["COUNT()"] == 1 && search_inv_player(playerid, 6, plate.tointeger()) != 0)
 		{	
-			if (gas > max_fuel)
-			{
-				sqlite3( "UPDATE car_db SET x = '"+carpos[0]+"', y = '"+carpos[1]+"', z = '"+carpos[2]+"', rot = '"+carrot[0]+"', fuel = '"+(max_fuel/2)+"' WHERE carnumber = '"+plate+"'")
-			}
-			else
-			{
-				sqlite3( "UPDATE car_db SET x = '"+carpos[0]+"', y = '"+carpos[1]+"', z = '"+carpos[2]+"', rot = '"+carrot[0]+"', fuel = '"+gas+"' WHERE carnumber = '"+plate+"'")
-			}
+			sqlite3( "UPDATE car_db SET x = '"+carpos[0]+"', y = '"+carpos[1]+"', z = '"+carpos[2]+"', rot = '"+carrot[0]+"', fuel = '"+fuel[plate]+"' WHERE number = '"+plate+"'")
 		}
 
 		triggerClientEvent( playerid, "event_tab_load", "car", "" )
 
-		dviglo[playerid] = 0
+		dviglo[plate] <- 0
 	}
 }
 addEventHandler ("onPlayerVehicleExit", PlayerVehicleExit)
@@ -2376,10 +2379,10 @@ function inv_server_load (playerid, value, id3, id1, id2, tabpanel)//измен�
 		array_car_1[plate][id3] = id1
 		array_car_2[plate][id3] = id2
 
-		local result = sqlite3( "SELECT COUNT() FROM car_db WHERE carnumber = '"+plate+"'" )
+		local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
 		if (result[1]["COUNT()"] == 1)
 		{
-			sqlite3( "UPDATE car_db SET slot_"+id3+"_1 = '"+array_car_1[plate][id3]+"', slot_"+id3+"_2 = '"+array_car_2[plate][id3]+"' WHERE carnumber = '"+plate+"'")
+			sqlite3( "UPDATE car_db SET slot_"+id3+"_1 = '"+array_car_1[plate][id3]+"', slot_"+id3+"_2 = '"+array_car_2[plate][id3]+"' WHERE number = '"+plate+"'")
 		}
 
 		triggerClientEvent( playerid, "event_inv_load", value, id3, array_car_1[plate][id3], array_car_2[plate][id3] )
@@ -2491,22 +2494,20 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			if (isPlayerInVehicle(playerid))
 			{
 				local plate = getVehiclePlateText ( vehicleid )
-				local gas = getVehicleFuel(vehicleid)
 
-				if (getSpeed(playerid) < 5)
+				if (getSpeed(vehicleid) < 5)
 				{
-					if (gas+id2 <= max_fuel)
+					if (fuel[plate]+id2 <= max_fuel)
 					{
-						setVehicleFuel(vehicleid, (gas+id2))
-
-						sqlite3( "UPDATE car_db SET fuel = '"+(gas+id2)+"' WHERE carnumber = '"+plate+"'")
-
+						fuel[plate] <- fuel[plate]+id2
 						me_chat(playerid, playername+" заправил(а) машину из канистры")
 						id2 = 0
+
+						sqlite3( "UPDATE car_db SET fuel = '"+fuel[plate]+"' WHERE number = '"+plate+"'")
 					}
 					else
 					{
-						sendMessage(playerid, "[ERROR] Максимальная вместимость бака "+max_fuel+" литров", red[0], red[1], red[2])
+						sendPlayerMessage(playerid, "[ERROR] Максимальная вместимость бака "+max_fuel+" литров", red[0], red[1], red[2])
 						return
 					}
 				}
@@ -2526,7 +2527,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if (isPlayerInVehicle(playerid))
 			{
-				if (getSpeed(playerid) > 5)
+				if (getSpeed(vehicleid) > 5)
 				{
 					sendMessage(playerid, "[ERROR] Остановите т/с", red[0], red[1], red[2])
 					return
@@ -2684,7 +2685,7 @@ function (playerid, id)
 			local plate = getVehiclePlateText(vehicleid)
 			if (id == plate.tointeger())
 			{
-				local result = sqlite3( "SELECT COUNT() FROM car_db WHERE carnumber = '"+plate+"'" )
+				local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
 				if (result[1]["COUNT()"] == 1) 
 				{
 					if (result[1]["frozen"] == 0)
@@ -2703,7 +2704,7 @@ function (playerid, id)
 							setVehiclePosition(vehicleid, myPos[0]+5, myPos[1], myPos[2]+1)
 							setVehicleRotation(vehicleid, 0.0, 0.0, 0.0)
 
-							sqlite3( "UPDATE car_db SET x = '"+(myPos[0]+5)+"', y = '"+myPos[1]+"', z = '"+(myPos[2]+1)+"' WHERE carnumber = '"+plate+"'")
+							sqlite3( "UPDATE car_db SET x = '"+(myPos[0]+5)+"', y = '"+myPos[1]+"', z = '"+(myPos[2]+1)+"' WHERE number = '"+plate+"'")
 
 							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playerid )
 
@@ -2779,6 +2780,22 @@ function(playerid, id1, id2)
 	}
 })
 
+addCommandHandler("subt",//выдача предмета и кол-во
+function(playerid, id1, id2)
+{
+	local val1 = id1.tointeger()
+	local val2 = id2.tostring()
+
+	if (inv_player_empty(playerid, val1, val2))
+	{
+		sendMessage(playerid, "Вы создали "+info_png[val1][0]+" "+val2+" "+info_png[val1][1], lyme[0], lyme[1], lyme[2])
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
+	}
+})
+
 addCommandHandler ( "subcar",//--выдача предметов с числом
 function (playerid, id1, id2 )
 {
@@ -2817,6 +2834,8 @@ function(playerid, id)
 	local pos = getPlayerPosition( playerid )
 	local vehicleid = createVehicle( id.tointeger(), pos[0] + 2.0, pos[1], pos[2] + 1.0, 0.0, 0.0, 0.0 )
 	setVehiclePlateText(vehicleid, "0")
+	fuel["0"] <- max_fuel
+	dviglo["0"] <- 0
 })
 
 addCommandHandler("flip",
@@ -2828,6 +2847,20 @@ function(playerid)
 		local rot = getVehicleRotation(vehicleid)
 		setVehicleRotation(vehicleid, rot[0], 0.0, 0.0)
 	}
+})
+
+addCommandHandler("getfuel",
+function(playerid)
+{	
+	timer(function () 
+	{
+		if (isPlayerInVehicle(playerid))
+		{
+			local vehicleid = getPlayerVehicle(playerid)
+			local gas = getVehicleFuel(vehicleid)
+			sendMessage(playerid, "gas "+gas, 255, 255, 255)
+		}
+	}, 1000, -1)
 })
 
 addCommandHandler("p",
