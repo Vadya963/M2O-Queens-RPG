@@ -3,6 +3,7 @@ local screen = getScreenSize()
 local max_inv = 24
 local width = 370.0
 local height = 250.0
+local image_w_h = 50.0
 local dxDrawTexture_width_height = 0.78
 local pos_x_3d_image = (screen[0]/2)-(width/2)
 local pos_y_3d_image = (screen[1]/2)-(height/2)
@@ -555,7 +556,7 @@ gui_drop = guiCreateElement( 2, "", (screen[0]-pos_x_3d_image), 0.0, pos_x_3d_im
 //создание инв-ря и кнопок
 for (local i = 0; i < max_inv; i++) 
 {
-	inv_pos[i][0] = guiCreateElement( 2, "", (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), 50.0, 50.0, false, gui_fon )
+	inv_pos[i][0] = guiCreateElement( 2, "", (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), image_w_h, image_w_h, false, gui_fon )
 	guiSetVisible( inv_pos[i][0], false )
 }
 
@@ -855,7 +856,7 @@ function( post )
 				dxdrawtext( inv_slot_player[i][1].tostring(), (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+35), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
 			
 				/*local scale = 1.0
-				local formyla = (50.0/dimensions[0])
+				local formyla = (image_w_h/dimensions[0])
 
 				if ( formyla <= scale )
 				{
@@ -896,12 +897,12 @@ function( post )
 		{
 			if (info_tab == "player" && state_inv_player || info_tab == "car" && state_inv_car || info_tab == "house" && state_inv_house)
 			{
-				dxDrawRectangle( (inv_pos[info3][1]+pos_x_3d_image), (inv_pos[info3][2]+pos_y_3d_image), 50.0, 50.0, fromRGB( 255, 255, 130, 100 ) )
+				dxDrawRectangle( (inv_pos[info3][1]+pos_x_3d_image), (inv_pos[info3][2]+pos_y_3d_image), image_w_h, image_w_h, fromRGB( 255, 255, 130, 100 ) )
 			}
 		}
 
 
-		//dxDrawRectangle( (button_pos[0][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[0][3]), 50.0, button_pos[0][3], fromRGB( 50, 50, 50, 200 ) )
+		//dxDrawRectangle( (button_pos[0][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[0][3]), image_w_h, button_pos[0][3], fromRGB( 50, 50, 50, 200 ) )
 		if (state_inv_player)
 		{
 			dxdrawtext( button_pos[0][1].tostring(), (button_pos[0][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[0][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
@@ -913,7 +914,7 @@ function( post )
 
 		if (plate != "")
 		{
-			//dxDrawRectangle( (button_pos[1][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[1][3]), 50.0, button_pos[1][3], fromRGB( 50, 50, 50, 200 ) )
+			//dxDrawRectangle( (button_pos[1][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[1][3]), image_w_h, button_pos[1][3], fromRGB( 50, 50, 50, 200 ) )
 			if (state_inv_car)
 			{
 				dxdrawtext( button_pos[1][1].tostring(), (button_pos[1][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[1][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
@@ -926,7 +927,7 @@ function( post )
 
 		if (house != "")
 		{
-			//dxDrawRectangle( (button_pos[2][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[2][3]), 50.0, button_pos[2][3], fromRGB( 50, 50, 50, 200 ) )
+			//dxDrawRectangle( (button_pos[2][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[2][3]), image_w_h, button_pos[2][3], fromRGB( 50, 50, 50, 200 ) )
 			if (state_inv_house)
 			{
 				dxdrawtext( button_pos[2][1].tostring(), (button_pos[2][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[2][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
