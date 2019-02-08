@@ -654,13 +654,15 @@ function(playerid, text)
 addEventHandler("up_chat",
 function(playerid)
 {
-	if(min_chat[playerid] == 0)
+	local count = 15
+
+	if(min_chat[playerid]-count < 0)
 	{
 		return
 	}
 
-	max_chat[playerid] -= 1
-	min_chat[playerid] -= 1
+	max_chat[playerid] -= count
+	min_chat[playerid] -= count
 
 	for (local i = min_chat[playerid]; i < max_chat[playerid]; i++)
 	{
@@ -671,13 +673,15 @@ function(playerid)
 addEventHandler("down_chat",
 function(playerid)
 {
-	if(max_chat[playerid] == message[playerid].len())
+	local count = 15
+
+	if(max_chat[playerid]+count > message[playerid].len())
 	{
 		return
 	}
 		
-	max_chat[playerid] += 1
-	min_chat[playerid] += 1
+	max_chat[playerid] += count
+	min_chat[playerid] += count
 
 	for (local i = min_chat[playerid]; i < max_chat[playerid]; i++)
 	{
@@ -1842,19 +1846,11 @@ function tab_down(playerid)
 		if (isPlayerInVehicle(playerid)) 
 		{
 			local plate = getVehiclePlateText(vehicleid)
-
-			if (plate.tointeger() != 0)
-			{
-				for (local id3 = 0; id3 < max_inv; id3++)
-				{
-					triggerClientEvent( playerid, "event_inv_load", "car", id3, array_car_1[plate][id3], array_car_2[plate][id3] )
-				}
-			}
 		}
 
 		foreach (idx, value in sqlite3( "SELECT * FROM house_db" )) 
 		{	
-			if (isPointInCircle3D( myPos[0], myPos[1], myPos[2], value["x"], value["y"], value["z"], house_bussiness_radius))
+			if (isPointInCircle3D( myPos[0], myPos[1], myPos[2], value["x"], value["y"], value["z"], house_bussiness_radius) && search_inv_player(playerid, 25, value["number"]) != 0)
 			{
 				for (local id3 = 0; id3 < max_inv; id3++)
 				{
@@ -1920,6 +1916,11 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 
 			if (plate.tointeger() != 0)
 			{
+				for (local id3 = 0; id3 < max_inv; id3++)
+				{
+					triggerClientEvent( playerid, "event_inv_load", "car", id3, array_car_1[plate][id3], array_car_2[plate][id3] )
+				}
+				
 				triggerClientEvent( playerid, "event_tab_load", "car", plate )
 			}
 
@@ -2778,6 +2779,7 @@ function (playerid, id)
 				local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
 				if (result[1]["COUNT()"] == 1) 
 				{
+					local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
 					if (result[1]["frozen"] == 0)
 					{
 						if (search_inv_player(playerid, 6, id) != 0) 
