@@ -546,7 +546,7 @@ local button_pos = [//позиция кнопок
 ]
 
 gui_fon = guiCreateElement( 2, "фон", 0.0, 0.0, screen[0], screen[1], false )//фон для гуи
-guiSetAlpha(gui_fon, 1.0)
+guiSetAlpha(gui_fon, 0.0)
 
 guiSetVisible( gui_fon, false )
 
