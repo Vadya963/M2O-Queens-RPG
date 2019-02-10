@@ -826,8 +826,8 @@ function( post )
 
 	if (state_inv_gui)//инв-рь
 	{
-		dxDrawRectangle( pos_x_3d_image, (pos_y_3d_image-(10.0+button_pos[0][3])), width, (10.0+button_pos[0][3]), fromRGB( 0, 0, 0, 255 ) )
-		dxDrawRectangle( pos_x_3d_image, pos_y_3d_image, width, height, fromRGB( 0, 0, 0, 255 ) )
+		//dxDrawRectangle( pos_x_3d_image, (pos_y_3d_image-(10.0+button_pos[0][3])), width, (10.0+button_pos[0][3]), fromRGB( 0, 0, 0, 255 ) )
+		dxDrawRectangle( pos_x_3d_image, (pos_y_3d_image-(10.0+button_pos[0][3])), width, height+(10.0+button_pos[0][3]), fromRGB( 0, 0, 0, 255 ) )
 
 		if (state_inv_player)
 		{
@@ -1430,6 +1430,12 @@ function f1_down()
 	showCursor( !isCursorShowing )
 	isCursorShowing = !isCursorShowing
 }
+
+addCommandHandler("shake",
+function (playerid, i1, i2, i3) 
+{
+	simpleShake(i1.tofloat(), i2.tofloat(), i3.tofloat())
+})
 
 
 //-------------------------------------тестирование разных функций---------------------------------
