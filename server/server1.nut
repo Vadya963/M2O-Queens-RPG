@@ -2500,7 +2500,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 	if (value == "player")
 	{
-		if (id1 == 6 || id1 == 2 || id1 == 25 || id1 == 34 || id1 == 36)//--ключ авто, права, ключ дома, лиц водилы, лиц бизнеса
+		if (id1 == 2 || id1 == 34)//права, лиц водилы
 		{
 			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 			return
@@ -2580,6 +2580,24 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 		}
 		//-----------------------------------------------------------------------------------------
+		else if (id1 == 6)//--ключ авто
+		{
+			local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+id2+"'" )
+			if (result[1]["COUNT()"] == 1)
+			{
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+			}
+			return
+		}
+		else if (id1 == 25)//--ключ дома
+		{
+			local result = sqlite3( "SELECT COUNT() FROM house_db WHERE number = '"+id2+"'" )
+			if (result[1]["COUNT()"] == 1)
+			{
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+			}
+			return
+		}
 		else if (id1 == 5) 
 		{
 			if (isPlayerInVehicle(playerid))
@@ -2635,6 +2653,15 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 				return
 			}
+		}
+		else if (id1 == 36)//--документы на бизнес
+		{
+			local result = sqlite3( "SELECT COUNT() FROM business_db WHERE number = '"+id2+"'" )
+			if (result[1]["COUNT()"] == 1)
+			{
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+			}
+			return
 		}
 		else if (id1 == 54) //--инкасаторский сумка
 		{
