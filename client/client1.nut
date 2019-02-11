@@ -151,7 +151,7 @@ function guiGridListAddRow (window, text)
 		local guiSize_window = guiGetSize( window[0] )
 		local text_gui = guiCreateElement( 6, text, 10.0, (15.0*table_len), guiSize_window[0], 15.0, false, window[0] )
 
-		gridlist_table_text[ window[1] ][ table_len ] <- [text_gui,table_len]
+		gridlist_table_text[ window[1] ][ table_len ] <- text_gui
 		return true
 	}
 	else 
@@ -193,7 +193,7 @@ function guiSetVisibleGridList (window, bool)
 
 		foreach (idx, value in gridlist_table_text[ window[1] ]) 
 		{
-			guiSetVisible( value[0], bool )
+			guiSetVisible( value, bool )
 		}
 
 		gridlist_window = false
@@ -297,9 +297,9 @@ local mayoralty_shop = {
 	[55] = ["лицензия инкасатора", 1, 10000],
 	[34] = ["лицензия дальнобойщика", 1, 15000],
 	[62] = ["лицензия водителя мусоровоза", 1, 20000],
-	[48] = ["квитанция для оплаты дома на "+day_nalog+" дней", day_nalog, (zakon_nalog_house*day_nalog)],
-	[49] = ["квитанция для оплаты бизнеса на "+day_nalog+" дней", day_nalog, (zakon_nalog_business*day_nalog)],
-	[50] = ["квитанция для оплаты т/с на "+day_nalog+" дней", day_nalog, (zakon_nalog_car*day_nalog)],
+	[48] = ["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog)],
+	[49] = ["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog)],
+	[50] = ["квитанция для оплаты т/с на", day_nalog, (zakon_nalog_car*day_nalog)],
 }
 local mayoralty_shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in mayoralty_shop)
@@ -1027,43 +1027,22 @@ function( element )
 	local pos = getMousePosition()
 	//sendMessage("pos[0] "+pos[0]+" | pos[1] "+pos[1], 255, 255, 255)
 
-	for (local i = 0; i < max_inv; i++) 
+	if (state_inv_gui)
 	{
-		if ( ((inv_pos[i][1]+pos_x_3d_image)) < pos[0] && ((inv_pos[i][1]+pos_x_3d_image)+image_w_h) > pos[0] && ((inv_pos[i][2]+pos_y_3d_image)) < pos[1] && ((inv_pos[i][2]+pos_y_3d_image)+image_w_h) > pos[1] )
+		for (local i = 0; i < max_inv; i++) 
 		{
-			info3 = i
-
-			if (state_inv_player)
+			if ( ((inv_pos[i][1]+pos_x_3d_image)) < pos[0] && ((inv_pos[i][1]+pos_x_3d_image)+image_w_h) > pos[0] && ((inv_pos[i][2]+pos_y_3d_image)) < pos[1] && ((inv_pos[i][2]+pos_y_3d_image)+image_w_h) > pos[1] )
 			{
-				info1 = inv_slot_player[info3][0]
-				info2 = inv_slot_player[info3][1]
+				info3 = i
 
-				if (lmb == 0)
+				if (state_inv_player)
 				{
-					foreach (idx, v in no_use_subject)
+					info1 = inv_slot_player[info3][0]
+					info2 = inv_slot_player[info3][1]
+
+					if (lmb == 0)
 					{
-						if (v == info1)
-						{
-							lmb = 0
-							gui_selection = false
-							return
-						}
-					}
-
-					gui_selection = true
-					info_tab = "player"
-					info3_selection_1 = info3
-					info1_selection_1 = info1
-					info2_selection_1 = info2
-					lmb = 1
-				}
-				else
-				{
-					//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
-					/*if (inv_slot_player[info3][0] != 0)
-					{*/
-						local no_use_subject_1 = [-1,1]
-						foreach (idx, v in no_use_subject_1)
+						foreach (idx, v in no_use_subject)
 						{
 							if (v == info1)
 							{
@@ -1073,53 +1052,53 @@ function( element )
 							}
 						}
 
-						/*info_tab = "player"
+						gui_selection = true
+						info_tab = "player"
 						info3_selection_1 = info3
 						info1_selection_1 = info1
 						info2_selection_1 = info2
-						return
-					}*/
-
-					triggerServerEvent( "event_inv_server_load", "player", info3, info1_selection_1, info2_selection_1, playerid )
-
-					zamena_img()
-
-					gui_selection = false
-					info_tab = ""
-					lmb = 0
-				}
-			}
-			else if (state_inv_car)
-			{
-				info1 = inv_slot_car[info3][0]
-				info2 = inv_slot_car[info3][1]
-				
-				if (lmb == 0)
-				{
-					foreach (idx, v in no_use_subject)
-					{
-						if (v == info1)
-						{
-							lmb = 0
-							gui_selection = false
-							return
-						}
+						lmb = 1
 					}
+					else
+					{
+						//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
+						/*if (inv_slot_player[info3][0] != 0)
+						{*/
+							local no_use_subject_1 = [-1,1]
+							foreach (idx, v in no_use_subject_1)
+							{
+								if (v == info1)
+								{
+									lmb = 0
+									gui_selection = false
+									return
+								}
+							}
 
-					gui_selection = true
-					info_tab = "car"
-					info3_selection_1 = info3
-					info1_selection_1 = info1
-					info2_selection_1 = info2
-					lmb = 1
+							/*info_tab = "player"
+							info3_selection_1 = info3
+							info1_selection_1 = info1
+							info2_selection_1 = info2
+							return
+						}*/
+
+						triggerServerEvent( "event_inv_server_load", "player", info3, info1_selection_1, info2_selection_1, playerid )
+
+						zamena_img()
+
+						gui_selection = false
+						info_tab = ""
+						lmb = 0
+					}
 				}
-				else
+				else if (state_inv_car)
 				{
-					//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
-					/*if (inv_slot_car[info3][0] != 0)
-					{*/
-						local no_use_subject_1 = [-1,1]
-						foreach (idx, v in no_use_subject_1)
+					info1 = inv_slot_car[info3][0]
+					info2 = inv_slot_car[info3][1]
+					
+					if (lmb == 0)
+					{
+						foreach (idx, v in no_use_subject)
 						{
 							if (v == info1)
 							{
@@ -1129,53 +1108,53 @@ function( element )
 							}
 						}
 
-						/*info_tab = "car"
+						gui_selection = true
+						info_tab = "car"
 						info3_selection_1 = info3
 						info1_selection_1 = info1
 						info2_selection_1 = info2
-						return
-					}*/
-
-					triggerServerEvent( "event_inv_server_load", "car", info3, info1_selection_1, info2_selection_1, plate )
-
-					zamena_img()
-
-					gui_selection = false
-					info_tab = ""
-					lmb = 0
-				}
-			}
-			else if (state_inv_house)
-			{
-				info1 = inv_slot_house[info3][0]
-				info2 = inv_slot_house[info3][1]
-				
-				if (lmb == 0)
-				{
-					foreach (idx, v in no_use_subject)
-					{
-						if (v == info1)
-						{
-							lmb = 0
-							gui_selection = false
-							return
-						}
+						lmb = 1
 					}
+					else
+					{
+						//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
+						/*if (inv_slot_car[info3][0] != 0)
+						{*/
+							local no_use_subject_1 = [-1,1]
+							foreach (idx, v in no_use_subject_1)
+							{
+								if (v == info1)
+								{
+									lmb = 0
+									gui_selection = false
+									return
+								}
+							}
 
-					gui_selection = true
-					info_tab = "house"
-					info3_selection_1 = info3
-					info1_selection_1 = info1
-					info2_selection_1 = info2
-					lmb = 1
+							/*info_tab = "car"
+							info3_selection_1 = info3
+							info1_selection_1 = info1
+							info2_selection_1 = info2
+							return
+						}*/
+
+						triggerServerEvent( "event_inv_server_load", "car", info3, info1_selection_1, info2_selection_1, plate )
+
+						zamena_img()
+
+						gui_selection = false
+						info_tab = ""
+						lmb = 0
+					}
 				}
-				else
+				else if (state_inv_house)
 				{
-					//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
-					/*if (inv_slot_house[info3][0] != 0)
-					{*/
-						local no_use_subject_1 = [-1,1]
-						foreach (idx, v in no_use_subject_1)
+					info1 = inv_slot_house[info3][0]
+					info2 = inv_slot_house[info3][1]
+					
+					if (lmb == 0)
+					{
+						foreach (idx, v in no_use_subject)
 						{
 							if (v == info1)
 							{
@@ -1185,105 +1164,128 @@ function( element )
 							}
 						}
 
-						/*info_tab = "house"
+						gui_selection = true
+						info_tab = "house"
 						info3_selection_1 = info3
 						info1_selection_1 = info1
 						info2_selection_1 = info2
-						return
-					}*/
+						lmb = 1
+					}
+					else
+					{
+						//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
+						/*if (inv_slot_house[info3][0] != 0)
+						{*/
+							local no_use_subject_1 = [-1,1]
+							foreach (idx, v in no_use_subject_1)
+							{
+								if (v == info1)
+								{
+									lmb = 0
+									gui_selection = false
+									return
+								}
+							}
 
-					triggerServerEvent( "event_inv_server_load", "house", info3, info1_selection_1, info2_selection_1, house )
+							/*info_tab = "house"
+							info3_selection_1 = info3
+							info1_selection_1 = info1
+							info2_selection_1 = info2
+							return
+						}*/
 
-					zamena_img()
+						triggerServerEvent( "event_inv_server_load", "house", info3, info1_selection_1, info2_selection_1, house )
 
-					gui_selection = false
-					info_tab = ""
-					lmb = 0
+						zamena_img()
+
+						gui_selection = false
+						info_tab = ""
+						lmb = 0
+					}
 				}
-			}
 
-			return
+			}
 		}
-	}
 
-	if ( ((button_pos[0][2]+pos_x_3d_image)) < pos[0] && ((button_pos[0][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[0][3])) < pos[1] && ((pos_y_3d_image-button_pos[0][3])+button_pos[0][3]) > pos[1] )
-	{
-		state_inv_player = true
-		state_inv_car = false
-		state_inv_house = false
-	}
-	else if ( plate != "" && ((button_pos[1][2]+pos_x_3d_image)) < pos[0] && ((button_pos[1][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[1][3])) < pos[1] && ((pos_y_3d_image-button_pos[1][3])+button_pos[1][3]) > pos[1] )
-	{
-		state_inv_player = false
-		state_inv_car = true
-		state_inv_house = false
-	}
-	else if ( house != "" && ((button_pos[2][2]+pos_x_3d_image)) < pos[0] && ((button_pos[2][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[2][3])) < pos[1] && ((pos_y_3d_image-button_pos[2][3])+button_pos[2][3]) > pos[1] )
-	{
-		state_inv_player = false
-		state_inv_car = false
-		state_inv_house = true
-	}
-
-	if ( 0.0 < pos[0] && pos_x_3d_image > pos[0] )//использовать предмет
-	{
-		if (lmb == 1)
+		if ( ((button_pos[0][2]+pos_x_3d_image)) < pos[0] && ((button_pos[0][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[0][3])) < pos[1] && ((pos_y_3d_image-button_pos[0][3])+button_pos[0][3]) > pos[1] )
 		{
-			foreach (k, v in no_use_subject) 
-			{
-				if (v == info1)
-				{
-					return
-				}
-			}
-
-			if (info_tab == "player" && state_inv_player)
-			{
-				triggerServerEvent( "event_use_inv", "player", info3, info1, info2 )
-			}
-
-			gui_selection = false
-			info_tab = ""
-			info1 = -1
-			info2 = -1
-			info3 = -1
-			lmb = 0
+			state_inv_player = true
+			state_inv_car = false
+			state_inv_house = false
 		}
-	}
-	else if ( (screen[0]-pos_x_3d_image) < pos[0] && (screen[0]+pos_x_3d_image) > pos[0] )//выкинуть предмет
-	{
-		if (lmb == 1)
+		else if ( plate != "" && ((button_pos[1][2]+pos_x_3d_image)) < pos[0] && ((button_pos[1][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[1][3])) < pos[1] && ((pos_y_3d_image-button_pos[1][3])+button_pos[1][3]) > pos[1] )
 		{
-			foreach (k, v in no_use_subject) 
-			{
-				if (v == info1)
-				{
-					return
-				}
-			}
+			state_inv_player = false
+			state_inv_car = true
+			state_inv_house = false
+		}
+		else if ( house != "" && ((button_pos[2][2]+pos_x_3d_image)) < pos[0] && ((button_pos[2][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[2][3])) < pos[1] && ((pos_y_3d_image-button_pos[2][3])+button_pos[2][3]) > pos[1] )
+		{
+			state_inv_player = false
+			state_inv_car = false
+			state_inv_house = true
+		}
 
-			if (info_tab == "player" && state_inv_player)
+		if ( 0.0 < pos[0] && pos_x_3d_image > pos[0] )//использовать предмет
+		{
+			if (lmb == 1)
 			{
-				triggerServerEvent( "event_throw_earth_server", "player", info3, info1, info2, playerid )
-			}
-			else if (info_tab == "car" && state_inv_car)
-			{
-				if (isPlayerInVehicle(playerid))
+				foreach (k, v in no_use_subject) 
 				{
-					triggerServerEvent( "event_throw_earth_server", "car", info3, info1, info2, plate )
+					if (v == info1)
+					{
+						return
+					}
 				}
-			}
-			else if (info_tab == "house" && state_inv_house)
-			{
-				triggerServerEvent( "event_throw_earth_server", "house", info3, info1, info2, house )
-			}
 
-			gui_selection = false
-			info_tab = ""
-			info1 = -1
-			info2 = -1
-			info3 = -1
-			lmb = 0
+				if (info_tab == "player" && state_inv_player)
+				{
+					triggerServerEvent( "event_use_inv", "player", info3, info1, info2 )
+				}
+
+				gui_selection = false
+				info_tab = ""
+				info1 = -1
+				info2 = -1
+				info3 = -1
+				lmb = 0
+			}
+		}
+		else if ( (screen[0]-pos_x_3d_image) < pos[0] && (screen[0]+pos_x_3d_image) > pos[0] )//выкинуть предмет
+		{
+			if (lmb == 1)
+			{
+				foreach (k, v in no_use_subject) 
+				{
+					if (v == info1)
+					{
+						return
+					}
+				}
+
+				if (info_tab == "player" && state_inv_player)
+				{
+					triggerServerEvent( "event_throw_earth_server", "player", info3, info1, info2, playerid )
+				}
+				else if (info_tab == "car" && state_inv_car)
+				{
+					if (isPlayerInVehicle(playerid))
+					{
+						triggerServerEvent( "event_throw_earth_server", "car", info3, info1, info2, plate )
+					}
+				}
+				else if (info_tab == "house" && state_inv_house)
+				{
+					triggerServerEvent( "event_throw_earth_server", "house", info3, info1, info2, house )
+				}
+
+				gui_selection = false
+				info_tab = ""
+				info1 = -1
+				info2 = -1
+				info3 = -1
+				lmb = 0
+			}
 		}
 	}
 
@@ -1292,11 +1294,11 @@ function( element )
 	{	
 		foreach (idx2, value2 in gridlist_table_text[idx])
 		{	
-			if (element == value2[0])
+			if (element == value2)
 			{
 				gridlist_window = gridlist_table_window[idx]
 				gridlist_lable = element
-				gridlist_row = value2[1]
+				gridlist_row = idx2
 				gridlist_select = true
 				break
 			}
@@ -1439,7 +1441,7 @@ function (playerid, i1, i2, i3)
 
 
 //-------------------------------------тестирование разных функций---------------------------------
-/*local mayoralty_shop = {
+local mayoralty_shop = {
 		[0] = "права",
 		[1] = "лицензия на оружие", 
 		[2] = "лицензия таксиста",
@@ -1480,4 +1482,4 @@ local mayoralty_shop = {
 
 	test_button11 = guiCreateElement( 2, "вывод", 550.0, 100.0+140.0, 50.0, 50.0, false )
 	test_button22 = guiCreateElement( 2, "скрыть", 600.0, 100.0+140.0, 50.0, 50.0, false )
-	test_button33 = guiCreateElement( 2, "показать", 650.0, 100.0+140.0, 50.0, 50.0, false )*/
+	test_button33 = guiCreateElement( 2, "показать", 650.0, 100.0+140.0, 50.0, 50.0, false )
