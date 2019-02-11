@@ -528,7 +528,7 @@ local drugs = array(getMaxPlayers(), 0)
 local max_message = 15//максимально отображаемое число сообщений
 local max_chat = array(getMaxPlayers(), max_message)
 local min_chat = array(getMaxPlayers(), 0)
-local message = {}
+local message = {}//сообщения
 
 //слоты тс
 local array_car_1 = {}
@@ -933,9 +933,9 @@ function buy_subject_fun( playerid, text, number, value )
 		}
 
 		local mayoralty_nalog = {
-			[48] = ["квитанция для оплаты дома на "+day_nalog+" дней", day_nalog, (zakon_nalog_house*day_nalog)],
-			[49] = ["квитанция для оплаты бизнеса на "+day_nalog+" дней", day_nalog, (zakon_nalog_business*day_nalog)],
-			[50] = ["квитанция для оплаты т/с на "+day_nalog+" дней", day_nalog, (zakon_nalog_car*day_nalog)],
+			[48] = ["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog)],
+			[49] = ["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog)],
+			[50] = ["квитанция для оплаты т/с на", day_nalog, (zakon_nalog_car*day_nalog)],
 		}
 
 		foreach (k, v in mayoralty_shop)
@@ -1549,6 +1549,46 @@ function need()//--нужды
 	}
 }
 
+function pay_nalog()
+{
+	local date = split(getDateTime(), ": ")//установка времени
+	local chas = date[3].tointeger()
+	local min = date[4].tointeger()
+	local sec = date[5].tointeger()
+
+	if (chas == 12)
+	{
+		local result = sqlite3( "SELECT * FROM car_db" )
+		foreach (k, v in result) 
+		{
+			if (v["nalog"] > 0)
+			{
+				sqlite3( "UPDATE car_db SET nalog = nalog - '1' WHERE number = '"+v["number"]+"'")
+			}
+		}
+
+		local result = sqlite3( "SELECT * FROM house_db" )
+		foreach (k, v in result) 
+		{
+			if (v["nalog"] > 0)
+			{
+				sqlite3( "UPDATE house_db SET nalog = nalog - '1' WHERE number = '"+v["number"]+"'")
+			}
+		}
+
+		local result = sqlite3( "SELECT * FROM business_db" )
+		foreach (k, v in result) 
+		{
+			if (v["nalog"] > 0)
+			{
+				sqlite3( "UPDATE business_db SET nalog = nalog - '1' WHERE number = '"+v["number"]+"'")
+			}
+		}
+
+		print("[pay_nalog]")
+	}
+}
+
 addEventHandler( "onScriptInit",
 function()
 {	
@@ -1563,6 +1603,7 @@ function()
 	timer(timer_earth_clear, (24*60000), -1)//--очистка земли от предметов
 	timer(need, 60000, -1)//--уменьшение потребностей
 	timer(need_1, 1000, -1)//--смена скина на бомжа
+	timer(pay_nalog, (60*60000), -1)//--списание налогов
 
 	local house_number = 0
 	foreach (idx, value in sqlite3( "SELECT * FROM house_db" )) 
@@ -2495,6 +2536,9 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 	local playername = getPlayerName ( playerid )
 	local vehicleid = getPlayerVehicle(playerid)
 	local myPos = getPlayerPosition(playerid)
+	local x = myPos[0]
+	local y = myPos[1]
+	local z = myPos[2]
 	local id1 = id_1
 	local id2 = id_2
 
@@ -2598,6 +2642,15 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			return
 		}
+		else if (id1 == 36)//--документы на бизнес
+		{
+			local result = sqlite3( "SELECT COUNT() FROM business_db WHERE number = '"+id2+"'" )
+			if (result[1]["COUNT()"] == 1)
+			{
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+			}
+			return
+		}
 		else if (id1 == 5) 
 		{
 			if (isPlayerInVehicle(playerid))
@@ -2654,14 +2707,77 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 		}
-		else if (id1 == 36)//--документы на бизнес
+		else if (id1 == 48)//--налог дома
 		{
-			local result = sqlite3( "SELECT COUNT() FROM business_db WHERE number = '"+id2+"'" )
-			if (result[1]["COUNT()"] == 1)
+			local count = 0
+			foreach (k, v in sqlite3( "SELECT * FROM house_db" ))
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius))
+				{
+					sqlite3( "UPDATE house_db SET nalog = nalog + '"+id2+"' WHERE number = '"+v["number"]+"'")
+					
+					me_chat(playerid, playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+
+					id2 = 0
+					count = 1
+					break
+				}
 			}
-			return
+
+			if (count == 0)
+			{
+				sendMessage(playerid, "[ERROR] Вы должны быть около дома", red[0], red[1], red[2])
+				return
+			}
+		}
+		else if (id1 == 49)//--налог бизнеса
+		{
+			local count = 0
+			foreach (k, v in sqlite3( "SELECT * FROM business_db" ))
+			{
+				if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius))
+				{
+					sqlite3( "UPDATE business_db SET nalog = nalog + '"+id2+"' WHERE number = '"+v["number"]+"'")
+					
+					me_chat(playerid, playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+
+					id2 = 0
+					count = 1
+					break
+				}
+			}
+
+			if (count == 0)
+			{
+				sendMessage(playerid, "[ERROR] Вы должны быть около бизнеса", red[0], red[1], red[2])
+				return
+			}
+		}
+		else if (id1 == 50)//--налог авто
+		{
+			if (isPlayerInVehicle(playerid))
+			{
+				local plate = getVehiclePlateText(vehicleid)
+				local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
+				if (result[1]["COUNT()"] == 1)
+				{
+					sqlite3( "UPDATE car_db SET nalog = nalog + '"+id2+"' WHERE number = '"+plate+"'")
+
+					me_chat(playerid, playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+
+					id2 = 0
+				}
+				else
+				{
+					sendMessage(playerid, "[ERROR] Т/с не найдено", red[0], red[1], red[2])
+					return
+				}
+			}
+			else
+			{
+				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
+				return
+			}
 		}
 		else if (id1 == 54) //--инкасаторский сумка
 		{
@@ -3070,6 +3186,8 @@ function(command, params)
 		{
 			setElementData(1, i, i*2)
 		}*/
+
+		//pay_nalog()
 	}
 
 	if(command == "x")
