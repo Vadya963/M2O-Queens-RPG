@@ -1361,7 +1361,7 @@ function debuginfo ()
 
 		setElementData(playerid, "timeserver", hour+":"+minute)
 
-		setElementData(playerid, "alcohol_data", alcohol[playerid])
+		setElementData(playerid, "alcohol_data", alcohol[playerid].tofloat())
 		setElementData(playerid, "satiety_data", satiety[playerid])
 		setElementData(playerid, "hygiene_data", hygiene[playerid])
 		setElementData(playerid, "sleep_data", sleep[playerid])
@@ -1490,8 +1490,9 @@ function need()//--нужды
 			if (alcohol[playerid] == 500)
 			{
 				local hygiene_minys = 25
+				local hp = getPlayerHealth(playerid)-100.0
 
-				setPlayerHealth( playerid, getPlayerHealth(playerid)-100 )
+				setPlayerHealth( playerid, hp )
 
 				sendMessage(playerid, "-100 хп", yellow[0], yellow[1], yellow[2])
 
@@ -1507,7 +1508,9 @@ function need()//--нужды
 
 			if (drugs[playerid] == 100)
 			{
-				setPlayerHealth( playerid, getPlayerHealth(playerid)-100 )
+				local hp = getPlayerHealth(playerid)-100.0
+
+				setPlayerHealth( playerid, hp )
 				sendMessage(playerid, "-100 хп", yellow[0], yellow[1], yellow[2])
 			}
 
@@ -1520,7 +1523,9 @@ function need()//--нужды
 
 			if (satiety[playerid] == 0)
 			{
-				setPlayerHealth( playerid, getPlayerHealth(playerid)-1 )
+				local hp = getPlayerHealth(playerid)-1.0
+				
+				setPlayerHealth( playerid, hp )
 			}
 			else
 			{
@@ -1539,7 +1544,9 @@ function need()//--нужды
 
 			if (sleep[playerid] == 0)
 			{
-				setPlayerHealth( playerid, getPlayerHealth(playerid)-1 )
+				local hp = getPlayerHealth(playerid)-1.0
+				
+				setPlayerHealth( playerid, hp )
 			}
 			else
 			{
@@ -3187,7 +3194,7 @@ function(command, params)
 			setElementData(1, i, i*2)
 		}*/
 
-		//pay_nalog()
+		//print(random(0,22))
 	}
 
 	if(command == "x")
