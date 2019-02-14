@@ -821,6 +821,8 @@ function( post )
 
 		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*5, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
 		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*5, ((width_need/100.0)*sleep), 15.0, fromRGB ( 90, 151, 107, 255 ) )
+
+		simpleShake(1.0, (alcohol/100).tofloat(), 1.0)
 	}
 
 
@@ -1441,7 +1443,7 @@ function (playerid, i1, i2, i3)
 
 
 //-------------------------------------тестирование разных функций---------------------------------
-local mayoralty_shop = {
+/* local mayoralty_shop = {
 		[0] = "права",
 		[1] = "лицензия на оружие", 
 		[2] = "лицензия таксиста",
@@ -1482,4 +1484,4 @@ local mayoralty_shop = {
 
 	test_button11 = guiCreateElement( 2, "вывод", 550.0, 100.0+140.0, 50.0, 50.0, false )
 	test_button22 = guiCreateElement( 2, "скрыть", 600.0, 100.0+140.0, 50.0, 50.0, false )
-	test_button33 = guiCreateElement( 2, "показать", 650.0, 100.0+140.0, 50.0, 50.0, false )
+	test_button33 = guiCreateElement( 2, "показать", 650.0, 100.0+140.0, 50.0, 50.0, false )*/
