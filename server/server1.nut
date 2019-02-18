@@ -2185,7 +2185,7 @@ function e_down (playerid)//--подбор предметов с земли
 
 		if (area) 
 		{
-			if ((v[3] == 24 || v[3] == 40) && search_inv_player(playerid, v[3], search_inv_player_2_parameter(playerid, v[3])) >= 1) {
+			if ((v[3] == 24 || v[3] == 40 || v[3] == 55) && search_inv_player(playerid, v[3], search_inv_player_2_parameter(playerid, v[3])) >= 1) {
 				sendMessage(playerid, "[ERROR] Можно переносить только один предмет", red[0], red[1], red[2])
 				return
 			}
