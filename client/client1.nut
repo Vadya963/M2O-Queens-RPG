@@ -98,7 +98,7 @@ local info_png = {
 	[38] = ["риэлторская лицензия", "шт"],
 	[39] = ["тушка свиньи", "$ за штуку"],
 	[40] = ["молоток", "шт"],
-	[41] = ["лицензия на оружие", ""],
+	[41] = ["лицензия на оружие", "шт"],
 	[42] = ["бургер", "шт"],
 	[43] = ["пицца", "шт"],
 	[44] = ["мыло", "процентов"],
@@ -294,7 +294,6 @@ local mayoralty_shop = {
 	[2] = ["права", 1, 1000],
 	[41] = ["лицензия на оружие", 1, 10000],
 	[53] = ["лицензия таксиста", 1, 5000],
-	[55] = ["лицензия инкасатора", 1, 10000],
 	[34] = ["лицензия дальнобойщика", 1, 15000],
 	[62] = ["лицензия водителя мусоровоза", 1, 20000],
 	[48] = ["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog)],
@@ -746,6 +745,7 @@ function( post )
 	playerid = getLocalPlayer()
 
 	local myPos = getPlayerPosition(playerid)
+	local myRot = getPlayerRotation(playerid)
 
 	local currentTick = getTickCount()
 	local elapsedTime = currentTick - lastTick
@@ -768,7 +768,7 @@ function( post )
 		local hygiene = getElementData ( "hygiene_data" ).tofloat()//--макс 100
 		local sleep = getElementData ( "sleep_data" ).tofloat()//--макс 100
 		local drugs = getElementData ( "drugs_data" ).tofloat()//--макс 100
-		local heal_player = split(getPlayerHealth(playerid).tostring(), ".")
+		local heal_player = split(getElementData ( "health_data" ).tostring(), ".")
 
 		local client_time = getDateTime()
 		local text = "FPS: "+FPS+" | Ping: "+getPlayerPing(playerid)+" | ID: "+playerid+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | Time: "+getElementData("timeserver")+" | "+client_time
@@ -785,7 +785,7 @@ function( post )
 			local pos = getMousePosition()
 			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		
-			for (local i = 0; i < 9; i++) 
+			for (local i = 0; i <= 9; i++) 
 			{	
 				dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			}
@@ -801,10 +801,13 @@ function( post )
 			dxdrawtext ( satiety.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*3, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			dxdrawtext ( hygiene.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*4, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			dxdrawtext ( sleep.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*5, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+
+			dxdrawtext ( myPos[0]+" "+myPos[1]+" "+myPos[2], 300.0, 40.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+			dxdrawtext ( myRot[0]+" "+myRot[1]+" "+myRot[2], 300.0, 55.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
 
 		dxDrawRectangle( screenWidth-width_need-30, height_need, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
-		dxDrawRectangle( screenWidth-width_need-30, height_need, (width_need/720)*getPlayerHealth(playerid), 15.0, fromRGB ( 90, 151, 107, 255 ) )
+		dxDrawRectangle( screenWidth-width_need-30, height_need, (width_need/720)*heal_player[0].tofloat(), 15.0, fromRGB ( 90, 151, 107, 255 ) )
 
 		//--нужды
 		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*1, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
