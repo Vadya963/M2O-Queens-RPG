@@ -74,7 +74,7 @@ local info_png = {
 	[38] = ["риэлторская лицензия", "шт"],
 	[39] = ["тушка свиньи", "$ за штуку"],
 	[40] = ["молоток", "шт"],
-	[41] = ["лицензия на оружие", ""],
+	[41] = ["лицензия на оружие", "шт"],
 	[42] = ["бургер", "шт"],
 	[43] = ["пицца", "шт"],
 	[44] = ["мыло", "процентов"],
@@ -535,6 +535,8 @@ local state_gui_window = array(getMaxPlayers(), 0)//--состояние гуи 
 local logged = array(getMaxPlayers(), 0)
 local sead = array(getMaxPlayers(), 0)
 local crimes = array(getMaxPlayers(), 0)
+local enter_house = array(getMaxPlayers(), 0)
+local health = array(getMaxPlayers(), 0)
 //--нужды
 local alcohol = array(getMaxPlayers(), 0)
 local satiety = array(getMaxPlayers(), 0)
@@ -763,6 +765,23 @@ function inv_player_delet(playerid, id1, id2)//--удаления предмет
 
 	return false
 }
+
+function setplayerhealth (playerid, id) 
+{	
+	if (id < 720)
+	{
+		health[playerid] = id
+	}
+	else 
+	{
+		health[playerid] = 720.0
+	}
+}
+
+function getplayerhealth (playerid) 
+{
+	return health[playerid]
+}
 //-------------------------------------------------------------------------------------------------
 
 //---------------------------------------авто------------------------------------------------------
@@ -915,6 +934,12 @@ function buy_subject_fun( playerid, text, number, value )
 
 	if ( value == "pd" )//пд
 	{
+		if (search_inv_player(playerid, 41, 1) == 0)
+		{
+			sendMessage(playerid, "[ERROR] У вас нет лицензии на оружие, приобрести её можно в Мэрии", red[0], red[1], red[2])
+			return
+		}
+
 		foreach (k, v in weapon)
 		{
 			local text1 = v[0]+" 25 "+info_png[k][1]+" "+v[2]+"$"
@@ -945,7 +970,6 @@ function buy_subject_fun( playerid, text, number, value )
 			[2] = ["права", 1, 1000],
 			[41] = ["лицензия на оружие", 1, 10000],
 			[53] = ["лицензия таксиста", 1, 5000],
-			[55] = ["лицензия инкасатора", 1, 10000],
 			[34] = ["лицензия дальнобойщика", 1, 15000],
 			[62] = ["лицензия водителя мусоровоза", 1, 20000],
 		}
@@ -1029,10 +1053,14 @@ function buy_subject_fun( playerid, text, number, value )
 			return
 		}
 
-		if (cash <= array_player_2[playerid][0])
-		{
 			if (value == 0)
 			{
+				if (search_inv_player(playerid, 41, 1) == 0)
+				{
+					sendMessage(playerid, "[ERROR] У вас нет лицензии на оружие, приобрести её можно в Мэрии", red[0], red[1], red[2])
+					return
+				}
+
 				foreach (k, v in weapon)
 				{
 					local text1 = v[0]+" 25 "+info_png[k][1]+" "+v[2]+"$"
@@ -1204,11 +1232,7 @@ function buy_subject_fun( playerid, text, number, value )
 					}
 				}
 			}
-		}
-		else
-		{
-			sendMessage(playerid, "[ERROR] У вас недостаточно средств", red[0], red[1], red[2])
-		}
+
 	}
 	else
 	{
@@ -1365,15 +1389,16 @@ function debuginfo ()
 		triggerClientEvent( playerid, "event_inv_load", "player", 0, array_player_1[playerid][0], array_player_2[playerid][0].tostring() )
 
 		//--элементдата
-		setElementData(playerid, "0", "state_inv_player[playerid] "+state_inv_player[playerid])
-		setElementData(playerid, "1", "logged[playerid] "+logged[playerid])
-		setElementData(playerid, "2", "sead[playerid] "+sead[playerid])
-		setElementData(playerid, "3", "0 "+0)
-		setElementData(playerid, "4", "max_earth "+max_earth)
-		setElementData(playerid, "5", "state_gui_window[playerid] "+state_gui_window[playerid])
+		setElementData(playerid, "0", "skin "+getPlayerModel(playerid))
+		setElementData(playerid, "1", "max_earth "+max_earth)
+		setElementData(playerid, "2", "state_inv_player[playerid] "+state_inv_player[playerid])
+		setElementData(playerid, "3", "state_gui_window[playerid] "+state_gui_window[playerid])
+		setElementData(playerid, "4", "logged[playerid] "+logged[playerid])
+		setElementData(playerid, "5", "sead[playerid] "+sead[playerid])
 		setElementData(playerid, "6", "crimes[playerid] "+crimes[playerid])
 		setElementData(playerid, "7", "min_chat[playerid] "+min_chat[playerid])
 		setElementData(playerid, "8", "max_chat[playerid] "+max_chat[playerid])
+		setElementData(playerid, "9", "enter_house[playerid] "+enter_house[playerid])
 
 		setElementData(playerid, "serial", getPlayerSerial(playerid))
 
@@ -1384,6 +1409,7 @@ function debuginfo ()
 		setElementData(playerid, "hygiene_data", hygiene[playerid])
 		setElementData(playerid, "sleep_data", sleep[playerid])
 		setElementData(playerid, "drugs_data", drugs[playerid])
+		setElementData(playerid, "health_data", health[playerid].tofloat())
 
 		local vehicleid = getPlayerVehicle(playerid)
 		if (isPlayerInVehicle(playerid))
@@ -1391,6 +1417,8 @@ function debuginfo ()
 			local plate = getVehiclePlateText(vehicleid)
 			setElementData ( playerid, "fuel_data", fuel[plate] )
 		}
+
+		setPlayerHealth(playerid, health[playerid].tofloat())
 	}
 }
 
@@ -1508,9 +1536,9 @@ function need()//--нужды
 			if (alcohol[playerid] == 500)
 			{
 				local hygiene_minys = 25
-				local hp = getPlayerHealth(playerid)-100.0
+				local hp = getplayerhealth(playerid)-100.0
 
-				setPlayerHealth( playerid, hp )
+				setplayerhealth( playerid, hp )
 
 				sendMessage(playerid, "-100 хп", yellow[0], yellow[1], yellow[2])
 
@@ -1526,9 +1554,9 @@ function need()//--нужды
 
 			if (drugs[playerid] == 100)
 			{
-				local hp = getPlayerHealth(playerid)-100.0
+				local hp = getplayerhealth(playerid)-100.0
 
-				setPlayerHealth( playerid, hp )
+				setplayerhealth( playerid, hp )
 				sendMessage(playerid, "-100 хп", yellow[0], yellow[1], yellow[2])
 			}
 
@@ -1541,9 +1569,9 @@ function need()//--нужды
 
 			if (satiety[playerid] == 0)
 			{
-				local hp = getPlayerHealth(playerid)-1.0
+				local hp = getplayerhealth(playerid)-1.0
 				
-				setPlayerHealth( playerid, hp )
+				setplayerhealth( playerid, hp )
 			}
 			else
 			{
@@ -1562,9 +1590,9 @@ function need()//--нужды
 
 			if (sleep[playerid] == 0)
 			{
-				local hp = getPlayerHealth(playerid)-1.0
+				local hp = getplayerhealth(playerid)-1.0
 				
-				setPlayerHealth( playerid, hp )
+				setplayerhealth( playerid, hp )
 			}
 			else
 			{
@@ -1693,6 +1721,8 @@ function( playerid, name, ip, serial )
 	logged[playerid] = 0
 	sead[playerid] = 0
 	crimes[playerid] = 0
+	enter_house[playerid] = 0
+	health[playerid] = 0
 	//--нужды
 	alcohol[playerid] = 0
 	satiety[playerid] = 0
@@ -1711,7 +1741,7 @@ function playerDisconnect( playerid, reason )
 	{
 		local myPos = getPlayerPosition(playerid)
 		local vehicleid = getPlayerVehicle(playerid)
-		local heal = getPlayerHealth(playerid)
+		local heal = getplayerhealth(playerid)
 		local playername = getPlayerName(playerid)
 
 		if (myPos[0] != 0 && myPos[1] != 0 && myPos[2] != 0)
@@ -1725,6 +1755,13 @@ function playerDisconnect( playerid, reason )
 	}
 }
 addEventHandler( "onPlayerDisconnect", playerDisconnect )
+
+addEventHandler( "onPlayerChangeHealth",
+function (playerid, newhealth, oldhealth)
+{
+	health[playerid] = newhealth
+	print("newhealth "+newhealth)
+})
 
 addEventHandler( "onPlayerSpawn",
 function( playerid )
@@ -1833,7 +1870,7 @@ function reg_or_login(playerid)
 		sleep[playerid] = result[1]["sleep"]
 		drugs[playerid] = result[1]["drugs"]
 
-		setPlayerHealth( playerid, result[1]["heal"] )
+		setplayerhealth( playerid, result[1]["heal"] )
 		setPlayerModel(playerid, result[1]["skin"])
 		setPlayerPosition( playerid, -393.265,905.334,-20.0026 )
 
@@ -1871,7 +1908,7 @@ function reg_or_login(playerid)
 		drugs[playerid] = result[1]["drugs"]
 
 		setPlayerPosition( playerid, result[1]["x"],result[1]["y"],result[1]["z"] )
-		setPlayerHealth( playerid, result[1]["heal"] )
+		setplayerhealth( playerid, result[1]["heal"] )
 		setPlayerModel(playerid, result[1]["skin"])
 
 		sendMessage(playerid, "Вы удачно зашли!", turquoise[0], turquoise[1], turquoise[2])
@@ -1998,6 +2035,8 @@ function tab_down(playerid)
 
 				triggerClientEvent( playerid, "event_tab_load", "house", value["number"] )
 
+				enter_house[playerid] = 1
+
 				break
 			}
 		}
@@ -2009,6 +2048,7 @@ function tab_down(playerid)
 		triggerClientEvent( playerid, "event_tab_load", "house", "" )
 
 		state_inv_player[playerid] = 0
+		enter_house[playerid] = 0
 	}
 
 	triggerClientEvent( playerid, "event_tab_down_fun" )
@@ -2559,7 +2599,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 	if (value == "player")
 	{
-		if (id1 == 2 || id1 == 34)//права, лиц водилы
+		if (id1 == 2 || id1 == 34 || id1 == 41)//права, лиц водилы, лиц на оружие
 		{
 			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 			return
@@ -2569,7 +2609,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			local satiety_minys = 5
 
-			if (getPlayerHealth(playerid) == max_heal)
+			if (getplayerhealth(playerid) == max_heal)
 			{
 				sendMessage(playerid, "[ERROR] У вас полное здоровье", red[0], red[1], red[2])
 				return
@@ -2580,19 +2620,19 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			if (id1 == 3)
 			{
 				local hp = max_heal*0.05
-				setPlayerHealth(playerid, getPlayerHealth(playerid)+hp)
+				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
 				sendMessage(playerid, "+"+hp+" хп", yellow[0], yellow[1], yellow[2])
 			}
 			else if (id1 == 7)
 			{
 				local hp = max_heal*0.10
-				setPlayerHealth(playerid, getPlayerHealth(playerid)+hp)
+				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
 				sendMessage(playerid, "+"+hp+" хп", yellow[0], yellow[1], yellow[2])
 			}
 			else if (id1 == 8)
 			{
 				local hp = max_heal*0.15
-				setPlayerHealth(playerid, getPlayerHealth(playerid)+hp)
+				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
 				sendMessage(playerid, "+"+hp+" хп", yellow[0], yellow[1], yellow[2])
 			}
 
@@ -2606,7 +2646,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 4)//--аптечка
 		{
-			if (getPlayerHealth(playerid) == max_heal)
+			if (getplayerhealth(playerid) == max_heal)
 			{
 				sendMessage(playerid, "[ERROR] У вас полное здоровье", red[0], red[1], red[2])
 				return
@@ -2614,7 +2654,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			id2 = id2 - 1
 
-			setPlayerHealth(playerid, max_heal)
+			setplayerhealth(playerid, max_heal)
 			sendMessage(playerid, "+"+max_heal+" хп", yellow[0], yellow[1], yellow[2])
 
 			me_chat(playerid, playername+" использовал(а) аптечку")
@@ -2624,7 +2664,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			local satiety_minys = 10
 			local drugs_plus = 1
 
-			if (getPlayerHealth(playerid) == max_heal)
+			if (getplayerhealth(playerid) == max_heal)
 			{
 				sendMessage(playerid, "[ERROR] У вас полное здоровье", red[0], red[1], red[2])
 				return
@@ -2638,7 +2678,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			id2 = id2 - 1
 
 			local hp = max_heal*0.50
-			setPlayerHealth(playerid, getPlayerHealth(playerid)+hp)
+			setplayerhealth(playerid, getplayerhealth(playerid)+hp)
 			sendMessage(playerid, "+"+hp+" хп",  yellow[0], yellow[1], yellow[2])
 
 			drugs[playerid] = drugs[playerid]+drugs_plus
@@ -2657,7 +2697,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			local alcohol_plus = 10.0
 			local hygiene_minys = 5
 
-			if (getPlayerHealth(playerid) == max_heal)
+			if (getplayerhealth(playerid) == max_heal)
 			{
 				sendMessage(playerid, "[ERROR] У вас полное здоровье", red[0], red[1], red[2])
 				return
@@ -2674,7 +2714,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				local satiety_plus = 10
 				local hp = max_heal*0.20
-				setPlayerHealth(playerid, getPlayerHealth(playerid)+hp)
+				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
 				sendMessage(playerid, "+"+hp+" хп", yellow[0], yellow[1], yellow[2])
 
 				if (satiety[playerid]+satiety_plus <= max_satiety)
@@ -2687,7 +2727,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				local satiety_plus = 5
 				local hp = max_heal*0.25
-				setPlayerHealth(playerid, getPlayerHealth(playerid)+hp)
+				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
 				sendMessage(playerid, "+"+hp+" хп", yellow[0], yellow[1], yellow[2])
 
 				if (satiety[playerid]+satiety_plus <= max_satiety)
@@ -2708,11 +2748,25 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			me_chat(playerid, playername+" выпил(а) пиво")
 		}
-		else if (id1 == 43)//--бургер, пицца
+		else if (id1 == 42 || id1 == 43)//--бургер, пицца
 		{
 			id2 = id2 - 1
 
-			if (id1 == 43)
+			if (id1 == 42)
+			{
+				local satiety_plus = 50
+
+				if (satiety[playerid]+satiety_plus > max_satiety)
+				{
+					sendMessage(playerid, "[ERROR] Вы не голодны", red[0], red[1], red[2])
+					return
+				}
+
+				satiety[playerid] = satiety[playerid]+satiety_plus
+				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow[0], yellow[1], yellow[2])
+				me_chat(playerid, playername+" съел(а) "+info_png[id1][0])
+			}
+			else if (id1 == 43)
 			{
 				local satiety_plus = 25
 
@@ -2726,6 +2780,81 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow[0], yellow[1], yellow[2])
 				me_chat(playerid, playername+" съел(а) "+info_png[id1][0])
 			}
+		}
+		else if (id1 == 44 || id1 == 45)//--мыло, пижама
+		{
+			id2 = id2 - 1
+
+			if (id1 == 44)
+			{
+				local sleep_hygiene_plus = 100
+
+				if (hygiene[playerid]+sleep_hygiene_plus > max_hygiene)
+				{
+					sendMessage(playerid, "[ERROR] Вы чисты", red[0], red[1], red[2])
+					return
+				}
+				else if (enter_house[playerid] == 0)
+				{
+					sendMessage(playerid, "[ERROR] Вы не в доме", red[0], red[1], red[2])
+					return
+				}
+
+				hygiene[playerid] = hygiene[playerid]+sleep_hygiene_plus
+				sendMessage(playerid, "+"+sleep_hygiene_plus+" ед. чистоплотности", yellow[0], yellow[1], yellow[2])
+				me_chat(playerid, playername+" помылся(ась)")
+			}
+			else if (id1 == 45)
+			{
+				local sleep_hygiene_plus = 100
+
+				if (sleep[playerid]+sleep_hygiene_plus > max_sleep)
+				{
+					sendMessage(playerid, "[ERROR] Вы бодры", red[0], red[1], red[2])
+					return
+				}
+				else if(enter_house[playerid] == 0)
+				{
+					sendMessage(playerid, "[ERROR] Вы не в доме", red[0], red[1], red[2])
+					return
+				}
+
+				sleep[playerid] = sleep[playerid]+sleep_hygiene_plus
+				sendMessage(playerid, "+"+sleep_hygiene_plus+" ед. сна", yellow[0], yellow[1], yellow[2])
+				me_chat(playerid, playername+" вздремнул(а)")
+			}
+		}
+		else if (id1 == 26)//--лекарство от наркозависимости
+		{
+			id2 = id2 - 1
+
+			local drugs_minys = 10
+
+			if (drugs[playerid]-drugs_minys < 0)
+			{
+				sendMessage(playerid, "[ERROR] У вас нет наркозависимости", red[0], red[1], red[2])
+				return
+			}
+
+			drugs[playerid] = drugs[playerid]-drugs_minys
+			sendMessage(playerid, "-"+drugs_minys+" ед. наркозависимости", yellow[0], yellow[1], yellow[2])
+			me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
+		}
+		else if (id1 == 64)//--антипохмелин
+		{
+			id2 = id2 - 1
+
+			local alcohol_minys = 50.0
+
+			if (alcohol[playerid]-alcohol_minys < 0)
+			{
+				sendMessage(playerid, "[ERROR] Вы не пьяны", red[0], red[1], red[2])
+				return
+			}
+
+			alcohol[playerid] = alcohol[playerid]-alcohol_minys
+			sendMessage(playerid, "-"+(alcohol_minys/100.0)+" промилле", yellow[0], yellow[1], yellow[2])
+			me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
 		}
 		//-----------------------------------------------------------------------------------------
 		else if (id1 == 6)//--ключ авто
@@ -3109,6 +3238,17 @@ function(playerid, id1, id2)
 	local val1 = id1.tointeger()
 	local val2 = id2.tointeger()
 
+	if (logged[playerid] == 0)
+	{
+		return
+	}
+
+	if (val1 > (info_png.len()-1) || val1 < 2)
+	{
+		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red[0], red[1], red[2])
+		return
+	}
+
 	if (inv_player_empty(playerid, val1, val2))
 	{
 		sendMessage(playerid, "Вы создали "+info_png[val1][0]+" "+val2+" "+info_png[val1][1], lyme[0], lyme[1], lyme[2])
@@ -3124,6 +3264,17 @@ function(playerid, id1, id2)
 {
 	local val1 = id1.tointeger()
 	local val2 = id2.tostring()
+
+	if (logged[playerid] == 0)
+	{
+		return
+	}
+
+	if (val1 > (info_png.len()-1) || val1 < 2)
+	{
+		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red[0], red[1], red[2])
+		return
+	}
 
 	if (inv_player_empty(playerid, val1, val2))
 	{
@@ -3148,9 +3299,9 @@ function (playerid, id1, id2 )
 		return
 	}
 
-	if (val1 > info_png.len() || val1 < 2)
+	if (val1 > (info_png.len()-1) || val1 < 2)
 	{
-		sendMessage(playerid, "[ERROR] от 2 до "+info_png.len(), red[0], red[1], red[2])
+		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red[0], red[1], red[2])
 		return
 	}
 
