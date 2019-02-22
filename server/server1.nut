@@ -70,8 +70,8 @@ local info_png = {
 	[34] = ["лицензия дальнобойщика", "шт"],
 	[35] = ["лом", "процентов"],
 	[36] = ["документы на", "бизнес"],
-	[37] = ["админский жетон", "шт"],
-	[38] = ["риэлторская лицензия", "шт"],
+	[37] = ["админский жетон на имя", ""],
+	[38] = ["риэлторская лицензия на имя", ""],
 	[39] = ["тушка свиньи", "$ за штуку"],
 	[40] = ["молоток", "шт"],
 	[41] = ["лицензия на оружие", "шт"],
@@ -3291,8 +3291,9 @@ function(playerid, id1, id2)
 {
 	local val1 = id1.tointeger()
 	local val2 = id2.tointeger()
+	local playername = getPlayerName ( playerid )
 
-	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
 	{
 		return
 	}
@@ -3313,13 +3314,15 @@ function(playerid, id1, id2)
 	}
 })
 
+local sub_text = [44,45]
 addCommandHandler("subt",//выдача предмета и кол-во
 function(playerid, id1, id2)
 {
 	local val1 = id1.tointeger()
 	local val2 = id2.tostring()
+	local playername = getPlayerName ( playerid )
 
-	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
 	{
 		return
 	}
@@ -3330,13 +3333,19 @@ function(playerid, id1, id2)
 		return
 	}
 
-	if (inv_player_empty(playerid, val1, val2))
-	{
-		sendMessage(playerid, "Вы создали "+info_png[val1][0]+" "+val2+" "+info_png[val1][1], lyme[0], lyme[1], lyme[2])
-	}
-	else
-	{
-		sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
+	foreach (idx, value in sub_text) 
+	{	
+		if (val1 == value)
+		{
+			if (inv_player_empty(playerid, val1, val2))
+			{
+				sendMessage(playerid, "Вы создали "+info_png[val1][0]+" "+val2+" "+info_png[val1][1], lyme[0], lyme[1], lyme[2])
+			}
+			else
+			{
+				sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
+			}
+		}
 	}
 })
 
@@ -3347,8 +3356,9 @@ function (playerid, id1, id2 )
 	local val2 = id2.tointeger()
 	local playername = getPlayerName ( playerid )
 	local vehicleid = getPlayerVehicle ( playerid )
+	local playername = getPlayerName ( playerid )
 
-	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
 	{
 		return
 	}
@@ -3375,7 +3385,9 @@ function (playerid, id1, id2 )
 addCommandHandler("v",
 function(playerid, id)
 {
-	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	local playername = getPlayerName ( playerid )
+
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
 	{
 		return
 	}
@@ -3390,7 +3402,9 @@ function(playerid, id)
 addCommandHandler("stime",
 function(playerid, id1, id2)
 {	
-	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	local playername = getPlayerName ( playerid )
+
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
 	{
 		return
 	}
@@ -3411,7 +3425,7 @@ function ( playerid, ... )
 	local pos = getPlayerPosition( playerid )
 	local text = ""
 
-	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
 	{
 		return
 	}
@@ -3437,6 +3451,13 @@ function( playerid )
 addCommandHandler( "go",
 function( playerid, q, w, e )
 {
+	local playername = getPlayerName ( playerid )
+
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
+	{
+		return
+	}
+	
 	if(!isPlayerInVehicle(playerid))
 	{
 		setPlayerPosition( playerid, q.tofloat(), w.tofloat(), e.tofloat() )
