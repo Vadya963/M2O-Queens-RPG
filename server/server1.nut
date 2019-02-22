@@ -3314,7 +3314,7 @@ function(playerid, id1, id2)
 	}
 })
 
-local sub_text = [44,45]
+local sub_text = [37,38]
 addCommandHandler("subt",//выдача предмета и кол-во
 function(playerid, id1, id2)
 {
