@@ -768,7 +768,7 @@ function( post )
 		local hygiene = getElementData ( "hygiene_data" ).tofloat()//--макс 100
 		local sleep = getElementData ( "sleep_data" ).tofloat()//--макс 100
 		local drugs = getElementData ( "drugs_data" ).tofloat()//--макс 100
-		local heal_player = split(getElementData ( "health_data" ).tostring(), ".")
+		local heal_player = split(getPlayerHealth(playerid).tostring(), ".")
 
 		local client_time = getDateTime()
 		local text = "FPS: "+FPS+" | Ping: "+getPlayerPing(playerid)+" | ID: "+playerid+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | Time: "+getElementData("timeserver")+" | "+client_time
