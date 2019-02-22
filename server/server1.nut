@@ -563,6 +563,25 @@ local array_house_2 = {}
 function sqlite3(text)
 {
 	local result = database.query(text)
+
+	/*local posfile = file("db.txt", "a")
+
+	local date = split(getDateTime(), ": ")//установка времени
+	local month = date[1].tostring()
+	local day = date[2].tostring()
+	local chas = date[3].tostring()
+	local min = date[4].tostring()
+	local sec = date[5].tostring()
+
+	local say = "["+day+" "+month+" "+chas+":"+min+":"+sec+"] "+text
+	for (local i = 0; i < say.len(); i++) 
+	{
+		posfile.writen(say[i], 'b')
+	}
+	
+	posfile.writen('\n', 'b')
+	posfile.close()*/
+
 	return result
 }
 
@@ -1409,7 +1428,6 @@ function debuginfo ()
 		setElementData(playerid, "hygiene_data", hygiene[playerid])
 		setElementData(playerid, "sleep_data", sleep[playerid])
 		setElementData(playerid, "drugs_data", drugs[playerid])
-		setElementData(playerid, "health_data", health[playerid].tofloat())
 
 		local vehicleid = getPlayerVehicle(playerid)
 		if (isPlayerInVehicle(playerid))
@@ -2918,6 +2936,41 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 		}
+		else if (id1 == 10) //--документы копа
+		{	
+			if (search_inv_player(playerid, 10, 1) != 0)
+			{
+				if (search_inv_player(playerid, 28, 1) != 0)
+				{
+					me_chat(playerid, "Офицер "+playername+" показал(а) "+info_png[id1][0])
+				}
+				else if (search_inv_player(playerid, 29, 1) != 0)
+				{
+					me_chat(playerid, "Детектив "+playername+" показал(а) "+info_png[id1][0])
+				}
+				else if (search_inv_player(playerid, 30, 1) != 0)
+				{
+					me_chat(playerid, "Сержант "+playername+" показал(а) "+info_png[id1][0])
+				}
+				else if (search_inv_player(playerid, 31, 1) != 0)
+				{
+					me_chat(playerid, "Лейтенант "+playername+" показал(а) "+info_png[id1][0])
+				}
+				else if (search_inv_player(playerid, 32, 1) != 0)
+				{
+					me_chat(playerid, "Капитан "+playername+" показал(а) "+info_png[id1][0])
+				}
+				else if (search_inv_player(playerid, 33, 1) != 0)
+				{
+					me_chat(playerid, "Шеф полиции "+playername+" показал(а) "+info_png[id1][0])
+				}
+			}
+			else
+			{
+				sendMessage(playerid, "[ERROR] Вы не полицейский", red[0], red[1], red[2])
+			}
+			return
+		}
 		else if (id1 == 23)//--ремонтный набор
 		{
 			if (isPlayerInVehicle(playerid))
@@ -3232,13 +3285,14 @@ function (playerid, value, money)
 	}
 })
 
+//--------------------------------------------админские команды--------------------------------------------
 addCommandHandler("sub",//выдача предмета и кол-во
 function(playerid, id1, id2)
 {
 	local val1 = id1.tointeger()
 	local val2 = id2.tointeger()
 
-	if (logged[playerid] == 0)
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
 	{
 		return
 	}
@@ -3265,7 +3319,7 @@ function(playerid, id1, id2)
 	local val1 = id1.tointeger()
 	local val2 = id2.tostring()
 
-	if (logged[playerid] == 0)
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
 	{
 		return
 	}
@@ -3294,7 +3348,7 @@ function (playerid, id1, id2 )
 	local playername = getPlayerName ( playerid )
 	local vehicleid = getPlayerVehicle ( playerid )
 
-	if (logged[playerid] == 0)
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
 	{
 		return
 	}
@@ -3321,6 +3375,11 @@ function (playerid, id1, id2 )
 addCommandHandler("v",
 function(playerid, id)
 {
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	{
+		return
+	}
+
 	local pos = getPlayerPosition( playerid )
 	local vehicleid = createVehicle( id.tointeger(), pos[0] + 2.0, pos[1], pos[2] + 1.0, 0.0, 0.0, 0.0 )
 	setVehiclePlateText(vehicleid, "0")
@@ -3328,43 +3387,20 @@ function(playerid, id)
 	dviglo["0"] <- 0
 })
 
-addCommandHandler("flip",
-function(playerid)
+addCommandHandler("stime",
+function(playerid, id1, id2)
 {	
-	if (isPlayerInVehicle(playerid))
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
 	{
-		local vehicleid = getPlayerVehicle(playerid)
-		local rot = getVehicleRotation(vehicleid)
-		setVehicleRotation(vehicleid, rot[0], 0.0, 0.0)
+		return
 	}
-})
 
-addCommandHandler("getfuel",
-function(playerid)
-{	
-	timer(function () 
+	if (id1 <= 24 && id2 <= 60)
 	{
-		if (isPlayerInVehicle(playerid))
-		{
-			local vehicleid = getPlayerVehicle(playerid)
-			local gas = getVehicleFuel(vehicleid)
-			sendMessage(playerid, "gas "+gas, 255, 255, 255)
-		}
-	}, 1000, -1)
-})
+		hour = id1
+		minute = id2
 
-addCommandHandler("p",
-function(playerid, id)
-{	
-	if (pogoda)
-	{
-		setWeather(pogoda_leto[id.tointeger()][0])
-		sendMessage(playerid, pogoda_leto[id.tointeger()][0])
-	}
-	else 
-	{
-		setWeather(pogoda_zima[id.tointeger()][0])
-		sendMessage(playerid, pogoda_zima[id.tointeger()][0])
+		sendMessage(playerid, "stime "+hour+":"+minute, lyme[0], lyme[1], lyme[2])
 	}
 })
 
@@ -3375,7 +3411,7 @@ function ( playerid, ... )
 	local pos = getPlayerPosition( playerid )
 	local text = ""
 
-	if (logged[playerid] == 0)
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
 	{
 		return
 	}
