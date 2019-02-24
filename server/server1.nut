@@ -537,6 +537,7 @@ local sead = array(getMaxPlayers(), 0)
 local crimes = array(getMaxPlayers(), 0)
 local enter_house = array(getMaxPlayers(), 0)
 local health = array(getMaxPlayers(), 0)
+local arrest = array(getMaxPlayers(), 0)
 //--нужды
 local alcohol = array(getMaxPlayers(), 0)
 local satiety = array(getMaxPlayers(), 0)
@@ -801,6 +802,19 @@ function getplayerhealth (playerid)
 {
 	return health[playerid]
 }
+
+function takeAllWeapons (playerid) 
+{
+	removePlayerWeapon(playerid, 2, 0)
+	removePlayerWeapon(playerid, 3, 0)
+	removePlayerWeapon(playerid, 4, 0)
+	removePlayerWeapon(playerid, 5, 0)
+	removePlayerWeapon(playerid, 6, 0)
+	removePlayerWeapon(playerid, 8, 0)
+	removePlayerWeapon(playerid, 9, 0)
+	removePlayerWeapon(playerid, 10, 0)
+	removePlayerWeapon(playerid, 11, 0)
+}
 //-------------------------------------------------------------------------------------------------
 
 //---------------------------------------авто------------------------------------------------------
@@ -959,9 +973,30 @@ function buy_subject_fun( playerid, text, number, value )
 			return
 		}
 
-		foreach (k, v in weapon)
+		local sub_cops = {
+			[10] = [info_png[10][0]],
+			[28] = [info_png[28][0]],
+			[29] = [info_png[29][0]],
+			[30] = [info_png[30][0]],
+			[31] = [info_png[31][0]],
+			[32] = [info_png[32][0]],
+		}
+
+		local weapon_cops = {
+			[9] = [info_png[9][0], 11, 4700],
+			[12] = [info_png[12][0], 2, 630],
+			[13] = [info_png[13][0], 4, 1230],
+			[14] = [info_png[14][0], 5, 2700],
+			[15] = [info_png[15][0], 8, 4000],
+			[16] = [info_png[16][0], 10, 2190],
+			[17] = [info_png[17][0], 3, 1050],
+			[18] = [info_png[18][0], 6, 1500],
+			[19] = [info_png[19][0], 9, 1990]
+		}
+
+		foreach (k, v in weapon_cops)
 		{
-			local text1 = v[0]+" 25 "+info_png[k][1]+" "+v[2]+"$"
+			local text1 = v[0]
 			if (text1 == text)
 			{
 				if (inv_player_empty(playerid, k, 25))
@@ -974,8 +1009,30 @@ function buy_subject_fun( playerid, text, number, value )
 				{
 					sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
 				}
+			}
+		}
 
-				break
+		foreach (k, v in sub_cops)
+		{
+			local text1 = v[0]
+			if (text1 == text)
+			{
+				if (search_inv_player(playerid, 33, 1) == 0)
+				{
+					sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red[0], red[1], red[2])
+					return
+				}
+
+				if (inv_player_empty(playerid, k, 1))
+				{
+					sendMessage(playerid, "Вы получили "+text, orange[0], orange[1], orange[2])
+
+					save_player_action(playerid, "[sub_cops_fun] "+playername+" [sub_cops - "+text+"]")
+				}
+				else
+				{
+					sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
+				}
 			}
 		}
 
@@ -1418,6 +1475,7 @@ function debuginfo ()
 		setElementData(playerid, "7", "min_chat[playerid] "+min_chat[playerid])
 		setElementData(playerid, "8", "max_chat[playerid] "+max_chat[playerid])
 		setElementData(playerid, "9", "enter_house[playerid] "+enter_house[playerid])
+		setElementData(playerid, "10", "arrest[playerid] "+arrest[playerid])
 
 		setElementData(playerid, "serial", getPlayerSerial(playerid))
 
@@ -1660,6 +1718,64 @@ function pay_nalog()
 	}
 }
 
+function prison_timer()//--античит если не в тюрьме
+{
+	foreach (playerid, playername in getPlayers()) 
+	{
+		local playername = getPlayerName(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+
+		if (arrest[playerid] == 1)
+		{
+			if (!isPointInCircle3D(x,y,z, -1030.42,1712.74,10.3595, 5.0))
+			{
+				state_inv_player[playerid] = 0
+				state_gui_window[playerid] = 0
+				enter_house[playerid] = 0
+
+				takeAllWeapons ( playerid )
+
+				setPlayerPosition( playerid, -1030.42,1712.74,10.3595 )
+
+				triggerClientEvent( playerid, "event_gui_delet" )
+				triggerClientEvent( playerid, "event_tab_down_fun", state_inv_player[playerid] )
+			}
+		}
+	}
+}
+
+function prison()//--таймер заключения
+{
+	foreach (playerid, playername in getPlayers()) 
+	{
+		local playername = getPlayerName(playerid)
+
+		if (arrest[playerid] == 1)
+		{
+			if (crimes[playerid] == 0)
+			{
+				arrest[playerid] = 0
+				crimes[playerid] = -1
+
+				setPlayerPosition( playerid, -378.987, 654.699, -11.5013 )
+
+				sendMessage(playerid, "Вы свободны, больше не нарушайте", yellow[0], yellow[1], yellow[2])
+
+				save_player_action(playerid, "[prison_timer] "+playername+" вышел из тюрьмы")
+			}
+			else if (crimes[playerid] > 0)
+			{
+				crimes[playerid] = crimes[playerid]-1
+
+				sendMessage(playerid, "Вам сидеть ещё "+(crimes[playerid]+1)+" мин", yellow[0], yellow[1], yellow[2])
+			}
+		}
+	}
+}
+
 addEventHandler( "onScriptInit",
 function()
 {	
@@ -1675,6 +1791,8 @@ function()
 	timer(need, 60000, -1)//--уменьшение потребностей
 	timer(need_1, 1000, -1)//--смена скина на бомжа
 	timer(pay_nalog, (60*60000), -1)//--списание налогов
+	timer(prison, 60000, -1)//--таймер заключения в тюрьме
+	timer(prison_timer, 1000, -1)//--античит если не в тюрьме
 
 	local house_number = 0
 	foreach (idx, value in sqlite3( "SELECT * FROM house_db" )) 
@@ -1728,7 +1846,7 @@ function( playerid, name, ip, serial )
 
 	for (local i = 0; i < 15; i++)//заполнение 15 пустых строк
 	{
-		message_chat(playerid, "", 255,255,255)
+		message_chat(playerid, "", 0,0,0)
 	}
 
 	array_player_1[playerid] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -1738,9 +1856,10 @@ function( playerid, name, ip, serial )
 	state_gui_window[playerid] = 0
 	logged[playerid] = 0
 	sead[playerid] = 0
-	crimes[playerid] = 0
+	crimes[playerid] = -1
 	enter_house[playerid] = 0
 	health[playerid] = 0
+	arrest[playerid] = 0
 	//--нужды
 	alcohol[playerid] = 0
 	satiety[playerid] = 0
@@ -1764,7 +1883,7 @@ function playerDisconnect( playerid, reason )
 
 		if (myPos[0] != 0 && myPos[1] != 0 && myPos[2] != 0)
 		{
-			sqlite3( "UPDATE account SET x = '"+myPos[0]+"', y = '"+myPos[1]+"', z = '"+myPos[2]+"', heal = '"+heal+"', crimes = '"+crimes[playerid]+"', alcohol = '"+alcohol[playerid]+"', satiety = '"+satiety[playerid]+"', hygiene = '"+hygiene[playerid]+"', sleep = '"+sleep[playerid]+"', drugs = '"+drugs[playerid]+"' WHERE name = '"+playername+"'")
+			sqlite3( "UPDATE account SET x = '"+myPos[0]+"', y = '"+myPos[1]+"', z = '"+myPos[2]+"', heal = '"+heal+"', arrest = '"+arrest[playerid]+"', crimes = '"+crimes[playerid]+"', alcohol = '"+alcohol[playerid]+"', satiety = '"+satiety[playerid]+"', hygiene = '"+hygiene[playerid]+"', sleep = '"+sleep[playerid]+"', drugs = '"+drugs[playerid]+"' WHERE name = '"+playername+"'")
 		}
 
 		logged[playerid] = 0
@@ -1917,7 +2036,7 @@ function reg_or_login(playerid)
 		}
 
 		logged[playerid] = 1
-		//arrest[playerid] = result[1]["arrest"]
+		arrest[playerid] = result[1]["arrest"]
 		crimes[playerid] = result[1]["crimes"]
 		alcohol[playerid] = result[1]["alcohol"]
 		satiety[playerid] = result[1]["satiety"]
@@ -2030,7 +2149,7 @@ function tab_down(playerid)
 		return
 	}
 
-	if (state_inv_player[playerid] == 0)
+	if (state_inv_player[playerid] == 0 && arrest[playerid] == 0)
 	{
 		for (local id3 = 1; id3 < max_inv; id3++)
 		{
@@ -2060,16 +2179,18 @@ function tab_down(playerid)
 		}
 
 		state_inv_player[playerid] = 1
+
+		triggerClientEvent( playerid, "event_tab_down_fun", state_inv_player[playerid] )
 	}
-	else
+	else if (state_inv_player[playerid] == 1)
 	{
 		triggerClientEvent( playerid, "event_tab_load", "house", "" )
 
 		state_inv_player[playerid] = 0
 		enter_house[playerid] = 0
-	}
 
-	triggerClientEvent( playerid, "event_tab_down_fun" )
+		triggerClientEvent( playerid, "event_tab_down_fun", state_inv_player[playerid] )
+	}
 }
 addEventHandler ("event_tab_down", tab_down)
 
@@ -2617,7 +2738,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 	if (value == "player")
 	{
-		if (id1 == 2 || id1 == 34 || id1 == 41)//права, лиц водилы, лиц на оружие
+		if (id1 == 2 || id1 == 34 || id1 == 37 || id1 == 41)//права, лиц водилы, АЖ, лиц на оружие
 		{
 			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 			return
@@ -3106,6 +3227,62 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 }
 addEventHandler( "event_use_inv", use_inv )
 
+addCommandHandler ( "prison",//--команда для копов (посадить игрока в тюрьму)
+function (playerid, id)
+{
+	local playername = getPlayerName ( playerid )
+	local myPos = getPlayerPosition(playerid)
+	local x = myPos[0]
+	local y = myPos[1]
+	local z = myPos[2]
+	local cash = 100
+
+	if (logged[playerid] == 0)
+	{
+		return
+	}
+
+	if(logged[id] == 0)
+	{
+		sendMessage(playerid, "[ERROR] Такого игрока нет", red[0], red[1], red[2])
+		return
+	}
+
+	if (search_inv_player(playerid, 10, 1) == 0)
+	{
+		sendMessage(playerid, "[ERROR] Вы не полицейский", red[0], red[1], red[2])
+		return
+	}
+
+	local myPos1 = getPlayerPosition(playerid)
+	local x1 = myPos1[0]
+	local y1 = myPos1[1]
+	local z1 = myPos1[2]
+
+	if (crimes[id] == -1)
+	{
+		sendMessage(playerid, "[ERROR] Гражданин чист перед законом", red[0], red[1], red[2])
+		return
+	}
+
+	if (isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
+	{
+		me_chat(playerid, playername+" посадил(а) "+id+" в камеру на "+(crimes[id]+1)+" мин")
+
+		arrest[id] = 1
+
+		sendMessage(playerid, "Вы получили премию "+(cash*(crimes[id]+1))+"$", green[0], green[1], green[2])
+
+		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+(cash*(crimes[id]+1)), playername )
+
+		save_player_action(playerid, "[police_prison] "+playername+" prison "+id+" time "+(crimes[id]+1))
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Игрок далеко", red[0], red[1], red[2])
+	}
+})
+
 addCommandHandler( "sms",//смс
 function( playerid, id, ...)
 {
@@ -3457,7 +3634,7 @@ function( playerid, q, w, e )
 	{
 		return
 	}
-	
+
 	if(!isPlayerInVehicle(playerid))
 	{
 		setPlayerPosition( playerid, q.tofloat(), w.tofloat(), e.tofloat() )
