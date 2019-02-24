@@ -308,6 +308,31 @@ foreach (k,v in mayoralty_shop)
 }
 guiSetVisibleGridList (mayoralty_shop_menu, false)
 
+local sub_cops = {
+	[10] = [info_png[10][0]],
+	[28] = [info_png[28][0]],
+	[29] = [info_png[29][0]],
+	[30] = [info_png[30][0]],
+	[31] = [info_png[31][0]],
+	[32] = [info_png[32][0]],
+	[9] = [info_png[9][0], 11, 4700],
+	[12] = [info_png[12][0], 2, 630],
+	[13] = [info_png[13][0], 4, 1230],
+	[14] = [info_png[14][0], 5, 2700],
+	[15] = [info_png[15][0], 8, 4000],
+	[16] = [info_png[16][0], 10, 2190],
+	[17] = [info_png[17][0], 3, 1050],
+	[18] = [info_png[18][0], 6, 1500],
+	[19] = [info_png[19][0], 9, 1990]
+}
+local sub_cops_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
+foreach (k,v in sub_cops)
+{
+	local text = v[0]
+	guiGridListAddRow (sub_cops_menu, text)
+}
+guiSetVisibleGridList (sub_cops_menu, false)
+
 local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2)+4.0, 400.0, 30.0, false )
 guiSetVisible( shop_menu_button, false )
 
@@ -325,6 +350,7 @@ function tune_close ()//--закрытие окна
 	guiSetVisibleGridList (repair_shop_menu, false)
 	guiSetVisibleGridList (eda_menu, false)
 	guiSetVisibleGridList (mayoralty_shop_menu, false)
+	guiSetVisibleGridList (sub_cops_menu, false)
 }
 addEventHandler ( "event_gui_delet", tune_close )
 
@@ -358,7 +384,7 @@ function shop_menu_fun(number, value)//--создание окна магази�
 	}
 	else if (value_business == "pd")
 	{
-		guiSetVisibleGridList (weapon_menu, true)
+		guiSetVisibleGridList (sub_cops_menu, true)
 	}
 	else if (value_business == "mer")
 	{
@@ -785,7 +811,7 @@ function( post )
 			local pos = getMousePosition()
 			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		
-			for (local i = 0; i <= 9; i++) 
+			for (local i = 0; i <= 10; i++) 
 			{	
 				dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			}
@@ -954,9 +980,9 @@ function( post )
 	}
 })
 
-function tab_down_fun()//инв-рь игрока
+function tab_down_fun(value)//инв-рь игрока
 {
-	if (state_inv_gui)
+	if (value == 0)
 	{
 		state_inv_gui = false
 		state_inv_player = false
@@ -975,7 +1001,7 @@ function tab_down_fun()//инв-рь игрока
 
 		guiSetVisible( gui_fon, false )
 	}
-	else
+	else if (value == 1)
 	{
 		state_inv_gui = true
 		state_inv_player = true
