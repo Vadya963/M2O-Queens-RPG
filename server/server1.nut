@@ -1730,7 +1730,7 @@ function prison_timer()//--античит если не в тюрьме
 
 		if (arrest[playerid] == 1)
 		{
-			if (!isPointInCircle3D(x,y,z, -1030.42,1712.74,10.3595, 5.0))
+			if (!isPointInCircle3D(x,y,z, -1030.42,1712.74,10.3595, 10.0))
 			{
 				state_inv_player[playerid] = 0
 				state_gui_window[playerid] = 0
@@ -1758,7 +1758,7 @@ function prison()//--таймер заключения
 			if (crimes[playerid] == 0)
 			{
 				arrest[playerid] = 0
-				crimes[playerid] = -1
+				crimes[playerid] = 0
 
 				setPlayerPosition( playerid, -378.987, 654.699, -11.5013 )
 
@@ -1770,7 +1770,7 @@ function prison()//--таймер заключения
 			{
 				crimes[playerid] = crimes[playerid]-1
 
-				sendMessage(playerid, "Вам сидеть ещё "+(crimes[playerid]+1)+" мин", yellow[0], yellow[1], yellow[2])
+				sendMessage(playerid, "Вам сидеть ещё "+(crimes[playerid])+" мин", yellow[0], yellow[1], yellow[2])
 			}
 		}
 	}
@@ -1782,7 +1782,7 @@ function()
 	setSummer(pogoda)
 
 	timer( EngineState, 500, -1 )//двигатель машины
-	timer( fuel_down, 1000, -1 )//система топлива
+	//timer( fuel_down, 1000, -1 )//система топлива
 	timer( debuginfo, 1000, -1)//--дебагинфа
 	timer( element_data_push_client, 1000, -1)//--элементдата
 	timer( timeserver, 1000, -1 )//время сервера 1 игровой час = 1 мин реальных
@@ -1856,7 +1856,7 @@ function( playerid, name, ip, serial )
 	state_gui_window[playerid] = 0
 	logged[playerid] = 0
 	sead[playerid] = 0
-	crimes[playerid] = -1
+	crimes[playerid] = 0
 	enter_house[playerid] = 0
 	health[playerid] = 0
 	arrest[playerid] = 0
@@ -1896,8 +1896,8 @@ addEventHandler( "onPlayerDisconnect", playerDisconnect )
 addEventHandler( "onPlayerChangeHealth",
 function (playerid, newhealth, oldhealth)
 {
-	health[playerid] = newhealth
-	print("newhealth "+newhealth)
+	//health[playerid] = newhealth
+	//print("newhealth "+newhealth)
 })
 
 addEventHandler( "onPlayerSpawn",
@@ -1986,12 +1986,17 @@ function reg_or_login(playerid)
 	{
 		local result = sqlite3( "SELECT COUNT() FROM account WHERE reg_serial = '"+serial+"'" )
 		if (result[1]["COUNT()"] == 1) 
-		{
-			kickPlayer(playerid)
+		{	
+			local result = sqlite3( "SELECT * FROM account WHERE reg_serial = '"+serial+"'" )
+			sendMessage(playerid, "[ERROR] Регистрация твинков запрещена, вас кикнет через 10 сек", red[0], red[1], red[2])
+			timer(function () 
+			{
+				kickPlayer(playerid)
+			}, 10000, 1)
 			return
 		}
 		
-		local result = sqlite3( "INSERT INTO account (name, ban, reason, x, y, z, reg_ip, reg_serial, heal, alcohol, satiety, hygiene, sleep, drugs, skin, arrest, crimes, slot_0_1, slot_0_2, slot_1_1, slot_1_2, slot_2_1, slot_2_2, slot_3_1, slot_3_2, slot_4_1, slot_4_2, slot_5_1, slot_5_2, slot_6_1, slot_6_2, slot_7_1, slot_7_2, slot_8_1, slot_8_2, slot_9_1, slot_9_2, slot_10_1, slot_10_2, slot_11_1, slot_11_2, slot_12_1, slot_12_2, slot_13_1, slot_13_2, slot_14_1, slot_14_2, slot_15_1, slot_15_2, slot_16_1, slot_16_2, slot_17_1, slot_17_2, slot_18_1, slot_18_2, slot_19_1, slot_19_2, slot_20_1, slot_20_2, slot_21_1, slot_21_2, slot_22_1, slot_22_2, slot_23_1, slot_23_2) VALUES ('"+playername+"', '0', '0', '0', '0', '0', '"+ip+"', '"+serial+"', '"+max_heal+"', '0', '100', '100', '100', '0', '81', '0', '-1', '1', '500', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')" )
+		local result = sqlite3( "INSERT INTO account (name, ban, reason, x, y, z, reg_ip, reg_serial, heal, alcohol, satiety, hygiene, sleep, drugs, skin, arrest, crimes, slot_0_1, slot_0_2, slot_1_1, slot_1_2, slot_2_1, slot_2_2, slot_3_1, slot_3_2, slot_4_1, slot_4_2, slot_5_1, slot_5_2, slot_6_1, slot_6_2, slot_7_1, slot_7_2, slot_8_1, slot_8_2, slot_9_1, slot_9_2, slot_10_1, slot_10_2, slot_11_1, slot_11_2, slot_12_1, slot_12_2, slot_13_1, slot_13_2, slot_14_1, slot_14_2, slot_15_1, slot_15_2, slot_16_1, slot_16_2, slot_17_1, slot_17_2, slot_18_1, slot_18_2, slot_19_1, slot_19_2, slot_20_1, slot_20_2, slot_21_1, slot_21_2, slot_22_1, slot_22_2, slot_23_1, slot_23_2) VALUES ('"+playername+"', '0', '0', '0', '0', '0', '"+ip+"', '"+serial+"', '"+max_heal+"', '0', '100', '100', '100', '0', '81', '0', '0', '1', '500', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')" )
 
 		local result = sqlite3( "SELECT * FROM account WHERE name = '"+playername+"'" )
 		for (local i = 0; i < max_inv; i++) 
@@ -2025,8 +2030,12 @@ function reg_or_login(playerid)
 
 		if (result[1]["reg_serial"] != serial)
 		{
-			//kickPlayer(playerid)
-			//return
+			sendMessage(playerid, "[ERROR] Вы не владелец аккаунта, вас кикнет через 10 сек", red[0], red[1], red[2])
+			timer(function () 
+			{
+				kickPlayer(playerid)
+			}, 10000, 1)
+			return
 		}
 
 		for (local i = 0; i < max_inv; i++) 
@@ -3198,7 +3207,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			local crimes_plus = 1
 			crimes[playerid] = crimes[playerid]+crimes_plus
-			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+(crimes[playerid]+1), yellow[0], yellow[1], yellow[2])
+			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+(crimes[playerid]), yellow[0], yellow[1], yellow[2])
 
 			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 		}
@@ -3259,7 +3268,7 @@ function (playerid, id)
 	local y1 = myPos1[1]
 	local z1 = myPos1[2]
 
-	if (crimes[id] == -1)
+	if (crimes[id] == 0)
 	{
 		sendMessage(playerid, "[ERROR] Гражданин чист перед законом", red[0], red[1], red[2])
 		return
@@ -3267,15 +3276,15 @@ function (playerid, id)
 
 	if (isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
 	{
-		me_chat(playerid, playername+" посадил(а) "+id+" в камеру на "+(crimes[id]+1)+" мин")
+		me_chat(playerid, playername+" посадил(а) "+id+" в камеру на "+(crimes[id])+" мин")
 
 		arrest[id] = 1
 
-		sendMessage(playerid, "Вы получили премию "+(cash*(crimes[id]+1))+"$", green[0], green[1], green[2])
+		sendMessage(playerid, "Вы получили премию "+(cash*(crimes[id]))+"$", green[0], green[1], green[2])
 
-		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+(cash*(crimes[id]+1)), playername )
+		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+(cash*(crimes[id])), playername )
 
-		save_player_action(playerid, "[police_prison] "+playername+" prison "+id+" time "+(crimes[id]+1))
+		save_player_action(playerid, "[police_prison] "+playername+" prison "+id+" time "+(crimes[id]))
 	}
 	else
 	{
@@ -3643,6 +3652,41 @@ function( playerid, q, w, e )
 	{
 		local vehicleid = getPlayerVehicle(playerid)
 		setVehiclePosition( vehicleid, q.tofloat(), w.tofloat(), e.tofloat() )
+	}
+})
+
+addCommandHandler( "wheel",
+function( playerid, q, w )
+{
+	local playername = getPlayerName ( playerid )
+
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
+	{
+		return
+	}
+
+	if(isPlayerInVehicle(playerid))
+	{
+		local vehicleid = getPlayerVehicle(playerid)
+		setVehicleWheelTexture( vehicleid, 0, q.tointeger() )
+		setVehicleWheelTexture( vehicleid, 1, w.tointeger() )
+	}
+})
+
+addCommandHandler( "fuel",
+function( playerid )
+{
+	local playername = getPlayerName ( playerid )
+
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
+	{
+		return
+	}
+
+	if(isPlayerInVehicle(playerid))
+	{
+		local vehicleid = getPlayerVehicle(playerid)
+		print("fuel "+getVehicleFuel(vehicleid))
 	}
 })
 
