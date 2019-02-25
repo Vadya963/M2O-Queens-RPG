@@ -1585,17 +1585,20 @@ function need_1 ()
 		local playername = getPlayerName(playerid)
 
 		if (logged[playerid] == 1)
-		{
-			local result = sqlite3( "SELECT * FROM account WHERE name = '"+playername+"'" )
+		{	
+			if (!isPlayerInVehicle(playerid))
+			{
+				local result = sqlite3( "SELECT * FROM account WHERE name = '"+playername+"'" )
 
-			//--нужды
-			if (hygiene[playerid] == 0 && getPlayerModel(playerid) != 153)
-			{
-				setPlayerModel(playerid, 153)
-			}
-			else if (hygiene[playerid] > 0 && getPlayerModel(playerid) != result[1]["skin"])
-			{
-				setPlayerModel(playerid, result[1]["skin"])
+				//--нужды
+				if (hygiene[playerid] == 0 && getPlayerModel(playerid) != 153)
+				{
+					setPlayerModel(playerid, 153)
+				}
+				else if (hygiene[playerid] > 0 && getPlayerModel(playerid) != result[1]["skin"])
+				{
+					setPlayerModel(playerid, result[1]["skin"])
+				}
 			}
 		}
 	}
@@ -1755,7 +1758,7 @@ function prison()//--таймер заключения
 
 		if (arrest[playerid] == 1)
 		{
-			if (crimes[playerid] == 0)
+			if (crimes[playerid] == 1)
 			{
 				arrest[playerid] = 0
 				crimes[playerid] = 0
@@ -1766,7 +1769,7 @@ function prison()//--таймер заключения
 
 				save_player_action(playerid, "[prison_timer] "+playername+" вышел из тюрьмы")
 			}
-			else if (crimes[playerid] > 0)
+			else if (crimes[playerid] > 1)
 			{
 				crimes[playerid] = crimes[playerid]-1
 
@@ -1782,7 +1785,7 @@ function()
 	setSummer(pogoda)
 
 	timer( EngineState, 500, -1 )//двигатель машины
-	//timer( fuel_down, 1000, -1 )//система топлива
+	timer( fuel_down, 1000, -1 )//система топлива
 	timer( debuginfo, 1000, -1)//--дебагинфа
 	timer( element_data_push_client, 1000, -1)//--элементдата
 	timer( timeserver, 1000, -1 )//время сервера 1 игровой час = 1 мин реальных
@@ -3245,6 +3248,7 @@ function (playerid, id)
 	local y = myPos[1]
 	local z = myPos[2]
 	local cash = 100
+	local id = id.tointeger()
 
 	if (logged[playerid] == 0)
 	{
@@ -3274,9 +3278,15 @@ function (playerid, id)
 		return
 	}
 
+	if (arrest[id] == 1)
+	{
+		sendMessage(playerid, "[ERROR] Игрок в тюрьме", red[0], red[1], red[2])
+		return
+	}
+
 	if (isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
 	{
-		me_chat(playerid, playername+" посадил(а) "+id+" в камеру на "+(crimes[id])+" мин")
+		me_chat(playerid, playername+" посадил(а) "+getPlayerName ( id )+" в камеру на "+(crimes[id])+" мин")
 
 		arrest[id] = 1
 
@@ -3284,7 +3294,7 @@ function (playerid, id)
 
 		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+(cash*(crimes[id])), playername )
 
-		save_player_action(playerid, "[police_prison] "+playername+" prison "+id+" time "+(crimes[id]))
+		save_player_action(playerid, "[police_prison] "+playername+" prison "+getPlayerName ( id )+" time "+(crimes[id]))
 	}
 	else
 	{
