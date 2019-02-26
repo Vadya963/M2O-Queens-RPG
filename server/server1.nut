@@ -1767,7 +1767,7 @@ function prison()//--таймер заключения
 
 				sendMessage(playerid, "Вы свободны, больше не нарушайте", yellow[0], yellow[1], yellow[2])
 
-				save_player_action(playerid, "[prison_timer] "+playername+" вышел из тюрьмы")
+				save_player_action(playerid, "[prison_timer] "+playername+" exit prison")
 			}
 			else if (crimes[playerid] > 1)
 			{
@@ -1792,7 +1792,7 @@ function()
 	timer(timer_earth, 500, -1)//--передача слотов земли на клиент
 	timer(timer_earth_clear, (24*60000), -1)//--очистка земли от предметов
 	timer(need, 60000, -1)//--уменьшение потребностей
-	timer(need_1, 1000, -1)//--смена скина на бомжа
+	timer(need_1, 5000, -1)//--смена скина на бомжа
 	timer(pay_nalog, (60*60000), -1)//--списание налогов
 	timer(prison, 60000, -1)//--таймер заключения в тюрьме
 	timer(prison_timer, 1000, -1)//--античит если не в тюрьме
@@ -1861,7 +1861,7 @@ function( playerid, name, ip, serial )
 	sead[playerid] = 0
 	crimes[playerid] = 0
 	enter_house[playerid] = 0
-	health[playerid] = 0
+	health[playerid] = 720
 	arrest[playerid] = 0
 	//--нужды
 	alcohol[playerid] = 0
@@ -3599,18 +3599,24 @@ addCommandHandler("stime",
 function(playerid, id1, id2)
 {	
 	local playername = getPlayerName ( playerid )
+	local id1 = id1.tointeger()
+	local id2 = id2.tointeger()
 
 	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
 	{
 		return
 	}
 
-	if (id1 <= 24 && id2 <= 60)
+	if (id1 <= 23 && id2 <= 59)
 	{
 		hour = id1
 		minute = id2
 
 		sendMessage(playerid, "stime "+hour+":"+minute, lyme[0], lyme[1], lyme[2])
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Часы от 0 до 23, Минуты от 0 до 59", red[0], red[1], red[2])
 	}
 })
 
