@@ -24,7 +24,7 @@ local zakon_drugs = 1
 local zakon_drugs_crimes = 1
 local zakon_kill_crimes = 1
 local zakon_robbery_crimes = 1
-local zakon_65_crimes = 1
+local zakon_54_crimes = 1
 
 //----цвета----
 local color_tips = [168,228,160]//--бабушкины яблоки
@@ -3498,14 +3498,14 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				gps_device[playerid] = 1
 				setElementData(playerid, "gps_device_data", gps_device[playerid])
 
-				me_chat(playerid, playername+" включил(а) "+info_png[id1][0])
+				me_chat(playerid, playername+" достал(а) "+info_png[id1][0])
 			}
 			else
 			{
 				gps_device[playerid] = 0
 				setElementData(playerid, "gps_device_data", gps_device[playerid])
 
-				me_chat(playerid, playername+" выключил(а) "+info_png[id1][0])
+				me_chat(playerid, playername+" убрал(а) "+info_png[id1][0])
 			}
 			return
 		}
@@ -3519,7 +3519,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
 
-			local crimes_plus = zakon_65_crimes
+			local crimes_plus = zakon_54_crimes
 			crimes[playerid] = crimes[playerid]+crimes_plus
 			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+(crimes[playerid]), yellow[0], yellow[1], yellow[2])
 
