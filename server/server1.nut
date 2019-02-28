@@ -17,7 +17,14 @@ local max_satiety = 100
 local max_hygiene = 100
 local max_sleep = 100
 local max_drugs = 100
+//законы
+local zakon_alcohol = 1
+local zakon_alcohol_crimes = 1
+local zakon_drugs = 1
+local zakon_drugs_crimes = 1
+local zakon_kill_crimes = 1
 local zakon_robbery_crimes = 1
+local zakon_65_crimes = 1
 
 //----цвета----
 local color_tips = [168,228,160]//--бабушкины яблоки
@@ -546,6 +553,7 @@ local hygiene = array(getMaxPlayers(), 0)
 local sleep = array(getMaxPlayers(), 0)
 local drugs = array(getMaxPlayers(), 0)
 local robbery_player = array(getMaxPlayers(), 0)
+local gps_device = array(getMaxPlayers(), 0)
 
 //для истории сообщений
 local max_message = 15//максимально отображаемое число сообщений
@@ -663,6 +671,21 @@ function me_chat(playerid, text)
 		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
 		{
 			sendMessage(player, text, pink[0], pink[1], pink[2])
+		}
+	}
+}
+
+function do_chat(playerid, text)
+{
+	local myPos = getPlayerPosition(playerid)
+
+	foreach (player, playername in getPlayers())
+	{
+		local Pos = getPlayerPosition(player)
+
+		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
+		{
+			sendMessage(player, text, orange_do[0], orange_do[1], orange_do[2])
 		}
 	}
 }
@@ -1543,7 +1566,7 @@ function debuginfo ()
 		setElementData(playerid, "8", "max_chat[playerid] "+max_chat[playerid])
 		setElementData(playerid, "9", "enter_house[playerid] "+enter_house[playerid])
 		setElementData(playerid, "10", "arrest[playerid] "+arrest[playerid])
-		setElementData(playerid, "11", "0[playerid] "+0)
+		setElementData(playerid, "11", "gps_device[playerid] "+gps_device[playerid])
 		setElementData(playerid, "12", "robbery_player[playerid] "+robbery_player[playerid])
 
 		setElementData(playerid, "serial", getPlayerSerial(playerid))
@@ -1939,8 +1962,10 @@ function( playerid, name, ip, serial )
 	sleep[playerid] = 0
 	drugs[playerid] = 0
 	robbery_player[playerid] = 0
+	gps_device[playerid] = 0
 
 	setElementData ( playerid, "fuel_data", 0 )
+	setElementData(playerid, "gps_device_data", 0)
 
 	print("[serial] "+getPlayerSerial(playerid))
 })
@@ -3271,16 +3296,23 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 		}
 		else if (id1 == 27)//--одежда
-		{
-			local skin = getPlayerModel(playerid)
+		{	
+			if (!isPlayerInVehicle(playerid))
+			{
+				local skin = getPlayerModel(playerid)
 
-			setPlayerModel(playerid, id2)
+				setPlayerModel(playerid, id2)
 
-			sqlite3( "UPDATE account SET skin = '"+id2+"' WHERE name = '"+playername+"'")
+				sqlite3( "UPDATE account SET skin = '"+id2+"' WHERE name = '"+playername+"'")
 
-			id2 = skin
+				id2 = skin
 
-			me_chat(playerid, playername+" переоделся(ась)")
+				me_chat(playerid, playername+" переоделся(ась)")
+			}
+			else 
+			{
+				return
+			}
 		}
 		else if (id1 == 35)//--лом
 		{
@@ -3351,6 +3383,34 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				sendMessage(playerid, "[ERROR] Ограбление доступно с 0 до 7 часов игрового времени", red[0], red[1], red[2])
 				return
+			}
+		}
+		else if (id1 == 46)//--алкостестер
+		{
+			local alcohol_test = alcohol[playerid]/100.0
+			
+			me_chat(playerid, playername+" подул(а) в "+info_png[id1][0])
+			do_chat(playerid, info_png[id1][0]+" показал "+alcohol_test+" промилле")
+
+			if (alcohol_test >= zakon_alcohol)
+			{
+				local crimes_plus = zakon_alcohol_crimes
+				crimes[playerid] = crimes[playerid]+crimes_plus
+				sendPlayerMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+			}
+		}
+		else if (id1 == 47)//--наркостестер
+		{
+			local drugs_test = drugs[playerid]
+			
+			me_chat(playerid, playername+" подул(а) в "+info_png[id1][0])
+			do_chat(playerid, info_png[id1][0]+" показал "+drugs_test+" процентов зависимости")
+
+			if (drugs_test >= zakon_drugs)
+			{
+				local crimes_plus = zakon_drugs_crimes
+				crimes[playerid] = crimes[playerid]+crimes_plus
+				sendPlayerMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
 			}
 		}
 		else if (id1 == 48)//--налог дома
@@ -3431,6 +3491,24 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 		}
+		else if (id1 == 52) //--gps навигатор
+		{
+			if (gps_device[playerid] == 0)
+			{
+				gps_device[playerid] = 1
+				setElementData(playerid, "gps_device_data", gps_device[playerid])
+
+				me_chat(playerid, playername+" включил(а) "+info_png[id1][0])
+			}
+			else
+			{
+				gps_device[playerid] = 0
+				setElementData(playerid, "gps_device_data", gps_device[playerid])
+
+				me_chat(playerid, playername+" выключил(а) "+info_png[id1][0])
+			}
+			return
+		}
 		else if (id1 == 54) //--инкасаторский сумка
 		{
 			local randomize = id2
@@ -3441,7 +3519,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
 
-			local crimes_plus = 1
+			local crimes_plus = zakon_65_crimes
 			crimes[playerid] = crimes[playerid]+crimes_plus
 			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+(crimes[playerid]), yellow[0], yellow[1], yellow[2])
 
