@@ -805,6 +805,16 @@ function( post )
 			local speed_vehicle = "plate "+plate+" | fuel "+getElementData("fuel_data")
 			dxdrawtext ( speed_vehicle, 2.0, screen[1]-16.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
+
+		if (getElementData("gps_device_data") == 1)
+		{
+			local coords = getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )
+			local x_table = split(myPos[0].tostring(), ".")
+			local y_table = split(myPos[1].tostring(), ".")
+			local dimensions = dxGetTextDimensions( "[X  "+x_table[0]+", Y  "+y_table[0]+"]", 1.0, "tahoma-bold" )
+
+			dxdrawtext ( "[X  "+x_table[0]+", Y  "+y_table[0]+"]", coords[0]-(dimensions[0]/2), coords[1], fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
+		}
 		
 		if (isCursorShowing)
 		{
