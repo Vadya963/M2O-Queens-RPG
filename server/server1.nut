@@ -3272,7 +3272,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 27)//--одежда
 		{
-			local skin = getElementModel(playerid)
+			local skin = getPlayerModel(playerid)
 
 			setPlayerModel(playerid, id2)
 
