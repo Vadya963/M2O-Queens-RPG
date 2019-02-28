@@ -811,7 +811,7 @@ function( post )
 			local pos = getMousePosition()
 			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		
-			for (local i = 0; i <= 10; i++) 
+			for (local i = 0; i <= 12; i++) 
 			{	
 				dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			}
