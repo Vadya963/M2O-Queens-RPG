@@ -469,7 +469,6 @@ local shop = {
 	[8] = [info_png[8][0], 20, 15],
 	[11] = [info_png[11][0], 1, 100],
 	[26] = [info_png[26][0], 1, 10000],
-	[35] = [info_png[35][0], 10, 500],
 	[44] = [info_png[44][0], 100, 50],
 	[45] = [info_png[45][0], 100, 100],
 	[46] = [info_png[46][0], 1, 100],
@@ -491,6 +490,7 @@ local gas = {
 
 local repair_shop = {
 	[23] = [info_png[23][0], 1, 100],
+	[35] = [info_png[35][0], 10, 500],
 }
 
 //-места поднятия предметов
@@ -1827,6 +1827,11 @@ function prison_timer()//--античит если не в тюрьме
 		{
 			if (!isPointInCircle3D(x,y,z, -1030.42,1712.74,10.3595, 10.0))
 			{
+				if (isPlayerInVehicle(playerid))
+				{
+					removePlayerFromVehicle( playerid )
+				}
+
 				state_inv_player[playerid] = 0
 				state_gui_window[playerid] = 0
 				enter_house[playerid] = 0
