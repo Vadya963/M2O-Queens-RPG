@@ -218,7 +218,6 @@ local shop = {
 	[8] = [info_png[8][0], 20, 15],
 	[11] = [info_png[11][0], 1, 100],
 	[26] = [info_png[26][0], 1, 10000],
-	[35] = [info_png[35][0], 10, 500],
 	[44] = [info_png[44][0], 100, 50],
 	[45] = [info_png[45][0], 100, 100],
 	[46] = [info_png[46][0], 1, 100],
@@ -266,6 +265,7 @@ guiSetVisibleGridList (gas_menu, false)
 
 local repair_shop = {
 	[23] = [info_png[23][0], 1, 100],
+	[35] = [info_png[35][0], 10, 500],
 }
 local repair_shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in repair_shop)
