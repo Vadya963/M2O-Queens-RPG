@@ -170,38 +170,17 @@ local motor_show = [
 ]
 
 local pogoda = true//зима(false) или лето(true)
-local pogoda_string_true = "DT_RTRclear_day_night"
+local pogoda_string_true = 1
 local weather_server_true = {
-	[0] = "DT_RTRclear_day_night",
-	[1] = "DT_RTRrainy_day_night",
-	[2] = "DT_RTRfoggy_day_night",
-
-	[6] = "DT_RTRclear_day_morning",
-	[7] = "DT_RTRrainy_day_morning",
-	[8] = "DT_RTRfoggy_day_morning",
-
-	[12] = "DT_RTRclear_day_afternoon",
-	[13] = "DT_RTRrainy_day_afternoon",
-	[14] = "DT_RTRfoggy_day_afternoon",
-
-	[18] = "DT_RTRclear_day_evening",
-	[19] = "DT_RTRrainy_day_evening",
-	[20] = "DT_RTRfoggy_day_evening",
+	[1] =["DT_RTRclear_day_night", "DT_RTRclear_day_morning", "DT_RTRclear_day_afternoon", "DT_RTRclear_day_evening"],
+	[2] =["DT_RTRrainy_day_night", "DT_RTRrainy_day_morning", "DT_RTRrainy_day_afternoon", "DT_RTRrainy_day_evening"],
+	[3] =["DT_RTRfoggy_day_night", "DT_RTRfoggy_day_morning", "DT_RTRfoggy_day_afternoon", "DT_RTRfoggy_day_evening"],
 }
 
-local pogoda_string_false = "DT04part02"
+local pogoda_string_false = 1
 local weather_server_false = {
-	[0] = "DT04part02",
-	[1] = "DT02NewStart2",//снег
-
-	[6] = "DT05part01JoesFlat",
-	[7] = "DT05part04Distillery",//туман
-
-	[12] = "DT05part03HarrysGunshop",
-	[13] = "DT05part05ElGreco",//туман
-
-	[18] = "DT02part02JoesFlat",
-	[19] = "DT03part02FreddysBar",//туман
+	[1] =["DT04part02", "DT05part01JoesFlat", "DT05part03HarrysGunshop", "DT02part02JoesFlat"],
+	[2] =["DT02NewStart2", "DT05part04Distillery", "DT05part05ElGreco", "DT03part02FreddysBar"],
 }
 
 local pogoda_leto = [
@@ -1727,6 +1706,37 @@ function timeserver()//время сервера
 		if(hour == 24)
 		{
 			hour = 0
+
+			if (pogoda)
+			{
+				pogoda_string_true = random(1,3)
+
+				if (pogoda_string_true == 1)
+				{
+					sendMessageAll(0, "[НОВОСТИ] Сегодня обещают солнечный день", green[0], green[1], green[2])
+				}
+				else if (pogoda_string_true == 2) 
+				{
+					sendMessageAll(0, "[НОВОСТИ] Сегодня обещают дождливый день", green[0], green[1], green[2])
+				}
+				else if (pogoda_string_true == 3) 
+				{
+					sendMessageAll(0, "[НОВОСТИ] Сегодня обещают туманный день", green[0], green[1], green[2])
+				}
+			}
+			else 
+			{
+				pogoda_string_false = random(1,2)
+
+				if (pogoda_string_false == 1)
+				{
+					sendMessageAll(0, "[НОВОСТИ] Сегодня обещают солнечный день", green[0], green[1], green[2])
+				}
+				else if (pogoda_string_false == 2) 
+				{
+					sendMessageAll(0, "[НОВОСТИ] Сегодня обещают туманный день", green[0], green[1], green[2])
+				}
+			}
 		}
 
 		random_weather (hour)
@@ -1739,56 +1749,86 @@ function random_weather (hour)
 	{
 		if (hour == 0)
 		{
-			local randomize = random(0,2)
-			pogoda_string_true = weather_server_true[randomize]
-			setWeather( pogoda_string_true )
+			setWeather( weather_server_true[pogoda_string_true][0] )
 		}
 		else if (hour == 6) 
 		{
-			local randomize = random(6,8)
-			pogoda_string_true = weather_server_true[randomize]
-			setWeather( pogoda_string_true )
+			setWeather( weather_server_true[pogoda_string_true][1] )
 		}
 		else if (hour == 12) 
 		{
-			local randomize = random(12,14)
-			pogoda_string_true = weather_server_true[randomize]
-			setWeather( pogoda_string_true )
+			setWeather( weather_server_true[pogoda_string_true][2] )
 		}
 		else if (hour == 18) 
 		{
-			local randomize = random(18,20)
-			pogoda_string_true = weather_server_true[randomize]
-			setWeather( pogoda_string_true )
+			setWeather( weather_server_true[pogoda_string_true][3] )
+		}
+
+		print("pogoda_string_true "+pogoda_string_true)
+	}
+	else 
+	{
+		if (hour == 0)
+		{
+			setWeather( weather_server_false[pogoda_string_false][0] )
+		}
+		else if (hour == 6) 
+		{
+			setWeather( weather_server_false[pogoda_string_false][1] )
+		}
+		else if (hour == 12) 
+		{
+			setWeather( weather_server_false[pogoda_string_false][2] )
+		}
+		else if (hour == 18) 
+		{
+			setWeather( weather_server_false[pogoda_string_false][3] )
+		}
+
+		//print("pogoda_string_false "+pogoda_string_false)
+	}
+}
+
+function spawn_weather (hour) 
+{	
+	if (pogoda)
+	{
+		if (hour >= 0 && hour <= 5)
+		{
+			setWeather( weather_server_true[pogoda_string_true][0] )
+		}
+		else if (hour >= 6 && hour <= 11)
+		{
+			setWeather( weather_server_true[pogoda_string_true][1] )
+		}
+		else if (hour >= 12 && hour <= 17)
+		{
+			setWeather( weather_server_true[pogoda_string_true][2] )
+		}
+		else if (hour >= 18 && hour <= 23)
+		{
+			setWeather( weather_server_true[pogoda_string_true][3] )
 		}
 
 		//print("pogoda_string_true "+pogoda_string_true)
 	}
 	else 
 	{
-		if (hour == 0)
+		if (hour >= 0 && hour <= 5)
 		{
-			local randomize = random(0,1)
-			pogoda_string_false = weather_server_false[randomize]
-			setWeather( pogoda_string_false )
+			setWeather( weather_server_false[pogoda_string_false][0] )
 		}
-		else if (hour == 6) 
+		else if (hour >= 6 && hour <= 11)
 		{
-			local randomize = random(6,7)
-			pogoda_string_false = weather_server_false[randomize]
-			setWeather( pogoda_string_false )
+			setWeather( weather_server_false[pogoda_string_false][1] )
 		}
-		else if (hour == 12) 
+		else if (hour >= 12 && hour <= 17)
 		{
-			local randomize = random(12,13)
-			pogoda_string_false = weather_server_false[randomize]
-			setWeather( pogoda_string_false )
+			setWeather( weather_server_false[pogoda_string_false][2] )
 		}
-		else if (hour == 18) 
+		else if (hour >= 18 && hour <= 23)
 		{
-			local randomize = random(18,19)
-			pogoda_string_false = weather_server_false[randomize]
-			setWeather( pogoda_string_false )
+			setWeather( weather_server_false[pogoda_string_false][3] )
 		}
 
 		//print("pogoda_string_false "+pogoda_string_false)
@@ -2176,14 +2216,7 @@ function( playerid )
 
 		reg_or_login(playerid)
 
-		if (pogoda)
-		{
-			setWeather( pogoda_string_true )
-		}
-		else 
-		{
-			setWeather( pogoda_string_false )
-		}
+		spawn_weather (hour)
 
 		foreach (k, v in sqlite3( "SELECT * FROM house_db" )) 
 		{
