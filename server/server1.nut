@@ -12,6 +12,7 @@ local max_blip = 250.0//--радиус блипов
 local zakon_nalog_car = 500
 local zakon_nalog_house = 1000
 local zakon_nalog_business = 2000
+//нужды
 local max_alcohol = 500
 local max_satiety = 100
 local max_hygiene = 100
@@ -25,6 +26,7 @@ local zakon_drugs_crimes = 1
 local zakon_kill_crimes = 1
 local zakon_robbery_crimes = 1
 local zakon_54_crimes = 1
+local zp_player_taxi = 250
 
 //----цвета----
 local color_tips = [168,228,160]//--бабушкины яблоки
@@ -554,6 +556,9 @@ local sleep = array(getMaxPlayers(), 0)
 local drugs = array(getMaxPlayers(), 0)
 local robbery_player = array(getMaxPlayers(), 0)
 local gps_device = array(getMaxPlayers(), 0)
+local job = array(getMaxPlayers(), 0)
+local job_pos = array(getMaxPlayers(), 0)
+local job_call = array(getMaxPlayers(), 0)
 
 //для истории сообщений
 local max_message = 15//максимально отображаемое число сообщений
@@ -657,7 +662,7 @@ function save_player_action (playerid, text)
 	posfile.writen('\n', 'b')
 	posfile.close()
 
-	triggerClientEvent(playerid, "event_save_player_action", text)
+	//triggerClientEvent(playerid, "event_save_player_action", text)
 }
 
 function me_chat(playerid, text)
@@ -1568,6 +1573,16 @@ function debuginfo ()
 		setElementData(playerid, "10", "arrest[playerid] "+arrest[playerid])
 		setElementData(playerid, "11", "gps_device[playerid] "+gps_device[playerid])
 		setElementData(playerid, "12", "robbery_player[playerid] "+robbery_player[playerid])
+		setElementData(playerid, "13", "job[playerid] "+job[playerid])
+		if (job_pos[playerid] != 0)
+		{
+			setElementData(playerid, "14", "job_pos[playerid] "+job_pos[playerid][0]+", "+job_pos[playerid][1]+", "+job_pos[playerid][2])
+		}
+		else
+		{
+			setElementData(playerid, "14", "job_pos[playerid] "+job_pos[playerid])
+		}
+		setElementData(playerid, "15", "job_call[playerid] "+job_call[playerid])
 
 		setElementData(playerid, "serial", getPlayerSerial(playerid))
 
@@ -1588,6 +1603,116 @@ function debuginfo ()
 
 		setPlayerHealth(playerid, health[playerid].tofloat())
 	}
+}
+
+function job_timer ()
+{
+	//--места для таксистов
+	local taxi_pos = {}
+
+	//--загрузка позиций для работы таксист
+	local count = taxi_pos.len()
+	foreach (k, v in sqlite3( "SELECT * FROM house_db" )) 
+	{
+		count = count+1
+		taxi_pos[count] <- [v["x"],v["y"],v["z"]]
+	}
+
+	foreach (k, v in sqlite3( "SELECT * FROM business_db" )) 
+	{
+		count = count+1
+		taxi_pos[count] <- [v["x"],v["y"],v["z"]]
+	}
+
+	foreach (k, v in interior_job) 
+	{
+		count = count+1
+		taxi_pos[count] <- [v[2],v[3],v[4]]
+	}
+
+	foreach (playerid, playername in getPlayers()) 
+	{
+		local playername = getPlayerName(playerid)
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+
+		if (logged[playerid] == 1)
+		{
+			if (job[playerid] == 1) //--работа таксиста
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == 24)
+					{
+						if (getSpeed(vehicleid) < 1)
+						{
+							if (job_call[playerid] == 0) //--нету вызова
+							{
+								local randomize = random(1,taxi_pos.len())
+
+								sendMessage(playerid, "Езжайте на вызов", yellow[0], yellow[1], yellow[2])
+
+								job_call[playerid] = 1
+								job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
+
+								triggerClientEvent(playerid, "job_gps", taxi_pos[randomize][0],taxi_pos[randomize][1])
+							}
+							else if (job_call[playerid] == 1) //--есть вызов
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
+								{
+									local randomize = random(1,taxi_pos.len())
+
+									sendMessage(playerid, "Отвезите клиента", yellow[0], yellow[1], yellow[2])
+
+									job_call[playerid] = 2
+									job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", taxi_pos[randomize][0],taxi_pos[randomize][1])
+								}
+							}
+							else if (job_call[playerid] == 2) //--сдаем вызов
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
+								{
+									local randomize = random(1,zp_player_taxi)
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+									sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
+
+									save_player_action(playerid, "[taxi_job_timer] "+playername+" [+"+randomize+"$, "+array_player_2[playerid][0]+"$]")
+
+									triggerClientEvent(playerid, "removegps")
+									
+									job_pos[playerid] = 0
+									job_call[playerid] = 0
+								}
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 0)//--нету вызова
+			{
+				job_0( playerid )
+			}
+		}
+	}
+}
+
+function job_0( playerid )
+{
+	triggerClientEvent(playerid, "removegps")
+
+	job[playerid] = 0
+	job_pos[playerid] = 0
+	job_call[playerid] = 0
 }
 
 function timeserver()//время сервера
@@ -1893,6 +2018,7 @@ function()
 	timer(pay_nalog, (60*60000), -1)//--списание налогов
 	timer(prison, 60000, -1)//--таймер заключения в тюрьме
 	timer(prison_timer, 1000, -1)//--античит если не в тюрьме
+	timer(job_timer, 1000, -1)//--работы в цикле
 
 	local house_number = 0
 	foreach (idx, value in sqlite3( "SELECT * FROM house_db" )) 
@@ -1968,6 +2094,9 @@ function( playerid, name, ip, serial )
 	drugs[playerid] = 0
 	robbery_player[playerid] = 0
 	gps_device[playerid] = 0
+	job[playerid] = 0
+	job_pos[playerid] = 0
+	job_call[playerid] = 0
 
 	setElementData ( playerid, "fuel_data", 0 )
 	setElementData(playerid, "gps_device_data", 0)
@@ -3511,6 +3640,22 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				setElementData(playerid, "gps_device_data", gps_device[playerid])
 
 				me_chat(playerid, playername+" убрал(а) "+info_png[id1][0])
+			}
+			return
+		}
+		else if (id1 == 53) //--лиц. таксиста
+		{
+			if (job[playerid] == 0)
+			{
+				job[playerid] = 1
+
+				me_chat(playerid, playername+" вышел(ла) на работу")
+			}
+			else
+			{
+				job[playerid] = 0
+
+				me_chat(playerid, playername+" закончил(а) работу")
 			}
 			return
 		}
