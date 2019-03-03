@@ -30,6 +30,7 @@ local gridlist_window = false//окно в котором выделяется �
 local gridlist_lable = false//текст который будет выделяться
 local gridlist_row = -1//номер текста который будет выделяться
 local gridlist_select = false//выделение текста
+local gridlist_button_height = 0.0//высота кнопки купить
 //-------------------------------------------------------
 
 local gui_fon = 0//1 открыт, 0 закрыт
@@ -124,6 +125,65 @@ local info_png = {
 	[64] = ["антипохмелин", "шт"],
 }
 
+//цены автосалона
+local motor_show = [
+	//[ид(0), цена(1), вместимость бака(2), название(3)]
+	[0,4995,60,"Ascot Bailey"],
+	[1,5000,90,"Berkley Kingfisher"],
+	//[2,0,0,"Trailer_1"],
+	//[3,0,200,"GAI 353 Military Truck"],
+	//[4,0,200,"Hank B"],
+	//[5,0,200,"Hank B Fuel Tank"],
+	[6,2500,70,"Walter Hot Rod"],
+	[7,1800,70,"Smith 34 Hot Rod"],
+	[8,2100,70,"Shubert Pickup Hot Rod"],
+	[9,2740,70,"Houston Wasp"],
+	[10,9000,70,"ISW 508"],
+	//[11,910,58,"Walter Military"],
+	[12,910,58,"Walter Utility"],
+	[13,25000,90,"Jefferson Futura"],
+	[14,3200,70,"Jefferson Provincial"],
+	[15,3500,90,"Lassister Series 69"],
+	//[16,0,90,"Lassister Series 69"],//копия
+	//[17,0,90,"Lassister Series 75 Hollywood"],//копия
+	[18,5170,90,"Lassister Series 75 Hollywood"],
+	//[19,1250,80,"Milk Truck"],
+	//[20,0,150,"Parry Bus"],
+	//[21,0,150,"Parry Bus Prison"],
+	[22,2100,70,"Potomac Indian"],
+	[23,2350,60,"Quicksilver Windsor"],
+	[24,2350,60,"Quicksilver Windsor Taxi"],
+	[25,730,65,"Shubert 38"],
+	//[26,0,65,"Shubert 38"],//копия
+	//[27,0,100,"Shubert Armored Van"],
+	[28,2300,80,"Shubert Beverly"],
+	[29,3500,70,"Shubert Frigate"],
+	//[30,850,65,"Shubert Hearse"],
+	[31,730,65,"Shubert 38 Panel Truck"],
+	//[32,0,65,"Shubert 38 Panel Truck"],//копия
+	//[33,730,65,"Shubert 38 Taxi"],
+	//[34,0,100,"Shubert Truck"],
+	//[35,0,100,"Shubert Truck Flatbed"],//копия
+	//[36,0,100,"Shubert Truck Flatbed"],
+	[37,4350,100,"Shubert Truck Covered"],
+	//[38,0,100,"Shubert Truck"],
+	//[39,0,100,"Shubert Show Plow"],
+	//[40,0,80,"Military Truck"],
+	[41,2140,80,"Smith Custom 200"],
+	[42,4280,80,"Smith Custom 200 Police Special"],
+	[43,450,50,"Smith Coupe"],
+	[44,1700,65,"Smith Mainline"],
+	[45,2700,70,"Smith Thunderbolt"],
+	//[46,0,80,"Smith Truck"],
+	[47,530,65,"Smith V8"],
+	[48,1500,50,"Smith Deluxe Station Wagon"],
+	//[49,0,0,"Trailer_2"],
+	[50,1475,70,"Culver Empire"],
+	//[51,2950,70,"Culver Empire Police Special"],
+	[52,2450,80,"Walker Rocket"],
+	[53,770,40,"Walter Coupe"]
+]
+
 //--------------------------------------------грайдлист--------------------------------------------
 function guiCreateGridList (x,y, width, height)
 {
@@ -210,6 +270,13 @@ function guiSetVisibleGridList (window, bool)
 }
 //-------------------------------------------------------------------------------------------------
 
+local avto_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(450.0/2), 400.0, 450.0)
+foreach (k,v in motor_show)
+{
+	local text = v[3]+"("+v[0]+") "+(v[1]*10)+"$"
+	guiGridListAddRow (avto_menu, text)
+}
+guiSetVisibleGridList (avto_menu, false)
 
 local shop = {
 	[3] = [info_png[3][0], 20, 5],
@@ -295,7 +362,7 @@ local mayoralty_shop = {
 	[41] = ["лицензия на оружие", 1, 10000],
 	[53] = ["лицензия таксиста", 1, 5000],
 	[34] = ["лицензия дальнобойщика", 1, 15000],
-	[62] = ["лицензия водителя мусоровоза", 1, 20000],
+	//[62] = ["лицензия водителя мусоровоза", 1, 20000],
 	[48] = ["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog)],
 	[49] = ["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog)],
 	[50] = ["квитанция для оплаты т/с на", day_nalog, (zakon_nalog_car*day_nalog)],
@@ -333,7 +400,7 @@ foreach (k,v in sub_cops)
 }
 guiSetVisibleGridList (sub_cops_menu, false)
 
-local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2)+4.0, 400.0, 30.0, false )
+local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 400.0, 30.0, false )
 guiSetVisible( shop_menu_button, false )
 
 function tune_close ()//--закрытие окна
@@ -351,6 +418,7 @@ function tune_close ()//--закрытие окна
 	guiSetVisibleGridList (eda_menu, false)
 	guiSetVisibleGridList (mayoralty_shop_menu, false)
 	guiSetVisibleGridList (sub_cops_menu, false)
+	guiSetVisibleGridList (avto_menu, false)
 }
 addEventHandler ( "event_gui_delet", tune_close )
 
@@ -360,36 +428,58 @@ function shop_menu_fun(number, value)//--создание окна магази�
 	value_business = value
 
 	showCursor( true )
-	guiSetVisible( shop_menu_button, true )
 
 	if (value_business == 0)
 	{
 		guiSetVisibleGridList (weapon_menu, true)
+		local pos = guiGetSize( weapon_menu[0] )
+		gridlist_button_height = pos[1]
 	}
 	else if (value_business == 2)
 	{
 		guiSetVisibleGridList (shop_menu, true)
+		local pos = guiGetSize( shop_menu[0] )
+		gridlist_button_height = pos[1]
 	}
 	else if (value_business == 3)
 	{
 		guiSetVisibleGridList (gas_menu, true)
+		local pos = guiGetSize( gas_menu[0] )
+		gridlist_button_height = pos[1]
 	}
 	else if (value_business == 4)
 	{
 		guiSetVisibleGridList (repair_shop_menu, true)
+		local pos = guiGetSize( repair_shop_menu[0] )
+		gridlist_button_height = pos[1]
 	}
 	else if (value_business == 5)
 	{
 		guiSetVisibleGridList (eda_menu, true)
+		local pos = guiGetSize( eda_menu[0] )
+		gridlist_button_height = pos[1]
 	}
 	else if (value_business == "pd")
 	{
 		guiSetVisibleGridList (sub_cops_menu, true)
+		local pos = guiGetSize( sub_cops_menu[0] )
+		gridlist_button_height = pos[1]
 	}
 	else if (value_business == "mer")
 	{
 		guiSetVisibleGridList (mayoralty_shop_menu, true)
+		local pos = guiGetSize( mayoralty_shop_menu[0] )
+		gridlist_button_height = pos[1]
 	}
+	else if (value_business == "dm")
+	{
+		guiSetVisibleGridList (avto_menu, true)
+		local pos = guiGetSize( avto_menu[0] )
+		gridlist_button_height = pos[1]
+	}
+
+	guiSetPosition(shop_menu_button, (screen[0]/2)-(400.0/2), (screen[1]/2)+(gridlist_button_height/2), false)
+	guiSetVisible( shop_menu_button, true )
 }
 addEventHandler ( "event_shop_menu_fun", shop_menu_fun )
 
