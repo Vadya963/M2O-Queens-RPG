@@ -115,56 +115,56 @@ local motor_show = [
 	//[ид(0), цена(1), вместимость бака(2), название(3)]
 	[0,4995,60,"Ascot Bailey"],
 	[1,5000,90,"Berkley Kingfisher"],
-	[2,0,0,"Trailer_1"],
-	[3,0,200,"GAI 353 Military Truck"],
-	[4,0,200,"Hank B"],
-	[5,0,200,"Hank B Fuel Tank"],
+	//[2,0,0,"Trailer_1"],
+	//[3,0,200,"GAI 353 Military Truck"],
+	//[4,0,200,"Hank B"],
+	//[5,0,200,"Hank B Fuel Tank"],
 	[6,2500,70,"Walter Hot Rod"],
 	[7,1800,70,"Smith 34 Hot Rod"],
 	[8,2100,70,"Shubert Pickup Hot Rod"],
 	[9,2740,70,"Houston Wasp"],
 	[10,9000,70,"ISW 508"],
-	[11,910,58,"Walter Military"],
+	//[11,910,58,"Walter Military"],
 	[12,910,58,"Walter Utility"],
 	[13,25000,90,"Jefferson Futura"],
 	[14,3200,70,"Jefferson Provincial"],
 	[15,3500,90,"Lassister Series 69"],
-	[16,0,90,"Lassister Series 69"],//копия
-	[17,0,90,"Lassister Series 75 Hollywood"],//копия
+	//[16,0,90,"Lassister Series 69"],//копия
+	//[17,0,90,"Lassister Series 75 Hollywood"],//копия
 	[18,5170,90,"Lassister Series 75 Hollywood"],
-	[19,1250,80,"Milk Truck"],
-	[20,0,150,"Parry Bus"],
-	[21,0,150,"Parry Bus Prison"],
+	//[19,1250,80,"Milk Truck"],
+	//[20,0,150,"Parry Bus"],
+	//[21,0,150,"Parry Bus Prison"],
 	[22,2100,70,"Potomac Indian"],
 	[23,2350,60,"Quicksilver Windsor"],
 	[24,2350,60,"Quicksilver Windsor Taxi"],
 	[25,730,65,"Shubert 38"],
-	[26,0,65,"Shubert 38"],//копия
-	[27,0,100,"Shubert Armored Van"],
+	//[26,0,65,"Shubert 38"],//копия
+	//[27,0,100,"Shubert Armored Van"],
 	[28,2300,80,"Shubert Beverly"],
 	[29,3500,70,"Shubert Frigate"],
-	[30,850,65,"Shubert Hearse"],
+	//[30,850,65,"Shubert Hearse"],
 	[31,730,65,"Shubert 38 Panel Truck"],
-	[32,0,65,"Shubert 38 Panel Truck"],//копия
-	[33,730,65,"Shubert 38 Taxi"],
-	[34,0,100,"Shubert Truck"],
-	[35,0,100,"Shubert Truck Flatbed"],//копия
-	[36,0,100,"Shubert Truck Flatbed"],
-	[37,0,100,"Shubert Truck Covered"],
-	[38,0,100,"Shubert Truck"],
-	[39,0,100,"Shubert Show Plow"],
-	[40,0,80,"Military Truck"],
+	//[32,0,65,"Shubert 38 Panel Truck"],//копия
+	//[33,730,65,"Shubert 38 Taxi"],
+	//[34,0,100,"Shubert Truck"],
+	//[35,0,100,"Shubert Truck Flatbed"],//копия
+	//[36,0,100,"Shubert Truck Flatbed"],
+	[37,4350,100,"Shubert Truck Covered"],
+	//[38,0,100,"Shubert Truck"],
+	//[39,0,100,"Shubert Show Plow"],
+	//[40,0,80,"Military Truck"],
 	[41,2140,80,"Smith Custom 200"],
 	[42,4280,80,"Smith Custom 200 Police Special"],
 	[43,450,50,"Smith Coupe"],
 	[44,1700,65,"Smith Mainline"],
 	[45,2700,70,"Smith Thunderbolt"],
-	[46,0,80,"Smith Truck"],
+	//[46,0,80,"Smith Truck"],
 	[47,530,65,"Smith V8"],
 	[48,1500,50,"Smith Deluxe Station Wagon"],
-	[49,0,0,"Trailer_2"],
+	//[49,0,0,"Trailer_2"],
 	[50,1475,70,"Culver Empire"],
-	[51,2950,70,"Culver Empire Police Special"],
+	//[51,2950,70,"Culver Empire Police Special"],
 	[52,2450,80,"Walker Rocket"],
 	[53,770,40,"Walter Coupe"]
 ]
@@ -428,7 +428,8 @@ local interior_business = [
 local interior_job = [//--12
 //   0              1                 2       3      4        5    6    7      
 	[0, "Полицейский департамент", -378.987,654.699,-11.5013, 24, "0", 5.0],
-	[1, "Мерия", -115.11,-63.1035,-12.041, 23, "0", 5.0],
+	[1, "Мэрия", -115.11,-63.1035,-12.041, 23, "0", 5.0],
+	[2, "Автосалон", -199.532,838.583,-21.2431, 21, "0", 5.0],
 ]
 
 local weapon = {
@@ -1112,7 +1113,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 		return
 	}
-	else if (value == "mer")//мерия
+	else if (value == "mer")//Мэрия
 	{
 		local day_nalog = 7
 
@@ -1189,6 +1190,94 @@ function buy_subject_fun( playerid, text, number, value )
 		}
 
 		return
+	}
+	else if (value == "dm")//автосалон
+	{
+		local police_car = [42,51]
+
+		local playername = getPlayerName ( playerid )
+		local x1 = myPos[0]
+		local y1 = myPos[1]
+		local z1 = myPos[2]
+		local car_pos = [0,0,0,0]
+		local id = 0
+		local coef = 10
+
+		foreach (k, v in motor_show)
+		{
+			local text1 = v[3]+"("+v[0]+") "+(v[1]*coef)+"$"
+			if (text1 == text)
+			{
+				local result = sqlite3( "SELECT COUNT() FROM car_db" )
+				local number1 = result[1]["COUNT()"]+1
+				local val1 = 6
+				local val2 = number1
+				id = v[0]
+
+				if (isPointInCircle3D(x1,y1,z1, interior_job[2][2],interior_job[2][3],interior_job[2][4], interior_job[2][7]))
+				{
+					foreach (k1, v1 in police_car) 
+					{
+						if (v1 == id && (search_inv_player(playerid, 10, 1) == 0 || search_inv_player(playerid, 33, 1) == 0))
+						{
+							sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red[0], red[1], red[2])
+							return
+						}
+					}
+
+					if ((v[1]*coef) > array_player_2[playerid][0])
+					{
+						sendMessage(playerid, "[ERROR] У вас недостаточно средств, необходимо "+(v[1]*coef)+"$", red[0], red[1], red[2])
+						return
+					}
+
+					if (inv_player_empty(playerid, val1, val2))
+					{
+						save_player_action(playerid, "[buy_vehicle] "+playername+" [plate - "+val2+"] [-"+(v[1]*coef)+"$, been "+array_player_2[playerid][0]+"$]")
+					}
+					else
+					{
+						sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
+						return
+					}
+
+					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(v[1]*coef), playername )
+
+					sendMessage(playerid, "Вы купили транспортное средство за "+(v[1]*coef)+"$", orange[0], orange[1], orange[2])
+
+					car_pos = [-205.534, 835.04, -20.9558, 160.0]
+				}
+				else
+				{
+					sendMessage(playerid, "[ERROR] Найдите место продажи т/с", red[0], red[1], red[2])
+					return
+				}
+
+
+				local vehicleid = createVehicle( id, car_pos[0], car_pos[1], car_pos[2], car_pos[3], 0.0, 0.0 )
+
+				setVehiclePlateText(vehicleid, val2.tostring())
+
+				local plate = val2.tostring()
+
+				local color = getVehicleColour(vehicleid)
+				local carcolor = fromRGB(color[0], color[1], color[2])
+				setVehicleColour(vehicleid, color[0], color[1], color[2], color[0], color[1], color[2])
+
+				local nalog_start = 5
+
+				array_car_1[plate] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+				array_car_2[plate] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+				fuel[plate] <- max_fuel
+				dviglo[plate] <- 0
+
+				sendMessage(playerid, "Вы получили "+info_png[val1][0]+" "+val2, orange[0], orange[1], orange[2])
+
+				sqlite3( "INSERT INTO car_db (number, model, nalog, frozen, x, y, z, rot, fuel, car_rgb, tune, slot_0_1, slot_0_2, slot_1_1, slot_1_2, slot_2_1, slot_2_2, slot_3_1, slot_3_2, slot_4_1, slot_4_2, slot_5_1, slot_5_2, slot_6_1, slot_6_2, slot_7_1, slot_7_2, slot_8_1, slot_8_2, slot_9_1, slot_9_2, slot_10_1, slot_10_2, slot_11_1, slot_11_2, slot_12_1, slot_12_2, slot_13_1, slot_13_2, slot_14_1, slot_14_2, slot_15_1, slot_15_2, slot_16_1, slot_16_2, slot_17_1, slot_17_2, slot_18_1, slot_18_2, slot_19_1, slot_19_2, slot_20_1, slot_20_2, slot_21_1, slot_21_2, slot_22_1, slot_22_2, slot_23_1, slot_23_2) VALUES ('"+val2+"', '"+id+"', '"+nalog_start+"', '0', '"+car_pos[0]+"', '"+car_pos[1]+"', '"+car_pos[2]+"', '"+car_pos[3]+"', '"+max_fuel+"', '"+carcolor+"', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')" )
+
+				return
+			}
+		}
 	}
 
 	local result = sqlite3( "SELECT * FROM business_db WHERE number = '"+number+"'" )
@@ -1764,7 +1853,7 @@ function random_weather (hour)
 			setWeather( weather_server_true[pogoda_string_true][3] )
 		}
 
-		print("pogoda_string_true "+pogoda_string_true)
+		//print("pogoda_string_true "+pogoda_string_true)
 	}
 	else 
 	{
@@ -2833,9 +2922,15 @@ function x_down (playerid)
 				state_gui_window[playerid] = 1
 				return
 			}
-			else if ( isPointInCircle3D(x,y,z, interior_job[1][2],interior_job[1][3],interior_job[1][4], interior_job[1][7]) )//мерия
+			else if ( isPointInCircle3D(x,y,z, interior_job[1][2],interior_job[1][3],interior_job[1][4], interior_job[1][7]) )//Мэрия
 			{
 				triggerClientEvent( playerid, "event_shop_menu_fun", -1, "mer" )
+				state_gui_window[playerid] = 1
+				return
+			}
+			else if ( isPointInCircle3D(x,y,z, interior_job[2][2],interior_job[2][3],interior_job[2][4], interior_job[2][7]) )//автосалон
+			{
+				triggerClientEvent( playerid, "event_shop_menu_fun", -1, "dm" )
 				state_gui_window[playerid] = 1
 				return
 			}
