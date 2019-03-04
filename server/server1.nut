@@ -1,6 +1,6 @@
 local database = sqlite( "ebmp-ver-3.1.db" )//база данных
 local element_data = {}
-local hour = 0
+local hour = 6
 local minute = 0
 local earth = {}//--слоты земли
 local max_earth = 0
@@ -99,8 +99,8 @@ local info_png = {
 	[53] = ["лицензия таксиста", "шт"],
 	[54] = ["инкасаторская сумка", "$ в сумке"],
 	[55] = ["лист металла", "кг"],
-	[56] = ["бензопила", "шт"],
-	[57] = ["дрова", "кг"],
+	[56] = ["пила", "шт"],
+	[57] = ["шпала", "$ за штуку"],
 	[58] = ["пустая коробка", "шт"],
 	[59] = ["кирка", "шт"],
 	[60] = ["руда", "кг"],
@@ -486,6 +486,7 @@ local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, 
 local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, скин 6}
 	[-427.786,-737.652,-21.7381, 5.0, 24, 20, 0],//--порт
 	[-85.0723,1736.84,-18.7004, 5.0, 40, 1, 0],//--свалка бруски
+	[826.577,565.208,-11.196, 5.0, 56, 1, 0],//--банк металла
 ]
 
 //--места сброса предметов
@@ -496,6 +497,7 @@ local down_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5
 local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4}
 	[-411.778,-827.907,-21.7456, 5.0, 24],//--порт
 	[-83.0683,1767.58,-18.4006, 5.0, 55],//--свалка бруски
+	[843.815,474.489,-12.0816, 5.0, 57],//--банк металла
 ]
 
 local anim_player_subject = [//--{x,y,z, радиус 3, ид пнг1 4, ид пнг2 5, зп 6, время работы анимации 7}
@@ -511,11 +513,21 @@ local anim_player_subject = [//--{x,y,z, радиус 3, ид пнг1 4, ид п
 	[-74.3065,1816.46,-18.7369, 1.0, 40, 55, 1, 5],
 	[-74.3066,1809.61,-18.7369, 1.0, 40, 55, 1, 5],
 	[-74.3065,1780.41,-18.7371, 1.0, 40, 55, 1, 5],
+
+	//--банк металла
+	[825.124,579.623,-12.0828, 1.0, 56, 57, 1, 5],
+	[824.448,582.761,-12.0828, 1.0, 56, 57, 1, 5],
+	[824.16,586.458,-12.0828, 1.0, 56, 57, 1, 5],
 ]
 
-for (local i = 0; i < 10; i++)
+for (local i = 0; i <= 9; i++)
 {
 	anim_player_subject[i][6] = 40
+}
+
+for (local i = 10; i <= 12; i++)
+{
+	anim_player_subject[i][6] = 60
 }
 
 //слоты игрока
@@ -2304,7 +2316,8 @@ function( playerid )
 	if (logged[playerid] == 0) 
 	{
 		sendMessage(playerid, "[TIPS] Если у вас нету счетчика FPS, перезайдите!", color_tips[0], color_tips[1], color_tips[2])
-		sendMessage(playerid, "[TIPS] TAB - открыть инвентарь", color_tips[0], color_tips[1], color_tips[2])
+		sendMessage(playerid, "[TIPS] TAB - открыть инвентарь, левая часть экрана - использовать предмет, правая - выкинуть", color_tips[0], color_tips[1], color_tips[2])
+		sendMessage(playerid, "[TIPS] /cmd - команды сервера", color_tips[0], color_tips[1], color_tips[2])
 
 		reg_or_login(playerid)
 
@@ -2771,7 +2784,7 @@ function e_down (playerid)//--подбор предметов с земли
 
 		if (area) 
 		{
-			if ((v[3] == 24 || v[3] == 40) && search_inv_player(playerid, v[3], search_inv_player_2_parameter(playerid, v[3])) >= 1) {
+			if ((v[3] == 24 || v[3] == 40 || v[3] == 56) && search_inv_player(playerid, v[3], search_inv_player_2_parameter(playerid, v[3])) >= 1) {
 				sendMessage(playerid, "[ERROR] Можно переносить только один предмет", red[0], red[1], red[2])
 				return
 			}
@@ -3184,7 +3197,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 	if (value == "player")
 	{
-		if (id1 == 2 || id1 == 34 || id1 == 37 || id1 == 41 || id1 == 11)//права, лиц водилы, АЖ, лиц на оружие
+		if (id1 == 2 || id1 == 34 || id1 == 37 || id1 == 41)//права, лиц водилы, АЖ, лиц на оружие
 		{
 			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 			return
@@ -3536,6 +3549,38 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				sendMessage(playerid, "[ERROR] Вы не полицейский", red[0], red[1], red[2])
 			}
+			return
+		}
+		else if (id1 == 11)//--газета
+		{
+			if (pogoda)
+			{
+				if (pogoda_string_true == 1)
+				{
+					sendMessage(playerid, "[ПОГОДА] Сегодня обещают солнечный день", yellow[0], yellow[1], yellow[2])
+				}
+				else if (pogoda_string_true == 2) 
+				{
+					sendMessage(playerid, "[ПОГОДА] Сегодня обещают дождливый день", yellow[0], yellow[1], yellow[2])
+				}
+				else if (pogoda_string_true == 3) 
+				{
+					sendMessage(playerid, "[ПОГОДА] Сегодня обещают туманный день", yellow[0], yellow[1], yellow[2])
+				}
+			}
+			else 
+			{
+				if (pogoda_string_false == 1)
+				{
+					sendMessage(playerid, "[ПОГОДА] Сегодня обещают солнечный день", yellow[0], yellow[1], yellow[2])
+				}
+				else if (pogoda_string_false == 2) 
+				{
+					sendMessage(playerid, "[ПОГОДА] Сегодня обещают туманный день", yellow[0], yellow[1], yellow[2])
+				}
+			}
+
+			me_chat(playerid, playername+" прочитал(а) газету")
 			return
 		}
 		else if (id1 == 23)//--ремонтный набор
