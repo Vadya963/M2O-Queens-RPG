@@ -108,6 +108,7 @@ local info_png = {
 	[62] = ["лицензия водителя мусоровоза", "шт"],
 	[63] = ["мусор", "кг"],
 	[64] = ["антипохмелин", "шт"],
+	[65] = ["двигатель", "уровень тюнинга"],
 }
 
 //цены автосалона
@@ -115,56 +116,56 @@ local motor_show = [
 	//[ид(0), цена(1), вместимость бака(2), название(3)]
 	[0,4995,60,"Ascot Bailey"],
 	[1,5000,90,"Berkley Kingfisher"],
-	//[2,0,0,"Trailer_1"],
-	//[3,0,200,"GAI 353 Military Truck"],
-	//[4,0,200,"Hank B"],
-	//[5,0,200,"Hank B Fuel Tank"],
+	[2,0,0,"Trailer_1"],
+	[3,0,200,"GAI 353 Military Truck"],
+	[4,0,200,"Hank B"],
+	[5,0,200,"Hank B Fuel Tank"],
 	[6,2500,70,"Walter Hot Rod"],
 	[7,1800,70,"Smith 34 Hot Rod"],
 	[8,2100,70,"Shubert Pickup Hot Rod"],
 	[9,2740,70,"Houston Wasp"],
 	[10,9000,70,"ISW 508"],
-	//[11,910,58,"Walter Military"],
+	[11,910,58,"Walter Military"],
 	[12,910,58,"Walter Utility"],
 	[13,25000,90,"Jefferson Futura"],
 	[14,3200,70,"Jefferson Provincial"],
 	[15,3500,90,"Lassister Series 69"],
-	//[16,0,90,"Lassister Series 69"],//копия
-	//[17,0,90,"Lassister Series 75 Hollywood"],//копия
+	[16,0,90,"Lassister Series 69"],//копия
+	[17,0,90,"Lassister Series 75 Hollywood"],//копия
 	[18,5170,90,"Lassister Series 75 Hollywood"],
-	//[19,1250,80,"Milk Truck"],
-	//[20,0,150,"Parry Bus"],
-	//[21,0,150,"Parry Bus Prison"],
+	[19,1250,80,"Milk Truck"],
+	[20,0,150,"Parry Bus"],
+	[21,0,150,"Parry Bus Prison"],
 	[22,2100,70,"Potomac Indian"],
 	[23,2350,60,"Quicksilver Windsor"],
 	[24,2350,60,"Quicksilver Windsor Taxi"],
 	[25,730,65,"Shubert 38"],
-	//[26,0,65,"Shubert 38"],//копия
-	//[27,0,100,"Shubert Armored Van"],
+	[26,0,65,"Shubert 38"],//копия
+	[27,0,100,"Shubert Armored Van"],
 	[28,2300,80,"Shubert Beverly"],
 	[29,3500,70,"Shubert Frigate"],
-	//[30,850,65,"Shubert Hearse"],
+	[30,850,65,"Shubert Hearse"],
 	[31,730,65,"Shubert 38 Panel Truck"],
-	//[32,0,65,"Shubert 38 Panel Truck"],//копия
-	//[33,730,65,"Shubert 38 Taxi"],
-	//[34,0,100,"Shubert Truck"],
-	//[35,0,100,"Shubert Truck Flatbed"],//копия
-	//[36,0,100,"Shubert Truck Flatbed"],
+	[32,0,65,"Shubert 38 Panel Truck"],//копия
+	[33,730,65,"Shubert 38 Taxi"],
+	[34,0,100,"Shubert Truck"],
+	[35,0,100,"Shubert Truck Flatbed"],//копия
+	[36,0,100,"Shubert Truck Flatbed"],
 	[37,4350,100,"Shubert Truck Covered"],
-	//[38,0,100,"Shubert Truck"],
-	//[39,0,100,"Shubert Show Plow"],
-	//[40,0,80,"Military Truck"],
+	[38,0,100,"Shubert Truck"],
+	[39,0,100,"Shubert Show Plow"],
+	[40,0,80,"Military Truck"],
 	[41,2140,80,"Smith Custom 200"],
 	[42,4280,80,"Smith Custom 200 Police Special"],
 	[43,450,50,"Smith Coupe"],
 	[44,1700,65,"Smith Mainline"],
 	[45,2700,70,"Smith Thunderbolt"],
-	//[46,0,80,"Smith Truck"],
+	[46,0,80,"Smith Truck"],
 	[47,530,65,"Smith V8"],
 	[48,1500,50,"Smith Deluxe Station Wagon"],
-	//[49,0,0,"Trailer_2"],
+	[49,0,0,"Trailer_2"],
 	[50,1475,70,"Culver Empire"],
-	//[51,2950,70,"Culver Empire Police Special"],
+	[51,2950,70,"Culver Empire Police Special"],
 	[52,2450,80,"Walker Rocket"],
 	[53,770,40,"Walter Coupe"]
 ]
@@ -426,10 +427,11 @@ local interior_business = [
 
 //--здания для работ и фракций
 local interior_job = [//--12
-//   0              1                 2       3      4        5    6    7      
-	[0, "Полицейский департамент", -378.987,654.699,-11.5013, 24, "0", 5.0],
-	[1, "Мэрия", -115.11,-63.1035,-12.041, 23, "0", 5.0],
-	[2, "Автосалон", -199.532,838.583,-21.2431, 21, "0", 5.0],
+//   0              1                 2       3      4        5    6    7   8
+	[0, "Полицейский департамент", -378.987,654.699,-11.5013, 24, "0", 5.0, 0],
+	[1, "Мэрия", -115.11,-63.1035,-12.041, 23, "0", 5.0, 0],
+	[2, "Автосалон", -199.532,838.583,-21.2431, 21, "0", 5.0, 0],
+	[3, "Казино", -539.082,-91.9283,0.436483, 0, "0", 5.0, 9],
 ]
 
 local weapon = {
@@ -473,6 +475,7 @@ local gas = {
 local repair_shop = {
 	[23] = [info_png[23][0], 1, 100],
 	[35] = [info_png[35][0], 10, 500],
+	[65] = [info_png[65][0], 3, 15000],
 }
 
 //-места поднятия предметов
@@ -2354,7 +2357,7 @@ function( playerid )
 
 		foreach (k, v in interior_job)
 		{
-			triggerClientEvent( playerid, "event_blip_create", v[2], v[3], v[5],0, max_blip )
+			triggerClientEvent( playerid, "event_blip_create", v[2], v[3], v[5],v[8], max_blip )
 		}
 	}
 	else 
@@ -3573,6 +3576,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 				return
 			}
 		}
@@ -3635,9 +3639,29 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					}
 				}
 
+				if (isPointInCircle3D(-539.082,-91.9283,0.436483, x,y,z, 5.0) && robbery_player[playerid] == 0)
+				{
+					local time_rob = 1//--время для ограбления
+
+					id2 = id2 - 1
+
+					count = count+1
+
+					robbery_player[playerid] = 1
+
+					me_chat(playerid, playername+" взломал(а) сейф")
+
+					sendMessage(playerid, "Вы начали взлом", yellow[0], yellow[1], yellow[2])
+					sendMessage(playerid, "[TIPS] Не покидайте место ограбления "+time_rob+" мин", color_tips[0], color_tips[1], color_tips[2])
+
+					police_chat(playerid, "[ДИСПЕТЧЕР] Ограбление Казино, подозреваемый "+playername)
+
+					timer(robbery, (time_rob*10000), 1, playerid, zakon_robbery_crimes, 2000, -539.082,-91.9283,0.436483, 5.0, "Casino Caligulas")
+				}
+
 				if (count == 0)
 				{
-					sendMessage(playerid, "[ERROR] Нужно быть около дома или бизнеса; Вы уже начали ограбление", red[0], red[1], red[2])
+					sendMessage(playerid, "[ERROR] Нужно быть около дома, бизнеса или около казино; Вы уже начали ограбление", red[0], red[1], red[2])
 					return
 				}
 			}
@@ -3803,6 +3827,33 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 		}
+		else if (id1 == 65) //--двигло
+		{
+			if (isPlayerInVehicle(playerid))
+			{
+				if (getSpeed(vehicleid) > 5)
+				{
+					sendMessage(playerid, "[ERROR] Остановите т/с", red[0], red[1], red[2])
+					return
+				}
+				
+				local tune = getVehicleTuningTable(vehicleid)
+				local plate = getVehiclePlateText(vehicleid)
+
+				setVehicleTuningTable(vehicleid, id2)
+
+				sqlite3( "UPDATE car_db SET tune = '"+id2+"' WHERE number = '"+plate+"'")
+
+				me_chat(playerid, playername+" установил(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+
+				id2 = tune
+			}
+			else 
+			{
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				return
+			}
+		}
 		else if (id1 == 9 || id1 == 12 || id1 == 13 || id1 == 14 || id1 == 15 || id1 == 16 || id1 == 17 || id1 == 18 || id1 == 19)//оружие
 		{
 			givePlayerWeapon(playerid, weapon[id1][1], id2)
@@ -3827,6 +3878,195 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 	}
 }
 addEventHandler( "event_use_inv", use_inv )
+
+local Red = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]
+local Black = [2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35]
+local to1 = [1,4,7,10,13,16,19,22,25,28,31,34]
+local to2 = [2,5,8,11,14,17,20,23,26,29,32,35]
+local to3 = [3,6,9,12,15,18,21,24,27,30,33,36]
+
+function roulette(playerid, randomize)
+{
+	foreach (k, v in Red) 
+	{
+		if (randomize == v)
+		{
+			sendMessage(playerid, "====[ Рулетка ]====", yellow[0], yellow[1], yellow[2])
+			sendMessage(playerid, "Выпало "+randomize+" красное", yellow[0], yellow[1], yellow[2])
+			return
+		}
+	}
+
+	foreach (k, v in Black) 
+	{
+		if (randomize == v)
+		{
+			sendMessage(playerid, "====[ Рулетка ]====", yellow[0], yellow[1], yellow[2])
+			sendMessage(playerid, "Выпало "+randomize+" черное", yellow[0], yellow[1], yellow[2])
+			return
+		}
+	}
+
+	if (randomize == 0)
+	{
+		sendMessage(playerid, "====[ Рулетка ]====", yellow[0], yellow[1], yellow[2])
+		sendMessage(playerid, "Выпало ZERO", yellow[0], yellow[1], yellow[2])
+		return
+	}
+}
+
+function win_roulette( playerid, cash, ratio )
+{
+	local playername = getPlayerName ( playerid )
+	local money = cash*ratio
+
+	sendMessage(playerid, "Вы заработали "+money+"$ X"+ratio, green[0], green[1], green[2])
+
+	inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
+
+	save_player_action(playerid, "[win_roulette] "+playername+" [+"+money+"$, "+array_player_2[playerid][0]+"$]")
+}
+
+addCommandHandler ( "roulette",//--играть в рулетку
+function (playerid, id, cash)
+{
+	local playername = getPlayerName ( playerid )
+	local myPos = getPlayerPosition(playerid)
+	local x = myPos[0]
+	local y = myPos[1]
+	local z = myPos[2]
+	local id = id.tostring()
+	local cash = cash.tointeger()
+	local randomize = random(0,36)
+	local roulette_game = ["красное","черное","четное","нечетное","1-18","19-36","1-12","2-12","3-12","3-1","3-2","3-3"]
+
+	if (logged[playerid] == 0)
+	{
+		return
+	}
+
+	if (cash < 1)
+	{
+		return
+	}
+
+	if (cash > array_player_2[playerid][0])
+	{
+		sendPlayerMessage(playerid, "[ERROR] У вас недостаточно средств", red[0], red[1], red[2])
+		return
+	}
+
+	if (isPointInCircle3D( x, y, z, -539.082,-91.9283,0.436483, 5.0 ))
+	{
+		foreach (k, v in roulette_game)
+		{
+			if (v == id)
+			{
+				roulette(playerid, randomize)
+
+				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playername )
+
+				if (id == "красное")
+				{
+					foreach (k, v in Red) 
+					{
+						if (randomize == v)
+						{
+							win_roulette(playerid, cash, 2)
+							return
+						}
+					}
+				}
+				else if (id == "черное")
+				{
+					foreach (k, v in Black) 
+					{
+						if (randomize == v)
+						{
+							win_roulette(playerid, cash, 2)
+							return
+						}
+					}
+				}
+				else if (id == "четное" && randomize%2 == 0)
+				{
+					win_roulette(playerid, cash, 2)
+					return
+				}
+				else if (id == "нечетное" && randomize%2 == 1)
+				{
+					win_roulette(playerid, cash, 2)
+					return
+				}
+				else if (id == "1-18" && randomize >= 1 && randomize <= 18)
+				{
+					win_roulette(playerid, cash, 2)
+					return
+				}
+				else if (id == "19-36" && randomize >= 19 && randomize <= 36)
+				{
+					win_roulette(playerid, cash, 2)
+					return
+				}
+				else if (id == "1-12" && randomize >= 1 && randomize <= 12)
+				{
+					win_roulette(playerid, cash, 3)
+					return
+				}
+				else if (id == "2-12" && randomize >= 13 && randomize <= 24)
+				{
+					win_roulette(playerid, cash, 3)
+					return
+				}
+				else if (id == "3-12" && randomize >= 25 && randomize <= 36)
+				{
+					win_roulette(playerid, cash, 3)
+					return
+				}
+				else if( id == "3-1")
+				{
+					foreach (k, v in to1) 
+					{
+						if (randomize == v)
+						{
+							win_roulette(playerid, cash, 3)
+							return
+						}
+					}
+				}
+				else if( id == "3-2")
+				{
+					foreach (k, v in to2) 
+					{
+						if (randomize == v)
+						{
+							win_roulette(playerid, cash, 3)
+							return
+						}
+					}
+				}
+				else if( id == "3-3")
+				{
+					foreach (k, v in to3) 
+					{
+						if (randomize == v)
+						{
+							win_roulette(playerid, cash, 3)
+							return
+						}
+					}
+				}
+
+				save_player_action(playerid, "[los_roulette] "+playername+" [-"+cash+"$, "+array_player_2[playerid][0]+"$]")
+				return
+			}
+		}
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Вы не в казино(кубок на карте)", red[0], red[1], red[2])
+	}
+})
 
 addCommandHandler ( "prison",//--команда для копов (посадить игрока в тюрьму)
 function (playerid, id)
