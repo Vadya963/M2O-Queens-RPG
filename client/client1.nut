@@ -123,6 +123,7 @@ local info_png = {
 	[62] = ["лицензия водителя мусоровоза", "шт"],
 	[63] = ["мусор", "кг"],
 	[64] = ["антипохмелин", "шт"],
+	[65] = ["двигатель", "тюнинга"],
 }
 
 //цены автосалона
@@ -333,6 +334,7 @@ guiSetVisibleGridList (gas_menu, false)
 local repair_shop = {
 	[23] = [info_png[23][0], 1, 100],
 	[35] = [info_png[35][0], 10, 500],
+	[65] = [info_png[65][0], 3, 15000],
 }
 local repair_shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in repair_shop)
