@@ -3656,7 +3656,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 					police_chat(playerid, "[ДИСПЕТЧЕР] Ограбление Казино, подозреваемый "+playername)
 
-					timer(robbery, (time_rob*10000), 1, playerid, zakon_robbery_crimes, 2000, -539.082,-91.9283,0.436483, 5.0, "Casino Caligulas")
+					timer(robbery, (time_rob*10000), 1, playerid, zakon_robbery_crimes, 2000, -539.082,-91.9283,0.436483, 5.0, "Casino")
 				}
 
 				if (count == 0)
