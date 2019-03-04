@@ -114,8 +114,8 @@ local info_png = {
 	[53] = ["лицензия таксиста", "шт"],
 	[54] = ["инкасаторская сумка", "$ в сумке"],
 	[55] = ["лист металла", "кг"],
-	[56] = ["бензопила", "шт"],
-	[57] = ["дрова", "кг"],
+	[56] = ["пила", "шт"],
+	[57] = ["шпала", "$ за штуку"],
 	[58] = ["пустая коробка", "шт"],
 	[59] = ["кирка", "шт"],
 	[60] = ["руда", "кг"],
@@ -668,12 +668,12 @@ guiSetAlpha(gui_fon, 0.0)
 guiSetVisible( gui_fon, false )
 
 
-guiCreateElement( 13, "health.png", screen[0]-30.0, height_need-7.5, 30.0, 30.0, false )
-guiCreateElement( 13, "alcohol.png", screen[0]-30.0, height_need-7.5+(20+7.5)*1, 30.0, 30.0, false )
-guiCreateElement( 13, "drugs.png", screen[0]-30.0, height_need-7.5+(20+7.5)*2, 30.0, 30.0, false )
-guiCreateElement( 13, "satiety.png", screen[0]-30.0, height_need-7.5+(20+7.5)*3, 30.0, 30.0, false )
-guiCreateElement( 13, "hygiene.png", screen[0]-30.0, height_need-7.5+(20+7.5)*4, 30.0, 30.0, false )
-guiCreateElement( 13, "sleep.png", screen[0]-30.0, height_need-7.5+(20+7.5)*5, 30.0, 30.0, false )
+local health_gui = guiCreateElement( 13, "health.png", screen[0]-30.0, height_need-7.5, 30.0, 30.0, false )
+local alcohol_gui = guiCreateElement( 13, "alcohol.png", screen[0]-30.0, height_need-7.5+(20+7.5)*1, 30.0, 30.0, false )
+local drugs_gui = guiCreateElement( 13, "drugs.png", screen[0]-30.0, height_need-7.5+(20+7.5)*2, 30.0, 30.0, false )
+local satiety_gui = guiCreateElement( 13, "satiety.png", screen[0]-30.0, height_need-7.5+(20+7.5)*3, 30.0, 30.0, false )
+local hygiene_gui = guiCreateElement( 13, "hygiene.png", screen[0]-30.0, height_need-7.5+(20+7.5)*4, 30.0, 30.0, false )
+local sleep_gui = guiCreateElement( 13, "sleep.png", screen[0]-30.0, height_need-7.5+(20+7.5)*5, 30.0, 30.0, false )
 
 function dxdrawtext(text, x, y, color, shadow, font, scale)
 {	
@@ -815,6 +815,7 @@ function()
 	bindKey( "x", "down", x_down )
 	bindKey( "page_up", "down", up_down )
 	bindKey( "page_down", "down", down_down )
+	bindKey( "f2", "down", f2_down )
 })
 
 function zamena_img()
@@ -1562,8 +1563,31 @@ addEventHandler ( "event_tab_load", tab_load )
 
 function f1_down()
 {
+	if(isMainMenuShowing())
+	{
+		return
+	}
+
 	showCursor( !isCursorShowing )
 	isCursorShowing = !isCursorShowing
+}
+
+function f2_down()
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+	
+	sync_timer = !sync_timer
+	showChat( sync_timer )
+
+	guiSetVisible(health_gui, sync_timer)
+	guiSetVisible(alcohol_gui, sync_timer)
+	guiSetVisible(drugs_gui, sync_timer)
+	guiSetVisible(satiety_gui, sync_timer)
+	guiSetVisible(hygiene_gui, sync_timer)
+	guiSetVisible(sleep_gui, sync_timer)
 }
 
 addEventHandler( "job_gps",
