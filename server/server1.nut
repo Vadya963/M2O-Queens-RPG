@@ -12,6 +12,7 @@ local max_blip = 250.0//--радиус блипов
 local zakon_nalog_car = 500
 local zakon_nalog_house = 1000
 local zakon_nalog_business = 2000
+local time_nalog = 12//--время когда будет взиматься налог
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -1307,6 +1308,12 @@ function buy_subject_fun( playerid, text, number, value )
 			return
 		}
 
+		if (result[1]["nalog"] <= 0)
+		{
+			sendMessage(playerid, "[ERROR] Бизнес арестован за уклонение от уплаты налогов", red[0], red[1], red[2])
+			return
+		}
+
 			if (value == 0)
 			{
 				if (search_inv_player(playerid, 41, 1) == 0)
@@ -1344,24 +1351,48 @@ function buy_subject_fun( playerid, text, number, value )
 					}
 				}
 			}
+			else if (value == 1)
+			{	
+				if (text.tointeger() >= 0 && text.tointeger() <= 171)
+				{
+					//нельзя купить
+					local no_skin = [0,3,11,14,15,16,21,23,25,26,29,30,31,33,34,36,82,128,136,155,156,157,158,159,160,161,165,166,167,168,169,170]
+					foreach (k, v in no_skin) 
+					{
+						if (v == text.tointeger())
+						{
+							sendMessage(playerid, "[ERROR] Эта одежда не продается", red[0], red[1], red[2])
+							return
+						}
+					}
 
-			/*elseif value == 1 then
-				if text == "мужская одежда" or text == "женская одежда" then
-					return
-				end
+					if (cash <= array_player_2[playerid][0])
+					{
+						if (inv_player_empty(playerid, 27, text.tointeger()))
+						{
+							sendMessage(playerid, "Вы купили "+text+" скин за "+cash+"$", orange[0], orange[1], orange[2])
 
-				if inv_player_empty(playerid, 27, text) then
-					sendMessage(playerid, "Вы купили "+text+" скин за "+cash+"$", orange[1], orange[2], orange[3])
+							sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash+"' WHERE number = '"+number+"'")
 
-					sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash+"' WHERE number = '"+number+"'")
+							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playername )
 
-					inv_server_load( playerid, "player", 0, 1, array_player_2[playername][1]-cash, playername )
-
-					save_player_action(playerid, "[buy_subject_fun] [skin - "+text+"], "+playername+" [-"+cash+"$, "+array_player_2[playername][1]+"$], "+info_bisiness(number))
+							save_player_action(playerid, "[buy_subject_fun] [skin - "+text+"], "+playername+" [-"+cash+"$, "+array_player_2[playerid][0]+"$], "+info_bisiness(number))
+						}
+						else
+						{
+							sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
+						}
+					}
+					else
+					{
+						sendMessage(playerid, "[ERROR] У вас недостаточно средств", red[0], red[1], red[2])
+					}
+				}
 				else
-					sendMessage(playerid, "[ERROR] Инвентарь полон", red[1], red[2], red[3])
-				end*/
-
+				{
+					sendMessage(playerid, "[ERROR] От 0 до 171", red[0], red[1], red[2])
+				}
+			}
 			else if (value == 2)
 			{
 				foreach (k, v in shop)
@@ -2049,7 +2080,7 @@ function pay_nalog()
 	local min = date[4].tointeger()
 	local sec = date[5].tointeger()
 
-	if (chas == 12)
+	if (chas == time_nalog)
 	{
 		local result = sqlite3( "SELECT * FROM car_db" )
 		foreach (k, v in result) 
@@ -2861,25 +2892,18 @@ function x_down (playerid)
 			{
 				if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius) && v["type"] == interior_business[0][1])//оружие
 				{
-					if (v["nalog"] <= 0)
-					{
-						sendMessage(playerid, "[ERROR] Бизнес арестован за уклонение от уплаты налогов", red[0], red[1], red[2])
-						return
-					}
-
 					triggerClientEvent( playerid, "event_shop_menu_fun", v["number"], 0 )
 					state_gui_window[playerid] = 1
 					business_info (playerid, v["number"])
 					return
 				}
+				if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius) && v["type"] == interior_business[1][1])//одежда
+				{
+					business_info (playerid, v["number"])
+					return
+				}
 				else if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius) && v["type"] == interior_business[2][1])//киоск
 				{
-					if (v["nalog"] <= 0)
-					{
-						sendMessage(playerid, "[ERROR] Бизнес арестован за уклонение от уплаты налогов", red[0], red[1], red[2])
-						return
-					}
-
 					triggerClientEvent( playerid, "event_shop_menu_fun", v["number"], 2 )
 					state_gui_window[playerid] = 1
 					business_info (playerid, v["number"])
@@ -2887,12 +2911,6 @@ function x_down (playerid)
 				}
 				else if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius) && v["type"] == interior_business[3][1])//заправка
 				{
-					if (v["nalog"] <= 0)
-					{
-						sendMessage(playerid, "[ERROR] Бизнес арестован за уклонение от уплаты налогов", red[0], red[1], red[2])
-						return
-					}
-
 					triggerClientEvent( playerid, "event_shop_menu_fun", v["number"], 3 )
 					state_gui_window[playerid] = 1
 					business_info (playerid, v["number"])
@@ -2900,12 +2918,6 @@ function x_down (playerid)
 				}
 				else if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius) && v["type"] == interior_business[4][1])//автомастерская
 				{
-					if (v["nalog"] <= 0)
-					{
-						sendMessage(playerid, "[ERROR] Бизнес арестован за уклонение от уплаты налогов", red[0], red[1], red[2])
-						return
-					}
-
 					triggerClientEvent( playerid, "event_shop_menu_fun", v["number"], 4 )
 					state_gui_window[playerid] = 1
 					business_info (playerid, v["number"])
@@ -2913,12 +2925,6 @@ function x_down (playerid)
 				}
 				else if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius) && v["type"] == interior_business[5][1])//еда
 				{
-					if (v["nalog"] <= 0)
-					{
-						sendMessage(playerid, "[ERROR] Бизнес арестован за уклонение от уплаты налогов", red[0], red[1], red[2])
-						return
-					}
-
 					triggerClientEvent( playerid, "event_shop_menu_fun", v["number"], 5 )
 					state_gui_window[playerid] = 1
 					business_info (playerid, v["number"])
@@ -4365,6 +4371,31 @@ function (playerid, value, money)
 		if ( isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius*2) && search_inv_player(playerid, 36, v["number"]) != 0 )
 		{
 			till_fun(playerid, v["number"], money, value)
+			return
+		}
+	}
+})
+
+addCommandHandler("buyskin",//купить скин
+function (playerid, id)
+{
+	local playername = getPlayerName( playerid )
+	local myPos = getPlayerPosition(playerid)
+	local x = myPos[0]
+	local y = myPos[1]
+	local z = myPos[2]
+	local id = id.tointeger()
+
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	foreach (k, v in sqlite3( "SELECT * FROM business_db" ))//--бизнесы
+	{
+		if ( isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius) && interior_business[1][1] == v["type"] )
+		{
+			buy_subject_fun(playerid, id, v["number"], 1)
 			return
 		}
 	}
