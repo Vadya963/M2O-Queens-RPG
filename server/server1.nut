@@ -2996,15 +2996,16 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 	local vehicleid = getPlayerVehicle(playerid)
 	local count2 = 0
 
-	if (value == "player") {
-
-		if (search_inv_player(playerid, id1, search_inv_player_2_parameter(playerid, id1)) >= 1) {
+	if (value == "player") 
+	{
+		if (search_inv_player(playerid, id1, search_inv_player_2_parameter(playerid, id1)) >= 1) 
+		{
 			sendMessage(playerid, "[ERROR] Можно переносить только один предмет", red[0], red[1], red[2])
 			return
 		}
 
-		if (inv_player_empty(playerid, id1, id2)) {
-
+		if (inv_player_empty(playerid, id1, id2)) 
+		{
 			sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
 
 			save_player_action(playerid, "[give_subject] "+playername+" [value - "+value+"] ["+info_png[id1][0]+", "+id2+"]")
@@ -3014,26 +3015,34 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
 		}
 	}
-	else if (value == "car") {//--для работ по перевозке ящиков
-
-		if (isPlayerInVehicle(playerid)) {
-			if (sead[playerid] != 0) {
+	else if (value == "car")//--для работ по перевозке ящиков
+	{
+		if (isPlayerInVehicle(playerid)) 
+		{
+			if (sead[playerid] != 0) 
+			{
 				return
 			}
-			else if (id1 == 65) {
-				if (search_inv_player(playerid, 66, playername) == 0) {
+			else if (id1 == 65) 
+			{
+				if (search_inv_player(playerid, 66, playername) == 0) 
+				{
 					sendMessage(playerid, "[ERROR] Вы не инкасатор", red[0], red[1], red[2])
 					return
 				}
 			}
-			else if (id1 == 24) {
-				if (search_inv_player(playerid, 34, 1) == 0) {
+			else if (id1 == 24) 
+			{
+				if (search_inv_player(playerid, 34, 1) == 0) 
+				{
 					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", red[0], red[1], red[2])
 					return
 				}
 			}
-			else if (id1 == 75) {
-				if (search_inv_player(playerid, 74, playername) == 0) {
+			else if (id1 == 75) 
+			{
+				if (search_inv_player(playerid, 74, playername) == 0) 
+				{
 					sendMessage(playerid, "[ERROR] Вы не водитель мусоровоза", red[0], red[1], red[2])
 					return
 				}
@@ -3041,27 +3050,21 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 
 			for (local i = 0; i < max_inv; i++) 
 			{
-				if (inv_car_empty(playerid, id1, id2)) {
+				if (inv_car_empty(playerid, id1, id2)) 
+				{
 					count2 = count2 + 1
 				}
 			}
 
-			if (count2 != 0) {
+			if (count2 != 0) 
+			{
 				local count = search_inv_car(vehicleid, id1, id2)
 
 				sendMessage(playerid, "Вы загрузили в т/с "+info_png[id1][0]+" "+count+" шт за "+id2+"$", svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
 				
-				if (id1 == 24) {
+				if (id1 == 24) 
+				{
 					sendMessage(playerid, "[TIPS] Езжайте в порт или в любой бизнес, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
-				}
-				else if (id1 == 65) {
-					sendMessage(playerid, "[TIPS] Езжайте в казино Калигула, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
-				}
-				else if (id1 == 73) {
-					sendMessage(playerid, "[TIPS] Езжайте в порт, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
-				}
-				else if (id1 == 75) {
-					sendMessage(playerid, "[TIPS] Езжайте на свалку, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
 				}
 
 				save_player_action(playerid, "[give_subject] "+playername+" [value - "+value+", count - "+count+"] ["+info_png[id1][0]+", "+id2+"]")
@@ -3076,7 +3079,6 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 		}
 	}
-
 }
 
 function delet_subject(playerid, id)//--удаление предметов из авто, для работ по перевозке ящиков
