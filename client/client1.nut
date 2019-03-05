@@ -124,6 +124,7 @@ local info_png = {
 	[63] = ["мусор", "кг"],
 	[64] = ["антипохмелин", "шт"],
 	[65] = ["двигатель", "уровень тюнинга"],
+	[66] = ["золотое колье", "$ за штуку"],
 }
 
 //цены автосалона
@@ -135,14 +136,14 @@ local motor_show = [
 	//[3,0,200,"GAI 353 Military Truck"],
 	//[4,0,200,"Hank B"],
 	//[5,0,200,"Hank B Fuel Tank"],
-	[6,2500,70,"Walter Hot Rod"],
-	[7,1800,70,"Smith 34 Hot Rod"],
-	[8,2100,70,"Shubert Pickup Hot Rod"],
+	[6,7000,70,"Walter Hot Rod"],
+	[7,6000,70,"Smith 34 Hot Rod"],
+	[8,6000,70,"Shubert Pickup Hot Rod"],
 	[9,2740,70,"Houston Wasp"],
-	[10,9000,70,"ISW 508"],
+	[10,5000,70,"ISW 508"],
 	//[11,910,58,"Walter Military"],
 	[12,910,58,"Walter Utility"],
-	[13,25000,90,"Jefferson Futura"],
+	[13,5000,90,"Jefferson Futura"],
 	[14,3200,70,"Jefferson Provincial"],
 	[15,3500,90,"Lassister Series 69"],
 	//[16,0,90,"Lassister Series 69"],//копия

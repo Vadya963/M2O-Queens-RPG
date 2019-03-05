@@ -2,6 +2,14 @@ local text = "Выбросите молоток, чтобы получить лист металла"
 local text2 = "Выбросите пилу, чтобы получить шпалу"
 
 local text_3d = [//--3d text
+	//interior_job
+	[-378.987,654.699,-11.5013, 5.0, "Полицейский департамент (Меню - X)"],
+	[-115.11,-63.1035,-12.041, 5.0, "Мэрия (Меню - X)"],
+	[-199.532,838.583,-21.2431, 5.0, "Автосалон (Меню - X)"],
+	[-539.082,-91.9283,0.436483, 5.0, "Казино"],
+	[-526.354,-40.6722,1.07341, 5.0, "Ювелирка"],
+	[-1292.64,1608.78,4.30491, 5.0, "Выбросите украшения, чтобы получить прибыль"],
+
 	//up_car_subject
 	[-632.282,955.495,-18.7324, 15.0, "Склад продуктов (Загрузить ящики - E)"],
 
@@ -127,19 +135,6 @@ function( post )
 
 			local dimensions = dxGetTextDimensions ( "(Разгрузить товар - E, Меню - X)", 1.0, "tahoma-bold" )
 			dxdrawtext ( "(Разгрузить товар - E, Меню - X)", coords[0]-(dimensions[0]/2), coords[1]+15.0, fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
-		}
-	}
-
-	foreach (k, v in job_pos)
-	{
-		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], v[0],v[1],v[2], v[4]))
-		{
-			local coords = getScreenFromWorld( v[0], v[1], v[2]+1.0 )
-			local dimensions = dxGetTextDimensions ( "Здание", 1.0, "tahoma-bold" )
-			dxdrawtext ( "Здание", coords[0]-(dimensions[0]/2), coords[1], fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
-
-			local dimensions = dxGetTextDimensions ( "(Меню - X)", 1.0, "tahoma-bold" )
-			dxdrawtext ( "(Меню - X)", coords[0]-(dimensions[0]/2), coords[1]+15.0, fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
 	}
 })
