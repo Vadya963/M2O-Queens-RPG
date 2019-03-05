@@ -110,6 +110,7 @@ local info_png = {
 	[63] = ["мусор", "кг"],
 	[64] = ["антипохмелин", "шт"],
 	[65] = ["двигатель", "уровень тюнинга"],
+	[66] = ["золотое колье", "$ за штуку"],
 }
 
 //цены автосалона
@@ -121,14 +122,14 @@ local motor_show = [
 	[3,0,200,"GAI 353 Military Truck"],
 	[4,0,200,"Hank B"],
 	[5,0,200,"Hank B Fuel Tank"],
-	[6,2500,70,"Walter Hot Rod"],
-	[7,1800,70,"Smith 34 Hot Rod"],
-	[8,2100,70,"Shubert Pickup Hot Rod"],
+	[6,7000,70,"Walter Hot Rod"],
+	[7,6000,70,"Smith 34 Hot Rod"],
+	[8,6000,70,"Shubert Pickup Hot Rod"],
 	[9,2740,70,"Houston Wasp"],
-	[10,9000,70,"ISW 508"],
+	[10,5000,70,"ISW 508"],
 	[11,910,58,"Walter Military"],
 	[12,910,58,"Walter Utility"],
-	[13,25000,90,"Jefferson Futura"],
+	[13,5000,90,"Jefferson Futura"],
 	[14,3200,70,"Jefferson Provincial"],
 	[15,3500,90,"Lassister Series 69"],
 	[16,0,90,"Lassister Series 69"],//копия
@@ -428,11 +429,12 @@ local interior_business = [
 
 //--здания для работ и фракций
 local interior_job = [//--12
-//   0              1                 2       3      4        5    6    7   8
+//	 0              1                 2       3      4        5    6    7   8
 	[0, "Полицейский департамент", -378.987,654.699,-11.5013, 24, "0", 5.0, 0],
 	[1, "Мэрия", -115.11,-63.1035,-12.041, 23, "0", 5.0, 0],
 	[2, "Автосалон", -199.532,838.583,-21.2431, 21, "0", 5.0, 0],
 	[3, "Казино", -539.082,-91.9283,0.436483, 0, "0", 5.0, 9],
+	[4, "Ювелирка", -526.354,-40.6722,1.07341, 0, "0", 5.0, 7],
 ]
 
 local weapon = {
@@ -499,6 +501,7 @@ local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4}
 	[-411.778,-827.907,-21.7456, 5.0, 24],//--порт
 	[-83.0683,1767.58,-18.4006, 5.0, 55],//--свалка бруски
 	[843.815,474.489,-12.0816, 5.0, 57],//--банк металла
+	[-1292.64,1608.78,4.30491, 5.0, 66],//--гарри
 ]
 
 local anim_player_subject = [//--{x,y,z, радиус 3, ид пнг1 4, ид пнг2 5, зп 6, время работы анимации 7}
@@ -887,15 +890,37 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 			local cash = random(1,money)
 
 			if (isPointInCircle3D(x1,y1,z1, x,y,z, radius))
-			{
-				crimes[playerid] = crimes[playerid]+crimes_plus
-				sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+			{	
+				if (text == "Arcade")
+				{	
+					local id1 = 66
+					if (inv_player_empty(playerid, id1, cash))
+					{
+						crimes[playerid] = crimes[playerid]+crimes_plus
+						sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
 
-				sendMessage(playerid, "Вы унесли "+cash+"$", green[0], green[1], green[2])
+						sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+cash+" "+info_png[id1][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
 
-				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+cash, playername )
+						sendMessage(playerid, "[TIPS] Отвезите украшения в Кингстон к Гарри", color_tips[0], color_tips[1], color_tips[2])
 
-				save_player_action(playerid, "[robbery] "+playername+" ["+text+"], [+"+cash+"$, "+array_player_2[playerid][0]+"$]")
+						save_player_action(playerid, "[robbery] "+playername+" ["+text+"], ["+info_png[id1][0]+", "+cash+"]")
+					}
+					else 
+					{
+						sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
+					}
+				}
+				else 
+				{
+					crimes[playerid] = crimes[playerid]+crimes_plus
+					sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+
+					sendMessage(playerid, "Вы унесли "+cash+"$", green[0], green[1], green[2])
+
+					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+cash, playername )
+
+					save_player_action(playerid, "[robbery] "+playername+" ["+text+"], [+"+cash+"$, "+array_player_2[playerid][0]+"$]")
+				}
 			}
 			else
 			{
@@ -1019,11 +1044,6 @@ function house_bussiness_job_pos_load( playerid )
 	foreach (idx, v in sqlite3( "SELECT * FROM business_db" )) 
 	{
 		triggerClientEvent( playerid, "event_bussines_house_fun", v["number"], v["x"], v["y"], v["z"], "biz", house_bussiness_radius, 0, 0 )
-	}
-
-	foreach (idx, v in interior_job) 
-	{
-		triggerClientEvent( playerid, "event_bussines_house_fun", idx, v[2], v[3], v[4], "job", house_bussiness_radius, v[6], v[7] )
 	}
 }
 
@@ -2451,7 +2471,7 @@ function reg_or_login(playerid)
 
 		setplayerhealth( playerid, result[1]["heal"] )
 		setPlayerModel(playerid, result[1]["skin"])
-		setPlayerPosition( playerid, -393.265,905.334,-20.0026 )
+		setPlayerPosition( playerid, -575.101,1622.8,-15.6957 )
 
 		sendMessage(playerid, "Вы удачно зарегистрировались!", turquoise[0], turquoise[1], turquoise[2])
 
@@ -3203,7 +3223,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 	if (value == "player")
 	{
-		if (id1 == 2 || id1 == 34 || id1 == 37 || id1 == 41)//права, лиц водилы, АЖ, лиц на оружие
+		if (id1 == 2 || id1 == 34 || id1 == 37 || id1 == 41 || id1 == 66)//права, лиц водилы, АЖ, лиц на оружие, украшение
 		{
 			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 			return
@@ -3391,7 +3411,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (id1 == 44)
 			{
-				local sleep_hygiene_plus = 100
+				local sleep_hygiene_plus = 50
 
 				if (hygiene[playerid]+sleep_hygiene_plus > max_hygiene)
 				{
@@ -3410,7 +3430,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else if (id1 == 45)
 			{
-				local sleep_hygiene_plus = 100
+				local sleep_hygiene_plus = 50
 
 				if (sleep[playerid]+sleep_hygiene_plus > max_sleep)
 				{
@@ -3690,7 +3710,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					}
 				}
 
-				if (isPointInCircle3D(-539.082,-91.9283,0.436483, x,y,z, 5.0) && robbery_player[playerid] == 0)
+				if (isPointInCircle3D(x,y,z, interior_job[4][2],interior_job[4][3],interior_job[4][4], interior_job[4][7]) && robbery_player[playerid] == 0)
 				{
 					local time_rob = 1//--время для ограбления
 
@@ -3700,19 +3720,19 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 					robbery_player[playerid] = 1
 
-					me_chat(playerid, playername+" взломал(а) сейф")
+					me_chat(playerid, playername+" взломал(а) дверь")
 
 					sendMessage(playerid, "Вы начали взлом", yellow[0], yellow[1], yellow[2])
 					sendMessage(playerid, "[TIPS] Не покидайте место ограбления "+time_rob+" мин", color_tips[0], color_tips[1], color_tips[2])
 
-					police_chat(playerid, "[ДИСПЕТЧЕР] Ограбление Казино, подозреваемый "+playername)
+					police_chat(playerid, "[ДИСПЕТЧЕР] Ограбление Ювелирки в Аркадии, подозреваемый "+playername)
 
-					timer(robbery, (time_rob*10000), 1, playerid, zakon_robbery_crimes, 2000, -539.082,-91.9283,0.436483, 5.0, "Casino")
+					timer(robbery, (time_rob*10000), 1, playerid, zakon_robbery_crimes, 400, interior_job[4][2],interior_job[4][3],interior_job[4][4], interior_job[4][7], "Arcade")
 				}
 
 				if (count == 0)
 				{
-					sendMessage(playerid, "[ERROR] Нужно быть около дома, бизнеса или около казино; Вы уже начали ограбление", red[0], red[1], red[2])
+					sendMessage(playerid, "[ERROR] Нужно быть около дома, бизнеса или ювелирки; Вы уже начали ограбление", red[0], red[1], red[2])
 					return
 				}
 			}
@@ -3726,28 +3746,28 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			local alcohol_test = alcohol[playerid]/100.0
 			
-			me_chat(playerid, playername+" подул(а) в "+info_png[id1][0])
+			me_chat(playerid, playername+" пописал(а) на палочку")
 			do_chat(playerid, info_png[id1][0]+" показал "+alcohol_test+" промилле")
 
 			if (alcohol_test >= zakon_alcohol)
 			{
 				local crimes_plus = zakon_alcohol_crimes
 				crimes[playerid] = crimes[playerid]+crimes_plus
-				sendPlayerMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+				sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
 			}
 		}
 		else if (id1 == 47)//--наркостестер
 		{
 			local drugs_test = drugs[playerid]
 			
-			me_chat(playerid, playername+" подул(а) в "+info_png[id1][0])
+			me_chat(playerid, playername+" смочил(а) слюной палочку")
 			do_chat(playerid, info_png[id1][0]+" показал "+drugs_test+" процентов зависимости")
 
 			if (drugs_test >= zakon_drugs)
 			{
 				local crimes_plus = zakon_drugs_crimes
 				crimes[playerid] = crimes[playerid]+crimes_plus
-				sendPlayerMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+				sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
 			}
 		}
 		else if (id1 == 48)//--налог дома
@@ -4003,11 +4023,11 @@ function (playerid, id, cash)
 
 	if (cash > array_player_2[playerid][0])
 	{
-		sendPlayerMessage(playerid, "[ERROR] У вас недостаточно средств", red[0], red[1], red[2])
+		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red[0], red[1], red[2])
 		return
 	}
 
-	if (isPointInCircle3D( x, y, z, -539.082,-91.9283,0.436483, 5.0 ))
+	if (isPointInCircle3D( x, y, z, interior_job[3][2],interior_job[3][3],interior_job[3][4], interior_job[3][7] ))
 	{
 		foreach (k, v in roulette_game)
 		{
@@ -4179,6 +4199,55 @@ function (playerid, id)
 	else
 	{
 		sendMessage(playerid, "[ERROR] Игрок далеко", red[0], red[1], red[2])
+	}
+})
+
+addCommandHandler ( "pr",//--пол-ая волна
+function (playerid, ...)
+{
+	local playername = getPlayerName ( playerid )
+	local text = ""
+
+	if (logged[playerid] == 0)
+	{
+		return
+	}
+
+	for(local i = 0; i < vargv.len(); i++)
+	{
+		text = text+vargv[i]+" "
+	}
+
+	if (search_inv_player(playerid, 10, 1) != 0)
+	{
+		if (search_inv_player(playerid, 28, 1) != 0)
+		{
+			police_chat(playerid, "[РАЦИЯ] Офицер "+playername+": "+text)
+		}
+		else if (search_inv_player(playerid, 29, 1) != 0)
+		{
+			police_chat(playerid, "[РАЦИЯ] Детектив "+playername+": "+text)
+		}
+		else if (search_inv_player(playerid, 30, 1) != 0)
+		{
+			police_chat(playerid, "[РАЦИЯ] Сержант "+playername+": "+text)
+		}
+		else if (search_inv_player(playerid, 31, 1) != 0)
+		{
+			police_chat(playerid, "[РАЦИЯ] Лейтенант "+playername+": "+text)
+		}
+		else if (search_inv_player(playerid, 32, 1) != 0)
+		{
+			police_chat(playerid, "[РАЦИЯ] Капитан "+playername+": "+text)
+		}
+		else if (search_inv_player(playerid, 33, 1) != 0)
+		{
+			police_chat(playerid, "[РАЦИЯ] Шеф полиции "+playername+": "+text)
+		}
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Вы не полицейский", red[0], red[1], red[2])
 	}
 })
 
@@ -4401,6 +4470,33 @@ function (playerid, id)
 	}
 })
 
+addCommandHandler("cmd",//все команды
+function (playerid)
+{
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	local commands = [
+		"/roulette [режим игры (красное, черное, четное, нечетное, 1-18, 19-36, 1-12, 2-12, 3-12, 3-1, 3-2, 3-3)] [сумма]",
+		"/prison [ИД игрока]",
+		"/pr [текст]",
+		"/let [ИД игрока] [текст]",
+		"/pay [ИД игрока] [сумма]",
+		"/evacuationcar [номер т/с]",
+		"/till [withdraw, deposit, price, buyprod] [сумма]",
+		"/buyskin [ИД скина]",
+	]
+
+	sendMessage(playerid, "====[КОМАНДЫ]====", white[0], white[1], white[2])
+
+	foreach (idx, value in commands) 
+	{
+		sendMessage(playerid, value, white[0], white[1], white[2])
+	}
+})
+
 //--------------------------------------------админские команды--------------------------------------------
 addCommandHandler("sub",//выдача предмета и кол-во
 function(playerid, id1, id2)
@@ -4472,7 +4568,6 @@ function (playerid, id1, id2 )
 	local val2 = id2.tointeger()
 	local playername = getPlayerName ( playerid )
 	local vehicleid = getPlayerVehicle ( playerid )
-	local playername = getPlayerName ( playerid )
 
 	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
 	{
@@ -4512,6 +4607,11 @@ function (playerid, id, time, ...)
 	}
 
 	if (logged[playerid] == 0 || search_inv_player(playerid, 37, playername) == 0)
+	{
+		return
+	}
+
+	if (time < 1)
 	{
 		return
 	}
@@ -4593,14 +4693,14 @@ function ( playerid, ... )
 	sendMessage(playerid, "save pos "+text, lyme[0], lyme[1], lyme[2])
 })
 
-addCommandHandler( "chat",
+/*addCommandHandler( "chat",
 function( playerid )
 {
 	for (local i = 0; i < 15; i++) 
 	{
 		sendMessage(playerid, "test "+i, 255, 255, 255)
 	}
-})
+})*/
 
 addCommandHandler( "go",
 function( playerid, q, w, e )
@@ -4623,7 +4723,7 @@ function( playerid, q, w, e )
 	}
 })
 
-addCommandHandler( "wheel",
+/*addCommandHandler( "wheel",
 function( playerid, q, w )
 {
 	local playername = getPlayerName ( playerid )
@@ -4656,7 +4756,7 @@ function( playerid )
 		local vehicleid = getPlayerVehicle(playerid)
 		print("fuel "+getVehicleFuel(vehicleid))
 	}
-})
+})*/
 
 addEventHandler("onConsoleInput",
 function(command, params)
