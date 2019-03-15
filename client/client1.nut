@@ -30,7 +30,7 @@ local gridlist_window = false//окно в котором выделяется �
 local gridlist_lable = false//текст который будет выделяться
 local gridlist_row = -1//номер текста который будет выделяться
 local gridlist_select = false//выделение текста
-local gridlist_button_height = 0.0//высота кнопки купить
+local gridlist_button_width_height = [0.0,0.0]//ширина и высота кнопки купить
 //-------------------------------------------------------
 
 local gui_fon = 0//1 открыт, 0 закрыт
@@ -63,20 +63,20 @@ local info_png = {
 	[2] = ["права", "шт"],
 	[3] = ["сигареты Big Break Red", "сигарет в пачке"],
 	[4] = ["аптечка", "шт"],
-	[5] = ["канистра с", "лит."],
+	[5] = ["Канистра с бензином", "лит."],
 	[6] = ["ключ от автомобиля с номером", ""],
 	[7] = ["сигареты Big Break Blue", "сигарет в пачке"],
 	[8] = ["сигареты Big Break White", "сигарет в пачке"],
-	[9] = ["Thompson 1928", "боеприпасов"],
+	[9] = ["ПП Томпсона обр. 1928 г.", "боеприпасов"],
 	[10] = ["полицейский жетон", "шт"],
 	[11] = ["газета", "шт"],
-	[12] = ["Model 12 Revolver", "боеприпасов"],
-	[13] = ["Colt M1911A1", "боеприпасов"],
-	[14] = ["Colt M1911 Special", "боеприпасов"],
-	[15] = ["Remington Model 870 Field gun", "боеприпасов"],
+	[12] = ["Револьвер кал. 38", "боеприпасов"],
+	[13] = ["Кольт 1911 п/авт.", "боеприпасов"],
+	[14] = ["Кольт 1911 особ.", "боеприпасов"],
+	[15] = ["Дробовик", "боеприпасов"],
 	[16] = ["MP40", "боеприпасов"],
-	[17] = ["Mauser C96", "боеприпасов"],
-	[18] = ["Model 19 Revolver", "боеприпасов"],
+	[17] = ["Пистолет C96", "боеприпасов"],
+	[18] = ["Магнум", "боеприпасов"],
 	[19] = ["M3 Grease Gun", "боеприпасов"],
 	[20] = ["наркотики", "гр"],
 	[21] = ["пиво старый эмпайр", "шт"],
@@ -95,12 +95,12 @@ local info_png = {
 	[34] = ["лицензия дальнобойщика", "шт"],
 	[35] = ["лом", "процентов"],
 	[36] = ["документы на", "бизнес"],
-	[37] = ["админский жетон на имя", ""],
-	[38] = ["риэлторская лицензия на имя", ""],
+	[37] = ["админский жетон", "шт"],
+	[38] = ["риэлторская лицензия", "шт"],
 	[39] = ["тушка свиньи", "шт"],
 	[40] = ["молоток", "шт"],
 	[41] = ["лицензия на оружие", "шт"],
-	[42] = ["бургер", "шт"],
+	[42] = ["гамбургер", "шт"],
 	[43] = ["пицца", "шт"],
 	[44] = ["мыло", "процентов"],
 	[45] = ["пижама", "процентов"],
@@ -127,6 +127,10 @@ local info_png = {
 	[66] = ["золотое колье", "$ за штуку"],
 	[67] = ["пропуск", "шт"],
 	[68] = ["свиной окорок", "$ за штуку"],
+	[69] = ["колесо", "марка"],
+	[70] = ["банка краски", "палитра"],
+	[71] = ["проездной жетон", "шт"],
+	[72] = ["лицензия инкассатора", "шт"],
 }
 
 //цены автосалона
@@ -159,7 +163,7 @@ local motor_show = [
 	[24,2350,60,"Quicksilver Windsor Taxi"],
 	[25,730,65,"Shubert 38"],
 	//[26,0,65,"Shubert 38"],//копия
-	//[27,0,100,"Shubert Armored Van"],
+	[27,5000,100,"Shubert Armored Van"],
 	[28,2300,80,"Shubert Beverly"],
 	[29,3500,70,"Shubert Frigate"],
 	//[30,850,65,"Shubert Hearse"],
@@ -167,9 +171,9 @@ local motor_show = [
 	//[32,0,65,"Shubert 38 Panel Truck"],//копия
 	//[33,730,65,"Shubert 38 Taxi"],
 	//[34,0,100,"Shubert Truck"],
-	//[35,0,100,"Shubert Truck Flatbed"],//копия
+	[35,4350,100,"Shubert Truck Flatbed"],//копия
 	//[36,0,100,"Shubert Truck Flatbed"],
-	[37,4350,100,"Shubert Truck Covered"],
+	//[37,4350,100,"Shubert Truck Covered"],
 	//[38,0,100,"Shubert Truck"],
 	//[39,0,100,"Shubert Show Plow"],
 	//[40,0,80,"Military Truck"],
@@ -255,11 +259,6 @@ function guiSetVisibleGridList (window, bool)
 	{		
 		guiSetVisible( window[0], bool )
 
-		foreach (idx, value in gridlist_table_text[ window[1] ]) 
-		{
-			guiSetVisible( value, bool )
-		}
-
 		gridlist_window = false
 		gridlist_lable = false
 		gridlist_row = -1
@@ -272,9 +271,33 @@ function guiSetVisibleGridList (window, bool)
 		return false
 	}
 }
+
+function guiGetCountGridList (window)
+{
+	if (window)
+	{		
+		return gridlist_table_text[ window[1] ].len()
+	}
+	else 
+	{
+		return false
+	}
+}
+
+function guiSetTextGridList (window, slot, text)
+{
+	if (window)
+	{	
+		return guiSetText(gridlist_table_text[ window[1] ][ slot ], text )
+	}
+	else 
+	{
+		return false
+	}
+}
 //-------------------------------------------------------------------------------------------------
 
-local avto_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(450.0/2), 400.0, 450.0)
+local avto_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(465.0/2), 400.0, 465.0)
 foreach (k,v in motor_show)
 {
 	local text = v[3]+"("+v[0]+") "+(v[1]*10)+"$"
@@ -282,13 +305,24 @@ foreach (k,v in motor_show)
 }
 guiSetVisibleGridList (avto_menu, false)
 
+local craft_table = [//--[предмет 0, рецепт 1, предметы для крафта 2, кол-во предметов для крафта 3, предмет который скрафтится 4]
+	[info_png[20][0]+"(1 гр)", info_png[3][0]+"(20 шт) + "+info_png[7][0]+"(20 шт) + "+info_png[8][0]+"(20 шт)", "3,7,8", "20,20,20", "20,1"],
+]
+local craft_menu = guiCreateGridList((screen[0]/2)-(650.0/2), (screen[1]/2)-(320.0/2), 650.0, 320.0)
+foreach (k,v in craft_table)
+{
+	local text = v[0]+" = "+v[1]
+	guiGridListAddRow (craft_menu, text)
+}
+guiSetVisibleGridList (craft_menu, false)
+
 local shop = {
 	[3] = [info_png[3][0], 20, 5],
 	[4] = [info_png[4][0], 1, 250],
 	[7] = [info_png[7][0], 20, 10],
 	[8] = [info_png[8][0], 20, 15],
 	[11] = [info_png[11][0], 1, 100],
-	[26] = [info_png[26][0], 1, 10000],
+	[26] = [info_png[26][0], 1, 5000],
 	[44] = [info_png[44][0], 100, 50],
 	[45] = [info_png[45][0], 100, 100],
 	[46] = [info_png[46][0], 1, 100],
@@ -334,15 +368,28 @@ foreach (k,v in gas)
 }
 guiSetVisibleGridList (gas_menu, false)
 
-local repair_shop = {
-	[23] = [info_png[23][0], 1, 100],
-	[35] = [info_png[35][0], 10, 500],
-	[65] = [info_png[65][0], 3, 15000],
-}
+local repair_shop = [
+	[info_png[23][0], 1, 100, 23],
+	[info_png[35][0], 10, 500, 35],
+	[info_png[65][0], 3, 15000, 65],
+	[info_png[69][0], 1, 1000, 69],
+	[info_png[69][0], 2, 1000, 69],
+	[info_png[69][0], 3, 1000, 69],
+	[info_png[69][0], 4, 1000, 69],
+	[info_png[69][0], 5, 1000, 69],
+	[info_png[69][0], 6, 1000, 69],
+	[info_png[69][0], 7, 1000, 69],
+	[info_png[69][0], 8, 1000, 69],
+	[info_png[69][0], 9, 1000, 69],
+	[info_png[69][0], 10, 1000, 69],
+	[info_png[69][0], 11, 1000, 69],
+	[info_png[70][0], 1, 500, 70],
+	[info_png[70][0], 2, 500, 70],
+]
 local repair_shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in repair_shop)
 {
-	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+	local text = v[0]+" "+v[1]+" "+info_png[v[3]][1]+" "+v[2]+"$"
 	guiGridListAddRow (repair_shop_menu, text)
 }
 guiSetVisibleGridList (repair_shop_menu, false)
@@ -363,12 +410,14 @@ guiSetVisibleGridList (eda_menu, false)
 
 local day_nalog = 7
 local mayoralty_shop = {
-	[2] = ["права", 1, 1000],
-	[41] = ["лицензия на оружие", 1, 10000],
-	[53] = ["лицензия таксиста", 1, 5000],
-	[34] = ["лицензия дальнобойщика", 1, 15000],
-	//[62] = ["лицензия водителя мусоровоза", 1, 20000],
-	[67] = ["пропуск", 100, 10],
+	[2] = [info_png[2][0], 1, 1000],
+	[41] = [info_png[41][0], 1, 10000],
+	[53] = [info_png[53][0], 1, 5000],
+	[34] = [info_png[34][0], 1, 10000],
+	[62] = [info_png[62][0], 1, 15000],
+	[67] = [info_png[67][0], 1, 10],
+	[71] = [info_png[71][0], 100, 100],
+	[72] = [info_png[72][0], 1, 20000],
 	[48] = ["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog)],
 	[49] = ["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog)],
 	[50] = ["квитанция для оплаты т/с на", day_nalog, (zakon_nalog_car*day_nalog)],
@@ -406,8 +455,21 @@ foreach (k,v in sub_cops)
 }
 guiSetVisibleGridList (sub_cops_menu, false)
 
+local clothing_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(450.0/2), 400.0, 450.0)
+for (local i = 0; i <= 29; i++) 
+{
+	guiGridListAddRow (clothing_menu, i.tostring())
+}
+guiSetVisibleGridList (clothing_menu, false)
+
 local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 400.0, 30.0, false )
 guiSetVisible( shop_menu_button, false )
+
+local clothing_menu_value = 1
+local shop_menu_button2 = guiCreateElement( 2, "<", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
+guiSetVisible( shop_menu_button2, false )
+local shop_menu_button3 = guiCreateElement( 2, ">", (screen[0]/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
+guiSetVisible( shop_menu_button3, false )
 
 function tune_close ()//--закрытие окна
 {
@@ -416,6 +478,8 @@ function tune_close ()//--закрытие окна
 
 	showCursor( false )
 	guiSetVisible( shop_menu_button, false )
+	guiSetVisible( shop_menu_button2, false )
+	guiSetVisible( shop_menu_button3, false )
 
 	guiSetVisibleGridList (shop_menu, false)
 	guiSetVisibleGridList (weapon_menu, false)
@@ -425,6 +489,8 @@ function tune_close ()//--закрытие окна
 	guiSetVisibleGridList (mayoralty_shop_menu, false)
 	guiSetVisibleGridList (sub_cops_menu, false)
 	guiSetVisibleGridList (avto_menu, false)
+	guiSetVisibleGridList (craft_menu, false)
+	guiSetVisibleGridList (clothing_menu, false)
 }
 addEventHandler ( "event_gui_delet", tune_close )
 
@@ -439,53 +505,83 @@ function shop_menu_fun(number, value)//--создание окна магази�
 	{
 		guiSetVisibleGridList (weapon_menu, true)
 		local pos = guiGetSize( weapon_menu[0] )
-		gridlist_button_height = pos[1]
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Купить")
+	}
+	if (value_business == 1)
+	{
+		guiSetVisibleGridList (clothing_menu, true)
+		local pos = guiGetSize( clothing_menu[0] )
+		gridlist_button_width_height =[pos[0],pos[1]+60.0]
+		guiSetText(shop_menu_button, "Купить")
+
+		guiSetPosition(shop_menu_button2, (screen[0]/2)-(400.0/2), (screen[1]/2)+((gridlist_button_width_height[1]-60.0)/2), false)
+		guiSetVisible( shop_menu_button2, true )
+
+		guiSetPosition(shop_menu_button3, (screen[0]/2), (screen[1]/2)+((gridlist_button_width_height[1]-60.0)/2), false)
+		guiSetVisible( shop_menu_button3, true )
 	}
 	else if (value_business == 2)
 	{
 		guiSetVisibleGridList (shop_menu, true)
 		local pos = guiGetSize( shop_menu[0] )
-		gridlist_button_height = pos[1]
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Купить")
 	}
 	else if (value_business == 3)
 	{
 		guiSetVisibleGridList (gas_menu, true)
 		local pos = guiGetSize( gas_menu[0] )
-		gridlist_button_height = pos[1]
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Купить")
 	}
 	else if (value_business == 4)
 	{
 		guiSetVisibleGridList (repair_shop_menu, true)
 		local pos = guiGetSize( repair_shop_menu[0] )
-		gridlist_button_height = pos[1]
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Купить")
 	}
 	else if (value_business == 5)
 	{
 		guiSetVisibleGridList (eda_menu, true)
 		local pos = guiGetSize( eda_menu[0] )
-		gridlist_button_height = pos[1]
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Купить")
 	}
 	else if (value_business == "pd")
 	{
 		guiSetVisibleGridList (sub_cops_menu, true)
 		local pos = guiGetSize( sub_cops_menu[0] )
-		gridlist_button_height = pos[1]
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Получить")
 	}
 	else if (value_business == "mer")
 	{
 		guiSetVisibleGridList (mayoralty_shop_menu, true)
 		local pos = guiGetSize( mayoralty_shop_menu[0] )
-		gridlist_button_height = pos[1]
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Купить")
 	}
 	else if (value_business == "dm")
 	{
 		guiSetVisibleGridList (avto_menu, true)
 		local pos = guiGetSize( avto_menu[0] )
-		gridlist_button_height = pos[1]
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Купить")
+	}
+	else if (value_business == "craft")
+	{
+		guiSetVisibleGridList (craft_menu, true)
+		local pos = guiGetSize( craft_menu[0] )
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Изготовить")
 	}
 
-	guiSetPosition(shop_menu_button, (screen[0]/2)-(400.0/2), (screen[1]/2)+(gridlist_button_height/2), false)
+	guiSetPosition(shop_menu_button, (screen[0]/2)-(400.0/2), (screen[1]/2)+(gridlist_button_width_height[1]/2), false)
 	guiSetVisible( shop_menu_button, true )
+	//local x = guiSetSize(shop_menu_button, gridlist_button_width_height[0].tofloat(), 30.0)
+	//print(x.tostring())
 }
 addEventHandler ( "event_shop_menu_fun", shop_menu_fun )
 
@@ -863,6 +959,7 @@ function( post )
 		[14] = "info2_selection_1 "+info2_selection_1,
 		[15] = "number_business "+number_business,
 		[16] = "value_business "+value_business,
+		[17] = "clothing_menu_value "+clothing_menu_value,
 	}
 
 	playerid = getLocalPlayer()
@@ -918,7 +1015,7 @@ function( post )
 			local pos = getMousePosition()
 			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		
-			for (local i = 0; i <= 15; i++) 
+			for (local i = 0; i <= 16; i++) 
 			{	
 				dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			}
@@ -1450,7 +1547,106 @@ function( element )
 		{
 			triggerServerEvent( "event_buy_subject_fun", guiGridListGetItemText(), number_business, value_business )
 
-			//sendMessage("shop_menu_button - "+guiGridListGetItemText().tostring())
+			//print("shop_menu_button - "+guiGetCountGridList (avto_menu))
+		}
+	}
+	else if (element == shop_menu_button2)
+	{	
+		clothing_menu_value--
+
+		if (clothing_menu_value <= 0)
+		{
+			clothing_menu_value = 1
+			return
+		}
+
+		if (clothing_menu_value == 1)
+		{
+			for (local i = guiGetCountGridList(clothing_menu)*0; i < guiGetCountGridList(clothing_menu)*1; i++)
+			{
+				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*0, i.tostring())
+			}
+		}
+		else if (clothing_menu_value == 2)
+		{
+			for (local i = guiGetCountGridList(clothing_menu)*1; i < guiGetCountGridList(clothing_menu)*2; i++)
+			{
+				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*1, i.tostring())
+			}
+		}
+		else if (clothing_menu_value == 3)
+		{
+			for (local i = guiGetCountGridList(clothing_menu)*2; i < guiGetCountGridList(clothing_menu)*3; i++)
+			{
+				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*2, i.tostring())
+			}
+		}
+		else if (clothing_menu_value == 4)
+		{
+			for (local i = guiGetCountGridList(clothing_menu)*3; i < guiGetCountGridList(clothing_menu)*4; i++)
+			{
+				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*3, i.tostring())
+			}
+		}
+		else if (clothing_menu_value == 5)
+		{
+			for (local i = guiGetCountGridList(clothing_menu)*4; i < guiGetCountGridList(clothing_menu)*5; i++)
+			{
+				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*4, i.tostring())
+			}
+		}
+	}
+	else if (element == shop_menu_button3)
+	{	
+		clothing_menu_value++
+
+		if (clothing_menu_value >= 7)
+		{
+			clothing_menu_value = 6
+			return
+		}
+
+		if (clothing_menu_value == 1)
+		{
+			for (local i = guiGetCountGridList(clothing_menu)*0; i < guiGetCountGridList(clothing_menu)*1; i++)
+			{
+				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*0, i.tostring())
+			}
+		}
+		else if (clothing_menu_value == 2)
+		{
+			for (local i = guiGetCountGridList(clothing_menu)*1; i < guiGetCountGridList(clothing_menu)*2; i++)
+			{
+				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*1, i.tostring())
+			}
+		}
+		else if (clothing_menu_value == 3)
+		{
+			for (local i = guiGetCountGridList(clothing_menu)*2; i < guiGetCountGridList(clothing_menu)*3; i++)
+			{
+				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*2, i.tostring())
+			}
+		}
+		else if (clothing_menu_value == 4)
+		{
+			for (local i = guiGetCountGridList(clothing_menu)*3; i < guiGetCountGridList(clothing_menu)*4; i++)
+			{
+				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*3, i.tostring())
+			}
+		}
+		else if (clothing_menu_value == 5)
+		{
+			for (local i = guiGetCountGridList(clothing_menu)*4; i < guiGetCountGridList(clothing_menu)*5; i++)
+			{
+				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*4, i.tostring())
+			}
+		}
+		else if (clothing_menu_value == 6)
+		{
+			for (local i = guiGetCountGridList(clothing_menu)*5; i < guiGetCountGridList(clothing_menu)*6; i++)
+			{
+				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*5, i.tostring())
+			}
 		}
 	}
 
@@ -1604,6 +1800,18 @@ addEventHandler( "removegps",
 function(  )
 {
 	removeGPSTarget()
+})
+
+addEventHandler( "createHudTimer",
+function( id1 )
+{
+	createHudTimer(id1*0.7, true, true)
+})
+
+addEventHandler( "destroyHudTimer",
+function()
+{
+	destroyHudTimer()
 })
 
 /*addCommandHandler("shake",
