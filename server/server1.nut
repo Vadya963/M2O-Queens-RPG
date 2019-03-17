@@ -32,6 +32,7 @@ local zakon_54_crimes = 1
 local zp_player_taxi = 1000
 local zp_car_63 = 150
 local zp_car_54 = 200
+local zp_car_73 = 20
 
 //----цвета----
 local color_tips = [168,228,160]//--бабушкины яблоки
@@ -124,8 +125,10 @@ local info_png = {
 	[68] = ["свиной окорок", "$ за штуку"],
 	[69] = ["колесо", "марка"],
 	[70] = ["банка краски", "палитра"],
-	[71] = ["проездной билет", "шт"],
+	[71] = ["", ""],
 	[72] = ["лицензия инкассатора", "шт"],
+	[73] = ["рыба", "кг"],
+	[74] = ["удочка", "процентов"],
 }
 
 //цены автосалона
@@ -461,6 +464,7 @@ local interior_job = [//--12
 	[3, "Казино", -539.082,-91.9283,0.436483, 0, "0", 5.0, 9],
 	[4, "Ювелирка", -526.354,-40.6722,1.07341, 0, "0", 5.0, 7],
 	[5, "Отель Титания", -579.186,-175.013,1.03791, 25, "0", 5.0, 0],
+	[6, "Пристань", 566.041,-591.121,-22.7021, 0, "0", 20.0, 2],
 ]
 
 local weapon = {
@@ -488,6 +492,7 @@ local shop = {
 	[47] = [info_png[47][0], 1, 100],
 	[52] = [info_png[52][0], 1, 100],
 	[64] = [info_png[64][0], 1, 250],
+	[74] = [info_png[74][0], 100, 100],
 }
 
 local eda = {
@@ -547,6 +552,7 @@ local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4}
 	[843.815,474.489,-12.0816, 5.0, 57],//--банк металла
 	[-1292.64,1608.78,4.30491, 5.0, 66],//--гарри
 	[1.93655,1825.94,-16.963, 1.0, 68],//--мясокомбинат
+	[385.379,126.888,-20.2027, 5.0, 73],//--рыбзавод
 ]
 
 local anim_player_subject = [//--{x,y,z, радиус 3, ид пнг1 4, ид пнг2 5, зп 6, время работы анимации 7}
@@ -615,6 +621,7 @@ local hygiene = array(getMaxPlayers(), 0)
 local sleep = array(getMaxPlayers(), 0)
 local drugs = array(getMaxPlayers(), 0)
 local robbery_player = array(getMaxPlayers(), 0)
+local robbery_timer = array(getMaxPlayers(), 0)
 local gps_device = array(getMaxPlayers(), 0)
 local job = array(getMaxPlayers(), 0)
 local job_pos = array(getMaxPlayers(), 0)
@@ -1080,8 +1087,23 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 				sendMessage(playerid, "[ERROR] Вы покинули место ограбления", red[0], red[1], red[2])
 			}
 
-			robbery_player[playerid] = 0
+			robbery_kill( playerid )
 		}
+	}
+}
+
+function robbery_kill( playerid )
+{
+	if (robbery_player[playerid] == 1)
+	{
+		robbery_player[playerid] = 0
+
+		if (robbery_timer[playerid].IsActive())
+		{
+			robbery_timer[playerid].Kill()
+		}
+
+		robbery_timer[playerid] = 0
 	}
 }
 
@@ -1454,7 +1476,6 @@ function buy_subject_fun( playerid, text, number, value )
 			[34] = [info_png[34][0], 1, 10000],
 			[62] = [info_png[62][0], 1, 15000],
 			[67] = [info_png[67][0], 1, 10],
-			[71] = [info_png[71][0], 100, 100],
 			[72] = [info_png[72][0], 1, 20000],
 		}
 
@@ -1617,6 +1638,19 @@ function buy_subject_fun( playerid, text, number, value )
 	else if (value == "craft")
 	{
 		craft_fun( playerid, text )
+
+		return
+	}
+	else if (value == "subway")
+	{
+		foreach (k, v in station) 
+		{
+			if (text == v[4])
+			{
+				setPlayerPosition(playerid, v[0],v[1],v[2])
+				return
+			}
+		}
 
 		return
 	}
@@ -2090,6 +2124,7 @@ function debuginfo ()
 		}
 		setElementData(playerid, "15", "job_call[playerid] "+job_call[playerid])
 		setElementData(playerid, "16", "enter_job[playerid] "+enter_job[playerid])
+		setElementData(playerid, "17", "robbery_timer[playerid] "+robbery_timer[playerid].tostring())
 
 		setElementData(playerid, "serial", getPlayerSerial(playerid))
 		setElementData(playerid, "timeserver", hour+":"+minute)
@@ -2745,6 +2780,7 @@ function( playerid, name, ip, serial )
 	sleep[playerid] = 0
 	drugs[playerid] = 0
 	robbery_player[playerid] = 0
+	robbery_timer[playerid] = 0
 	gps_device[playerid] = 0
 	job[playerid] = 0
 	job_pos[playerid] = 0
@@ -2770,10 +2806,7 @@ function playerDisconnect( playerid, reason )
 			sqlite3( "UPDATE account SET x = '"+myPos[0]+"', y = '"+myPos[1]+"', z = '"+myPos[2]+"', heal = '"+heal+"', arrest = '"+arrest[playerid]+"', crimes = '"+crimes[playerid]+"', alcohol = '"+alcohol[playerid]+"', satiety = '"+satiety[playerid]+"', hygiene = '"+hygiene[playerid]+"', sleep = '"+sleep[playerid]+"', drugs = '"+drugs[playerid]+"' WHERE name = '"+playername+"'")
 		}
 
-		if (robbery_player[playerid] == 1)
-		{
-			robbery_player[playerid] = 0
-		}
+		robbery_kill(playerid)
 
 		logged[playerid] = 0
 
@@ -2841,10 +2874,7 @@ function playerDeath( playerid, attacker )
 
 	save_player_action(playerid, "[onPlayerDeath] "+playername+" [attacker - "+playername_a.tostring()+"]")
 
-	if (robbery_player[playerid] == 1)
-	{
-		robbery_player[playerid] = 0
-	}
+	robbery_kill(playerid)
 }
 addEventHandler( "onPlayerDeath", playerDeath )
 
@@ -3508,6 +3538,16 @@ function x_down (playerid)
 				triggerClientEvent( playerid, "event_shop_menu_fun", -1, "dm" )
 				state_gui_window[playerid] = 1
 				return
+			}
+
+			foreach (k, v in station) 
+			{
+				if ( isPointInCircle3D(x,y,z, v[0],v[1],v[2], v[3]) )//subway
+				{
+					triggerClientEvent( playerid, "event_shop_menu_fun", -1, "subway" )
+					state_gui_window[playerid] = 1
+					return
+				}
 			}
 
 			triggerClientEvent( playerid, "event_shop_menu_fun", -1, "craft" )
@@ -4272,7 +4312,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 						police_chat(playerid, "[ДИСПЕТЧЕР] Ограбление "+v["number"]+" дома, координаты [X  "+x1+", Y  "+y1+"], подозреваемый "+playername)
 
-						timer(robbery, (time_rob*10000), 1, playerid, zakon_robbery_crimes, 1000, v["x"],v["y"],v["z"], house_bussiness_radius, "house - "+v["number"])
+						robbery_timer[playerid] = timer(robbery, (time_rob*10000), 1, playerid, zakon_robbery_crimes, 1000, v["x"],v["y"],v["z"], house_bussiness_radius, "house - "+v["number"])
 
 						triggerClientEvent( playerid, "createHudTimer", (time_rob*10).tofloat() )
 
@@ -4299,7 +4339,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 						police_chat(playerid, "[ДИСПЕТЧЕР] Ограбление "+v["number"]+" бизнеса, координаты [X  "+x1+", Y  "+y1+"], подозреваемый "+playername)
 
-						timer(robbery, (time_rob*10000), 1, playerid, zakon_robbery_crimes, 1000, v["x"],v["y"],v["z"], house_bussiness_radius, "business - "+v["number"])
+						robbery_timer[playerid] = timer(robbery, (time_rob*10000), 1, playerid, zakon_robbery_crimes, 1000, v["x"],v["y"],v["z"], house_bussiness_radius, "business - "+v["number"])
 
 						triggerClientEvent( playerid, "createHudTimer", (time_rob*10).tofloat() )
 
@@ -4324,7 +4364,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 					police_chat(playerid, "[ДИСПЕТЧЕР] Ограбление Ювелирки в Аркадии, подозреваемый "+playername)
 
-					timer(robbery, (time_rob*10000), 1, playerid, zakon_robbery_crimes, 2000, interior_job[4][2],interior_job[4][3],interior_job[4][4], interior_job[4][7], "Arcade")
+					robbery_timer[playerid] = timer(robbery, (time_rob*10000), 1, playerid, zakon_robbery_crimes, 2000, interior_job[4][2],interior_job[4][3],interior_job[4][4], interior_job[4][7], "Arcade")
 
 					triggerClientEvent( playerid, "createHudTimer", (time_rob*10).tofloat() )
 				}
@@ -4623,54 +4663,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 		}
-		else if (id1 == 71)//--жетон
-		{
-			if (isPlayerInVehicle(playerid))
-			{
-				return
-			}
-
-			if (isPointInCircle3D(x,y,z, station[0][0],station[0][1],station[0][2], station[0][3]))
-			{
-				setPlayerPosition(playerid, station[1][0],station[1][1],station[1][2])
-				id2 = id2 - 1
-			}
-			else if (isPointInCircle3D(x,y,z, station[1][0],station[1][1],station[1][2], station[1][3]))
-			{
-				setPlayerPosition(playerid, station[2][0],station[2][1],station[2][2])
-				id2 = id2 - 1
-			}
-			else if (isPointInCircle3D(x,y,z, station[2][0],station[2][1],station[2][2], station[2][3]))
-			{
-				setPlayerPosition(playerid, station[3][0],station[3][1],station[3][2])
-				id2 = id2 - 1
-			}
-			else if (isPointInCircle3D(x,y,z, station[3][0],station[3][1],station[3][2], station[3][3]))
-			{
-				setPlayerPosition(playerid, station[4][0],station[4][1],station[4][2])
-				id2 = id2 - 1
-			}
-			else if (isPointInCircle3D(x,y,z, station[4][0],station[4][1],station[4][2], station[4][3]))
-			{
-				setPlayerPosition(playerid, station[5][0],station[5][1],station[5][2])
-				id2 = id2 - 1
-			}
-			else if (isPointInCircle3D(x,y,z, station[5][0],station[5][1],station[5][2], station[5][3]))
-			{
-				setPlayerPosition(playerid, station[6][0],station[6][1],station[6][2])
-				id2 = id2 - 1
-			}
-			else if (isPointInCircle3D(x,y,z, station[6][0],station[6][1],station[6][2], station[6][3]))
-			{
-				setPlayerPosition(playerid, station[0][0],station[0][1],station[0][2])
-				id2 = id2 - 1
-			}
-			else 
-			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
-				return
-			}
-		}
 		else if (id1 == 72) //--лиц. инкасатора
 		{
 			if (job[playerid] == 0)
@@ -4686,6 +4678,35 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				me_chat(playerid, playername+" закончил(а) работу")
 			}
 			return
+		}
+		else if (id1 == 74)//--удочка
+		{
+			if (isPlayerInVehicle(playerid))
+			{
+				sendMessage(playerid, "[ERROR] Вы в т/с", red[0], red[1], red[2])
+				return
+			}
+			
+			if (isPointInCircle3D(x,y,z, interior_job[6][2],interior_job[6][3],interior_job[6][4], interior_job[6][7]))
+			{
+				local randomize = random(1,zp_car_73)
+
+				if ( inv_player_empty(playerid, 73, randomize) )
+				{
+					me_chat(playerid, playername+" поймал(а) "+info_png[73][0]+" "+randomize+" "+info_png[73][1])
+					id2 = id2 - 1
+				}
+				else
+				{
+					sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
+					return
+				}
+			}
+			else 
+			{
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				return
+			}
 		}
 		else if (id1 == 9 || id1 == 12 || id1 == 13 || id1 == 14 || id1 == 15 || id1 == 16 || id1 == 17 || id1 == 18 || id1 == 19)//оружие
 		{
@@ -5509,7 +5530,7 @@ function (playerid, id)
 	local playername = getPlayerName( playerid )
 	local myPos = getPlayerPosition(playerid)
 	local id = id.tointeger()
-	local cash = 100
+	local cash = 500
 
 	if (logged[playerid] == 0) 
 	{
@@ -5941,6 +5962,20 @@ function(command, params)
 		/*if (4.0 == 4)
 		{
 			print("true")
+		}*/
+
+		/*local x = timer(function () {
+			print("timer out")
+		}, 5000, 1);
+		print(x.tostring())
+
+		if (x.IsActive())
+		{
+			print("timer kill "+x.Kill().tostring())
+		}
+		else 
+		{
+			print("timer not active")
 		}*/
 	}
 
