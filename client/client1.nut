@@ -129,8 +129,10 @@ local info_png = {
 	[68] = ["свиной окорок", "$ за штуку"],
 	[69] = ["колесо", "марка"],
 	[70] = ["банка краски", "палитра"],
-	[71] = ["проездной билет", "шт"],
+	[71] = ["", ""],
 	[72] = ["лицензия инкассатора", "шт"],
+	[73] = ["рыба", "кг"],
+	[74] = ["удочка", "процентов"],
 }
 
 //цены автосалона
@@ -329,6 +331,7 @@ local shop = {
 	[47] = [info_png[47][0], 1, 100],
 	[52] = [info_png[52][0], 1, 100],
 	[64] = [info_png[64][0], 1, 250],
+	[74] = [info_png[74][0], 100, 100],
 }
 local shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in shop)
@@ -416,7 +419,6 @@ local mayoralty_shop = {
 	[34] = [info_png[34][0], 1, 10000],
 	[62] = [info_png[62][0], 1, 15000],
 	[67] = [info_png[67][0], 1, 10],
-	[71] = [info_png[71][0], 100, 100],
 	[72] = [info_png[72][0], 1, 20000],
 	[48] = ["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog)],
 	[49] = ["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog)],
@@ -465,6 +467,26 @@ guiSetVisibleGridList (clothing_menu, false)
 local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 400.0, 30.0, false )
 guiSetVisible( shop_menu_button, false )
 
+local station = [
+	[-554.36,1592.92,-21.8639, 4.0, "Диптон"],
+	[-1118.99,1376.44,-18.5, 4.0, "Кингстон"],
+	[-1535.55,-231.03,-13.5892, 4.0, "Сэнд-Айленд"],
+	[-511.412,20.1703,-5.7096, 4.0, "Вест-Сайд"],
+	[-113.792,-481.71,-8.92243, 4.0, "Сауспорт"],
+	[234.395,380.914,-9.41271, 4.0, "Китайский квартал"],
+	[-293.069,568.25,-2.27367, 4.0, "Аптаун"],
+]
+local station_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
+foreach (k,v in station)
+{
+	local text = v[4]
+	guiGridListAddRow (station_menu, text)
+}
+guiSetVisibleGridList (station_menu, false)
+
+local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 400.0, 30.0, false )
+guiSetVisible( shop_menu_button, false )
+
 local clothing_menu_value = 1
 local shop_menu_button2 = guiCreateElement( 2, "<", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
 guiSetVisible( shop_menu_button2, false )
@@ -491,6 +513,7 @@ function tune_close ()//--закрытие окна
 	guiSetVisibleGridList (avto_menu, false)
 	guiSetVisibleGridList (craft_menu, false)
 	guiSetVisibleGridList (clothing_menu, false)
+	guiSetVisibleGridList (station_menu, false)
 }
 addEventHandler ( "event_gui_delet", tune_close )
 
@@ -576,6 +599,13 @@ function shop_menu_fun(number, value)//--создание окна магази�
 		local pos = guiGetSize( craft_menu[0] )
 		gridlist_button_width_height = [pos[0],pos[1]]
 		guiSetText(shop_menu_button, "Изготовить")
+	}
+	else if (value_business == "subway")
+	{
+		guiSetVisibleGridList (station_menu, true)
+		local pos = guiGetSize( station_menu[0] )
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Отправиться")
 	}
 
 	guiSetPosition(shop_menu_button, (screen[0]/2)-(400.0/2), (screen[1]/2)+(gridlist_button_width_height[1]/2), false)
@@ -1015,7 +1045,7 @@ function( post )
 			local pos = getMousePosition()
 			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		
-			for (local i = 0; i <= 16; i++) 
+			for (local i = 0; i <= 17; i++) 
 			{	
 				dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			}
