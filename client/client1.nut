@@ -165,7 +165,7 @@ local motor_show = [
 	[24,2350,60,"Quicksilver Windsor Taxi"],
 	[25,730,65,"Shubert 38"],
 	//[26,0,65,"Shubert 38"],//копия
-	[27,5000,100,"Shubert Armored Van"],
+	[27,4000,100,"Shubert Armored Van"],
 	[28,2300,80,"Shubert Beverly"],
 	[29,3500,70,"Shubert Frigate"],
 	//[30,850,65,"Shubert Hearse"],
@@ -173,9 +173,9 @@ local motor_show = [
 	//[32,0,65,"Shubert 38 Panel Truck"],//копия
 	//[33,730,65,"Shubert 38 Taxi"],
 	//[34,0,100,"Shubert Truck"],
-	[35,4350,100,"Shubert Truck Flatbed"],//копия
+	[35,3000,100,"Shubert Truck Flatbed"],//копия
 	//[36,0,100,"Shubert Truck Flatbed"],
-	//[37,4350,100,"Shubert Truck Covered"],
+	//[37,3000,100,"Shubert Truck Covered"],
 	//[38,0,100,"Shubert Truck"],
 	//[39,0,100,"Shubert Show Plow"],
 	//[40,0,80,"Military Truck"],
@@ -416,10 +416,10 @@ local mayoralty_shop = {
 	[2] = [info_png[2][0], 1, 1000],
 	[41] = [info_png[41][0], 1, 10000],
 	[53] = [info_png[53][0], 1, 5000],
-	[34] = [info_png[34][0], 1, 10000],
-	[62] = [info_png[62][0], 1, 15000],
+	[34] = [info_png[34][0], 1, 5000],
+	[62] = [info_png[62][0], 1, 5000],
 	[67] = [info_png[67][0], 1, 10],
-	[72] = [info_png[72][0], 1, 20000],
+	[72] = [info_png[72][0], 1, 5000],
 	[48] = ["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog)],
 	[49] = ["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog)],
 	[50] = ["квитанция для оплаты т/с на", day_nalog, (zakon_nalog_car*day_nalog)],
