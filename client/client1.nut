@@ -467,9 +467,6 @@ for (local i = 0; i <= 29; i++)
 }
 guiSetVisibleGridList (clothing_menu, false)
 
-local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 400.0, 30.0, false )
-guiSetVisible( shop_menu_button, false )
-
 local station = [
 	[-554.36,1592.92,-21.8639, 4.0, "Диптон"],
 	[-1118.99,1376.44,-18.5, 4.0, "Кингстон"],
@@ -613,8 +610,12 @@ function shop_menu_fun(number, value)//--создание окна магази�
 
 	guiSetPosition(shop_menu_button, (screen[0]/2)-(400.0/2), (screen[1]/2)+(gridlist_button_width_height[1]/2), false)
 	guiSetVisible( shop_menu_button, true )
-	//local x = guiSetSize(shop_menu_button, gridlist_button_width_height[0].tofloat(), 30.0)
-	//print(x.tostring())
+
+	/*guiSetVisible( shop_menu_button, true )
+	guiSetPosition(shop_menu_button, (screen[0]/2)-(gridlist_button_width_height[0]/2), (screen[1]/2)+(gridlist_button_width_height[1]/2), false)
+	local x = guiSetSize(shop_menu_button, 650.0, 30.0)
+	local z = guiGetSize(shop_menu_button)
+	print(x.tostring()+" "+z[0]+" "+z[1]+" "+type(shop_menu_button))*/
 }
 addEventHandler ( "event_shop_menu_fun", shop_menu_fun )
 
@@ -1848,9 +1849,12 @@ function()
 })
 
 /*addCommandHandler("shake",
-function (playerid, i1, i2, i3) 
+function (playerid, i1, i2) 
 {
-	simpleShake(i1.tofloat(), i2.tofloat(), i3.tofloat())
+	//simpleShake(i1.tofloat(), i2.tofloat(), i3.tofloat())
+
+	local x = guiSetSize(shop_menu_button, i1.tofloat(), i2.tofloat())
+	print(x.tostring())
 })*/
 
 
