@@ -4713,7 +4713,13 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 71) //--рем ящик
 		{
-			if(job_pos[playerid] == 0 || isPlayerInVehicle(playerid))
+			if(job[playerid] == 0)
+			{
+				sendMessage(playerid, "[ERROR] Вы не ремонтник", red[0], red[1], red[2])
+				return
+			}
+
+			if(isPlayerInVehicle(playerid))
 			{
 				sendMessage(playerid, "[ERROR] Вы в т/с", red[0], red[1], red[2])
 				return
