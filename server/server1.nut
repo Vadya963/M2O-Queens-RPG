@@ -4713,7 +4713,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 71) //--рем ящик
 		{
-			if(job[playerid] == 0)
+			if(job[playerid] != 4)
 			{
 				sendMessage(playerid, "[ERROR] Вы не ремонтник", red[0], red[1], red[2])
 				return
