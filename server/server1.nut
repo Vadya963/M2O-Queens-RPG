@@ -4719,13 +4719,19 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 
+			if(job_pos[playerid] == 0 || getPlayerModel(playerid) != 12 || job_call[playerid] != 1)
+			{
+				sendMessage(playerid, "[ERROR] Вы должны быть в одежде 12", red[0], red[1], red[2])
+				return
+			}
+
 			if(isPlayerInVehicle(playerid))
 			{
 				sendMessage(playerid, "[ERROR] Вы в т/с", red[0], red[1], red[2])
 				return
 			}
 
-			if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && getPlayerModel(playerid) == 12 && job_call[playerid] == 1)
+			if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0))
 			{
 				local randomize = random(1,zp_player_71)
 
@@ -4741,7 +4747,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				sendMessage(playerid, "[ERROR] Вы должны быть в одежде 12 и около телефонной будки", red[0], red[1], red[2])
+				sendMessage(playerid, "[ERROR] Вы должны быть около телефонной будки", red[0], red[1], red[2])
 				return
 			}
 		}
