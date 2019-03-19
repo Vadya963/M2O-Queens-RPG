@@ -4026,6 +4026,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 44 || id1 == 45)//--мыло, пижама
 		{
+			if (isPlayerInVehicle(playerid))
+			{
+				sendMessage(playerid, "[ERROR] Вы в т/с", red[0], red[1], red[2])
+				return
+			}
+			
 			if (id1 == 44)
 			{
 				local sleep_hygiene_plus = 50
@@ -4195,7 +4201,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 				return
 			}
 		}
@@ -4296,7 +4302,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 				return
 			}
 		}
@@ -4316,7 +4322,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы в т/с", red[0], red[1], red[2])
 				return
 			}
 		}
@@ -4326,6 +4332,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			local pos = player_position( playerid )
 			local x1 = pos[0]
 			local y1 = pos[1]
+
+			if (isPlayerInVehicle(playerid))
+			{
+				sendMessage(playerid, "[ERROR] Вы в т/с", red[0], red[1], red[2])
+				return
+			}
 
 			if (hour >= 0 && hour <= 5)
 			{
@@ -4519,7 +4531,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 				return
 			}
 		}
@@ -4611,7 +4623,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 				return
 			}
 		}
@@ -4619,7 +4631,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if (isPlayerInVehicle(playerid))
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы в т/с", red[0], red[1], red[2])
 				return
 			}
 
@@ -4633,7 +4645,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы должны быть около ворот мясокомбината", red[0], red[1], red[2])
 			}
 
 			return
@@ -4668,7 +4680,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 				return
 			}
 		}
@@ -4695,15 +4707,15 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 				return
 			}
 		}
 		else if (id1 == 71) //--рем ящик
 		{
-			if(job_pos[playerid] == 0)
+			if(job_pos[playerid] == 0 || isPlayerInVehicle(playerid))
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы в т/с", red[0], red[1], red[2])
 				return
 			}
 
@@ -4747,7 +4759,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if (isPlayerInVehicle(playerid))
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы в т/с", red[0], red[1], red[2])
 				return
 			}
 			
@@ -4768,7 +4780,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				sendMessage(playerid, "[ERROR] Вы должны быть около место ловли рыбы", red[0], red[1], red[2])
 				return
 			}
 		}
