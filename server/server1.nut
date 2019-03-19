@@ -33,6 +33,7 @@ local zp_player_taxi = 1000
 local zp_car_63 = 150
 local zp_car_54 = 200
 local zp_car_73 = 20
+local zp_player_71 = 500
 
 //----цвета----
 local color_tips = [168,228,160]//--бабушкины яблоки
@@ -125,10 +126,11 @@ local info_png = {
 	[68] = ["свиной окорок", "$ за штуку"],
 	[69] = ["колесо", "марка"],
 	[70] = ["банка краски", "палитра"],
-	[71] = ["", ""],
+	[71] = ["ящик с инструментами", "процентов"],
 	[72] = ["лицензия инкассатора", "шт"],
 	[73] = ["рыба", "кг"],
 	[74] = ["удочка", "процентов"],
+	[75] = ["лицензия ремонтника", "шт"],
 }
 
 //цены автосалона
@@ -523,6 +525,7 @@ local repair_shop = [
 	[info_png[69][0], 11, 1000, 69],
 	[info_png[70][0], 1, 500, 70],
 	[info_png[70][0], 2, 500, 70],
+	[info_png[71][0], 100, 50, 71],
 ]
 
 //-места поднятия предметов
@@ -1477,6 +1480,7 @@ function buy_subject_fun( playerid, text, number, value )
 			[62] = [info_png[62][0], 1, 5000],
 			[67] = [info_png[67][0], 1, 10],
 			[72] = [info_png[72][0], 1, 5000],
+			[75] = [info_png[75][0], 1, 1000],
 		}
 
 		local mayoralty_nalog = {
@@ -2066,7 +2070,14 @@ function fuel_down()//--система топлива авто
 
 function timer_earth_clear()
 {
-	print("[timer_earth_clear] max_earth "+max_earth)
+	local count_earth = 0
+
+	foreach (k, v in earth) 
+	{
+		count_earth = count_earth+1
+	}
+
+	print("[timer_earth_clear] max_earth "+max_earth+", count_earth "+count_earth)
 
 	earth = {}
 	max_earth = 0
@@ -2336,6 +2347,25 @@ function job_timer ()
 								}
 							}
 						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 4) //--работа по починке тел будок
+			{
+				if (getPlayerModel(playerid) == 12)
+				{
+					if (job_call[playerid] == 0) //--нету вызова
+					{
+						local randomize = random(0,phohe.len()-1)
+
+						sendMessage(playerid, "Езжайте к телефонной будки", yellow[0], yellow[1], yellow[2])
+
+						job_call[playerid] = 1
+						job_pos[playerid] = [phohe[randomize][0],phohe[randomize][1],phohe[randomize][2]]
+
+						triggerClientEvent(playerid, "removegps")
+						triggerClientEvent(playerid, "job_gps", phohe[randomize][0],phohe[randomize][1])
 					}
 				}
 			}
@@ -3089,13 +3119,6 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 			}
 		}
 
-		if (fuel[plate] <= 1)
-		{
-			sendMessage(playerid, "[ERROR] Бак пуст", red[0], red[1], red[2])
-			dviglo[plate] <- 0
-			return
-		}
-
 		if (search_inv_player(playerid, 6, plate.tointeger()) != 0 && search_inv_player(playerid, 2, 1) != 0)
 		{
 			local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
@@ -3113,6 +3136,13 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 				}
 				
 				triggerClientEvent( playerid, "event_tab_load", "car", plate )
+			}
+
+			if (fuel[plate] <= 1)
+			{
+				sendMessage(playerid, "[ERROR] Бак пуст", red[0], red[1], red[2])
+				dviglo[plate] <- 0
+				return
 			}
 
 			dviglo[plate] <- 1
@@ -4090,6 +4120,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
 		}
 		//-----------------------------------------------------------------------------------------
+		else if (id1 == 9 || id1 == 12 || id1 == 13 || id1 == 14 || id1 == 15 || id1 == 16 || id1 == 17 || id1 == 18 || id1 == 19)//оружие
+		{
+			givePlayerWeapon(playerid, weapon[id1][1], id2)
+			me_chat(playerid, playername+" взял(а) в руку "+weapon[id1][0])
+			id2 = 0
+		}
 		else if (id1 == 6)//--ключ авто
 		{
 			local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+id2+"'" )
@@ -4159,7 +4195,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 				return
 			}
 		}
@@ -4260,7 +4296,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 				return
 			}
 		}
@@ -4291,7 +4327,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			local x1 = pos[0]
 			local y1 = pos[1]
 
-			if (hour >= 0 && hour <= 7)
+			if (hour >= 0 && hour <= 5)
 			{
 				foreach (k, v in sqlite3( "SELECT * FROM house_db" ))
 				{
@@ -4377,7 +4413,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Ограбление доступно с 0 до 7 часов игрового времени", red[0], red[1], red[2])
+				sendMessage(playerid, "[ERROR] Ограбление доступно с 0 до 6 часов игрового времени", red[0], red[1], red[2])
 				return
 			}
 		}
@@ -4385,7 +4421,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			local alcohol_test = alcohol[playerid]/100.0
 			
-			me_chat(playerid, playername+" пописал(а) на палочку")
+			me_chat(playerid, playername+" смочил(а) слюной палочку")
 			do_chat(playerid, info_png[id1][0]+" показал "+alcohol_test+" промилле")
 
 			if (alcohol_test >= zakon_alcohol)
@@ -4483,7 +4519,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 				return
 			}
 		}
@@ -4511,7 +4547,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				job[playerid] = 1
 
-				me_chat(playerid, playername+" вышел(ла) на работу")
+				me_chat(playerid, playername+" вышел(ла) на "+job[playerid]+" работу")
 			}
 			else
 			{
@@ -4543,7 +4579,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				job[playerid] = 2
 
-				me_chat(playerid, playername+" вышел(ла) на работу")
+				me_chat(playerid, playername+" вышел(ла) на "+job[playerid]+" работу")
 			}
 			else
 			{
@@ -4583,7 +4619,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if (isPlayerInVehicle(playerid))
 			{
-				sendMessage(playerid, "[ERROR] Вы в т/с", red[0], red[1], red[2])
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 				return
 			}
 
@@ -4663,13 +4699,41 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 		}
+		else if (id1 == 71) //--рем ящик
+		{
+			if(job_pos[playerid] == 0)
+			{
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+				return
+			}
+
+			if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && getPlayerModel(playerid) == 12 && job_call[playerid] == 1)
+			{
+				local randomize = random(1,zp_player_71)
+
+				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+				sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
+
+				save_player_action(playerid, "[eb_telephone_service] "+playername+" [+"+randomize+"$, "+array_player_2[playerid][0]+"$]")
+									
+				job_call[playerid] = 0
+
+				id2 = id2 - 1
+			}
+			else 
+			{
+				sendMessage(playerid, "[ERROR] Вы должны быть в одежде 12 и около телефонной будки", red[0], red[1], red[2])
+				return
+			}
+		}
 		else if (id1 == 72) //--лиц. инкасатора
 		{
 			if (job[playerid] == 0)
 			{
 				job[playerid] = 3
 
-				me_chat(playerid, playername+" вышел(ла) на работу")
+				me_chat(playerid, playername+" вышел(ла) на "+job[playerid]+" работу")
 			}
 			else
 			{
@@ -4683,7 +4747,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if (isPlayerInVehicle(playerid))
 			{
-				sendMessage(playerid, "[ERROR] Вы в т/с", red[0], red[1], red[2])
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 				return
 			}
 			
@@ -4708,11 +4772,21 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 		}
-		else if (id1 == 9 || id1 == 12 || id1 == 13 || id1 == 14 || id1 == 15 || id1 == 16 || id1 == 17 || id1 == 18 || id1 == 19)//оружие
+		else if (id1 == 75) //--лиц. ремонтника тел. будок
 		{
-			givePlayerWeapon(playerid, weapon[id1][1], id2)
-			me_chat(playerid, playername+" взял(а) в руку "+weapon[id1][0])
-			id2 = 0
+			if (job[playerid] == 0)
+			{
+				job[playerid] = 4
+
+				me_chat(playerid, playername+" вышел(ла) на "+job[playerid]+" работу")
+			}
+			else
+			{
+				job[playerid] = 0
+
+				me_chat(playerid, playername+" закончил(а) работу")
+			}
+			return
 		}
 		else 
 		{
