@@ -4780,7 +4780,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				sendMessage(playerid, "[ERROR] Вы должны быть около место ловли рыбы", red[0], red[1], red[2])
+				sendMessage(playerid, "[ERROR] Вы должны быть около места ловли рыбы", red[0], red[1], red[2])
 				return
 			}
 		}
