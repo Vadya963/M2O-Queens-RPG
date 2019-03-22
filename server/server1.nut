@@ -50,8 +50,19 @@ local lyme = [130,255,0]//--лайм админский цвет
 local svetlo_zolotoy = [255,255,130]//--светло-золотой
 
 local color_table = {
-	[1] = [255,0,0],
-	[2] = [150,0,0],
+	[1] = [168,228,160],
+	[2] = [255,255,0],
+	[3] = [255,0,0],
+	[4] = [0,150,255],
+	[5] = [255,255,255],
+	[6] = [0,255,0],
+	[7] = [0,255,255],
+	[8] = [255,100,0],
+	[9] = [255,150,0],
+	[10] = [255,100,255],
+	[11] = [130,255,0],
+	[12] = [255,255,130],
+	[13] = [150,0,0],
 }
 
 local info_png = {
@@ -125,7 +136,7 @@ local info_png = {
 	[67] = ["пропуск", "шт"],
 	[68] = ["свиной окорок", "$ за штуку"],
 	[69] = ["колесо", "марка"],
-	[70] = ["банка краски", "палитра"],
+	[70] = ["банка краски", "цвет"],
 	[71] = ["ящик с инструментами", "процентов"],
 	[72] = ["лицензия инкассатора", "шт"],
 	[73] = ["рыба", "кг"],
@@ -512,21 +523,16 @@ local repair_shop = [
 	[info_png[23][0], 1, 100, 23],
 	[info_png[35][0], 10, 500, 35],
 	[info_png[65][0], 3, 15000, 65],
-	[info_png[69][0], 1, 1000, 69],
-	[info_png[69][0], 2, 1000, 69],
-	[info_png[69][0], 3, 1000, 69],
-	[info_png[69][0], 4, 1000, 69],
-	[info_png[69][0], 5, 1000, 69],
-	[info_png[69][0], 6, 1000, 69],
-	[info_png[69][0], 7, 1000, 69],
-	[info_png[69][0], 8, 1000, 69],
-	[info_png[69][0], 9, 1000, 69],
-	[info_png[69][0], 10, 1000, 69],
-	[info_png[69][0], 11, 1000, 69],
-	[info_png[70][0], 1, 500, 70],
-	[info_png[70][0], 2, 500, 70],
 	[info_png[71][0], 100, 50, 71],
 ]
+for (local i = 1; i <= 11; i++)//колеса
+{
+	repair_shop.push([info_png[69][0], i, 1000, 69])
+}
+foreach (k, v in color_table)//краска
+{
+	repair_shop.push([info_png[70][0]+" (RGB: "+v[0]+","+v[1]+","+v[2]+")", k, 50, 70])
+}
 
 //-места поднятия предметов
 local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, зп 6}
@@ -765,6 +771,21 @@ function do_chat(playerid, text)
 	}
 }
 
+function ic_chat(playerid, text)
+{
+	local myPos = getPlayerPosition(playerid)
+
+	foreach (player, playername in getPlayers())
+	{
+		local Pos = getPlayerPosition(player)
+
+		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
+		{
+			sendMessage(player, text, white[0], white[1], white[2])
+		}
+	}
+}
+
 function random(min=0, max=RAND_MAX)
 {
 	srand(getTickCount() * rand())
@@ -786,17 +807,32 @@ function(playerid, text)
 		return
 	}
 
-	local say = getPlayerName( playerid )+" ["+playerid+"]: " + text
+	local count = 0
+	local say = "(Всем) "+getPlayerName( playerid )+" ["+playerid+"]: " + text
+	local say_10_r = "(10 метров) "+getPlayerName( playerid )+" ["+playerid+"]: " + text
 
 	foreach(i, playername in getPlayers())
 	{
-		if(logged[i] == 1)
+		local myPos = getPlayerPosition(playerid)
+		local Pos = getPlayerPosition(i)
+
+		if(logged[i] == 1 && isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ) && i != playerid)
 		{
-			sendMessage( i, say, white[0], white[1], white[2] )
+			count = count + 1
 		}
 	}
+	
+	if (count == 0)
+	{
+		sendMessageAll( playerid, say, white[0], white[1], white[2] )
 
-	print("[CHAT] "+say)
+		print("[CHAT] "+say)
+	}
+	else 
+	{
+		ic_chat( playerid, say_10_r )
+		print("[CHAT] "+say_10_r)
+	}
 })
 
 addEventHandler("up_chat",
@@ -1334,6 +1370,7 @@ function setElementData (playerid, key, value)
 	element_data[playerid][key] <- value
 	//print("setElementData["+playerid+"]["+key+"] = "+value)
 }
+addEventHandler("event_setElementData", setElementData)
 
 function getElementData (playerid, key) 
 {	
@@ -2866,11 +2903,24 @@ function playerDeath( playerid, attacker )
 {
 	local playername = getPlayerName ( playerid )
 	local playername_a = false
+	local reason = "т/с"
 	local cash = 100
 
 	if( attacker != INVALID_ENTITY_ID )
 	{
 		playername_a = getPlayerName ( attacker )
+
+		if (getPlayerWeapon(attacker))
+		{	
+			foreach (k, v in weapon) 
+			{
+				if (v[1] == getPlayerWeapon(attacker))
+				{
+					reason = v[0]
+					break
+				}
+			}
+		}
 
 		if (search_inv_player(attacker, 10, 1) == 0)
 		{
@@ -2899,10 +2949,10 @@ function playerDeath( playerid, attacker )
 	}
 	else
 	{
-		sendMessageAll(playerid, "[НОВОСТИ] "+playername_a+" убил "+playername, green[0], green[1], green[2])
+		sendMessageAll(playerid, "[НОВОСТИ] "+playername_a+" убил "+playername+" Причина: "+reason.tostring(), green[0], green[1], green[2])
 	}
 
-	save_player_action(playerid, "[onPlayerDeath] "+playername+" [attacker - "+playername_a.tostring()+"]")
+	save_player_action(playerid, "[onPlayerDeath] "+playername+" [attacker - "+playername_a.tostring()+", reason - "+reason.tostring()+"]")
 
 	robbery_kill(playerid)
 }
@@ -2920,7 +2970,7 @@ function( playerid )
 		sendMessage(playerid, "[TIPS] /cmd - команды сервера", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] Первоначальная работа находится на свалке у Майка Бруски", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] Граждане не имеющий дом, могут помыться и выспаться в отеле Титания", color_tips[0], color_tips[1], color_tips[2])
-		sendMessage(playerid, "[TIPS] Права можно купить в Мэрии(зеленый пятиугольник)", color_tips[0], color_tips[1], color_tips[2])
+		sendMessage(playerid, "[TIPS] Права можно купить в Мэрии (зеленый пятиугольник)", color_tips[0], color_tips[1], color_tips[2])
 
 		reg_or_login(playerid)
 
@@ -3000,7 +3050,7 @@ function reg_or_login(playerid)
 	if (result[1]["COUNT()"] == 0)
 	{
 		local result = sqlite3( "SELECT COUNT() FROM account WHERE reg_serial = '"+serial+"'" )
-		if (result[1]["COUNT()"] == 1) 
+		if (result[1]["COUNT()"] >= 1) 
 		{	
 			local result = sqlite3( "SELECT * FROM account WHERE reg_serial = '"+serial+"'" )
 			sendMessage(playerid, "[ERROR] Регистрация твинков запрещена, вас кикнет через 10 сек", red[0], red[1], red[2])
@@ -3149,7 +3199,7 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Чтобы завести т/с надо иметь ключ от т/с и права(можно купить в Мэрии)", red[0], red[1], red[2])
+			sendMessage(playerid, "[ERROR] Чтобы завести т/с надо иметь ключ от т/с и права (можно купить в Мэрии)", red[0], red[1], red[2])
 			dviglo[plate] <- 0
 		}
 	}
@@ -5677,7 +5727,7 @@ function (playerid, id)
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] У вас нет ключей от этого т/с", red[0], red[1], red[2])
+							sendMessage(playerid, "[ERROR] У вас нет ключа от этого т/с", red[0], red[1], red[2])
 						}
 					}
 					else 
