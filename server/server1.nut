@@ -13,7 +13,8 @@ local zakon_nalog_car = 500
 local zakon_nalog_house = 1000
 local zakon_nalog_business = 2000
 local time_nalog = 12//--время когда будет взиматься налог
-local price_hotel = 100
+local price_hotel = 100//цена за отель
+local max_text_len = 90//макс длина сообщения
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -48,6 +49,8 @@ local orange_do = [255,150,0]//--оранжевый do
 local pink = [255,100,255]//--розовый
 local lyme = [130,255,0]//--лайм админский цвет
 local svetlo_zolotoy = [255,255,130]//--светло-золотой
+local crimson = [220,20,60]//--малиновый
+local purple = [175,0,255]//--фиолетовый
 
 local color_table = {
 	[1] = [168,228,160],
@@ -63,6 +66,8 @@ local color_table = {
 	[11] = [130,255,0],
 	[12] = [255,255,130],
 	[13] = [150,0,0],
+	[14] = [220,20,60],
+	[15] = [175,0,255],
 }
 
 local info_png = {
@@ -552,7 +557,7 @@ local down_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5
 	[-334.529,-786.738,-21.5261, 15.0, 24, 35],//--порт
 	[1189.65,1146.35,3.06759, 15.0, 63, 35],//--свалка
 	[-334.529,-786.738,-21.5261, 15.0, 61, 35],//--порт
-	[67.2002,-202.94,-20.2324, 15.0, 54, 27],//банк
+	[119.838,-202.878,-20.2502, 15.0, 54, 27],//банк
 ]
 
 local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4}
@@ -804,6 +809,11 @@ function(playerid, text)
 {
 	if(logged[playerid] == 0)
 	{
+		return
+	}
+	else if (text.len() > max_text_len)
+	{
+		sendMessage(playerid, "[ERROR] Максимальная длина сообщения "+max_text_len+" символов", red[0], red[1], red[2])
 		return
 	}
 
@@ -2181,12 +2191,24 @@ function debuginfo ()
 		setElementData(playerid, "hygiene_data", hygiene[playerid])
 		setElementData(playerid, "sleep_data", sleep[playerid])
 		setElementData(playerid, "drugs_data", drugs[playerid])
+		setElementData(playerid, "fuel_data", 0)
+		setElementData(playerid, "gps_device_data", gps_device[playerid])
+
+		for (local i = 0; i < getMaxPlayers(); i++) 
+		{	
+			if (isPlayerConnected(i))
+			{
+				setElementData(playerid, "crimes["+i+"]", crimes[i].tostring())
+				setElementData(playerid, "is_chat_open["+i+"]", getElementData(i, "is_chat_open"))
+				setElementData(playerid, "afk["+i+"]", getElementData(i, "afk").tostring())
+			}
+		}
 
 		local vehicleid = getPlayerVehicle(playerid)
 		if (isPlayerInVehicle(playerid))
 		{
 			local plate = getVehiclePlateText(vehicleid)
-			setElementData ( playerid, "fuel_data", fuel[plate] )
+			setElementData(playerid, "fuel_data", fuel[plate])
 		}
 
 		setPlayerHealth(playerid, health[playerid].tofloat())
@@ -2853,8 +2875,8 @@ function( playerid, name, ip, serial )
 	job_pos[playerid] = 0
 	job_call[playerid] = 0
 
-	setElementData ( playerid, "fuel_data", 0 )
-	setElementData(playerid, "gps_device_data", 0)
+	setElementData(playerid, "is_chat_open", 0)
+	setElementData(playerid, "afk", "0")
 
 	print("[serial] "+getPlayerSerial(playerid))
 })
@@ -3722,7 +3744,7 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 				}
 				else if (id1 == 61) 
 				{
-					sendMessage(playerid, "[TIPS] [TIPS] Езжайте в порт, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
+					sendMessage(playerid, "[TIPS] Езжайте в порт, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
 				}
 				else if (id1 == 63) 
 				{
@@ -4590,14 +4612,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			if (gps_device[playerid] == 0)
 			{
 				gps_device[playerid] = 1
-				setElementData(playerid, "gps_device_data", gps_device[playerid])
 
 				me_chat(playerid, playername+" достал(а) "+info_png[id1][0])
 			}
 			else
 			{
 				gps_device[playerid] = 0
-				setElementData(playerid, "gps_device_data", gps_device[playerid])
 
 				me_chat(playerid, playername+" убрал(а) "+info_png[id1][0])
 			}
@@ -5793,7 +5813,7 @@ function (playerid)
 	local commands = [
 		"/roulette [режим игры (красное, черное, четное, нечетное, 1-18, 19-36, 1-12, 2-12, 3-12, 3-1, 3-2, 3-3)] [сумма] - сыграть в рулетку",
 		"/prison [ИД игрока] - посадить игрока в тюрьму (для полицейских)",
-		"/pr [текст] - рация полицейских",
+		"/pr [текст] - рация полицейских (для полицейских)",
 		"/let [ИД игрока] [текст] - отправить письмо игроку",
 		"/pay [ИД игрока] [сумма] - передача денег",
 		"/ec [номер т/с] - эвакуция т/с",
@@ -6074,16 +6094,6 @@ function(command, params)
 		//delete table[1]
 		foreach (idx, value in table) {
 			print(value)
-		}/*
-
-		/*for (local i = 0; i < 10; i++) 
-		{
-			setElementData(0, i, i)
-		}
-
-		for (local i = 0; i < 10; i++) 
-		{
-			setElementData(1, i, i*2)
 		}*/
 
 		//print(PI)
@@ -6096,16 +6106,6 @@ function(command, params)
 
 		local x = false
 		print((x || 0))//0*/
-
-		/*for (local i = 0; i < 10; i++) 
-		{
-			getElementData(0, i)
-		}
-
-		for (local i = 0; i < 10; i++) 
-		{
-			getElementData(1, i)
-		}*/
 
 		/*if (4.0 == 4)
 		{
