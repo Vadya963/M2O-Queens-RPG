@@ -22,6 +22,8 @@ local screenWidth = screen[0]
 local zakon_nalog_car = 500
 local zakon_nalog_house = 1000
 local zakon_nalog_business = 2000
+local is_chat_open = 0//чат: 0-закрыт, 1-открыт
+local afk = 0//--сколько минут в афк
 
 //---------------------грайдлист-------------------------
 local gridlist_table_window = {}//таблица созданных окон
@@ -208,6 +210,8 @@ local orange_do = [255,150,0]//--оранжевый do
 local pink = [255,100,255]//--розовый
 local lyme = [130,255,0]//--лайм админский цвет
 local svetlo_zolotoy = [255,255,130]//--светло-золотой
+local crimson = [220,20,60]//--малиновый
+local purple = [175,0,255]//--фиолетовый
 
 local color_table = {
 	[1] = [168,228,160],
@@ -223,6 +227,8 @@ local color_table = {
 	[11] = [130,255,0],
 	[12] = [255,255,130],
 	[13] = [150,0,0],
+	[14] = [220,20,60],
+	[15] = [175,0,255],
 }
 
 //--------------------------------------------грайдлист--------------------------------------------
@@ -688,6 +694,24 @@ timer(function () {
 	}
 
 }, 500, -1)
+
+timer(function () {
+	is_chat_open = isInputVisible().tointeger()
+	setElementData("is_chat_open", is_chat_open)
+}, 500, -1)
+
+timer(function () {
+	if (isMainMenuShowing())
+	{
+		afk = afk+1
+		setElementData("afk", afk.tostring())
+	}
+	else
+	{
+		afk = 0
+		setElementData("afk", afk.tostring())
+	}
+}, 1000, -1)
 //-----------------------------------------------------------------------------------------
 
 local inv_slot_player = [//инв-рь игрока {пнг картинка 0, значение 1}
@@ -861,6 +885,13 @@ function getSpeed()
 	return speed*2.27*1.6
 }
 
+//------------------------------------Element Data-------------------------------------------------
+function setElementData (key, value)
+{
+	triggerServerEvent( "event_setElementData", key, value )
+	//print("setElementData["+key+"] = "+value)
+}
+
 function getElementData (key)
 {	
 	if (element_data[key])
@@ -880,6 +911,7 @@ function element_data_push_client(key, value)
 	//print("event_element_data_push_client["+key+"] = "+value)
 }
 addEventHandler ( "event_element_data_push_client", element_data_push_client )
+//-------------------------------------------------------------------------------------------------
 
 function blip_create(x, y, lib, icon, r)
 {
@@ -949,6 +981,35 @@ function up_down()
 	triggerServerEvent( "up_chat" )
 }
 
+function f1_down()
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+
+	showCursor( !isCursorShowing )
+	isCursorShowing = !isCursorShowing
+}
+
+function f2_down()
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+	
+	sync_timer = !sync_timer
+	showChat( sync_timer )
+
+	guiSetVisible(health_gui, sync_timer)
+	guiSetVisible(alcohol_gui, sync_timer)
+	guiSetVisible(drugs_gui, sync_timer)
+	guiSetVisible(satiety_gui, sync_timer)
+	guiSetVisible(hygiene_gui, sync_timer)
+	guiSetVisible(sleep_gui, sync_timer)
+}
+
 addEventHandler("onClientScriptInit", 
 function() 
 {
@@ -1005,6 +1066,7 @@ function( post )
 		[15] = "number_business "+number_business,
 		[16] = "value_business "+value_business,
 		[17] = "clothing_menu_value "+clothing_menu_value,
+		[18] = "is_chat_open "+is_chat_open,
 	}
 
 	playerid = getLocalPlayer()
@@ -1101,6 +1163,37 @@ function( post )
 		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*5, ((width_need/100.0)*sleep), 15.0, fromRGB ( 90, 151, 107, 255 ) )
 
 		simpleShake(1.0, (alcohol/100).tofloat(), 1.0)
+
+		for (local i = 0; i < getMaxPlayers(); i++) 
+		{
+			if (isPlayerConnected(i))
+			{	
+				local Pos = getPlayerPosition(i)
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 20.0 )
+				if (area && getElementData("crimes["+i+"]") != "0" && i != playerid)
+				{
+					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+					local dimensions = dxGetTextDimensions( "WANTED", 1.0, "tahoma-bold" )
+					dxdrawtext( "WANTED", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( red[0], red[1], red[2] ), true, "tahoma-bold", 1.0 )
+				}
+
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
+				if (area && getElementData("is_chat_open["+i+"]") == 1 && i != playerid)
+				{
+					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+					local dimensions = dxGetTextDimensions( "prints...", 1.0, "tahoma-bold" )
+					dxdrawtext( "prints...", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+				}
+
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
+				if (area && getElementData("afk["+i+"]") != "0" && i != playerid)
+				{
+					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+					local dimensions = dxGetTextDimensions( "[AFK] "+getElementData("afk["+i+"]")+" seconds", 1.0, "tahoma-bold" )
+					dxdrawtext( "[AFK] "+getElementData("afk["+i+"]")+" seconds", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( purple[0], purple[1], purple[2] ), true, "tahoma-bold", 1.0 )
+				}
+			}
+		}
 	}
 
 
@@ -1805,35 +1898,6 @@ function tab_load (value, text)//загрузка надписей в табе
 	}
 }
 addEventHandler ( "event_tab_load", tab_load )
-
-function f1_down()
-{
-	if(isMainMenuShowing())
-	{
-		return
-	}
-
-	showCursor( !isCursorShowing )
-	isCursorShowing = !isCursorShowing
-}
-
-function f2_down()
-{
-	if(isMainMenuShowing())
-	{
-		return
-	}
-	
-	sync_timer = !sync_timer
-	showChat( sync_timer )
-
-	guiSetVisible(health_gui, sync_timer)
-	guiSetVisible(alcohol_gui, sync_timer)
-	guiSetVisible(drugs_gui, sync_timer)
-	guiSetVisible(satiety_gui, sync_timer)
-	guiSetVisible(hygiene_gui, sync_timer)
-	guiSetVisible(sleep_gui, sync_timer)
-}
 
 addEventHandler( "job_gps",
 function( id1, id2 )
