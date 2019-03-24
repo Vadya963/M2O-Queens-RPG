@@ -498,11 +498,6 @@ local weapon = {
 	[19] = [info_png[19][0], 9, 1990]
 }
 
-local giuseppe = {
-	[35] = [info_png[35][0], 10, 500],
-	[76] = [info_png[76][0], 1, 5000],
-}
-
 local shop = {
 	[3] = [info_png[3][0], 20, 5],
 	[4] = [info_png[4][0], 1, 250],
@@ -532,6 +527,7 @@ local gas = {
 
 local repair_shop = [
 	[info_png[23][0], 1, 100, 23],
+	[info_png[35][0], 10, 500, 35],
 	[info_png[65][0], 3, 15000, 65],
 	[info_png[71][0], 100, 50, 71],
 ]
