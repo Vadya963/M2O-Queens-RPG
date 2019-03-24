@@ -136,6 +136,7 @@ local info_png = {
 	[73] = ["рыба", "кг"],
 	[74] = ["удочка", "процентов"],
 	[75] = ["лицензия ремонтника", "шт"],
+	[76] = ["динамит", "шт"],
 }
 
 //цены автосалона
@@ -311,6 +312,14 @@ function guiSetVisibleGridList (window, bool)
 	}
 }
 
+function guiGetVisibleGridList (window)
+{
+	if (window)
+	{		
+		return guiIsVisible( window[0] )
+	}
+}
+
 function guiGetCountGridList (window)
 {
 	if (window)
@@ -387,7 +396,7 @@ local weapon = {
 	[16] = [info_png[16][0], 10, 2190],
 	[17] = [info_png[17][0], 3, 1050],
 	[18] = [info_png[18][0], 6, 1500],
-	[19] = [info_png[19][0], 9, 1990]
+	[19] = [info_png[19][0], 9, 1990],
 }
 local weapon_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in weapon)
@@ -410,7 +419,6 @@ guiSetVisibleGridList (gas_menu, false)
 
 local repair_shop = [
 	[info_png[23][0], 1, 100, 23],
-	[info_png[35][0], 10, 500, 35],
 	[info_png[65][0], 3, 15000, 65],
 	[info_png[71][0], 100, 50, 71],
 ]
@@ -514,6 +522,18 @@ foreach (k,v in station)
 	guiGridListAddRow (station_menu, text)
 }
 guiSetVisibleGridList (station_menu, false)
+
+local giuseppe = {
+	[35] = [info_png[35][0], 10, 500],
+	[76] = [info_png[76][0], 1, 5000],
+}
+local giuseppe_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
+foreach (k,v in giuseppe)
+{
+	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+	guiGridListAddRow (giuseppe_menu, text)
+}
+guiSetVisibleGridList (giuseppe_menu, false)
 
 local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 400.0, 30.0, false )
 guiSetVisible( shop_menu_button, false )
@@ -1022,6 +1042,9 @@ function()
 	bindKey( "page_up", "down", up_down )
 	bindKey( "page_down", "down", down_down )
 	bindKey( "f2", "down", f2_down )
+
+	//setRenderNametags(false)
+	//setRenderHealthbar(false)
 })
 
 function zamena_img()
@@ -1166,11 +1189,11 @@ function( post )
 
 		for (local i = 0; i < getMaxPlayers(); i++) 
 		{
-			if (isPlayerConnected(i))
+			if (isPlayerConnected(i) && i != playerid)
 			{	
 				local Pos = getPlayerPosition(i)
-				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 20.0 )
-				if (area && getElementData("crimes["+i+"]") != "0" && i != playerid)
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 35.0 )
+				if (area && getElementData("crimes["+i+"]") != "0")
 				{
 					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
 					local dimensions = dxGetTextDimensions( "WANTED", 1.0, "tahoma-bold" )
@@ -1178,7 +1201,7 @@ function( post )
 				}
 
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
-				if (area && getElementData("is_chat_open["+i+"]") == 1 && i != playerid)
+				if (area && getElementData("is_chat_open["+i+"]") == 1)
 				{
 					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
 					local dimensions = dxGetTextDimensions( "prints...", 1.0, "tahoma-bold" )
@@ -1186,7 +1209,7 @@ function( post )
 				}
 
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
-				if (area && getElementData("afk["+i+"]") != "0" && i != playerid)
+				if (area && getElementData("afk["+i+"]") != "0")
 				{
 					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
 					local dimensions = dxGetTextDimensions( "[AFK] "+getElementData("afk["+i+"]")+" seconds", 1.0, "tahoma-bold" )
@@ -1320,6 +1343,36 @@ function( post )
 			dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
 		}
 	}
+
+
+	/*for (local i = 0; i < getMaxPlayers(); i++)//кастомная полоска хп
+	{
+		if (isPlayerConnected(i))
+		{	
+			local Pos = getPlayerPosition(i)
+			local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 35.0 )
+			local health = getPlayerHealth(i)
+			local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+
+			if (area)
+			{
+				dxDrawRectangle( coords[0]-(72.0/2), coords[1]+16.0, 72.0, 10.0, fromRGB( 0, 110, 0, 150 ) )
+
+				if (health >= 500)
+				{
+					dxDrawRectangle( coords[0]-(72.0/2), coords[1]+16.0, (health/10), 10.0, fromRGB( 0, 255, 0, 150 ) )
+				}
+				else if (health >= 250)
+				{
+					dxDrawRectangle( coords[0]-(72.0/2), coords[1]+16.0, (health/10), 10.0, fromRGB( 255, 255, 0, 150 ) )
+				}
+				else 
+				{
+					dxDrawRectangle( coords[0]-(72.0/2), coords[1]+16.0, (health/10), 10.0, fromRGB( 255, 0, 0, 150 ) )
+				}
+			}
+		}
+	}*/
 })
 
 function tab_down_fun(value)//инв-рь игрока
@@ -1690,100 +1743,106 @@ function( element )
 	}
 	else if (element == shop_menu_button2)
 	{	
-		clothing_menu_value--
+		if (guiGetVisibleGridList(clothing_menu))
+		{
+			clothing_menu_value--
 
-		if (clothing_menu_value <= 0)
-		{
-			clothing_menu_value = 1
-			return
-		}
+			if (clothing_menu_value <= 0)
+			{
+				clothing_menu_value = 1
+				return
+			}
 
-		if (clothing_menu_value == 1)
-		{
-			for (local i = guiGetCountGridList(clothing_menu)*0; i < guiGetCountGridList(clothing_menu)*1; i++)
+			if (clothing_menu_value == 1)
 			{
-				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*0, i.tostring())
+				for (local i = guiGetCountGridList(clothing_menu)*0; i < guiGetCountGridList(clothing_menu)*1; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*0, i.tostring())
+				}
 			}
-		}
-		else if (clothing_menu_value == 2)
-		{
-			for (local i = guiGetCountGridList(clothing_menu)*1; i < guiGetCountGridList(clothing_menu)*2; i++)
+			else if (clothing_menu_value == 2)
 			{
-				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*1, i.tostring())
+				for (local i = guiGetCountGridList(clothing_menu)*1; i < guiGetCountGridList(clothing_menu)*2; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*1, i.tostring())
+				}
 			}
-		}
-		else if (clothing_menu_value == 3)
-		{
-			for (local i = guiGetCountGridList(clothing_menu)*2; i < guiGetCountGridList(clothing_menu)*3; i++)
+			else if (clothing_menu_value == 3)
 			{
-				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*2, i.tostring())
+				for (local i = guiGetCountGridList(clothing_menu)*2; i < guiGetCountGridList(clothing_menu)*3; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*2, i.tostring())
+				}
 			}
-		}
-		else if (clothing_menu_value == 4)
-		{
-			for (local i = guiGetCountGridList(clothing_menu)*3; i < guiGetCountGridList(clothing_menu)*4; i++)
+			else if (clothing_menu_value == 4)
 			{
-				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*3, i.tostring())
+				for (local i = guiGetCountGridList(clothing_menu)*3; i < guiGetCountGridList(clothing_menu)*4; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*3, i.tostring())
+				}
 			}
-		}
-		else if (clothing_menu_value == 5)
-		{
-			for (local i = guiGetCountGridList(clothing_menu)*4; i < guiGetCountGridList(clothing_menu)*5; i++)
+			else if (clothing_menu_value == 5)
 			{
-				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*4, i.tostring())
+				for (local i = guiGetCountGridList(clothing_menu)*4; i < guiGetCountGridList(clothing_menu)*5; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*4, i.tostring())
+				}
 			}
 		}
 	}
 	else if (element == shop_menu_button3)
 	{	
-		clothing_menu_value++
+		if (guiGetVisibleGridList(clothing_menu))
+		{
+			clothing_menu_value++
+			
+			if (clothing_menu_value >= 7)
+			{
+				clothing_menu_value = 6
+				return
+			}
 
-		if (clothing_menu_value >= 7)
-		{
-			clothing_menu_value = 6
-			return
-		}
-
-		if (clothing_menu_value == 1)
-		{
-			for (local i = guiGetCountGridList(clothing_menu)*0; i < guiGetCountGridList(clothing_menu)*1; i++)
+			if (clothing_menu_value == 1)
 			{
-				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*0, i.tostring())
+				for (local i = guiGetCountGridList(clothing_menu)*0; i < guiGetCountGridList(clothing_menu)*1; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*0, i.tostring())
+				}
 			}
-		}
-		else if (clothing_menu_value == 2)
-		{
-			for (local i = guiGetCountGridList(clothing_menu)*1; i < guiGetCountGridList(clothing_menu)*2; i++)
+			else if (clothing_menu_value == 2)
 			{
-				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*1, i.tostring())
+				for (local i = guiGetCountGridList(clothing_menu)*1; i < guiGetCountGridList(clothing_menu)*2; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*1, i.tostring())
+				}
 			}
-		}
-		else if (clothing_menu_value == 3)
-		{
-			for (local i = guiGetCountGridList(clothing_menu)*2; i < guiGetCountGridList(clothing_menu)*3; i++)
+			else if (clothing_menu_value == 3)
 			{
-				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*2, i.tostring())
+				for (local i = guiGetCountGridList(clothing_menu)*2; i < guiGetCountGridList(clothing_menu)*3; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*2, i.tostring())
+				}
 			}
-		}
-		else if (clothing_menu_value == 4)
-		{
-			for (local i = guiGetCountGridList(clothing_menu)*3; i < guiGetCountGridList(clothing_menu)*4; i++)
+			else if (clothing_menu_value == 4)
 			{
-				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*3, i.tostring())
+				for (local i = guiGetCountGridList(clothing_menu)*3; i < guiGetCountGridList(clothing_menu)*4; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*3, i.tostring())
+				}
 			}
-		}
-		else if (clothing_menu_value == 5)
-		{
-			for (local i = guiGetCountGridList(clothing_menu)*4; i < guiGetCountGridList(clothing_menu)*5; i++)
+			else if (clothing_menu_value == 5)
 			{
-				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*4, i.tostring())
+				for (local i = guiGetCountGridList(clothing_menu)*4; i < guiGetCountGridList(clothing_menu)*5; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*4, i.tostring())
+				}
 			}
-		}
-		else if (clothing_menu_value == 6)
-		{
-			for (local i = guiGetCountGridList(clothing_menu)*5; i < guiGetCountGridList(clothing_menu)*6; i++)
+			else if (clothing_menu_value == 6)
 			{
-				guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*5, i.tostring())
+				for (local i = guiGetCountGridList(clothing_menu)*5; i < guiGetCountGridList(clothing_menu)*6; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*5, i.tostring())
+				}
 			}
 		}
 	}
