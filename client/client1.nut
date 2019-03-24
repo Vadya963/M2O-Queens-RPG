@@ -419,6 +419,7 @@ guiSetVisibleGridList (gas_menu, false)
 
 local repair_shop = [
 	[info_png[23][0], 1, 100, 23],
+	[info_png[35][0], 10, 500, 35],
 	[info_png[65][0], 3, 15000, 65],
 	[info_png[71][0], 100, 50, 71],
 ]
@@ -522,18 +523,6 @@ foreach (k,v in station)
 	guiGridListAddRow (station_menu, text)
 }
 guiSetVisibleGridList (station_menu, false)
-
-local giuseppe = {
-	[35] = [info_png[35][0], 10, 500],
-	[76] = [info_png[76][0], 1, 5000],
-}
-local giuseppe_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
-foreach (k,v in giuseppe)
-{
-	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
-	guiGridListAddRow (giuseppe_menu, text)
-}
-guiSetVisibleGridList (giuseppe_menu, false)
 
 local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 400.0, 30.0, false )
 guiSetVisible( shop_menu_button, false )
