@@ -2395,7 +2395,6 @@ function job_timer ()
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
 								{
-									local randomize = random(1,taxi_pos.len())
 									local randomize_zp = random(1,zp_car_63)
 
 									job_call[playerid] = 2
@@ -2446,7 +2445,6 @@ function job_timer ()
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
 								{
-									local randomize = random(1,taxi_pos.len())
 									local randomize_zp = random(1,zp_car_54)
 
 									job_call[playerid] = 2
@@ -3320,7 +3318,7 @@ function explode_car(vehicleid)
 	{
 		if (vehicleid == getPlayerVehicle(player))
 		{
-			removePlayerFromVehicle( player )
+			removePlayerFromVehicle( player )//антибаг
 		}
 	}
 
