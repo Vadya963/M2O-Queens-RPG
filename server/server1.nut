@@ -87,8 +87,8 @@ local info_png = {
 	[13] = ["Кольт 1911 п/авт.", "боеприпасов"],
 	[14] = ["Кольт 1911 особ.", "боеприпасов"],
 	[15] = ["Дробовик", "боеприпасов"],
-	[16] = ["MP40", "боеприпасов"],
-	[17] = ["Пистолет C96", "боеприпасов"],
+	[16] = ["МП40", "боеприпасов"],
+	[17] = ["Маузер C96", "боеприпасов"],
 	[18] = ["Магнум", "боеприпасов"],
 	[19] = ["M3 Grease Gun", "боеприпасов"],
 	[20] = ["наркотики", "гр"],
@@ -3039,6 +3039,7 @@ function playerDeath( playerid, attacker )
 	save_player_action(playerid, "[onPlayerDeath] "+playername+" [attacker - "+playername_a.tostring()+", reason - "+reason.tostring()+"]")
 
 	robbery_kill(playerid)
+	job_0( playerid )
 }
 addEventHandler( "onPlayerDeath", playerDeath )
 
@@ -4908,6 +4909,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 72) //--лиц. инкасатора
 		{
+			if (crimes[playerid] != 0)
+			{
+				sendMessage(playerid, "[ERROR] У вас плохая репутация", red[0], red[1], red[2])
+				return
+			}
+
 			if (job[playerid] == 0)
 			{
 				job[playerid] = 3
@@ -5908,6 +5915,22 @@ function (playerid, value, money)
 	}
 })
 
+addCommandHandler("info_png",
+function (playerid)
+{
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	sendMessage(playerid, "====[ПРЕДМЕТЫ]====", white[0], white[1], white[2])
+
+	for (local i = 1; i < info_png.len(); i++) 
+	{
+		sendMessage(playerid, "["+i+"] "+info_png[i][0]+" 0 "+info_png[i][1], white[0], white[1], white[2])
+	}
+})
+
 addCommandHandler("cmd",//все команды
 function (playerid)
 {
@@ -5929,6 +5952,7 @@ function (playerid)
 		"/takepolicerank [ИД игрока] [ИД шеврона от 28 до 32] - забрать шеврон (для полицейских)",
 		"/sellhouse - создать дом (для риэлторов)",
 		"/sellbusiness [номер бизнеса от 0 до 5] - создать бизнес (для риэлторов)",
+		"/info_png - предметы сервера",
 	]
 
 	sendMessage(playerid, "====[КОМАНДЫ]====", white[0], white[1], white[2])
