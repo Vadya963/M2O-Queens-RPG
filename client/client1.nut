@@ -63,12 +63,12 @@ local info_png = {
 	[0] = ["", ""],
 	[1] = ["деньги", "$"],
 	[2] = ["права", "шт"],
-	[3] = ["сигареты Big Break Red", "сигарет в пачке"],
+	[3] = ["сигареты Big Break Red", "сигарет"],
 	[4] = ["аптечка", "шт"],
 	[5] = ["канистра с бензином", "лит."],
 	[6] = ["ключ от автомобиля с номером", ""],
-	[7] = ["сигареты Big Break Blue", "сигарет в пачке"],
-	[8] = ["сигареты Big Break White", "сигарет в пачке"],
+	[7] = ["сигареты Big Break Blue", "сигарет"],
+	[8] = ["сигареты Big Break White", "сигарет"],
 	[9] = ["ПП Томпсона обр. 1928 г.", "боеприпасов"],
 	[10] = ["полицейский жетон", "шт"],
 	[11] = ["газета", "шт"],
@@ -79,7 +79,7 @@ local info_png = {
 	[16] = ["МП40", "боеприпасов"],
 	[17] = ["Маузер C96", "боеприпасов"],
 	[18] = ["Магнум", "боеприпасов"],
-	[19] = ["M3 Grease Gun", "боеприпасов"],
+	[19] = ["М3", "боеприпасов"],
 	[20] = ["наркотики", "гр"],
 	[21] = ["пиво старый эмпайр", "шт"],
 	[22] = ["пиво штольц", "шт"],
@@ -137,6 +137,10 @@ local info_png = {
 	[74] = ["удочка", "процентов"],
 	[75] = ["лицензия ремонтника", "шт"],
 	[76] = ["динамит", "шт"],
+	[77] = ["шнур", "шт"],
+	[78] = ["тратил", "гр"],
+	[79] = ["отмычка", "процентов"],
+	[80] = ["лицензия угонщика", "шт"],
 }
 
 //цены автосалона
@@ -230,6 +234,7 @@ local color_table = {
 	[13] = [150,0,0],
 	[14] = [220,20,60],
 	[15] = [175,0,255],
+	[16] = [0,0,0],
 }
 
 //--------------------------------------------грайдлист--------------------------------------------
@@ -354,7 +359,7 @@ foreach (k,v in motor_show)
 guiSetVisibleGridList (avto_menu, false)
 
 local craft_table = [//--[предмет 0, рецепт 1, предметы для крафта 2, кол-во предметов для крафта 3, предмет который скрафтится 4]
-	[info_png[20][0]+"(1 гр)", info_png[3][0]+"(20 шт) + "+info_png[7][0]+"(20 шт) + "+info_png[8][0]+"(20 шт)", "3,7,8", "20,20,20", "20,1"],
+	[info_png[76][0]+"(1 шт)", info_png[77][0]+"(1 шт) + "+info_png[78][0]+"(100 гр)", "77,78", "1,100", "76,1"],
 ]
 local craft_menu = guiCreateGridList((screen[0]/2)-(650.0/2), (screen[1]/2)-(320.0/2), 650.0, 320.0)
 foreach (k,v in craft_table)
@@ -363,6 +368,19 @@ foreach (k,v in craft_table)
 	guiGridListAddRow (craft_menu, text)
 }
 guiSetVisibleGridList (craft_menu, false)
+
+local giuseppe = {
+	[78] = [info_png[78][0], 100, 1000],
+	[79] = [info_png[79][0], 5, 500],
+	[80] = [info_png[80][0], 1, 5000],
+}
+local giuseppe_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
+foreach (k,v in giuseppe)
+{
+	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+	guiGridListAddRow (giuseppe_menu, text)
+}
+guiSetVisibleGridList (giuseppe_menu, false)
 
 local shop = {
 	[3] = [info_png[3][0], 20, 5],
@@ -431,10 +449,14 @@ foreach (k, v in color_table)//краска
 {
 	repair_shop.push([info_png[70][0]+" (RGB: "+v[0]+","+v[1]+","+v[2]+")", k, 50, 70])
 }
-local repair_shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(450.0/2), 400.0, 450.0)
-foreach (k,v in repair_shop)
+for (local i = 0; i <= 29; i++) 
 {
-	local text = v[0]+" "+v[1]+" "+info_png[v[3]][1]+" "+v[2]+"$"
+	repair_shop.push(["none", 0, 0, 0])
+}
+local repair_shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(450.0/2), 400.0, 450.0)
+for (local i = 0; i <= 29; i++) 
+{
+	local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
 	guiGridListAddRow (repair_shop_menu, text)
 }
 guiSetVisibleGridList (repair_shop_menu, false)
@@ -524,10 +546,23 @@ foreach (k,v in station)
 }
 guiSetVisibleGridList (station_menu, false)
 
+local phone_stats = [
+	["Штрафстоянка"],
+	["Аукцион"],
+]
+local phone_stats_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
+foreach (k,v in phone_stats)
+{
+	local text = v[0]
+	guiGridListAddRow (phone_stats_menu, text)
+}
+guiSetVisibleGridList (phone_stats_menu, false)
+
 local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 400.0, 30.0, false )
 guiSetVisible( shop_menu_button, false )
 
 local clothing_menu_value = 1
+local repair_shop_menu_value = 1
 local shop_menu_button2 = guiCreateElement( 2, "<", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
 guiSetVisible( shop_menu_button2, false )
 local shop_menu_button3 = guiCreateElement( 2, ">", (screen[0]/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
@@ -554,6 +589,8 @@ function tune_close ()//--закрытие окна
 	guiSetVisibleGridList (craft_menu, false)
 	guiSetVisibleGridList (clothing_menu, false)
 	guiSetVisibleGridList (station_menu, false)
+	guiSetVisibleGridList (giuseppe_menu, false)
+	guiSetVisibleGridList (phone_stats_menu, false)
 }
 addEventHandler ( "event_gui_delet", tune_close )
 
@@ -602,8 +639,14 @@ function shop_menu_fun(number, value)//--создание окна магази�
 	{
 		guiSetVisibleGridList (repair_shop_menu, true)
 		local pos = guiGetSize( repair_shop_menu[0] )
-		gridlist_button_width_height = [pos[0],pos[1]]
+		gridlist_button_width_height = [pos[0],pos[1]+60.0]
 		guiSetText(shop_menu_button, "Купить")
+
+		guiSetPosition(shop_menu_button2, (screen[0]/2)-(400.0/2), (screen[1]/2)+((gridlist_button_width_height[1]-60.0)/2), false)
+		guiSetVisible( shop_menu_button2, true )
+
+		guiSetPosition(shop_menu_button3, (screen[0]/2), (screen[1]/2)+((gridlist_button_width_height[1]-60.0)/2), false)
+		guiSetVisible( shop_menu_button3, true )
 	}
 	else if (value_business == 5)
 	{
@@ -646,6 +689,20 @@ function shop_menu_fun(number, value)//--создание окна магази�
 		local pos = guiGetSize( station_menu[0] )
 		gridlist_button_width_height = [pos[0],pos[1]]
 		guiSetText(shop_menu_button, "Отправиться")
+	}
+	else if (value_business == "giuseppe")
+	{
+		guiSetVisibleGridList (giuseppe_menu, true)
+		local pos = guiGetSize( giuseppe_menu[0] )
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Купить")
+	}
+	else if (value_business == "phone")
+	{
+		guiSetVisibleGridList (phone_stats_menu, true)
+		local pos = guiGetSize( phone_stats_menu[0] )
+		gridlist_button_width_height = [pos[0],pos[1]]
+		guiSetText(shop_menu_button, "Позвонить")
 	}
 
 	guiSetPosition(shop_menu_button, (screen[0]/2)-(400.0/2), (screen[1]/2)+(gridlist_button_width_height[1]/2), false)
@@ -1115,7 +1172,7 @@ function( post )
 
 		if (getPlayerVehicle(playerid) != -1)
 		{
-			local speed_vehicle = "plate "+plate+" | fuel "+getElementData("fuel_data")
+			local speed_vehicle = "plate "+plate+" | fuel "+getElementData("fuel_data")+" | kilometrage "+getElementData("probeg_data")
 			dxdrawtext ( speed_vehicle, 2.0, screen[1]-16.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
 
@@ -1134,15 +1191,15 @@ function( post )
 			local pos = getMousePosition()
 			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		
-			for (local i = 0; i <= 17; i++) 
+			/*for (local i = 0; i <= 19; i++) 
 			{	
 				dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-			}
+			}*/
 
-			for (local i = 0; i < local_param.len(); i++) 
+			/*for (local i = 0; i < local_param.len(); i++) 
 			{	
 				dxdrawtext ( local_param[i], 610.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-			}
+			}*/
 
 			dxdrawtext ( heal_player[0], screenWidth-width_need-30-30, height_need, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			dxdrawtext ( (alcohol/100).tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*1, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
@@ -1731,7 +1788,7 @@ function( element )
 		}
 	}
 	else if (element == shop_menu_button2)
-	{	
+	{
 		if (guiGetVisibleGridList(clothing_menu))
 		{
 			clothing_menu_value--
@@ -1775,6 +1832,40 @@ function( element )
 				for (local i = guiGetCountGridList(clothing_menu)*4; i < guiGetCountGridList(clothing_menu)*5; i++)
 				{
 					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*4, i.tostring())
+				}
+			}
+			else if (clothing_menu_value == 6)
+			{
+				for (local i = guiGetCountGridList(clothing_menu)*5; i < guiGetCountGridList(clothing_menu)*6; i++)
+				{
+					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*5, i.tostring())
+				}
+			}
+		}
+		else if (guiGetVisibleGridList(repair_shop_menu))
+		{
+			repair_shop_menu_value--
+
+			if (repair_shop_menu_value <= 0)
+			{
+				repair_shop_menu_value = 1
+				return
+			}
+
+			if (repair_shop_menu_value == 1)
+			{
+				for (local i = guiGetCountGridList(repair_shop_menu)*0; i < guiGetCountGridList(repair_shop_menu)*1; i++)
+				{
+					local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
+					guiSetTextGridList (repair_shop_menu, i-guiGetCountGridList(repair_shop_menu)*0, text)
+				}
+			}
+			else if (repair_shop_menu_value == 2)
+			{
+				for (local i = guiGetCountGridList(repair_shop_menu)*1; i < guiGetCountGridList(repair_shop_menu)*2; i++)
+				{
+					local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
+					guiSetTextGridList (repair_shop_menu, i-guiGetCountGridList(repair_shop_menu)*1, text)
 				}
 			}
 		}
@@ -1831,6 +1922,33 @@ function( element )
 				for (local i = guiGetCountGridList(clothing_menu)*5; i < guiGetCountGridList(clothing_menu)*6; i++)
 				{
 					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*5, i.tostring())
+				}
+			}
+		}
+		else if (guiGetVisibleGridList(repair_shop_menu))
+		{
+			repair_shop_menu_value++
+			
+			if (repair_shop_menu_value >= 3)
+			{
+				repair_shop_menu_value = 2
+				return
+			}
+
+			if (repair_shop_menu_value == 1)
+			{
+				for (local i = guiGetCountGridList(repair_shop_menu)*0; i < guiGetCountGridList(repair_shop_menu)*1; i++)
+				{
+					local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
+					guiSetTextGridList (repair_shop_menu, i-guiGetCountGridList(repair_shop_menu)*0, text)
+				}
+			}
+			else if (repair_shop_menu_value == 2)
+			{
+				for (local i = guiGetCountGridList(repair_shop_menu)*1; i < guiGetCountGridList(repair_shop_menu)*2; i++)
+				{
+					local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
+					guiSetTextGridList (repair_shop_menu, i-guiGetCountGridList(repair_shop_menu)*1, text)
 				}
 			}
 		}
