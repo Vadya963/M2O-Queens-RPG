@@ -41,6 +41,7 @@ local price_hotel = 100//цена за отель
 local max_text_len = 90//макс длина сообщения
 local car_number = 0//count car
 local car_theft_time = 10//время для угона
+local crimes_giuseppe = 25//прес-ия для джузеппе
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -4160,14 +4161,14 @@ function x_down (playerid)
 			}
 			else if ( isPointInCircle3D(x,y,z, interior_job[8][2],interior_job[8][3],interior_job[8][4], interior_job[8][7]) )//джузеппе
 			{
-				if (crimes[playerid] >= 50)
+				if (crimes[playerid] >= crimes_giuseppe)
 				{
 					triggerClientEvent( playerid, "event_shop_menu_fun", -1, "giuseppe" )
 					state_gui_window[playerid] = 1
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Нужно иметь 50 преступлений", red[0], red[1], red[2])					
+					sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_giuseppe+" преступлений", red[0], red[1], red[2])					
 				}
 				return
 			}
@@ -5495,9 +5496,9 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 80) //--лиц. медвежатника
 		{
-			if (crimes[playerid] < 50)
+			if (crimes[playerid] < crimes_giuseppe)
 			{
-				sendMessage(playerid, "[ERROR] Нужно иметь 50 преступлений", red[0], red[1], red[2])
+				sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_giuseppe+" преступлений", red[0], red[1], red[2])
 				return
 			}
 
