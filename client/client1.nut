@@ -425,7 +425,7 @@ foreach (k,v in weapon)
 guiSetVisibleGridList (weapon_menu, false)
 
 local gas = {
-	[5] = [info_png[5][0], 20, 250],
+	[5] = [info_png[5][0], 25, 250],
 }
 local gas_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in gas)
@@ -1089,8 +1089,8 @@ function()
 	bindKey( "page_down", "down", down_down )
 	bindKey( "f2", "down", f2_down )
 
-	//setRenderNametags(false)
-	//setRenderHealthbar(false)
+	setRenderNametags(false)
+	setRenderHealthbar(false)
 })
 
 function zamena_img()
