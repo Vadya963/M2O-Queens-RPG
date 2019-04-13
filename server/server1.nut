@@ -574,7 +574,7 @@ local eda = {
 }
 
 local gas = {
-	[5] = [info_png[5][0], 20, 250],
+	[5] = [info_png[5][0], 25, 250],
 }
 
 local giuseppe = {
@@ -2506,7 +2506,7 @@ function debuginfo ()
 		setElementData(playerid, "15", "job_call[playerid] "+job_call[playerid])
 		setElementData(playerid, "16", "enter_job[playerid] "+enter_job[playerid])
 		setElementData(playerid, "17", "robbery_timer[playerid] "+robbery_timer[playerid].tostring())
-		setElementData(playerid, "18", "job_vehicleid[playerid] "+job_vehicleid[playerid].tostring())
+		setElementData(playerid, "18", "job_vehicleid[playerid] "+job_vehicleid[playerid][0].tostring())
 		setElementData(playerid, "19", "job_timer[playerid] "+job_timer[playerid].tostring())*/
 
 		setElementData(playerid, "serial", getPlayerSerial(playerid))
@@ -2782,21 +2782,16 @@ function job_timer2 ()
 			{
 				if (job_call[playerid] == 0) //--нету вызова
 				{
-					local randomize = random(0,car_theft_pos.len()-1)
+					local vehicleid = player_car_theft()
+					local pos = getVehiclePosition(vehicleid)
+					local rot = getVehicleRotation(vehicleid)
 
 					sendMessage(playerid, "Угоните т/с, у вас есть "+car_theft_time+" мин", yellow[0], yellow[1], yellow[2])
 
 					job_call[playerid] = 1
-					job_pos[playerid] = [car_theft_pos[randomize][0],car_theft_pos[randomize][1],car_theft_pos[randomize][2]]
+					job_pos[playerid] = [pos[0],pos[1],pos[2]]
 
-					local open_car = [0,1,6,7,8,9,10,12,13,14,15,18,19,22,23,25,28,29,30,31,41,43,44,45,47,48,50,52,53]
-					local vehicleid = createVehicle( open_car[random(0,open_car.len()-1)], job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2] + 1.0, 0.0, 0.0, 0.0 )
-					setVehiclePlateText(vehicleid, "0")
-					fuel[getVehiclePlateText(vehicleid)] <- max_fuel
-					dviglo[getVehiclePlateText(vehicleid)] <- 0
-					probeg[getVehiclePlateText(vehicleid)] <- 0
-
-					job_vehicleid[playerid] = vehicleid
+					job_vehicleid[playerid] = [vehicleid,pos[0],pos[1],pos[2],rot[0]]
 					job_timer[playerid] = timer(car_theft_fun, (car_theft_time*60000), 1, playerid)
 
 					triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
@@ -2804,7 +2799,7 @@ function job_timer2 ()
 				}
 				else if (job_call[playerid] == 1)
 				{
-					if (job_vehicleid[playerid] == vehicleid)
+					if (job_vehicleid[playerid][0] == vehicleid)
 					{
 						local pos = player_position( playerid )
 						local x1 = pos[0]
@@ -2816,7 +2811,7 @@ function job_timer2 ()
 
 						sendMessage(playerid, "Езжайте на свалку Майка Бруски", yellow[0], yellow[1], yellow[2])
 
-						police_chat(playerid, "[ДИСПЕТЧЕР] Угон "+motor_show[getVehicleModel(vehicleid)][3]+", координаты [X  "+x1+", Y  "+y1+"], подозреваемый "+playername)
+						police_chat(playerid, "[ДИСПЕТЧЕР] Угон "+motor_show[getVehicleModel(vehicleid)][3]+" гос.номер "+getVehiclePlateText(vehicleid)+", координаты [X  "+x1+", Y  "+y1+"], подозреваемый "+playername)
 
 						job_pos[playerid] = [sell_car_theft[randomize][0],sell_car_theft[randomize][1],sell_car_theft[randomize][2]]
 
@@ -2826,7 +2821,7 @@ function job_timer2 ()
 				}
 				else if (job_call[playerid] == 2) //--сдаем вызов
 				{
-					if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && job_vehicleid[playerid] == vehicleid)
+					if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && job_vehicleid[playerid][0] == vehicleid)
 					{
 						if (getSpeed(vehicleid) < 1)
 						{
@@ -2872,20 +2867,27 @@ function job_0( playerid )
 
 function car_theft_fun(playerid) 
 {
-	local vehicleid = getPlayerVehicle(playerid)
-
 	if(job_vehicleid[playerid] != 0)
 	{
 		foreach (k, v in getPlayers())//в мта удалить
 		{
-			if(getPlayerVehicle(k) == job_vehicleid[playerid])
+			if(getPlayerVehicle(k) == job_vehicleid[playerid][0])
 			{
 				removePlayerFromVehicle(k)
 			}
 		}
 
 		timer(function() {
-			destroyVehicle(job_vehicleid[playerid])
+			setVehiclePosition(job_vehicleid[playerid][0],job_vehicleid[playerid][1],job_vehicleid[playerid][2],job_vehicleid[playerid][3]+1)
+			setVehicleRotation(job_vehicleid[playerid][0],job_vehicleid[playerid][4], 0.0, 0.0)
+
+			local plate = getVehiclePlateText(job_vehicleid[playerid][0])
+			local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
+			if (result[1]["COUNT()"] == 1)
+			{
+				sqlite3( "UPDATE car_db SET x = '"+job_vehicleid[playerid][1]+"', y = '"+job_vehicleid[playerid][2]+"', z = '"+(job_vehicleid[playerid][3]+1)+"', rot = '"+job_vehicleid[playerid][4]+"', fuel = '"+fuel[plate]+"', probeg = '"+probeg[plate]+"' WHERE number = '"+plate+"'")
+			}
+
 			job_vehicleid[playerid] = 0
 			job_call[playerid] = 0
 		}, 1000, 1)
@@ -2899,6 +2901,23 @@ function car_theft_fun(playerid)
 
 		triggerClientEvent( playerid, "destroyHudTimer" )//в мта удалить
 		triggerClientEvent(playerid, "removegps")
+	}
+}
+
+function player_car_theft()
+{
+	local vehicleid = random(0,getVehicles().len()-1)
+
+	while (true) 
+	{
+		if(getVehicleModel(vehicleid) != 27)
+		{
+			return vehicleid
+		}
+		else 
+		{
+			vehicleid = random(0,getVehicles().len()-1)
+		}
 	}
 }
 
@@ -3308,7 +3327,6 @@ addEventHandler( "onPlayerConnect",
 function( playerid, name, ip, serial )
 {
 	local playername = getPlayerName(playerid)
-	local myPos = getPlayerPosition(playerid)
 
 	element_data[playerid] <- {}
 	message[playerid] <- {}
@@ -3353,6 +3371,7 @@ function( playerid, name, ip, serial )
 		local result = sqlite3( "SELECT COUNT() FROM account WHERE name = '"+playername+"'" )
 		if (result[1]["COUNT()"] == 1 && logged[playerid] == 1)
 		{
+			local myPos = getPlayerPosition(playerid)
 			if (myPos[0] == 0 && myPos[1] == 0 && myPos[2] == 0)
 			{
 				local result = sqlite3( "SELECT * FROM account WHERE name = '"+playername+"'" )
@@ -5468,11 +5487,11 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if(job[playerid] == 5)
 				{
-					if(job_vehicleid[playerid] == vehicleid)
+					if(job_vehicleid[playerid][0] == vehicleid)
 					{
 						id2 = id2-1
 
-						dviglo["0"] <- 1
+						dviglo[getVehiclePlateText(vehicleid)] <- 1
 
 						me_chat(playerid, playername+" использовал(а) "+info_png[id1][0])
 					}
