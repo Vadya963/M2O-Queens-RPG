@@ -33,6 +33,7 @@ local gridlist_lable = false//текст который будет выделя�
 local gridlist_row = -1//номер текста который будет выделяться
 local gridlist_select = false//выделение текста
 local gridlist_button_width_height = [0.0,0.0]//ширина и высота кнопки купить
+local max_lable = 30//максимум сообщений на 1 стр
 //-------------------------------------------------------
 
 local gui_fon = 0//1 открыт, 0 закрыт
@@ -235,6 +236,7 @@ local color_table = {
 	[14] = [220,20,60],
 	[15] = [175,0,255],
 	[16] = [0,0,0],
+	[17] = [150,150,150],
 }
 
 //--------------------------------------------грайдлист--------------------------------------------
@@ -435,6 +437,7 @@ foreach (k,v in gas)
 }
 guiSetVisibleGridList (gas_menu, false)
 
+local repair_shop_menu_value = 1
 local repair_shop = [
 	[info_png[23][0], 1, 100, 23],
 	[info_png[35][0], 10, 500, 35],
@@ -454,10 +457,15 @@ for (local i = 0; i <= 29; i++)
 	repair_shop.push(["none", 0, 0, 0])
 }
 local repair_shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(450.0/2), 400.0, 450.0)
-for (local i = 0; i <= 29; i++) 
+foreach (k,v in repair_shop)
+{
+	local text = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+	guiGridListAddRow (repair_shop_menu, text)
+}
+for (local i = max_lable*(repair_shop_menu_value-1); i < max_lable*repair_shop_menu_value; i++)
 {
 	local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
-	guiGridListAddRow (repair_shop_menu, text)
+	guiSetTextGridList (repair_shop_menu, i-max_lable*(repair_shop_menu_value-1), text)
 }
 guiSetVisibleGridList (repair_shop_menu, false)
 
@@ -522,10 +530,21 @@ foreach (k,v in sub_cops)
 }
 guiSetVisibleGridList (sub_cops_menu, false)
 
-local clothing_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(450.0/2), 400.0, 450.0)
-for (local i = 0; i <= 29; i++) 
+local clothing_menu_value = 1
+local clothing = []
+for (local i = 0; i <= 179; i++) 
 {
-	guiGridListAddRow (clothing_menu, i.tostring())
+	clothing.push([i.tostring()])
+}
+local clothing_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(450.0/2), 400.0, 450.0)
+foreach (k,v in clothing)
+{
+	local text = v[0]
+	guiGridListAddRow (clothing_menu, text)
+}
+for (local i = max_lable*(clothing_menu_value-1); i < max_lable*clothing_menu_value; i++)
+{
+	guiSetTextGridList (clothing_menu, i-max_lable*(clothing_menu_value-1), i.tostring())
 }
 guiSetVisibleGridList (clothing_menu, false)
 
@@ -561,8 +580,6 @@ guiSetVisibleGridList (phone_stats_menu, false)
 local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 400.0, 30.0, false )
 guiSetVisible( shop_menu_button, false )
 
-local clothing_menu_value = 1
-local repair_shop_menu_value = 1
 local shop_menu_button2 = guiCreateElement( 2, "<", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
 guiSetVisible( shop_menu_button2, false )
 local shop_menu_button3 = guiCreateElement( 2, ">", (screen[0]/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
@@ -737,7 +754,7 @@ timer(function () {
 }, 2000, 1)
 
 timer(function () {
-	local myPos = getPlayerPosition(playerid)
+	local myPos = getPlayerPosition(getLocalPlayer())
 
 	foreach (k, v in blip_data) 
 	{	
@@ -1799,47 +1816,9 @@ function( element )
 				return
 			}
 
-			if (clothing_menu_value == 1)
+			for (local i = max_lable*(clothing_menu_value-1); i < max_lable*clothing_menu_value; i++)
 			{
-				for (local i = guiGetCountGridList(clothing_menu)*0; i < guiGetCountGridList(clothing_menu)*1; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*0, i.tostring())
-				}
-			}
-			else if (clothing_menu_value == 2)
-			{
-				for (local i = guiGetCountGridList(clothing_menu)*1; i < guiGetCountGridList(clothing_menu)*2; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*1, i.tostring())
-				}
-			}
-			else if (clothing_menu_value == 3)
-			{
-				for (local i = guiGetCountGridList(clothing_menu)*2; i < guiGetCountGridList(clothing_menu)*3; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*2, i.tostring())
-				}
-			}
-			else if (clothing_menu_value == 4)
-			{
-				for (local i = guiGetCountGridList(clothing_menu)*3; i < guiGetCountGridList(clothing_menu)*4; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*3, i.tostring())
-				}
-			}
-			else if (clothing_menu_value == 5)
-			{
-				for (local i = guiGetCountGridList(clothing_menu)*4; i < guiGetCountGridList(clothing_menu)*5; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*4, i.tostring())
-				}
-			}
-			else if (clothing_menu_value == 6)
-			{
-				for (local i = guiGetCountGridList(clothing_menu)*5; i < guiGetCountGridList(clothing_menu)*6; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*5, i.tostring())
-				}
+				guiSetTextGridList (clothing_menu, i-max_lable*(clothing_menu_value-1), i.tostring())
 			}
 		}
 		else if (guiGetVisibleGridList(repair_shop_menu))
@@ -1852,21 +1831,10 @@ function( element )
 				return
 			}
 
-			if (repair_shop_menu_value == 1)
+			for (local i = max_lable*(repair_shop_menu_value-1); i < max_lable*repair_shop_menu_value; i++)
 			{
-				for (local i = guiGetCountGridList(repair_shop_menu)*0; i < guiGetCountGridList(repair_shop_menu)*1; i++)
-				{
-					local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
-					guiSetTextGridList (repair_shop_menu, i-guiGetCountGridList(repair_shop_menu)*0, text)
-				}
-			}
-			else if (repair_shop_menu_value == 2)
-			{
-				for (local i = guiGetCountGridList(repair_shop_menu)*1; i < guiGetCountGridList(repair_shop_menu)*2; i++)
-				{
-					local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
-					guiSetTextGridList (repair_shop_menu, i-guiGetCountGridList(repair_shop_menu)*1, text)
-				}
+				local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
+				guiSetTextGridList (repair_shop_menu, i-max_lable*(repair_shop_menu_value-1), text)
 			}
 		}
 	}
@@ -1876,80 +1844,31 @@ function( element )
 		{
 			clothing_menu_value++
 			
-			if (clothing_menu_value >= 7)
+			if (clothing_menu_value > (guiGetCountGridList(clothing_menu)/max_lable).tointeger())
 			{
-				clothing_menu_value = 6
+				clothing_menu_value = (guiGetCountGridList(clothing_menu)/max_lable).tointeger()
 				return
 			}
 
-			if (clothing_menu_value == 1)
+			for (local i = max_lable*(clothing_menu_value-1); i < max_lable*clothing_menu_value; i++)
 			{
-				for (local i = guiGetCountGridList(clothing_menu)*0; i < guiGetCountGridList(clothing_menu)*1; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*0, i.tostring())
-				}
-			}
-			else if (clothing_menu_value == 2)
-			{
-				for (local i = guiGetCountGridList(clothing_menu)*1; i < guiGetCountGridList(clothing_menu)*2; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*1, i.tostring())
-				}
-			}
-			else if (clothing_menu_value == 3)
-			{
-				for (local i = guiGetCountGridList(clothing_menu)*2; i < guiGetCountGridList(clothing_menu)*3; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*2, i.tostring())
-				}
-			}
-			else if (clothing_menu_value == 4)
-			{
-				for (local i = guiGetCountGridList(clothing_menu)*3; i < guiGetCountGridList(clothing_menu)*4; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*3, i.tostring())
-				}
-			}
-			else if (clothing_menu_value == 5)
-			{
-				for (local i = guiGetCountGridList(clothing_menu)*4; i < guiGetCountGridList(clothing_menu)*5; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*4, i.tostring())
-				}
-			}
-			else if (clothing_menu_value == 6)
-			{
-				for (local i = guiGetCountGridList(clothing_menu)*5; i < guiGetCountGridList(clothing_menu)*6; i++)
-				{
-					guiSetTextGridList (clothing_menu, i-guiGetCountGridList(clothing_menu)*5, i.tostring())
-				}
+				guiSetTextGridList (clothing_menu, i-max_lable*(clothing_menu_value-1), i.tostring())
 			}
 		}
 		else if (guiGetVisibleGridList(repair_shop_menu))
 		{
 			repair_shop_menu_value++
 			
-			if (repair_shop_menu_value >= 3)
+			if (repair_shop_menu_value > (guiGetCountGridList(repair_shop_menu)/max_lable).tointeger())
 			{
-				repair_shop_menu_value = 2
+				repair_shop_menu_value = (guiGetCountGridList(repair_shop_menu)/max_lable).tointeger()
 				return
 			}
 
-			if (repair_shop_menu_value == 1)
+			for (local i = max_lable*(repair_shop_menu_value-1); i < max_lable*repair_shop_menu_value; i++)
 			{
-				for (local i = guiGetCountGridList(repair_shop_menu)*0; i < guiGetCountGridList(repair_shop_menu)*1; i++)
-				{
-					local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
-					guiSetTextGridList (repair_shop_menu, i-guiGetCountGridList(repair_shop_menu)*0, text)
-				}
-			}
-			else if (repair_shop_menu_value == 2)
-			{
-				for (local i = guiGetCountGridList(repair_shop_menu)*1; i < guiGetCountGridList(repair_shop_menu)*2; i++)
-				{
-					local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
-					guiSetTextGridList (repair_shop_menu, i-guiGetCountGridList(repair_shop_menu)*1, text)
-				}
+				local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
+				guiSetTextGridList (repair_shop_menu, i-max_lable*(repair_shop_menu_value-1), text)
 			}
 		}
 	}
