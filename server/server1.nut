@@ -80,25 +80,38 @@ local svetlo_zolotoy = [255,255,130]//--светло-золотой
 local crimson = [220,20,60]//--малиновый
 local purple = [175,0,255]//--фиолетовый
 
-local color_table = {
-	[1] = [168,228,160],
-	[2] = [255,255,0],
-	[3] = [255,0,0],
-	[4] = [0,150,255],
-	[5] = [255,255,255],
-	[6] = [0,255,0],
-	[7] = [0,255,255],
-	[8] = [255,100,0],
-	[9] = [255,150,0],
-	[10] = [255,100,255],
-	[11] = [130,255,0],
-	[12] = [255,255,130],
-	[13] = [150,0,0],
-	[14] = [220,20,60],
-	[15] = [175,0,255],
-	[16] = [0,0,0],
-	[17] = [150,150,150],
-}
+local color_table = [
+	[168,228,160],
+	[255,255,0],
+	[255,0,0],
+	[0,150,255],
+	[255,255,255],
+	[0,255,0],
+	[0,255,255],
+	[255,100,0],
+	[255,150,0],
+	[255,100,255],
+	[130,255,0],
+	[255,255,130],
+	[150,0,0],
+	[220,20,60],
+	[175,0,255],
+	[0,0,0],
+	[150,150,150],
+	[79,  72,  65],
+	[120, 111, 68],
+	[15,  32,  24],
+	[18,  44,  69],
+	[35,  22,  8],
+	[57,  49,  29],
+	[102, 70,  18],
+	[121, 113, 31],
+	[143, 137, 124],
+	[132, 112, 78],
+	[73,  75,  33],
+	[145, 114, 33],
+	[74,  43,  8],
+]
 
 local info_png = {
 	[0] = ["", ""],
@@ -613,7 +626,7 @@ local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4}
 	[843.815,474.489,-12.0816, 5.0, 57],//--банк металла
 	[-1292.64,1608.78,4.30491, 5.0, 66],//--гарри
 	[1.93655,1825.94,-16.963, 1.0, 68],//--мясокомбинат
-	[385.379,126.888,-20.2027, 5.0, 73],//--рыбзавод
+	[341.981,99.035,-21.2723, 5.0, 73],//--рыбзавод
 ]
 
 local anim_player_subject = [//--{x,y,z, радиус 3, ид пнг1 4, ид пнг2 5, зп 6, время работы анимации 7}
@@ -1736,7 +1749,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 					if (inv_player_empty(playerid, val1, val2))
 					{
-						save_player_action(playername, "[buy_vehicle] "+playername+" [plate - "+val2+"] [-"+(v[1]*coef)+"$, been "+array_player_2[playerid][0]+"$]")
+						save_player_action(playername, "[buy_vehicle] "+playername+" [plate - "+val2+"] [-"+(v[1]*coef)+"$, "+(array_player_2[playerid][0]-(v[1]*coef))+"$]")
 					}
 					else
 					{
@@ -6518,61 +6531,27 @@ function (playerid, value, money)
 	}
 })
 
-addCommandHandler("aucsell",//продать предмет
-function (playerid, id1, id2, money)
+addCommandHandler("auc",//купить, продать и вернуть предмет
+function (playerid, value, ...)
 {
 	local playername = getPlayerName( playerid )
 	local myPos = getPlayerPosition(playerid)
 	local x = myPos[0]
 	local y = myPos[1]
 	local z = myPos[2]
-	local id1 = id1.tointeger()
-	local id2 = id2.tointeger()
-	local money = money.tointeger()
 
 	if (logged[playerid] == 0) 
 	{
 		return
 	}
 
-	foreach (k, v in phohe)
+	local auc_text = ""
+	for(local i = 0; i < vargv.len(); i++)
 	{
-		if ( isPointInCircle3D(v[0],v[1],v[2], x,y,z, 5.0) )
-		{
-			if (money < 1)
-			{
-				return
-			}
-
-			if(id1 >= 2 && id1 <= (info_png.len()-1))
-			{
-				auction_buy_sell(playerid, "sell", 0, id1, id2, money)
-			}
-			else
-			{
-				sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red[0], red[1], red[2])
-			}
-			return
-		}
+		auc_text = auc_text+vargv[i]+" "
 	}
 
-	sendMessage(playerid, "[ERROR] Вы должны быть около телефонной будки", red[0], red[1], red[2])
-})
-
-addCommandHandler("auc",//купить и вернуть предмет
-function (playerid, value, i)
-{
-	local playername = getPlayerName( playerid )
-	local myPos = getPlayerPosition(playerid)
-	local x = myPos[0]
-	local y = myPos[1]
-	local z = myPos[2]
-	local i = i.tointeger()
-
-	if (logged[playerid] == 0) 
-	{
-		return
-	}
+	local spl = split(auc_text, " ")
 
 	foreach (k, v in phohe)
 	{
@@ -6580,7 +6559,23 @@ function (playerid, value, i)
 		{
 			if (value == "buy" || value == "return")
 			{
-				auction_buy_sell(playerid, value, i, 0, 0, 0)
+				auction_buy_sell(playerid, value, spl[0].tointeger(), 0, 0, 0)
+			}
+			else if (value == "sell")
+			{
+				if (spl[2].tointeger() < 1)
+				{
+					return
+				}
+
+				if(spl[0].tointeger() >= 2 && spl[0].tointeger() <= (info_png.len()-1))
+				{
+					auction_buy_sell(playerid, "sell", 0, spl[0].tointeger(), spl[1].tointeger(), spl[2].tointeger())
+				}
+				else
+				{
+					sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red[0], red[1], red[2])
+				}
 			}
 			return
 		}
@@ -6685,7 +6680,7 @@ function (playerid)
 		"/takepolicerank [ИД игрока] [ИД шеврона от 28 до 32] - забрать шеврон (для полицейских)",
 		"/sellhouse - создать дом (для риэлторов)",
 		"/sellbusiness [номер бизнеса от 0 до 5] - создать бизнес (для риэлторов)",
-		"/aucsell [ид предмета] [кол-во предмета] [сумма] - выставить предмет на аукцион",
+		"/auc sell [ид предмета] [кол-во предмета] [сумма] - выставить предмет на аукцион",
 		"/auc [buy | return] [номер слота] - купить или забрать предмет с аукциона",
 		"/takecar [номер т/с] - забрать т/с со штрафстоянки",
 		"/lawyer [ИД игрока] - заплатить залог за игрока",
