@@ -1520,10 +1520,9 @@ function getElementData (playerid, key)
 
 function element_data_push_client () 
 {
-	local text = ""
-
 	foreach (playerid, playername in getPlayers())
 	{	
+		local text = ""
 		foreach (k, v in element_data[playerid])
 		{
 			text = text + k+":"+v+","
@@ -7204,6 +7203,11 @@ function (playerid)
 		"/auc [buy | return] [номер слота] - купить или забрать предмет с аукциона",
 		"/takecar [номер т/с] - забрать т/с со штрафстоянки",
 		"/lawyer [ИД игрока] - заплатить залог за игрока",
+		"/msg buy - купить рыбзавод",
+		"/msg job [номер рыбзавода] - устроиться на рыбзавод",
+		"/msg menu [pay | coef] [сумма] - установить зарплату или доход от продаж",
+		"/msg menu tax - оплатить налог",
+		"/msg menu balance [знак - или + и сумма] - снять или положить деньги на баланс рыбзавода",
 		"/idpng - ид предметов сервера",
 	]
 
