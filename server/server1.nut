@@ -26,7 +26,9 @@ function sqlite3(text)
 local element_data = {}
 local hour = 6
 local minute = 0
-local earth = {}//--слоты земли
+local earth = {//--слоты земли
+	[-1] = [0.0,0.0,0.0, 0,0]
+}
 local max_earth = 0
 local me_radius = 10.0//--радиус отображения действий игрока в чате
 local max_fuel = 50.0//--объем бака авто
@@ -61,8 +63,11 @@ local zakon_car_theft_crimes = 1
 local zp_player_taxi = 1000
 local zp_car_63 = 150
 local zp_car_54 = 200
-local zp_car_73 = 20
+local zp_player_73 = 20
 local zp_player_71 = 500
+//вместимость складов бизнесов
+local max_business = 100
+local max_sg = 1000
 
 //----цвета----
 local color_tips = [168,228,160]//--бабушкины яблоки
@@ -150,7 +155,7 @@ local info_png = {
 	[33] = ["шеврон Шефа полиции", "шт"],
 	[34] = ["лицензия дальнобойщика", "шт"],
 	[35] = ["лом", "процентов"],
-	[36] = ["документы на", "бизнес"],
+	[36] = ["документы на бизнес под номером", ""],
 	[37] = ["админский жетон", "шт"],
 	[38] = ["риэлторская лицензия", "шт"],
 	[39] = ["тушка свиньи", "шт"],
@@ -195,6 +200,11 @@ local info_png = {
 	[78] = ["тратил", "гр"],
 	[79] = ["отмычка", "процентов"],
 	[80] = ["лицензия угонщика", "шт"],
+	[81] = ["нож", "процентов"],
+	[82] = ["лоток с рыбой", "$ за штуку"],
+	[83] = ["лоток с филе рыбы", "$ за штуку"],
+	[84] = ["документы на рыбзавод под номером", ""],
+	[85] = ["трудовой договор обработчика рыбы на", "рыбзаводе"],
 }
 
 //цены автосалона
@@ -238,7 +248,7 @@ local motor_show = [
 	[35,3000,100,"Shubert Truck Flatbed"],//копия
 	[36,0,100,"Shubert Truck Flatbed"],
 	[37,3000,100,"Shubert Truck Covered"],
-	[38,0,100,"Shubert Truck"],
+	[38,2000,100,"Shubert Truck Seagift"],
 	[39,0,100,"Shubert Show Plow"],
 	[40,0,80,"Military Truck"],
 	[41,2140,80,"Smith Custom 200"],
@@ -516,6 +526,12 @@ local sell_car_theft = [
 	[-130.638,1745.93,-18.348],
 ]
 
+local table_sg_pos = [
+	[385.372,126.822,-20.2027],
+	[374.982,132.089,-20.2027],
+	[362.548,135.839,-20.2027],
+]
+
 local interior_business = [
 	[0, "Магазин оружия", 4],
 	[1, "Магазин одежды", 2],
@@ -565,6 +581,7 @@ local shop = {
 	[52] = [info_png[52][0], 1, 100],
 	[64] = [info_png[64][0], 1, 250],
 	[74] = [info_png[74][0], 100, 100],
+	[81] = [info_png[81][0], 100, 100],
 }
 
 local eda = {
@@ -603,6 +620,8 @@ foreach (k, v in color_table)//краска
 local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, зп 6}
 	[-632.282,955.495,-17.7324, 15.0, 24, 35, 50],//--сигаретный завод
 	[1332.08,1284.72,-0.306898, 15.0, 61, 35, 100],//--нефтебаза
+	[-217.361,-724.751,-21.4251, 15.0, 82, 38, 50],//--погрузка рыбы для рз
+	[374.967,117.759,-21.0186, 5.0, 83, 38, 300],//--погрузка рыбы с рз
 ]
 
 local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, скин 6}
@@ -618,6 +637,8 @@ local down_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5
 	[1189.65,1146.35,3.06759, 15.0, 63, 35],//--свалка
 	[-334.529,-786.738,-21.5261, 15.0, 61, 35],//--порт
 	[119.838,-202.878,-20.2502, 15.0, 54, 27],//банк
+	[-299.495,-734.244,-21.422, 15.0, 83, 38],//порт
+	[365.745,116.044,-21.2489, 5.0, 82, 38],//--рыбзавод
 ]
 
 local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4}
@@ -626,7 +647,7 @@ local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4}
 	[843.815,474.489,-12.0816, 5.0, 57],//--банк металла
 	[-1292.64,1608.78,4.30491, 5.0, 66],//--гарри
 	[1.93655,1825.94,-16.963, 1.0, 68],//--мясокомбинат
-	[341.981,99.035,-21.2723, 5.0, 73],//--рыбзавод
+	[341.981,99.035,-21.2723, 5.0, 73],//--рз рыба
 ]
 
 local anim_player_subject = [//--{x,y,z, радиус 3, ид пнг1 4, ид пнг2 5, зп 6, время работы анимации 7}
@@ -1499,12 +1520,16 @@ function getElementData (playerid, key)
 
 function element_data_push_client () 
 {
+	local text = ""
+
 	foreach (playerid, playername in getPlayers())
 	{	
-		foreach (key, value in element_data[playerid])
+		foreach (k, v in element_data[playerid])
 		{
-			triggerClientEvent( playerid, "event_element_data_push_client", key, value )
+			text = text + k+":"+v+","
 		}
+
+		triggerClientEvent(playerid, "event_element_data_push_client", text)
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -1525,7 +1550,7 @@ function house_bussiness_job_pos_load( playerid )
 function info_bisiness( number )
 {
 	local result = sqlite3( "SELECT * FROM business_db WHERE number = '"+number+"'" )
-	return "[business "+number+", type "+result[1]["type"]+", price "+result[1]["price"]+", buyprod "+result[1]["buyprod"]+", money "+result[1]["money"]+", warehouse "+result[1]["warehouse"]+"]"
+	return "[business "+number+", type "+result[1]["type"]+", price "+result[1]["price"]+", money "+result[1]["money"]+", warehouse "+result[1]["warehouse"]+"]"
 }
 
 function select_sqlite(id1, id2)//--выводит имя владельца любого предмета
@@ -1871,6 +1896,16 @@ function buy_subject_fun( playerid, text, number, value )
 				sendMessage(playerid, "[ "+v["i"]+" - "+v["name_sell"]+" - "+info_png[v["id1"]][0]+" "+v["id2"]+" "+info_png[v["id1"]][1]+" - "+v["money"]+"$ ]", yellow[0], yellow[1], yellow[2])
 			}
 		}
+		else if ("Рыбзавод" == text)
+		{
+			sendMessage(playerid, "====[ РЫБЗАВОД ]====", yellow[0], yellow[1], yellow[2])
+			sendMessage(playerid, "[ номер рыбзавода - зарплата - доход от продаж ]", yellow[0], yellow[1], yellow[2])
+
+			foreach (k, v in sqlite3( "SELECT * FROM cow_farms_db" ))
+			{
+				sendMessage(playerid, "[ "+v["number"]+" - "+v["price"]+"$ - "+v["coef"]+" процентов ]", yellow[0], yellow[1], yellow[2])
+			}
+		}
 
 		return
 	}
@@ -2156,7 +2191,7 @@ function till_fun( playerid, number, money, value )
 
 		save_player_action(playername, "[till_fun_price] "+playername+" "+info_bisiness(number))
 	}
-	else if (value == "buyprod")
+	/*else if (value == "buyprod")
 	{
 		local result = sqlite3( "SELECT * FROM business_db WHERE number = '"+number+"'" )
 
@@ -2165,7 +2200,7 @@ function till_fun( playerid, number, money, value )
 		sendMessage(playerid, "Вы установили цену закупки товара "+money+"$", yellow[0], yellow[1], yellow[2])
 
 		save_player_action(playername, "[till_fun_buyprod] "+playername+" "+info_bisiness(number))
-	}
+	}*/
 }
 
 //----------------------------------крафт предметов -----------------------------------------------------------
@@ -2379,6 +2414,265 @@ function auction_buy_sell(playerid, value, i, id1, id2, money)//--продажа
 	}
 }
 addEventHandler ( "event_auction_buy_sell", auction_buy_sell )
+
+//----------------------------------------------рыбзавод-----------------------------------------------------
+function cow_farms(playerid, value, val1, val2)
+{
+	local playername = getPlayerName(playerid)
+	local myPos = getPlayerPosition(playerid)
+	local x = myPos[0]
+	local y = myPos[1]
+	local z = myPos[2]
+	local cash = 50000
+	local doc = 84
+	local lic = 85
+
+	if (value == "buy") {
+		local result = sqlite3( "SELECT COUNT() FROM cow_farms_db" )
+		result = result[1]["COUNT()"]+1
+		if (cash*result > array_player_2[playerid][0]) {
+			sendMessage(playerid, "[ERROR] У вас недостаточно средств, необходимо "+(cash*result)+"$", red[0], red[1], red[2])
+			return
+		}
+
+		if (inv_player_empty(playerid, doc, result)) {
+			sqlite3( "INSERT INTO cow_farms_db (number, price, coef, money, nalog, warehouse, prod) VALUES ('"+result+"', '0', '50', '0', '5', '0', '0')" )
+
+			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash*result, playername )
+
+			sendMessage(playerid, "Вы купили рыбзавод за "+(cash*result)+"$", orange[0], orange[1], orange[2])
+
+			sendMessage(playerid, "Вы получили "+info_png[doc][0]+" "+result+" "+info_png[doc][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
+
+			save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result+"] [-"+(cash*result)+"$, "+array_player_2[playerid][0]+"$]")
+		}
+		else
+		{
+			sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
+		}
+	}
+	else if ( value == "menu") 
+	{
+
+		if (val1 == "pay") {
+			if (val2 < 1) {
+				return
+			}
+
+			local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+			if (result[1]["COUNT()"] == 0) {
+				return
+			}
+
+			result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+			sqlite3( "UPDATE cow_farms_db SET price = '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+			sendMessage(playerid, "Вы установили зарплату "+val2+"$", yellow[0], yellow[1], yellow[2])
+
+			save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", price - "+val2+"]")
+		}
+		else if ( val1 == "coef") {
+			if (val2 < 1 || val2 > 100) {
+				return
+			}
+
+			local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+			if (result[1]["COUNT()"] == 0) {
+				return
+			}
+
+			result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+			sqlite3( "UPDATE cow_farms_db SET coef = '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+			sendMessage(playerid, "Вы установили доход от продаж "+val2+" процентов", yellow[0], yellow[1], yellow[2])
+
+			save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", coef - "+val2+"]")
+		}
+		else if ( val1 == "balance") {
+			if (val2 == 0) {
+				return
+			}
+
+			if (val2 < 1) {
+				local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+				if (result[1]["COUNT()"] == 0) {
+					return
+				}
+
+				result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+				if ((val2*-1) <= result[1]["money"]) {
+					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+(val2*-1), playername )
+
+					sqlite3( "UPDATE cow_farms_db SET money = money - '"+(val2*-1)+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+					sendMessage(playerid, "Вы забрали из кассы "+(val2*-1)+"$", green[0], green[1], green[2])
+
+					local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+					save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", money - "+result[1]["money"]+"] [+"+(val2*-1)+"$, "+array_player_2[playerid][0]+"$]")
+				}
+				else
+				{
+					sendMessage(playerid, "[ERROR] Недостаточно средств на балансе бизнеса", red[0], red[1], red[2])
+				}
+			}
+			else
+			{
+				if (val2 <= array_player_2[playerid][0]) {
+					local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+					if (result[1]["COUNT()"] == 0) {
+						return
+					}
+
+					result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-val2, playername )
+
+					sqlite3( "UPDATE cow_farms_db SET money = money + '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+					sendMessage(playerid, "Вы положили в кассу "+val2+"$", orange[0], orange[1], orange[2])
+
+					local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+					save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", money - "+result[1]["money"]+"] [-"+val2+"$, "+array_player_2[playerid][0]+"$]")
+				}
+				else
+				{
+					sendMessage(playerid, "[ERROR] У вас недостаточно средств", red[0], red[1], red[2])
+				}
+			}
+		}
+		else if ( val1 == "tax") {
+			local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+			if (result[1]["COUNT()"] == 0) {
+				return
+			}
+
+			result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+
+			if (search_inv_player(playerid, 49, 7) != 0) {
+				if (inv_player_delet(playerid, 49, 7)) {
+					sqlite3( "UPDATE cow_farms_db SET nalog = nalog + '7' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'")
+
+					sendMessage(playerid, "Вы оплатили налог "+search_inv_player_2_parameter(playerid, doc)+" рыбзавода", yellow[0], yellow[1], yellow[2])
+
+					local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+					save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", nalog - "+result[1]["nalog"]+"]")
+				}
+			}
+			else
+			{
+				sendMessage(playerid, "[ERROR] У вас нет "+info_png[49][0]+" 7 "+info_png[49][1], red[0], red[1], red[2])
+			}
+		}
+	}
+	else if ( value == "job") {
+		give_subject(playerid, "player", lic, val1)
+	}
+	else if ( value == "load") {
+		local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+
+		if (result[1]["COUNT()"] == 0) {
+			return false
+		}
+
+		result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		if ( result[1]["warehouse"]-val1 < 0) {
+			sendMessage(playerid, "[ERROR] Склад пуст", red[0], red[1], red[2])
+			return false
+		}
+
+		sqlite3( "UPDATE cow_farms_db SET warehouse = warehouse - '"+val1+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
+
+		local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", warehouse - "+result[1]["warehouse"]+"]")
+
+		return true
+	}
+	else if ( value == "unload") {
+		local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+
+		if (result[1]["COUNT()"] == 0) {
+			return true
+		}
+
+		result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		if ( !isPointInCircle3D(x,y,z, down_car_subject[4][0], down_car_subject[4][1],down_car_subject[4][2], down_car_subject[4][3])) {
+			return false
+		}
+
+		inv_car_delet(playerid, 83, val2)
+
+		state_inv_player[playerid] = 0
+		state_gui_window[playerid] = 0
+
+		triggerClientEvent( playerid, "event_gui_delet" )
+		triggerClientEvent( playerid, "event_tab_down_fun", state_inv_player[playerid] )
+
+		local money = val1*val2
+
+		local cash2 = money*(100-result[1]["coef"])/100
+		local cash = money*result[1]["coef"]/100
+
+		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+cash, playername )
+
+		sendMessage(playerid, "Вы разгрузили из т/с "+info_png[83][0]+" "+val1+" шт ("+val2+"$ за 1 шт) за "+cash+"$", green[0], green[1], green[2])
+
+		sqlite3( "UPDATE cow_farms_db SET money = money + '"+cash2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
+
+		local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", count - "+val1+", price - "+val2+", money - "+result[1]["money"]+", cash2 - "+cash2+"], [+"+cash+"$, "+array_player_2[playerid][0]+"$]")
+
+		return true
+	}
+	else if ( value == "unload_prod") {
+		local money = val1*val2
+		local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+
+		if (result[1]["COUNT()"] == 0) {
+			return true
+		}
+
+		result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		if ( result[1]["money"] < money) {
+			sendMessage(playerid, "[ERROR] Недостаточно средств на балансе бизнеса", red[0], red[1], red[2])
+			return true
+		}
+		else if ( result[1]["prod"] >= max_sg) {
+			sendMessage(playerid, "[ERROR] Склад полон", red[0], red[1], red[2])
+			return true
+		}
+		else if ( !isPointInCircle3D(x,y,z, down_car_subject[5][0], down_car_subject[5][1],down_car_subject[5][2], down_car_subject[5][3])) {
+			return false
+		}
+
+		state_inv_player[playerid] = 0
+		state_gui_window[playerid] = 0
+
+		triggerClientEvent( playerid, "event_gui_delet" )
+		triggerClientEvent( playerid, "event_tab_down_fun", state_inv_player[playerid] )
+
+		inv_car_delet(playerid, 82, val2)
+
+		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
+
+		sendMessage(playerid, "Вы разгрузили из т/с "+info_png[82][0]+" "+val1+" шт ("+val2+"$ за 1 шт) за "+money+"$", green[0], green[1], green[2])
+
+		sqlite3( "UPDATE cow_farms_db SET money = money - '"+money+"', prod = prod + '"+val1+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
+
+		local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", count - "+val1+", prod - "+result[1]["prod"]+", price - "+val2+", money - "+result[1]["money"]+", cash2 - "+money+"], [+"+money+"$, "+array_player_2[playerid][0]+"$]")
+
+		return true
+	}
+}
+addEventHandler ( "event_cow_farms", cow_farms )
 //-------------------------------------------------------------------------------------------------
 
 function EngineState()//двигатель вкл или выкл
@@ -2433,7 +2727,7 @@ function fuel_down()//--система топлива авто
 
 		if (result_c[1]["COUNT()"] == 1)
 		{
-			if (getVehicleModel(vehicleid) != 37 && getVehicleModel(vehicleid) != 35 && getVehicleModel(vehicleid) != 27)
+			if (getVehicleModel(vehicleid) != 37 && getVehicleModel(vehicleid) != 35 && getVehicleModel(vehicleid) != 27 && getVehicleModel(vehicleid) != 38)
 			{
 				setVehicleWheelTexture(vehicleid, 0, result[1]["wheel"])
 				setVehicleWheelTexture(vehicleid, 1, result[1]["wheel"])
@@ -2455,31 +2749,29 @@ function timer_earth_clear()
 
 		print("[timer_earth_clear] max_earth "+max_earth+", count_earth "+count_earth)
 
-		earth = {}
+		earth = {
+			[-1] = [0.0,0.0,0.0, 0,0]
+		}
 		max_earth = 0
 
 		foreach(playerid, playername in getPlayers())
 		{
 			sendMessage(playerid, "[НОВОСТИ] Улицы очищенны от мусора", green[0], green[1], green[2])
-			triggerClientEvent( playerid, "event_earth_load", "nil", 0, 0, 0, 0, 0, 0 )
 		}
 	}
 }
 
 function timer_earth()//--передача слотов земли на клиент
 {
+	local text = ""
+	foreach(i, v in earth)
+	{
+		text = text + v[0]+"/"+v[1]+"/"+v[2]+"/"+v[3]+"/"+v[4]+"|"
+	}
+
 	foreach(playerid, playername in getPlayers())
 	{
-		local playername = getPlayerName ( playerid )
-		local myPos = getPlayerPosition(playerid)
-
-		foreach(i, v in earth)
-		{
-			if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], v[0], v[1], v[2], 20.0)) 
-			{
-				triggerClientEvent( playerid, "event_earth_load", "", i.tofloat(), v[0], v[1], v[2], v[3].tofloat(), v[4].tofloat() )
-			}
-		}
+		setElementData(playerid, "earth", text)
 	}
 }
 
@@ -2860,6 +3152,71 @@ function job_timer2 ()
 				}
 			}
 
+			else if (job[playerid] == 6) //--ор на рз
+			{
+					if (job_call[playerid] == 0) //--нету вызова
+					{
+						local randomize = random(0,table_sg_pos.len()-1)
+
+						sendMessage(playerid, "Идите к столу", yellow[0], yellow[1], yellow[2])
+
+						job_call[playerid] = 1
+						job_pos[playerid] = [table_sg_pos[randomize][0],table_sg_pos[randomize][1],table_sg_pos[randomize][2]]
+
+						triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+					}
+					else if (job_call[playerid] >= 1 && job_call[playerid] <= 5)
+					{
+						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0))
+						{
+							job_call[playerid]++
+						}
+					}
+					else if (job_call[playerid] == 6)
+					{
+						local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && result[1]["COUNT()"] == 1)
+						{
+							result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+
+							local id1 = search_inv_player(playerid, 81, search_inv_player_2_parameter(playerid, 81))
+							local id2 = search_inv_player_2_parameter(playerid, 81)
+
+							if (result[1]["warehouse"] < max_sg && result[1]["money"] >= result[1]["price"] && result[1]["nalog"] != 0 && result[1]["prod"] != 0 && id1 != 0)
+							{
+								local randomize = result[1]["price"]
+
+								inv_player_delet(playerid, 81, id2)
+
+								id2 = id2 - 1
+
+								inv_player_empty(playerid, 81, id2)
+
+								if (id2 == 0)
+								{
+									inv_player_delet(playerid, 81, id2)
+								}
+
+								sqlite3( "UPDATE cow_farms_db SET warehouse = warehouse + '1', prod = prod - '1', money = money - '"+randomize+"' WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+
+								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+								sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
+
+								save_player_action(playername, "[seagift_job] "+playername+" [number - "+result[1]["number"]+", money - "+(result[1]["money"]-randomize)+", warehouse - "+(result[1]["warehouse"]+1)+", prod - "+(result[1]["prod"]-1)+"] [+"+randomize+"$, "+array_player_2[playerid][0]+"$]")
+													
+								job_call[playerid] = 0
+
+								triggerClientEvent(playerid, "removegps")
+							}
+							else
+							{
+								sendMessage(playerid, "[ERROR] Авария на производстве", red[0], red[1], red[2])
+							}
+						}
+					}
+			}
+
 			else if (job[playerid] == 0)//--нету работы
 			{
 				job_0( playerid )
@@ -3207,6 +3564,15 @@ function pay_nalog()
 			}
 		}
 
+		local result = sqlite3( "SELECT * FROM cow_farms_db" )
+		foreach (k, v in result) 
+		{
+			if (v["nalog"] > 0)
+			{
+				sqlite3( "UPDATE cow_farms_db SET nalog = nalog - '1' WHERE number = '"+v["number"]+"'")
+			}
+		}
+
 		print("[pay_nalog]")
 	}
 }
@@ -3288,7 +3654,7 @@ function()
 	timer( debuginfo, 1000, -1)//--дебагинфа
 	timer( element_data_push_client, 1000, -1)//--элементдата
 	timer( timeserver, 1000, -1 )//время сервера 1 игровой час = 1 мин реальных
-	timer(timer_earth, 500, -1)//--передача слотов земли на клиент
+	timer(timer_earth, 1000, -1)//--передача слотов земли на клиент
 	timer(need, 60000, -1)//--уменьшение потребностей
 	timer(need_1, 5000, -1)//--смена скина на бомжа
 	timer(pay_nalog, (60*60000), -1)//--списание налогов
@@ -3320,6 +3686,14 @@ function()
 		business_number++
 	}
 	print("[business_number] "+business_number)
+
+
+	local cow_farms_db_number = 0
+	foreach (idx, value in sqlite3( "SELECT * FROM cow_farms_db" )) 
+	{
+		cow_farms_db_number++
+	}
+	print("[cow_farms_db] "+cow_farms_db_number)
 
 
 	foreach (idx, value in sqlite3( "SELECT * FROM car_db" )) 
@@ -3398,6 +3772,7 @@ function( playerid, name, ip, serial )
 
 	setElementData(playerid, "is_chat_open", 0)
 	setElementData(playerid, "afk", "0")
+	setElementData(playerid, "earth", 0)
 
 	timer(function () {
 		local result = sqlite3( "SELECT COUNT() FROM account WHERE name = '"+playername+"'" )
@@ -3993,6 +4368,23 @@ function e_down (playerid)//--подбор предметов с земли
 		return
 	}
 
+		foreach (k, v in down_car_subject)
+		{
+			if (isPointInCircle3D(x,y,z, v[0],v[1],v[2], v[3]))
+			{
+				if (isPlayerInVehicle(playerid)) 
+				{
+					if (getVehicleModel(vehicleid) != v[5])
+					{
+						sendMessage(playerid, "[ERROR] Вы должны быть в "+motor_show[v[5]][3]+"("+v[5]+")", red[0], red[1], red[2])
+						return
+					}
+				}
+
+				delet_subject(playerid, v[4])
+			}
+		}
+
 		foreach (k, v in up_car_subject) 
 		{
 			if (isPointInCircle3D(x,y,z, v[0],v[1],v[2], v[3]))
@@ -4043,29 +4435,13 @@ function e_down (playerid)//--подбор предметов с земли
 				delet_subject(playerid, 24)
 			}
 		}
-
-		foreach (k, v in down_car_subject)
-		{
-			if (isPointInCircle3D(x,y,z, v[0],v[1],v[2], v[3]))
-			{
-				if (isPlayerInVehicle(playerid)) 
-				{
-					if (getVehicleModel(vehicleid) != v[5])
-					{
-						sendMessage(playerid, "[ERROR] Вы должны быть в "+motor_show[v[5]][3]+"("+v[5]+")", red[0], red[1], red[2])
-						return
-					}
-				}
-
-				delet_subject(playerid, v[4])
-			}
-		}
+		
 
 	foreach (i, v in earth)
 	{
 		local area = isPointInCircle3D( myPos[0],myPos[1],myPos[2], v[0], v[1], v[2], 10.0 )
 
-		if (area) 
+		if (area && v[3] != 0)
 		{
 			if ((v[3] == 51 || v[3] == 40 || v[3] == 56) && search_inv_player(playerid, v[3], search_inv_player_2_parameter(playerid, v[3])) >= 1) {
 				sendMessage(playerid, "[ERROR] Можно переносить только один предмет", red[0], red[1], red[2])
@@ -4115,7 +4491,7 @@ function business_info (playerid, number)
 	sendMessage(playerid, "Тип "+result[1]["type"], yellow[0], yellow[1], yellow[2])
 	sendMessage(playerid, "Товаров на складе "+result[1]["warehouse"]+" шт", yellow[0], yellow[1], yellow[2])
 	sendMessage(playerid, "Стоимость товара (надбавка в N раз) "+result[1]["price"]+"$", green[0], green[1], green[2])
-	sendMessage(playerid, "Цена закупки товара "+result[1]["buyprod"]+"$", green[0], green[1], green[2])
+	//sendMessage(playerid, "Цена закупки товара "+result[1]["buyprod"]+"$", green[0], green[1], green[2])
 
 	if (search_inv_player(playerid, 36, result[1]["number"]) != 0)
 	{
@@ -4291,8 +4667,15 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 	{
 		if (isPlayerInVehicle(playerid)) 
 		{
+			count2 = amount_inv_car_1_parameter(vehicleid, 0)
+
 			if (sead[playerid] != 0) 
 			{
+				return
+			}
+			else if(count2 == 0)
+			{
+				sendMessage(playerid, "[ERROR] Багажник заполнен", red[0], red[1], red[2])
 				return
 			}
 			else if (id1 == 24 || id1 == 61) 
@@ -4319,38 +4702,70 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 					return
 				}
 			}
-
-			count2 = inv_car_empty(playerid, id1, id2)
-
-			if (count2 != 0) 
+			else if (id1 == 83)
 			{
-				local count = search_inv_car(vehicleid, id1, id2)
+				if (search_inv_player(playerid, 34, 1) == 0) 
+				{
+					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", red[0], red[1], red[2])
+					return
+				}
+				else if (search_inv_player(playerid, 85, search_inv_player_2_parameter(playerid, 85)) == 0)
+				{
+					sendMessage(playerid, "[ERROR] Вы не работаете на рыбзаводе", red[0], red[1], red[2])
+					return
+				}
+				else if (!cow_farms(playerid, "load", count2, 0))
+				{
+					return
+				}
+			}
+			else if (id1 == 82)
+			{
+				if (search_inv_player(playerid, 34, 1) == 0)
+				{
+					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", red[0], red[1], red[2])
+					return
+				}
+				else if (search_inv_player(playerid, 85, search_inv_player_2_parameter(playerid, 85)) == 0)
+				{
+					sendMessage(playerid, "[ERROR] Вы не работаете на рыбзаводе", red[0], red[1], red[2])
+					return
+				}
+			}
 
-				sendMessage(playerid, "Вы загрузили в т/с "+info_png[id1][0]+" "+count+" шт за "+id2+"$", svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
+
+			inv_car_empty(playerid, id1, id2)
+
+			local count = search_inv_car(vehicleid, id1, id2)
+
+			sendMessage(playerid, "Вы загрузили в т/с "+info_png[id1][0]+" "+count+" шт за "+id2+"$", svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
 				
-				if (id1 == 24) 
-				{
-					sendMessage(playerid, "[TIPS] Езжайте в порт или в любой бизнес, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
-				}
-				else if (id1 == 54) 
-				{
-					sendMessage(playerid, "[TIPS] Езжайте в банк, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
-				}
-				else if (id1 == 61) 
-				{
-					sendMessage(playerid, "[TIPS] Езжайте в порт, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
-				}
-				else if (id1 == 63) 
-				{
-					sendMessage(playerid, "[TIPS] Езжайте на свалку(около заброшенной литейной фабрики), чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
-				}
-
-				save_player_action(playername, "[give_subject] "+playername+" [value - "+value+", count - "+count+"] ["+info_png[id1][0]+", "+id2+"]")
-			}
-			else
+			if (id1 == 24) 
 			{
-				sendMessage(playerid, "[ERROR] Багажник заполнен", red[0], red[1], red[2])
+				sendMessage(playerid, "[TIPS] Езжайте в порт или в любой бизнес, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
 			}
+			else if (id1 == 54) 
+			{
+				sendMessage(playerid, "[TIPS] Езжайте в банк, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
+			}
+			else if (id1 == 61) 
+			{
+				sendMessage(playerid, "[TIPS] Езжайте в порт, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
+			}
+			else if (id1 == 63) 
+			{
+				sendMessage(playerid, "[TIPS] Езжайте на свалку(около заброшенной литейной фабрики), чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
+			}
+			else if (id1 == 82) 
+			{
+				sendMessage(playerid, "[TIPS] Езжайте на рыбзавод, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
+			}
+			else if (id1 == 83) 
+			{
+				sendMessage(playerid, "[TIPS] Езжайте в порт, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
+			}
+
+			save_player_action(playername, "[give_subject] "+playername+" [value - "+value+", count - "+count+"] ["+info_png[id1][0]+", "+id2+"]")
 		}
 		else
 		{
@@ -4391,19 +4806,19 @@ function delet_subject(playerid, id)//--удаление предметов из
 						return
 					}
 
-					if (v["buyprod"] == 0) 
+					/*if (v["buyprod"] == 0) 
 					{
 						sendMessage(playerid, "[ERROR] Цена покупки не указана", red[0], red[1], red[2])
 						return
-					}
+					}*/
 
-					if (v["warehouse"] >= 100) 
+					if (v["warehouse"] >= max_business) 
 					{
 						sendMessage(playerid, "[ERROR] Склад полон", red[0], red[1], red[2])
 						return
 					}
 
-					money = count*v["buyprod"]
+					money = count*sic2p
 
 					if (v["money"] < money) 
 					{
@@ -4423,7 +4838,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 
 					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
 
-					sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт ("+v["buyprod"]+"$ за 1 шт) за "+money+"$", green[0], green[1], green[2])
+					sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт ("+sic2p+"$ за 1 шт) за "+money+"$", green[0], green[1], green[2])
 
 					save_player_action(playername, "[delet_subject_business] "+playername+" [count - "+count+"], [+"+money+"$, "+array_player_2[playerid][0]+"$], "+info_bisiness(v["number"]))
 					return
@@ -4434,24 +4849,31 @@ function delet_subject(playerid, id)//--удаление предметов из
 			{
 				if (isPointInCircle3D(x,y,z, v[0],v[1],v[2], v[3]))//--места разгрузки
 				{
-					state_inv_player[playerid] = 0
-					state_gui_window[playerid] = 0
+					if (!cow_farms(playerid, "unload", count, sic2p) && !cow_farms(playerid, "unload_prod", count, sic2p))
+					{
+						state_inv_player[playerid] = 0
+						state_gui_window[playerid] = 0
 
-					triggerClientEvent( playerid, "event_gui_delet" )
-					triggerClientEvent( playerid, "event_tab_down_fun", state_inv_player[playerid] )
+						triggerClientEvent( playerid, "event_gui_delet" )
+						triggerClientEvent( playerid, "event_tab_down_fun", state_inv_player[playerid] )
 
-					inv_car_delet(playerid, id, sic2p)
+						inv_car_delet(playerid, id, sic2p)
 
-					money = count*sic2p
+						money = count*sic2p
 
-					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
+						inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
 
-					sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт ("+sic2p+"$ за 1 шт) за "+money+"$", green[0], green[1], green[2])
+						sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт ("+sic2p+"$ за 1 шт) за "+money+"$", green[0], green[1], green[2])
 
-					save_player_action(playername, "[delet_subject_job] "+playername+" [count - "+count+", price - "+sic2p+"], [+"+money+"$, "+array_player_2[playerid][0]+"$]")
-					return
+						save_player_action(playername, "[delet_subject_job] "+playername+" [count - "+count+", price - "+sic2p+"], [+"+money+"$, "+array_player_2[playerid][0]+"$]")
+						return
+					}
 				}
 			}
+		}
+		else 
+		{
+			sendMessage(playerid, "[ERROR] Багажник пуст", red[0], red[1], red[2])
 		}
 	}
 	else
@@ -5320,7 +5742,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					return
 				}
 
-				if (getVehicleModel(vehicleid) == 37 || getVehicleModel(vehicleid) == 35 || getVehicleModel(vehicleid) == 27)
+				if (getVehicleModel(vehicleid) == 37 || getVehicleModel(vehicleid) == 35 || getVehicleModel(vehicleid) == 27 || getVehicleModel(vehicleid) == 38)
 				{
 					sendMessage(playerid, "[ERROR] На это т/с нельзя установить колеса", red[0], red[1], red[2])
 					return
@@ -5445,7 +5867,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			
 			if (isPointInCircle3D(x,y,z, interior_job[6][2],interior_job[6][3],interior_job[6][4], interior_job[6][7]))
 			{
-				local randomize = random(1,zp_car_73)
+				local randomize = random(1,zp_player_73)
 
 				if ( inv_player_empty(playerid, 73, randomize) )
 				{
@@ -5548,6 +5970,61 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				job[playerid] = 5
 
 				me_chat(playerid, playername+" вышел(ла) на работу Угонщик")
+			}
+			else
+			{
+				job[playerid] = 0
+
+				car_theft_fun(playerid)
+
+				me_chat(playerid, playername+" закончил(а) работу")
+			}
+			return
+		}
+		else if (id1 == 84)
+		{
+			local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+id2+"'" )
+			if (result[1])
+			{
+				local farms = [
+					[result[1]["number"], "Зарплата", result[1]["price"]+"$"],
+					[result[1]["number"], "Баланс", result[1]["money"]+"$"],
+					[result[1]["number"], "Доход от продаж", result[1]["coef"]+" процентов"],
+					[result[1]["number"], "Налог", result[1]["nalog"]+" дней"],
+					[result[1]["number"], "Склад", result[1]["warehouse"]+" филе рыбы"],
+					[result[1]["number"], "Склад", result[1]["prod"]+" свежей рыбы"],
+				]
+					
+				sendMessage(playerid, "====[ ИНФО "+id2+" РЫБЗАВОДА ]====", yellow[0], yellow[1], yellow[2])
+
+				foreach (k, v in farms) {
+					sendMessage(playerid, v[1]+" "+v[2], yellow[0], yellow[1], yellow[2])
+				}
+			}
+			return
+		}
+		else if (id1 == 85)
+		{
+			local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+id2+"'" )
+			if (result[1])
+			{
+				local farms = [
+					[result[1]["number"], "Зарплата", result[1]["price"]+"$"],
+					[result[1]["number"], "Доход от продаж", result[1]["coef"]+" процентов"],
+				]
+					
+				sendMessage(playerid, "====[ ИНФО "+id2+" РЫБЗАВОДА ]====", yellow[0], yellow[1], yellow[2])
+
+				foreach (k, v in farms) {
+					sendMessage(playerid, v[1]+" "+v[2], yellow[0], yellow[1], yellow[2])
+				}
+			}
+
+			if (job[playerid] == 0)
+			{
+				job[playerid] = 6
+
+				me_chat(playerid, playername+" вышел(ла) на работу Обработчик рыбы на рыбзаводе")
 			}
 			else
 			{
@@ -5726,7 +6203,7 @@ function (playerid, id)
 				triggerClientEvent( playerid, "event_blip_create", x, y, 0,4, max_blip )
 				triggerClientEvent( playerid, "event_blip_create", x, y, interior_business[id][2],0, max_blip )
 
-				sqlite3( "INSERT INTO business_db (number, type, price, buyprod, money, nalog, warehouse, x, y, z, interior) VALUES ('"+dim+"', '"+interior_business[id][1]+"', '0', '0', '0', '5', '0', '"+x+"', '"+y+"', '"+z+"', '"+id+"')" )
+				sqlite3( "INSERT INTO business_db (number, type, price, money, nalog, warehouse, x, y, z, interior) VALUES ('"+dim+"', '"+interior_business[id][1]+"', '0', '0', '5', '0', '"+x+"', '"+y+"', '"+z+"', '"+id+"')" )
 
 				sendMessage(playerid, "Вы получили "+info_png[36][0]+" "+dim+" "+info_png[36][1], orange[0], orange[1], orange[2])
 				
@@ -6643,6 +7120,49 @@ function (playerid, plate)
 	sendMessage(playerid, "[ERROR] Вы должны быть около телефонной будки", red[0], red[1], red[2])
 })
 
+addCommandHandler("msg",//меню рыбзавода
+function (playerid, value, ...)
+{
+	local playername = getPlayerName( playerid )
+	local myPos = getPlayerPosition(playerid)
+	local x = myPos[0]
+	local y = myPos[1]
+	local z = myPos[2]
+
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	local factory_text = ""
+	for(local i = 0; i < vargv.len(); i++)
+	{
+		factory_text = factory_text+vargv[i]+" "
+	}
+
+	local spl = split(factory_text, " ")
+
+	if (value == "menu")
+	{	
+		if (spl[0].tostring() == "pay" || spl[0].tostring() == "coef" || spl[0].tostring() == "balance")
+		{
+			cow_farms(playerid, value, spl[0].tostring(), spl[1].tointeger())
+		}
+		else if (spl[0].tostring() == "tax")
+		{
+			cow_farms(playerid, value, spl[0].tostring(), 0)
+		}
+	}
+	else if (value == "buy")
+	{
+		cow_farms(playerid, value, 0, 0)
+	}
+	else if (value == "job")
+	{
+		cow_farms(playerid, value, spl[0].tointeger(), 0)
+	}
+})
+
 addCommandHandler("idpng",
 function (playerid)
 {
@@ -6674,7 +7194,7 @@ function (playerid)
 		"/let [ИД игрока] [текст] - отправить письмо игроку",
 		"/pay [ИД игрока] [сумма] - передача денег",
 		"/ec [номер т/с] - эвакуция т/с",
-		"/till [withdraw, deposit, price, buyprod] [сумма] - установить цены в бизнесе",
+		"/till [withdraw, deposit, price] [сумма] - установить цены в бизнесе",
 		"/search [player | car | house] [ИД игрока | номер т/с | номер дома] - обыскать игрока, т/с или дом (для полицейских)",
 		"/takepolicetoken [ИД игрока] - забрать полицейский жетон (для полицейских)",
 		"/takepolicerank [ИД игрока] [ИД шеврона от 28 до 32] - забрать шеврон (для полицейских)",
@@ -6816,6 +7336,8 @@ function(playerid, id)
 	fuel["0"] <- max_fuel
 	dviglo["0"] <- 0
 	probeg["0"] <- 0
+	array_car_1["0"] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	array_car_2["0"] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 })
 
 addCommandHandler("stime",
@@ -6988,19 +7510,7 @@ function(command, params)
 
 	if(command == "z")
 	{	
-		/*local table = {}
 
-		table[1] <- 145
-		foreach (idx, value in table) {
-			print(value)
-		}
-
-		//delete table[1]
-		foreach (idx, value in table) {
-			print(value)
-		}*/
-
-		//print(PI)
 	}
 
 	if(command == "x")
@@ -7027,7 +7537,7 @@ function(command, params)
 		}
 		else 
 		{
-			print("timer not active")
+			print("timer ! active")
 		}*/
 	}
 
