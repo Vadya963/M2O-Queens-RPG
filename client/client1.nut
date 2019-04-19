@@ -97,7 +97,7 @@ local info_png = {
 	[33] = ["шеврон Шефа полиции", "шт"],
 	[34] = ["лицензия дальнобойщика", "шт"],
 	[35] = ["лом", "процентов"],
-	[36] = ["документы на", "бизнес"],
+	[36] = ["документы на бизнес под номером", ""],
 	[37] = ["админский жетон", "шт"],
 	[38] = ["риэлторская лицензия", "шт"],
 	[39] = ["тушка свиньи", "шт"],
@@ -142,6 +142,11 @@ local info_png = {
 	[78] = ["тратил", "гр"],
 	[79] = ["отмычка", "процентов"],
 	[80] = ["лицензия угонщика", "шт"],
+	[81] = ["нож", "процентов"],
+	[82] = ["лоток с рыбой", "$ за штуку"],
+	[83] = ["лоток с филе рыбы", "$ за штуку"],
+	[84] = ["документы на рыбзавод под номером", ""],
+	[85] = ["трудовой договор обработчика рыбы на", "рыбзаводе"],
 }
 
 //цены автосалона
@@ -185,7 +190,7 @@ local motor_show = [
 	[35,3000,100,"Shubert Truck Flatbed"],//копия
 	//[36,0,100,"Shubert Truck Flatbed"],
 	//[37,3000,100,"Shubert Truck Covered"],
-	//[38,0,100,"Shubert Truck"],
+	[38,2000,100,"Shubert Truck Seagift"],
 	//[39,0,100,"Shubert Show Plow"],
 	//[40,0,80,"Military Truck"],
 	[41,2140,80,"Smith Custom 200"],
@@ -365,11 +370,21 @@ function guiSetTextGridList (window, slot, text)
 }
 //-------------------------------------------------------------------------------------------------
 
-local avto_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(465.0/2), 400.0, 465.0)
+local avto_menu_value = 1
+local avto_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(450.0/2), 400.0, 450.0)
+for (local i = 0; i <= 29; i++) 
+{
+	motor_show.push([0, 0, 0, "none"])
+}
 foreach (k,v in motor_show)
 {
 	local text = v[3]+"("+v[0]+") "+(v[1]*10)+"$"
 	guiGridListAddRow (avto_menu, text)
+}
+for (local i = max_lable*(avto_menu_value-1); i < max_lable*avto_menu_value; i++)
+{
+	local text = motor_show[i][3]+"("+motor_show[i][0]+") "+(motor_show[i][1]*10)+"$"
+	guiSetTextGridList (avto_menu, i-max_lable*(avto_menu_value-1), text)
 }
 guiSetVisibleGridList (avto_menu, false)
 
@@ -411,6 +426,7 @@ local shop = {
 	[52] = [info_png[52][0], 1, 100],
 	[64] = [info_png[64][0], 1, 250],
 	[74] = [info_png[74][0], 100, 100],
+	[81] = [info_png[81][0], 100, 100],
 }
 local shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in shop)
@@ -581,6 +597,7 @@ guiSetVisibleGridList (station_menu, false)
 local phone_stats = [
 	["Штрафстоянка"],
 	["Аукцион"],
+	["Рыбзавод"],
 ]
 local phone_stats_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in phone_stats)
@@ -703,8 +720,14 @@ function shop_menu_fun(number, value)//--создание окна магази�
 	{
 		guiSetVisibleGridList (avto_menu, true)
 		local pos = guiGetSize( avto_menu[0] )
-		gridlist_button_width_height = [pos[0],pos[1]]
+		gridlist_button_width_height = [pos[0],pos[1]+60.0]
 		guiSetText(shop_menu_button, "Купить")
+
+		guiSetPosition(shop_menu_button2, (screen[0]/2)-(400.0/2), (screen[1]/2)+((gridlist_button_width_height[1]-60.0)/2), false)
+		guiSetVisible( shop_menu_button2, true )
+
+		guiSetPosition(shop_menu_button3, (screen[0]/2), (screen[1]/2)+((gridlist_button_width_height[1]-60.0)/2), false)
+		guiSetVisible( shop_menu_button3, true )
 	}
 	else if (value_business == "craft")
 	{
@@ -764,7 +787,7 @@ timer(function () {
 
 timer(function () {
 	sync_timer = true
-}, 2000, 1)
+}, 5000, 1)
 
 timer(function () {
 	local myPos = getPlayerPosition(getLocalPlayer())
@@ -1001,9 +1024,13 @@ function getElementData (key)
 	}
 }
 
-function element_data_push_client(key, value)
+function element_data_push_client(text)
 {
-	element_data[key] <- value
+	foreach (k, v in split(text, ",")) 
+	{
+		local spl = split(v, ":")
+		element_data[spl[0]] <- spl[1]
+	}
 	//print("event_element_data_push_client["+key+"] = "+value)
 }
 addEventHandler ( "event_element_data_push_client", element_data_push_client )
@@ -1015,21 +1042,7 @@ function blip_create(x, y, lib, icon, r)
 }
 addEventHandler ( "event_blip_create", blip_create )
 
-local earth = {}//--слоты земли
 //-----------эвенты------------------------------------------------------------------------
-function earth_load (value, i, x, y, z, id1, id2)//--изменения слотов земли
-{
-	if (value != "nil")
-	{
-		earth[i] <- [x,y,z,id1,id2]
-	}
-	else
-	{
-		earth = {}
-	}
-}
-addEventHandler ( "event_earth_load", earth_load )
-
 //сохранение действий игрока
 function save_player_action (text)
 {
@@ -1206,7 +1219,7 @@ function( post )
 			dxdrawtext ( speed_vehicle, 2.0, screen[1]-16.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
 
-		if (getElementData("gps_device_data") == 1)
+		if (getElementData("gps_device_data").tointeger() == 1)
 		{
 			local coords = getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )
 			local x_table = split(myPos[0].tostring(), ".")
@@ -1277,7 +1290,7 @@ function( post )
 				}
 
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
-				if (area && getElementData("is_chat_open["+i+"]") == 1)
+				if (area && getElementData("is_chat_open["+i+"]").tointeger() == 1)
 				{
 					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
 					local dimensions = dxGetTextDimensions( "prints...", 1.0, "tahoma-bold" )
@@ -1291,6 +1304,20 @@ function( post )
 					local dimensions = dxGetTextDimensions( "[AFK] "+getElementData("afk["+i+"]")+" seconds", 1.0, "tahoma-bold" )
 					dxdrawtext( "[AFK] "+getElementData("afk["+i+"]")+" seconds", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( purple[0], purple[1], purple[2] ), true, "tahoma-bold", 1.0 )
 				}
+			}
+		}
+
+		foreach (k, v in split(getElementData("earth"), "|"))//--отображение предметов на земле
+		{
+			local spl = split(v, "/")
+			if (isPointInCircle3D( myPos[0], myPos[1], myPos[2], spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat(), 20.0 ))
+			{
+				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat() )
+				dxDrawTexture(image[spl[3].tofloat()], coords[0]-(57/2), coords[1], 0.88, 0.88, 0.0, 0.0, 0.0, 255)
+
+				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat()+0.2 )
+				local dimensions = dxGetTextDimensions("Press E", 1.0, "tahoma-bold" )
+				dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
 			}
 		}
 	}
@@ -1403,21 +1430,6 @@ function( post )
 		local guiSize_lable = guiGetSize( gridlist_lable )
 
 		dxDrawRectangle( guiPos_window[0]+guiPos_lable[0]-10.0, guiPos_window[1]+guiPos_lable[1]+2.0, guiSize_lable[0], guiSize_lable[1], fromRGB( 81, 101, 204, 150 ) )
-	}
-
-	foreach (k, v in earth)//--отображение предметов на земле
-	{
-		local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], v[0], v[1], v[2], 20.0 )
-
-		if (area)
-		{
-			local coords = getScreenFromWorld( v[0], v[1], v[2] )
-			dxDrawTexture(image[v[3]], coords[0]-(57/2), coords[1], 0.88, 0.88, 0.0, 0.0, 0.0, 255)
-
-			local coords = getScreenFromWorld( v[0], v[1], v[2]+0.2 )
-			local dimensions = dxGetTextDimensions("Press E", 1.0, "tahoma-bold" )
-			dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
-		}
 	}
 
 
@@ -1850,6 +1862,22 @@ function( element )
 				guiSetTextGridList (repair_shop_menu, i-max_lable*(repair_shop_menu_value-1), text)
 			}
 		}
+		else if (guiGetVisibleGridList(avto_menu))
+		{
+			avto_menu_value--
+
+			if (avto_menu_value <= 0)
+			{
+				avto_menu_value = 1
+				return
+			}
+
+			for (local i = max_lable*(avto_menu_value-1); i < max_lable*avto_menu_value; i++)
+			{
+				local text = motor_show[i][3]+"("+motor_show[i][0]+") "+(motor_show[i][1]*10)+"$"
+				guiSetTextGridList (avto_menu, i-max_lable*(avto_menu_value-1), text)
+			}
+		}
 	}
 	else if (element == shop_menu_button3)
 	{	
@@ -1882,6 +1910,22 @@ function( element )
 			{
 				local text = repair_shop[i][0]+" "+repair_shop[i][1]+" "+info_png[repair_shop[i][3]][1]+" "+repair_shop[i][2]+"$"
 				guiSetTextGridList (repair_shop_menu, i-max_lable*(repair_shop_menu_value-1), text)
+			}
+		}
+		else if (guiGetVisibleGridList(avto_menu))
+		{
+			avto_menu_value++
+			
+			if (avto_menu_value > (guiGetCountGridList(avto_menu)/max_lable).tointeger())
+			{
+				avto_menu_value = (guiGetCountGridList(avto_menu)/max_lable).tointeger()
+				return
+			}
+
+			for (local i = max_lable*(avto_menu_value-1); i < max_lable*avto_menu_value; i++)
+			{
+				local text = motor_show[i][3]+"("+motor_show[i][0]+") "+(motor_show[i][1]*10)+"$"
+				guiSetTextGridList (avto_menu, i-max_lable*(avto_menu_value-1), text)
 			}
 		}
 	}
