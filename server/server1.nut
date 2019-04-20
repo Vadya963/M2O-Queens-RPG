@@ -53,7 +53,7 @@ local max_drugs = 100
 //законы
 local zakon_alcohol = 1
 local zakon_alcohol_crimes = 1
-local zakon_drugs = 1
+local zakon_drugs = 10
 local zakon_drugs_crimes = 1
 local zakon_kill_crimes = 1
 local zakon_robbery_crimes = 1
@@ -202,7 +202,7 @@ local info_png = {
 	[80] = ["лицензия угонщика", "шт"],
 	[81] = ["нож", "процентов"],
 	[82] = ["лоток с рыбой", "$ за штуку"],
-	[83] = ["лоток с филе рыбы", "$ за штуку"],
+	[83] = ["ящик с рыбным филе", "$ за штуку"],
 	[84] = ["документы на рыбзавод под номером", ""],
 	[85] = ["трудовой договор обработчика рыбы на", "рыбзаводе"],
 }
@@ -2815,8 +2815,8 @@ function debuginfo ()
 		setElementData(playerid, "19", "job_timer[playerid] "+job_timer[playerid].tostring())*/
 
 		setElementData(playerid, "serial", getPlayerSerial(playerid))
-		setElementData(playerid, "timeserver", hour+":"+minute)
-		setElementData(playerid, "alcohol_data", alcohol[playerid].tofloat())
+		setElementData(playerid, "timeserver", hour+"-"+minute)
+		setElementData(playerid, "alcohol_data", alcohol[playerid])
 		setElementData(playerid, "satiety_data", satiety[playerid])
 		setElementData(playerid, "hygiene_data", hygiene[playerid])
 		setElementData(playerid, "sleep_data", sleep[playerid])
@@ -2824,14 +2824,18 @@ function debuginfo ()
 		setElementData(playerid, "fuel_data", 0)
 		setElementData(playerid, "probeg_data", 0)
 		setElementData(playerid, "gps_device_data", gps_device[playerid])
+		setElementData(playerid, "zakon_alcohol", zakon_alcohol)
+		setElementData(playerid, "zakon_drugs", zakon_drugs)
 
 		for (local i = 0; i < getMaxPlayers(); i++) 
 		{	
 			if (isPlayerConnected(i))
 			{
-				setElementData(playerid, "crimes["+i+"]", crimes[i].tostring())
+				setElementData(playerid, "drugs["+i+"]", drugs[i])
+				setElementData(playerid, "alcohol["+i+"]", alcohol[i])
+				setElementData(playerid, "crimes["+i+"]", crimes[i])
 				setElementData(playerid, "is_chat_open["+i+"]", getElementData(i, "is_chat_open"))
-				setElementData(playerid, "afk["+i+"]", getElementData(i, "afk").tostring())
+				setElementData(playerid, "afk["+i+"]", getElementData(i, "afk"))
 			}
 		}
 
@@ -3207,10 +3211,6 @@ function job_timer2 ()
 								job_call[playerid] = 0
 
 								triggerClientEvent(playerid, "removegps")
-							}
-							else
-							{
-								sendMessage(playerid, "[ERROR] Авария на производстве", red[0], red[1], red[2])
 							}
 						}
 					}
@@ -4122,7 +4122,7 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 			{
 				for (local id3 = 0; id3 < max_inv; id3++)
 				{
-					triggerClientEvent( playerid, "event_inv_load", "car", id3, array_car_1[plate][id3].tofloat(), array_car_2[plate][id3].tofloat() )
+					triggerClientEvent( playerid, "event_inv_load", "car", id3, array_car_1[plate][id3].tofloat(), array_car_2[plate][id3].tostring() )
 				}
 				
 				triggerClientEvent( playerid, "event_tab_load", "car", plate )
@@ -4210,7 +4210,7 @@ function tab_down(playerid)
 	{
 		for (local id3 = 0; id3 < max_inv; id3++)
 		{
-			triggerClientEvent( playerid, "event_inv_load", "player", id3, array_player_1[playerid][id3].tofloat(), array_player_2[playerid][id3].tofloat() )
+			triggerClientEvent( playerid, "event_inv_load", "player", id3, array_player_1[playerid][id3].tofloat(), array_player_2[playerid][id3].tostring() )
 		}
 
 		if (isPlayerInVehicle(playerid)) 
@@ -4226,7 +4226,7 @@ function tab_down(playerid)
 				{
 					for (local id3 = 0; id3 < max_inv; id3++)
 					{
-						triggerClientEvent( playerid, "event_inv_load", "house", id3, array_house_1[value["number"]][id3].tofloat(), array_house_2[value["number"]][id3].tofloat() )
+						triggerClientEvent( playerid, "event_inv_load", "house", id3, array_house_1[value["number"]][id3].tofloat(), array_house_2[value["number"]][id3].tostring() )
 					}
 
 					local result = sqlite3( "SELECT * FROM house_db WHERE number = '"+value["number"]+"'" )
@@ -4494,7 +4494,7 @@ function business_info (playerid, number)
 
 	if (search_inv_player(playerid, 36, result[1]["number"]) != 0)
 	{
-		sendMessage(playerid, "Состояние кассы "+result[1]["money"]+"$", green[0], green[1], green[2])
+		sendMessage(playerid, "Состояние кассы "+split(result[1]["money"].tostring(),".")[0]+"$", green[0], green[1], green[2])
 		sendMessage(playerid, "Налог бизнеса оплачен на "+result[1]["nalog"]+" дней", yellow[0], yellow[1], yellow[2])
 	}
 }
@@ -4886,6 +4886,8 @@ function inv_server_load (playerid, value, id3, id1, id2, tabpanel)//измен�
 	local playername = getPlayerName(playerid)
 	local plate = tabpanel
 	local h = tabpanel
+	local id1 = id1.tointeger()
+	local id2 = id2.tointeger()
 
 	if (value == "player")
 	{
@@ -5987,7 +5989,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				local farms = [
 					[result[1]["number"], "Зарплата", result[1]["price"]+"$"],
-					[result[1]["number"], "Баланс", result[1]["money"]+"$"],
+					[result[1]["number"], "Баланс", split(result[1]["money"].tostring(),".")[0]+"$"],
 					[result[1]["number"], "Доход от продаж", result[1]["coef"]+" процентов"],
 					[result[1]["number"], "Налог", result[1]["nalog"]+" дней"],
 					[result[1]["number"], "Склад", result[1]["warehouse"]+" филе рыбы"],
