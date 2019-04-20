@@ -144,7 +144,7 @@ local info_png = {
 	[80] = ["лицензия угонщика", "шт"],
 	[81] = ["нож", "процентов"],
 	[82] = ["лоток с рыбой", "$ за штуку"],
-	[83] = ["лоток с филе рыбы", "$ за штуку"],
+	[83] = ["ящик с рыбным филе", "$ за штуку"],
 	[84] = ["документы на рыбзавод под номером", ""],
 	[85] = ["трудовой договор обработчика рыбы на", "рыбзаводе"],
 }
@@ -1281,6 +1281,22 @@ function( post )
 			if (isPlayerConnected(i) && i != playerid)
 			{	
 				local Pos = getPlayerPosition(i)
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
+				if (area && getElementData("drugs["+i+"]").tofloat() >= getElementData("zakon_drugs").tofloat())
+				{
+					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+					local dimensions = dxGetTextDimensions( "*effect of drugs*", 1.0, "tahoma-bold" )
+					dxdrawtext( "*effect of drugs*", coords[0]-(dimensions[0]/2), coords[1]-60.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+				}
+
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
+				if (area && (getElementData("alcohol["+i+"]").tofloat()/100) >= getElementData("zakon_alcohol").tofloat())
+				{
+					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+					local dimensions = dxGetTextDimensions( "*effect of alcohol*", 1.0, "tahoma-bold" )
+					dxdrawtext( "*effect of alcohol*", coords[0]-(dimensions[0]/2), coords[1]-45.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+				}
+
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 35.0 )
 				if (area && getElementData("crimes["+i+"]") != "0")
 				{
@@ -1332,9 +1348,9 @@ function( post )
 		{
 			for (local i = 0; i < max_inv; i++)
 			{
-				local dimensions = dxGetTextDimensions( inv_slot_player[i][1].tostring(), 1.0, "tahoma-bold" )
+				local dimensions = dxGetTextDimensions( split(inv_slot_player[i][1].tostring(),".")[0], 1.0, "tahoma-bold" )
 				dxDrawTexture(image[inv_slot_player[i][0]], (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
-				dxdrawtext( inv_slot_player[i][1].tostring(), (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+35), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
+				dxdrawtext( split(inv_slot_player[i][1].tostring(),".")[0], (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+35), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
 			
 				/*local scale = 1.0
 				local formyla = (image_w_h/dimensions[0])
