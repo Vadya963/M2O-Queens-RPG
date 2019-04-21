@@ -725,6 +725,7 @@ local job_call = array(getMaxPlayers(), 0)
 local job_vehicleid = array(getMaxPlayers(), 0)
 local job_timer = array(getMaxPlayers(), 0)
 local car_27 = array(getMaxPlayers(), 0)
+local tp_player_lh = array(getMaxPlayers(), 0)
 
 //для истории сообщений
 local max_message = 15//максимально отображаемое число сообщений
@@ -2682,11 +2683,13 @@ function EngineState()//двигатель вкл или выкл
 			
 		if(dviglo[plate] == 1)
 		{
+
+			setVehicleFuel(vehicleid, max_fuel)
 		}
 		else
 		{
-			setVehicleEngineState(vehicleid, false)
-			setVehicleSpeed( vehicleid, 0.0,0.0,0.0 )
+			setVehicleFuel(vehicleid, 0.0)
+			//setVehicleSpeed( vehicleid, 0.0,0.0,0.0 )
 		}
 	}
 }
@@ -2718,8 +2721,6 @@ function fuel_down()//--система топлива авто
 					probeg[plate] <- probeg[plate] + (getSpeed(vehicleid)/3600)
 				}
 			}
-
-			setVehicleFuel(vehicleid, max_fuel)
 		}
 
 		setVehicleDirtLevel(vehicleid, 0.0)
@@ -3648,7 +3649,7 @@ function()
 {	
 	setSummer(pogoda)
 
-	timer( EngineState, 500, -1 )//двигатель машины
+	timer( EngineState, 1000, -1 )//двигатель машины
 	timer( fuel_down, 1000, -1 )//система топлива
 	timer( debuginfo, 1000, -1)//--дебагинфа
 	timer( element_data_push_client, 1000, -1)//--элементдата
@@ -3761,6 +3762,7 @@ function( playerid, name, ip, serial )
 	car_27[playerid] = false
 	job_vehicleid[playerid] = 0
 	job_timer[playerid] = 0
+	tp_player_lh[playerid] = 0
 
 	//--нужды
 	alcohol[playerid] = 0
@@ -3784,7 +3786,7 @@ function( playerid, name, ip, serial )
 				setPlayerPosition(playerid, result[1]["x"],result[1]["y"],result[1]["z"])
 			}
 		}
-	}, 10000, 1)//спавн если х и у = 0
+	}, 20000, 1)//спавн если х и у = 0
 
 	print("[serial] "+getPlayerSerial(playerid))
 })
@@ -3801,6 +3803,13 @@ function playerDisconnect( playerid, reason )
 		if (myPos[0] != 0 && myPos[1] != 0 && myPos[2] != 0)
 		{
 			sqlite3( "UPDATE account SET x = '"+myPos[0]+"', y = '"+myPos[1]+"', z = '"+myPos[2]+"', heal = '"+heal+"', arrest = '"+arrest[playerid]+"', crimes = '"+crimes[playerid]+"', alcohol = '"+alcohol[playerid]+"', satiety = '"+satiety[playerid]+"', hygiene = '"+hygiene[playerid]+"', sleep = '"+sleep[playerid]+"', drugs = '"+drugs[playerid]+"' WHERE name = '"+playername+"'")
+		}
+
+		if(tp_player_lh[playerid] != 0)
+		{
+			tp_player_lh[playerid].Kill()
+			tp_player_lh[playerid] = 0
+			print("[playerDisconnect] tp_player_lh["+playerid+"] = "+tp_player_lh[playerid])
 		}
 
 		robbery_kill(playerid)
@@ -4079,6 +4088,37 @@ function reg_or_login(playerid)
 		save_player_action(playername, "[log_fun] "+playername+" [ip - "+ip+", serial - "+serial+"]")
 
 		house_bussiness_job_pos_load( playerid )
+
+		if (result[1]["y"] < -1050.0)
+		{
+			//togglePlayerControls(playerid, true)
+			setPlayerPosition( playerid, -1310.0,-222.0,-23.0 )
+			/*sendMessage(playerid, "[TIPS] Вы заморожены, не открывайте чат", color_tips[0], color_tips[1], color_tips[2])
+
+			tp_player_lh[playerid] = timer(function () 
+			{	
+				if(logged[playerid] == 1)
+				{
+					local myPos = getPlayerPosition(playerid)
+
+					setPlayerPosition( playerid, myPos[0],myPos[1]-1000.0,myPos[2] )
+					print(myPos[0]+" "+myPos[1]+" "+myPos[2])
+
+					if((myPos[1]*-1+result[1]["y"]) > -500.0)
+					{
+						sendMessage(playerid, "[TIPS] Прилетели, можно двигаться, спасибо что воспользовались нашими услугами :)", color_tips[0], color_tips[1], color_tips[2])
+						//togglePlayerControls(playerid, false)
+						setPlayerPosition( playerid, result[1]["x"],result[1]["y"],result[1]["z"] )
+						print(result[1]["x"]+" "+result[1]["y"]+" "+result[1]["z"])
+
+						tp_player_lh[playerid].Kill()
+						tp_player_lh[playerid] = 0
+
+						print("tp_player_lh["+playerid+"] = "+tp_player_lh[playerid])
+					}
+				}
+			}, 5000, -1)*/
+		}
 	}
 }
 
@@ -7342,8 +7382,8 @@ function(playerid, id)
 	fuel["0"] <- max_fuel
 	dviglo["0"] <- 0
 	probeg["0"] <- 0
-	array_car_1["0"] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	array_car_2["0"] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	array_car_1["0"] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	array_car_2["0"] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 })
 
 addCommandHandler("stime",
@@ -7521,30 +7561,7 @@ function(command, params)
 
 	if(command == "x")
 	{	
-		/*local x = true
-		print((x || 0))//true
-
-		local x = false
-		print((x || 0))//0*/
-
-		/*if (4.0 == 4)
-		{
-			print("true")
-		}*/
-
-		/*local x = timer(function () {
-			print("timer out")
-		}, 5000, 1);
-		print(x.tostring())
-
-		if (x.IsActive())
-		{
-			print("timer kill "+x.Kill().tostring())
-		}
-		else 
-		{
-			print("timer ! active")
-		}*/
+		
 	}
 
 	if(command == "a")//админский чат
