@@ -73,9 +73,11 @@ local max_sg = 1000
 local color_tips = [168,228,160]//--бабушкины яблоки
 local yellow = [255,255,0]//--желтый
 local red = [255,0,0]//--красный
+local red_try = [200,0,0]//--красный
 local blue = [0,150,255]//--синий
 local white = [255,255,255]//--белый
 local green = [0,255,0]//--зеленый
+local green_try = [0,200,0]//--зеленый
 local turquoise = [0,255,255]//--бирюзовый
 local orange = [255,100,0]//--оранжевый
 local orange_do = [255,150,0]//--оранжевый do
@@ -116,6 +118,8 @@ local color_table = [
 	[73,  75,  33],
 	[145, 114, 33],
 	[74,  43,  8],
+	[0,150,0],
+	[0,0,150],
 ]
 
 local info_png = {
@@ -822,6 +826,21 @@ function me_chat(playerid, text)
 	}
 }
 
+function me_chat_player(playerid, text)
+{
+	local myPos = getPlayerPosition(playerid)
+
+	foreach (player, playername in getPlayers())
+	{
+		local Pos = getPlayerPosition(player)
+
+		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
+		{
+			sendMessage(player, "[ME] "+text, pink[0], pink[1], pink[2])
+		}
+	}
+}
+
 function do_chat(playerid, text)
 {
 	local myPos = getPlayerPosition(playerid)
@@ -833,6 +852,44 @@ function do_chat(playerid, text)
 		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
 		{
 			sendMessage(player, text, orange_do[0], orange_do[1], orange_do[2])
+		}
+	}
+}
+
+function do_chat_player(playerid, text)
+{
+	local myPos = getPlayerPosition(playerid)
+
+	foreach (player, playername in getPlayers())
+	{
+		local Pos = getPlayerPosition(player)
+
+		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
+		{
+			sendMessage(player, "[DO] "+text, orange_do[0], orange_do[1], orange_do[2])
+		}
+	}
+}
+
+function try_chat_player(playerid, text)
+{
+	local myPos = getPlayerPosition(playerid)
+	local randomize = random(0,1)
+
+	foreach (player, playername in getPlayers())
+	{
+		local Pos = getPlayerPosition(player)
+
+		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
+		{
+			if(randomize)
+			{
+				sendMessage(player, "[TRY] "+text+"[УДАЧНО]", green_try[0], green_try[1], green_try[2])
+			}
+			else
+			{
+				sendMessage(player, "[TRY] "+text+"[НЕУДАЧНО]", red_try[0], red_try[1], red_try[2])
+			}
 		}
 	}
 }
@@ -3169,14 +3226,14 @@ function job_timer2 ()
 
 						triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
 					}
-					else if (job_call[playerid] >= 1 && job_call[playerid] <= 5)
+					else if (job_call[playerid] >= 1 && job_call[playerid] <= 11)
 					{
 						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0))
 						{
 							job_call[playerid]++
 						}
 					}
-					else if (job_call[playerid] == 6)
+					else if (job_call[playerid] == 12)
 					{
 						local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
 						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && result[1]["COUNT()"] == 1)
@@ -3709,7 +3766,7 @@ function car_spawn(number)
 	if (value[1]["nalog"] != 0)
 	{
 		local color = toRGBA(value[1]["car_rgb"])
-		local vehicleid = createVehicle( value[1]["model"], value[1]["x"], value[1]["y"], value[1]["z"] + 1.0, value[1]["rot"], 0.0, 0.0 )
+		local vehicleid = createVehicle( value[1]["model"], value[1]["x"], value[1]["y"], value[1]["z"] + 0.0, value[1]["rot"], 0.0, 0.0 )
 
 		setVehiclePlateText(vehicleid, number)
 		setVehicleColour(vehicleid, color[0], color[1], color[2], color[0], color[1], color[2])
@@ -6468,7 +6525,11 @@ function (playerid, id)
 	local cash = 100
 	local id = id.tointeger()
 
-	if (logged[playerid] == 0)
+	if (id < 0 || id >= getMaxPlayers()) 
+	{
+		return
+	}
+	else if (logged[playerid] == 0)
 	{
 		return
 	}
@@ -6531,7 +6592,11 @@ function (playerid, id)
 	local cash = 1000
 	local id = id.tointeger()
 
-	if (logged[playerid] == 0)
+	if (id < 0 || id >= getMaxPlayers()) 
+	{
+		return
+	}
+	else if (logged[playerid] == 0)
 	{
 		return
 	}
@@ -6602,7 +6667,11 @@ function (playerid, value, id)
 
 	if (value == "player")
 	{
-		if(logged[id] == 0)
+		if (id < 0 || id >= getMaxPlayers()) 
+		{
+			return
+		}
+		else if(logged[id] == 0)
 		{
 			sendMessage(playerid, "[ERROR] Такого игрока нет", red[0], red[1], red[2])
 			return
@@ -6726,7 +6795,11 @@ function (playerid, id)
 	local playername = getPlayerName ( playerid )
 	local id = id.tointeger()
 
-	if (logged[playerid] == 0)
+	if (id < 0 || id >= getMaxPlayers()) 
+	{
+		return
+	}
+	else if (logged[playerid] == 0)
 	{
 		return
 	}
@@ -6763,7 +6836,11 @@ function (playerid, id, rang)
 	local id = id.tointeger()
 	local rang = rang.tointeger()
 
-	if (logged[playerid] == 0)
+	if (id < 0 || id >= getMaxPlayers()) 
+	{
+		return
+	}
+	else if (logged[playerid] == 0)
 	{
 		return
 	}
@@ -6855,7 +6932,11 @@ function( playerid, id, ...)
 	local playername = getPlayerName ( playerid )
 	local id = id.tointeger()
 
-	if(logged[playerid] == 0)
+	if (id < 0 || id >= getMaxPlayers()) 
+	{
+		return
+	}
+	else if (logged[playerid] == 0)
 	{
 		return
 	}
@@ -6886,7 +6967,11 @@ function (playerid, id, cash)
 	local cash = cash.tointeger()
 	local id = id.tointeger()
 
-	if (logged[playerid] == 0) 
+	if (id < 0 || id >= getMaxPlayers()) 
+	{
+		return
+	}
+	else if (logged[playerid] == 0)
 	{
 		return
 	}
@@ -6981,10 +7066,10 @@ function (playerid, id)
 								}
 							}
 
-							setVehiclePosition(vehicleid, myPos[0]+2, myPos[1], myPos[2]+1)
+							setVehiclePosition(vehicleid, myPos[0]+2, myPos[1], myPos[2]+0.5)
 							setVehicleRotation(vehicleid, 0.0, 0.0, 0.0)
 
-							sqlite3( "UPDATE car_db SET x = '"+(myPos[0]+2)+"', y = '"+myPos[1]+"', z = '"+(myPos[2]+1)+"' WHERE number = '"+plate+"'")
+							sqlite3( "UPDATE car_db SET x = '"+(myPos[0]+2)+"', y = '"+myPos[1]+"', z = '"+(myPos[2]+0.5)+"' WHERE number = '"+plate+"'")
 
 							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playerid )
 
@@ -7220,6 +7305,63 @@ function (playerid)
 	}
 })
 
+addCommandHandler("me",
+function (playerid, ...)
+{
+	local playername = getPlayerName( playerid )
+
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	local text = ""
+	for(local i = 0; i < vargv.len(); i++)
+	{
+		text = text+vargv[i]+" "
+	}
+
+	me_chat_player(playerid, playername+" "+text)
+})
+
+addCommandHandler("do",
+function (playerid, ...)
+{
+	local playername = getPlayerName( playerid )
+
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	local text = ""
+	for(local i = 0; i < vargv.len(); i++)
+	{
+		text = text+vargv[i]+" "
+	}
+
+	do_chat_player(playerid, playername+" "+text)
+})
+
+addCommandHandler("try",
+function (playerid, ...)
+{
+	local playername = getPlayerName( playerid )
+
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	local text = ""
+	for(local i = 0; i < vargv.len(); i++)
+	{
+		text = text+vargv[i]+" "
+	}
+
+	try_chat_player(playerid, playername+" "+text)
+})
+
 addCommandHandler("cmd",//все команды
 function (playerid)
 {
@@ -7250,6 +7392,9 @@ function (playerid)
 		"/msg menu [pay | coef] [сумма] - установить зарплату или доход от продаж",
 		"/msg menu tax - оплатить налог",
 		"/msg menu balance [знак - или + и сумма] - снять или положить деньги на баланс рыбзавода",
+		"/me [текст] - описание действия от 1 лица",
+		"/do [текст] - описание от 3 лица",
+		"/try [текст] - попытка действия",
 		"/idpng - ид предметов сервера",
 	]
 
@@ -7342,7 +7487,11 @@ function (playerid, id, time, ...)
 		reason = reason+vargv[i]+" "
 	}
 
-	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	if (id < 0 || id >= getMaxPlayers()) 
+	{
+		return
+	}
+	else if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
 	{
 		return
 	}
