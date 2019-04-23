@@ -884,14 +884,16 @@ function try_chat_player(playerid, text)
 		{
 			if(randomize)
 			{
-				sendMessage(player, "[TRY] "+text+"[УДАЧНО]", green_try[0], green_try[1], green_try[2])
+				sendMessage(player, "[TRY] "+text+" [УДАЧНО]", green_try[0], green_try[1], green_try[2])
 			}
 			else
 			{
-				sendMessage(player, "[TRY] "+text+"[НЕУДАЧНО]", red_try[0], red_try[1], red_try[2])
+				sendMessage(player, "[TRY] "+text+" [НЕУДАЧНО]", red_try[0], red_try[1], red_try[2])
 			}
 		}
 	}
+
+	return randomize
 }
 
 function ic_chat(playerid, text)
@@ -3215,6 +3217,8 @@ function job_timer2 ()
 
 			else if (job[playerid] == 6) //--ор на рз
 			{
+				if (getPlayerModel(playerid) == 133)
+				{
 					if (job_call[playerid] == 0) //--нету вызова
 					{
 						local randomize = random(0,table_sg_pos.len()-1)
@@ -3272,6 +3276,7 @@ function job_timer2 ()
 							}
 						}
 					}
+				}
 			}
 
 			else if (job[playerid] == 0)//--нету работы
@@ -3843,7 +3848,7 @@ function( playerid, name, ip, serial )
 				setPlayerPosition(playerid, result[1]["x"],result[1]["y"],result[1]["z"])
 			}
 		}
-	}, 20000, 1)//спавн если х и у = 0
+	}, 10000, 2)//спавн если х и у = 0
 
 	print("[serial] "+getPlayerSerial(playerid))
 })
@@ -3856,6 +3861,12 @@ function playerDisconnect( playerid, reason )
 		local vehicleid = getPlayerVehicle(playerid)
 		local heal = getplayerhealth(playerid)
 		local playername = getPlayerName(playerid)
+
+		if(isPlayerInVehicle(playerid))
+		{
+			local pos = getVehiclePosition(vehicleid)
+			myPos = [pos[0]+2,pos[1]+2,pos[2]]
+		}
 
 		if (myPos[0] != 0 && myPos[1] != 0 && myPos[2] != 0)
 		{
@@ -6081,9 +6092,10 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 84)
 		{
-			local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+id2+"'" )
-			if (result[1])
+			local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+id2+"'" )
+			if (result[1]["COUNT()"] == 1)
 			{
+				result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+id2+"'" )
 				local farms = [
 					[result[1]["number"], "Зарплата", result[1]["price"]+"$"],
 					[result[1]["number"], "Баланс", split(result[1]["money"].tostring(),".")[0]+"$"],
@@ -6103,9 +6115,16 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 85)
 		{
-			local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+id2+"'" )
-			if (result[1])
+			if(getPlayerModel(playerid) != 133)
 			{
+				sendMessage(playerid, "[ERROR] Вы должны быть в одежде 133", red[0], red[1], red[2])
+				return
+			}
+
+			local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+id2+"'" )
+			if (result[1]["COUNT()"] == 1)
+			{
+				result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+id2+"'" )
 				local farms = [
 					[result[1]["number"], "Зарплата", result[1]["price"]+"$"],
 					[result[1]["number"], "Доход от продаж", result[1]["coef"]+" процентов"],
@@ -6877,6 +6896,48 @@ function (playerid, id, rang)
 	}
 })
 
+addCommandHandler ( "enshot",//--выстрелить в двигатель
+function (playerid, id)
+{
+	local playername = getPlayerName ( playerid )
+	local id = id.tointeger()
+	local myPos = getPlayerPosition(playerid)
+
+	if (id < 0 || id >= getMaxPlayers()) 
+	{
+		return
+	}
+	else if (logged[playerid] == 0)
+	{
+		return
+	}
+
+	if (search_inv_player(playerid, 10, 1) != 0)
+	{
+		if (logged[id] == 0 || !isPlayerInVehicle(id))
+		{
+			return
+		}
+
+		local Pos = getPlayerPosition(id)
+		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], 10.0))
+		{
+			if(try_chat_player(playerid, playername+" попытался(ась) выстрелить в двигатель"))
+			{
+				dviglo[getVehiclePlateText(getPlayerVehicle(id))] <- 0
+			}
+		}
+		else
+		{
+			sendMessage(playerid, "[ERROR] Игрок далеко", red[0], red[1], red[2])
+		}
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Вы не полицейский", red[0], red[1], red[2])
+	}
+})
+
 addCommandHandler ( "pr",//--пол-ая волна
 function (playerid, ...)
 {
@@ -7387,6 +7448,7 @@ function (playerid)
 		"/auc [buy | return] [номер слота] - купить или забрать предмет с аукциона",
 		"/takecar [номер т/с] - забрать т/с со штрафстоянки",
 		"/lawyer [ИД игрока] - заплатить залог за игрока",
+		"/enshot [ИД игрока] - выстрелить в двигатель",
 		"/msg buy - купить рыбзавод",
 		"/msg job [номер рыбзавода] - устроиться на рыбзавод",
 		"/msg menu [pay | coef] [сумма] - установить зарплату или доход от продаж",
