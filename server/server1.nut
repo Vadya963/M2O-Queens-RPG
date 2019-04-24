@@ -105,21 +105,50 @@ local color_table = [
 	[175,0,255],
 	[0,0,0],
 	[150,150,150],
-	[79,  72,  65],
-	[120, 111, 68],
-	[15,  32,  24],
-	[18,  44,  69],
-	[35,  22,  8],
-	[57,  49,  29],
-	[102, 70,  18],
-	[121, 113, 31],
-	[143, 137, 124],
-	[132, 112, 78],
-	[73,  75,  33],
-	[145, 114, 33],
-	[74,  43,  8],
 	[0,150,0],
 	[0,0,150],
+	[50,50,50],
+
+	[62,82,93],
+	[31,29,50],
+	[52,24,46],
+	[190,211,178],
+	[103,56,50],
+	[144,90,78],
+	[196,34,49],
+	[238,201,156],
+	[82,55,48],
+	[123,97,74],
+	[143,91,54],
+	[191,140,87],
+	[33,27,39],
+	[174,88,101],
+	[161,71,80],
+	[234,176,162],
+	[37,41,52],
+	[62,67,71],
+	[164,166,144],
+	[133,166,149],
+	[31,45,46],
+	[155,141,94],
+	[180,181,141],
+	[172,152,132],
+	[55,64,59],
+	[136,151,94],
+	[90,133,106],
+	[180,209,161],
+	[70,30,38],
+	[176,103,68],
+	[120,28,41],
+	[170,68,64],
+	[228,201,124],
+	[244,202,130],
+	[250,234,185],
+	[227,197,147],
+	[165,138,117],
+	[219,190,156],
+	[251,227,191],
+	[254,245,212],
 ]
 
 local info_png = {
@@ -181,7 +210,7 @@ local info_png = {
 	[55] = ["лист металла", "кг"],
 	[56] = ["пила", "шт"],
 	[57] = ["шпала", "$ за штуку"],
-	[58] = ["пустая коробка", "шт"],
+	[58] = ["колба с", "этм"],
 	[59] = ["кирка", "шт"],
 	[60] = ["руда", "кг"],
 	[61] = ["бочка с нефтью", "$ за штуку"],
@@ -580,8 +609,6 @@ local shop = {
 	[26] = [info_png[26][0], 1, 5000],
 	[44] = [info_png[44][0], 100, 50],
 	[45] = [info_png[45][0], 100, 100],
-	[46] = [info_png[46][0], 1, 100],
-	[47] = [info_png[47][0], 1, 100],
 	[52] = [info_png[52][0], 1, 100],
 	[64] = [info_png[64][0], 1, 250],
 	[74] = [info_png[74][0], 100, 100],
@@ -600,6 +627,7 @@ local gas = {
 }
 
 local giuseppe = {
+	[58] = [info_png[58][0], 78, 1000],
 	[78] = [info_png[78][0], 100, 1000],
 	[79] = [info_png[79][0], 5, 500],
 	[80] = [info_png[80][0], 1, 5000],
@@ -1318,6 +1346,7 @@ function random_sub (playerid, id)//выпадение предметов
 {
 	local random_sub_array = [
 		[51, [ [77,1,20] ]],
+		[39, [ [58,3,20] ]],
 	]
 
 	local playername = getPlayerName ( playerid )
@@ -1652,6 +1681,8 @@ function buy_subject_fun( playerid, text, number, value )
 			[30] = [info_png[30][0]],
 			[31] = [info_png[31][0]],
 			[32] = [info_png[32][0]],
+			[46] = [info_png[46][0]],
+			[47] = [info_png[47][0]],
 		}
 
 		local weapon_cops = {
@@ -1723,9 +1754,6 @@ function buy_subject_fun( playerid, text, number, value )
 			[67] = [info_png[67][0], 1, 10],
 			[72] = [info_png[72][0], 1, 5000],
 			[75] = [info_png[75][0], 1, 1000],
-		}
-
-		local mayoralty_nalog = {
 			[48] = ["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog)],
 			[49] = ["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog)],
 			[50] = ["квитанция для оплаты т/с на", day_nalog, (zakon_nalog_car*day_nalog)],
@@ -1755,37 +1783,6 @@ function buy_subject_fun( playerid, text, number, value )
 				{
 					sendMessage(playerid, "[ERROR] У вас недостаточно средств", red[0], red[1], red[2])
 				}
-
-				return
-			}
-		}
-
-		foreach (k, v in mayoralty_nalog)
-		{
-			local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
-			if (text1 == text)
-			{
-				if (v[2] <= array_player_2[playerid][0])
-				{
-					if (inv_player_empty(playerid, k, v[1]))
-					{
-						sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange[0], orange[1], orange[2])
-
-						inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(v[2]), playername )
-
-						save_player_action(playername, "[mayoralty_menu_fun] [mayoralty_nalog - "+text+"], "+playername+" [-"+v[2]+"$, "+array_player_2[playerid][0]+"$]")
-					}
-					else
-					{
-						sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
-					}
-				}
-				else
-				{
-					sendMessage(playerid, "[ERROR] У вас недостаточно средств", red[0], red[1], red[2])
-				}
-
-				return
 			}
 		}
 
@@ -2273,7 +2270,8 @@ function craft_fun( playerid, text )
 	local z = myPos[2]
 
 	local craft_table = [//--[предмет 0, рецепт 1, предметы для крафта 2, кол-во предметов для крафта 3, предмет который скрафтится 4]
-		[info_png[76][0]+"(1 шт)", info_png[77][0]+"(1 шт) + "+info_png[78][0]+"(100 гр)", "77,78", "1,100", "76,1"],
+		[info_png[76][0]+" 1 "+info_png[76][1], info_png[77][0]+" 1 "+info_png[77][1]+" + "+info_png[78][0]+" 100 "+info_png[78][1], "77,78", "1,100", "76,1"],
+		[info_png[20][0]+" 1 "+info_png[20][1], info_png[58][0]+" 3 "+info_png[58][1]+" + "+info_png[58][0]+" 78 "+info_png[58][1], "58,58", "3,78", "20,1"],
 	]
 
 		foreach (k, v in sqlite3("SELECT * FROM house_db")) 
@@ -6234,14 +6232,16 @@ function (playerid)
 			array_house_1[dim] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 			array_house_2[dim] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
-			triggerClientEvent( playerid, "event_blip_create", x, y, 0,4, max_blip )
-			triggerClientEvent( playerid, "event_blip_create", x, y, 6,0, max_blip )
+			foreach (playerid, v in getPlayers()) 
+			{
+				triggerClientEvent( playerid, "event_blip_create", x, y, 0,4, max_blip )
+				triggerClientEvent( playerid, "event_blip_create", x, y, 6,0, max_blip )
+				triggerClientEvent( playerid, "event_bussines_house_fun", dim, x, y, z, "house", house_bussiness_radius, 0, 0 )
+			}
 
 			sqlite3( "INSERT INTO house_db (number, nalog, x, y, z, inventory) VALUES ('"+dim+"', '5', '"+x+"', '"+y+"', '"+z+"', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
 			sendMessage(playerid, "Вы получили "+info_png[25][0]+" "+dim+" "+info_png[25][0], orange[0], orange[1], orange[2])
-			
-			triggerClientEvent( playerid, "event_bussines_house_fun", dim, x, y, z, "house", house_bussiness_radius, 0, 0 )
 
 			save_player_action(playername, "[sellhouse] "+playername+" [house - "+dim+", x - "+x+", y - "+y+", z - "+z+"]")
 		}
@@ -6316,16 +6316,18 @@ function (playerid, id)
 			local dim = business_number+1
 
 			if (inv_player_empty(playerid, 36, dim))
-			{
-				triggerClientEvent( playerid, "event_blip_create", x, y, 0,4, max_blip )
-				triggerClientEvent( playerid, "event_blip_create", x, y, interior_business[id][2],0, max_blip )
+			{	
+				foreach (playerid, v in getPlayers()) 
+				{
+					triggerClientEvent( playerid, "event_blip_create", x, y, 0,4, max_blip )
+					triggerClientEvent( playerid, "event_blip_create", x, y, interior_business[id][2],0, max_blip )
+					triggerClientEvent( playerid, "event_bussines_house_fun", dim, x, y, z, "biz", house_bussiness_radius, 0, 0 )
+				}
 
 				sqlite3( "INSERT INTO business_db (number, type, price, money, nalog, warehouse, x, y, z, interior) VALUES ('"+dim+"', '"+interior_business[id][1]+"', '0', '0', '5', '0', '"+x+"', '"+y+"', '"+z+"', '"+id+"')" )
 
 				sendMessage(playerid, "Вы получили "+info_png[36][0]+" "+dim+" "+info_png[36][1], orange[0], orange[1], orange[2])
-				
-				triggerClientEvent( playerid, "event_bussines_house_fun", dim, x, y, z, "biz", house_bussiness_radius, 0, 0 )
-
+					
 				save_player_action(playername, "[sellbusiness] "+playername+" [business - "+dim+", x - "+x+", y - "+y+", z - "+z+"]")
 			}
 			else
