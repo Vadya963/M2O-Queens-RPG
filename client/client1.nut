@@ -119,7 +119,7 @@ local info_png = {
 	[55] = ["лист металла", "кг"],
 	[56] = ["пила", "шт"],
 	[57] = ["шпала", "$ за штуку"],
-	[58] = ["колба с", "этм"],
+	[58] = ["колба", "реагент"],
 	[59] = ["кирка", "шт"],
 	[60] = ["руда", "кг"],
 	[61] = ["бочка с нефтью", "$ за штуку"],
@@ -1137,8 +1137,8 @@ function f1_down()
 		return
 	}
 
-	showCursor( !isCursorShowing )
 	isCursorShowing = !isCursorShowing
+	showCursor( isCursorShowing )
 }
 
 function f2_down()
