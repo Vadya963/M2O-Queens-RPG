@@ -241,12 +241,8 @@ local color_table = [
 	[220,20,60],
 	[175,0,255],
 	[0,0,0],
-	[150,150,150],
-	[0,150,0],
-	[0,0,150],
-	[50,50,50],
 
-	[62,82,93],
+	/*[62,82,93],
 	[31,29,50],
 	[52,24,46],
 	[190,211,178],
@@ -285,8 +281,52 @@ local color_table = [
 	[165,138,117],
 	[219,190,156],
 	[251,227,191],
-	[254,245,212],
+	[254,245,212],*/
+
+	[83,104,80],
+	[70,128,95],
+	[27,76,65],
+	[15,32,24],
+	[143,137,124],
+	[120,111,68],
+	[97,46,10],
+	[154,154,154],
+	[98,26,21],
+	[145,114,33],
+	[57,84,37],
+	[121,113,31],
+	[1,17,13],
+	[157,143,110],
+	[47,95,106],
+	[80,80,80],
+	[79,72,65],
+	[112,104,89],
+	[29,4,0],
+	[66,0,0],
+	[73,75,33],//21
 ]
+
+for (local i = 50; i <= 250; i+=50) {
+	color_table.push([i,0,0])
+}
+for (local i = 50; i <= 250; i+=50) {
+	color_table.push([250,i,0])
+}
+for (local i = 200; i >= 0; i-=50) {
+	color_table.push([i,250,0])
+}
+for (local i = 50; i <= 250; i+=50) {
+	color_table.push([0,250,i])
+}
+for (local i = 200; i >= 0; i-=50) {
+	color_table.push([0,i,250])
+}
+for (local i = 50; i <= 250; i+=50) {
+	color_table.push([i,0,250])
+}
+for (local i = 200; i >= 50; i-=50) {
+	color_table.push([250,0,i])
+}
 
 //--------------------------------------------грайдлист--------------------------------------------
 function guiCreateGridList (x,y, width, height)
@@ -827,11 +867,11 @@ timer(function () {
 
 	foreach (k, v in blip_data) 
 	{	
-		if ( isPointInCircle2D(myPos[0], myPos[1], v[1].tofloat(), v[2].tofloat(), v[5].tofloat()) )
+		if ( isPointInCircle2D(myPos[0], myPos[1], v[1], v[2], v[5]) )
 		{	
 			if (!v[6])
 			{
-				blip_data[k][0] = createBlip(v[1].tofloat(), v[2].tofloat(), v[3], v[4])
+				blip_data[k][0] = createBlip(v[1], v[2], v[3], v[4])
 				blip_data[k][6] = true
 			}
 		}
