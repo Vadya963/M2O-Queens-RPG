@@ -104,12 +104,8 @@ local color_table = [
 	[220,20,60],
 	[175,0,255],
 	[0,0,0],
-	[150,150,150],
-	[0,150,0],
-	[0,0,150],
-	[50,50,50],
 
-	[62,82,93],
+	/*[62,82,93],
 	[31,29,50],
 	[52,24,46],
 	[190,211,178],
@@ -148,8 +144,52 @@ local color_table = [
 	[165,138,117],
 	[219,190,156],
 	[251,227,191],
-	[254,245,212],
+	[254,245,212],*/
+
+	[83,104,80],
+	[70,128,95],
+	[27,76,65],
+	[15,32,24],
+	[143,137,124],
+	[120,111,68],
+	[97,46,10],
+	[154,154,154],
+	[98,26,21],
+	[145,114,33],
+	[57,84,37],
+	[121,113,31],
+	[1,17,13],
+	[157,143,110],
+	[47,95,106],
+	[80,80,80],
+	[79,72,65],
+	[112,104,89],
+	[29,4,0],
+	[66,0,0],
+	[73,75,33],//21
 ]
+
+for (local i = 50; i <= 250; i+=50) {
+	color_table.push([i,0,0])
+}
+for (local i = 50; i <= 250; i+=50) {
+	color_table.push([250,i,0])
+}
+for (local i = 200; i >= 0; i-=50) {
+	color_table.push([i,250,0])
+}
+for (local i = 50; i <= 250; i+=50) {
+	color_table.push([0,250,i])
+}
+for (local i = 200; i >= 0; i-=50) {
+	color_table.push([0,i,250])
+}
+for (local i = 50; i <= 250; i+=50) {
+	color_table.push([i,0,250])
+}
+for (local i = 200; i >= 50; i-=50) {
+	color_table.push([250,0,i])
+}
 
 local info_png = {
 	[0] = ["", ""],
@@ -5046,7 +5086,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		//-----------------------------------------------------------------------------------------
 		if (id1 == 3 || id1 == 7 || id1 == 8)//--сигареты
 		{
-			local satiety_minys = 5
+			local satiety_plus = 5
 
 			if (getplayerhealth(playerid) == max_heal)
 			{
@@ -5075,10 +5115,10 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				sendMessage(playerid, "+"+hp+" хп", yellow[0], yellow[1], yellow[2])
 			}
 
-			if (satiety[playerid]-satiety_minys >= 0)
+			if (satiety[playerid]+satiety_plus <= max_satiety)
 			{
-				satiety[playerid] = satiety[playerid]-satiety_minys
-				sendMessage(playerid, "-"+satiety_minys+" ед. сытости", yellow[0], yellow[1], yellow[2])
+				satiety[playerid] = satiety[playerid]+satiety_plus
+				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow[0], yellow[1], yellow[2])
 			}
 
 			me_chat(playerid, playername+" выкурил(а) сигарету")
@@ -5100,7 +5140,8 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 20)//--нарко
 		{
-			local satiety_minys = 10
+			local satiety_plus = 20
+			local sleep_plus = 20
 			local drugs_plus = 1
 
 			if (getplayerhealth(playerid) == max_heal)
@@ -5123,10 +5164,16 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			drugs[playerid] = drugs[playerid]+drugs_plus
 			sendMessage(playerid, "+"+drugs_plus+" ед. наркозависимости",  yellow[0], yellow[1], yellow[2])
 
-			if (satiety[playerid]-satiety_minys >= 0)
+			if (satiety[playerid]+satiety_plus <= max_satiety)
 			{
-				satiety[playerid] = satiety[playerid]-satiety_minys
-				sendMessage(playerid, "-"+satiety_minys+" ед. сытости",  yellow[0], yellow[1], yellow[2])
+				satiety[playerid] = satiety[playerid]+satiety_plus
+				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow[0], yellow[1], yellow[2])
+			}
+
+			if (sleep[playerid]+sleep_plus <= max_sleep)
+			{
+				sleep[playerid] = sleep[playerid]+sleep_plus
+				sendMessage(playerid, "+"+sleep_plus+" ед. сна", yellow[0], yellow[1], yellow[2])
 			}
 
 			me_chat(playerid, playername+" употребил(а) наркотики")
@@ -6140,7 +6187,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				job[playerid] = 6
 
-				me_chat(playerid, playername+" вышел(ла) на работу Обработчик рыбы на рыбзаводе")
+				me_chat(playerid, playername+" вышел(ла) на работу Обработчик рыбы на "+id2+" рыбзаводе")
 			}
 			else
 			{
@@ -7770,7 +7817,7 @@ function(command, params)
 
 	if(command == "z")
 	{	
-
+	
 	}
 
 	if(command == "x")
