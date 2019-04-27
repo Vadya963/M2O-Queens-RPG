@@ -52,7 +52,9 @@ local info2 = 0//число
 local plate = ""//если в тс
 local house = ""//если около дома
 
-local no_use_subject = [-1,0,1]
+local no_use_subject = [-1,0,1]//--нельзя использовать
+local no_select_subject = [-1,0,1]//--нельзя выделить
+local no_change_subject = [-1,1]//--нельзя заменить
 
 //--перемещение картинки
 local lmb = 0//--лкм
@@ -1652,7 +1654,7 @@ function( element )
 
 					if (lmb == 0)
 					{
-						foreach (idx, v in no_use_subject)
+						foreach (idx, v in no_select_subject)
 						{
 							if (v == info1)
 							{
@@ -1674,8 +1676,8 @@ function( element )
 						//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
 						/*if (inv_slot_player[info3][0] != 0)
 						{*/
-							local no_use_subject_1 = [-1,1]
-							foreach (idx, v in no_use_subject_1)
+
+							foreach (idx, v in no_change_subject)
 							{
 								if (v == info1)
 								{
@@ -1708,7 +1710,7 @@ function( element )
 					
 					if (lmb == 0)
 					{
-						foreach (idx, v in no_use_subject)
+						foreach (idx, v in no_select_subject)
 						{
 							if (v == info1)
 							{
@@ -1730,8 +1732,8 @@ function( element )
 						//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
 						/*if (inv_slot_car[info3][0] != 0)
 						{*/
-							local no_use_subject_1 = [-1,1]
-							foreach (idx, v in no_use_subject_1)
+
+							foreach (idx, v in no_change_subject)
 							{
 								if (v == info1)
 								{
@@ -1764,7 +1766,7 @@ function( element )
 					
 					if (lmb == 0)
 					{
-						foreach (idx, v in no_use_subject)
+						foreach (idx, v in no_select_subject)
 						{
 							if (v == info1)
 							{
@@ -1786,8 +1788,8 @@ function( element )
 						//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
 						/*if (inv_slot_house[info3][0] != 0)
 						{*/
-							local no_use_subject_1 = [-1,1]
-							foreach (idx, v in no_use_subject_1)
+
+							foreach (idx, v in no_change_subject)
 							{
 								if (v == info1)
 								{
@@ -1865,14 +1867,6 @@ function( element )
 		{
 			if (lmb == 1)
 			{
-				foreach (k, v in no_use_subject) 
-				{
-					if (v == info1)
-					{
-						return
-					}
-				}
-
 				if (info_tab == "player" && state_inv_player)
 				{
 					triggerServerEvent( "event_throw_earth_server", "player", info3, info1, info2, playerid )
