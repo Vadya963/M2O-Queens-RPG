@@ -4013,6 +4013,7 @@ function( playerid )
 	if (logged[playerid] == 0) 
 	{
 		sendMessage(playerid, "[TIPS] Если у вас нету счетчика FPS, перезайдите!", color_tips[0], color_tips[1], color_tips[2])
+		sendMessage(playerid, "[TIPS] F2 - скрыть или показать худ", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] TAB - открыть инвентарь, левая часть экрана - использовать предмет, правая - выкинуть", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] X - крафт предметов", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] Листать чат page up и page down", color_tips[0], color_tips[1], color_tips[2])
@@ -7357,7 +7358,7 @@ function (playerid, plate)
 	sendMessage(playerid, "[ERROR] Вы должны быть около телефонной будки", red[0], red[1], red[2])
 })
 
-addCommandHandler("msg",//меню рыбзавода
+addCommandHandler("sg",//меню рыбзавода
 function (playerid, value, ...)
 {
 	local playername = getPlayerName( playerid )
@@ -7499,11 +7500,11 @@ function (playerid)
 		"/takecar [номер т/с] - забрать т/с со штрафстоянки",
 		"/lawyer [ИД игрока] - заплатить залог за игрока",
 		"/enshot [ИД игрока] - выстрелить в двигатель",
-		"/msg buy - купить рыбзавод",
-		"/msg job [номер рыбзавода] - устроиться на рыбзавод",
-		"/msg menu [pay | coef] [сумма] - установить зарплату или доход от продаж",
-		"/msg menu tax - оплатить налог",
-		"/msg menu balance [знак - или + и сумма] - снять или положить деньги на баланс рыбзавода",
+		"/sg buy - купить рыбзавод",
+		"/sg job [номер рыбзавода] - устроиться на рыбзавод",
+		"/sg menu [pay | coef] [сумма] - установить зарплату или доход от продаж",
+		"/sg menu tax - оплатить налог",
+		"/sg menu balance [знак - или + и сумма] - снять или положить деньги на баланс рыбзавода",
 		"/me [текст] - описание действия от 1 лица",
 		"/do [текст] - описание от 3 лица",
 		"/try [текст] - попытка действия",
