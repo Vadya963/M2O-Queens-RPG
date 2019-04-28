@@ -44,6 +44,8 @@ local max_text_len = 90//макс длина сообщения
 local car_number = 0//count car
 local car_theft_time = 10//время для угона
 local crimes_giuseppe = 25//прес-ия для джузеппе
+local business_pos = {}//--позиции бизнесов
+local house_pos = {}//--позиции домов
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -1664,14 +1666,14 @@ function element_data_push_client ()
 
 function house_bussiness_job_pos_load( playerid )
 {
-	foreach (idx, v in sqlite3( "SELECT * FROM house_db" )) 
+	foreach (k, v in house_pos) 
 	{
-		triggerClientEvent( playerid, "event_bussines_house_fun", v["number"], v["x"], v["y"], v["z"], "house", house_bussiness_radius, 0, 0 )
+		triggerClientEvent( playerid, "event_bussines_house_fun", k, v[0], v[1], v[2], "house", house_bussiness_radius )
 	}
 
-	foreach (idx, v in sqlite3( "SELECT * FROM business_db" )) 
+	foreach (k, v in business_pos)
 	{
-		triggerClientEvent( playerid, "event_bussines_house_fun", v["number"], v["x"], v["y"], v["z"], "biz", house_bussiness_radius, 0, 0 )
+		triggerClientEvent( playerid, "event_bussines_house_fun", k, v[0], v[1], v[2], "biz", house_bussiness_radius )
 	}
 }
 
@@ -1783,7 +1785,7 @@ function buy_subject_fun( playerid, text, number, value )
 	}
 	else if (value == "mer")//Мэрия
 	{
-		local day_nalog = 7
+		local day_nalog = 7//кол-во дней для оплаты налога
 
 		local mayoralty_shop = {
 			[2] = [info_png[2][0], 1, 1000],
@@ -3768,12 +3770,14 @@ function()
 
 
 	local house_number = 0
-	foreach (idx, value in sqlite3( "SELECT * FROM house_db" )) 
+	foreach (idx, v in sqlite3( "SELECT * FROM house_db" )) 
 	{
-		array_house_1[value["number"]] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-		array_house_2[value["number"]] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		array_house_1[v["number"]] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		array_house_2[v["number"]] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
-		load_inv(value["number"], "house", value["inventory"])
+		load_inv(v["number"], "house", v["inventory"])
+
+		house_pos[v["number"]] <- [v["x"], v["y"], v["z"]]
 
 		house_number++
 	}
@@ -3781,8 +3785,10 @@ function()
 
 
 	local business_number = 0
-	foreach (idx, value in sqlite3( "SELECT * FROM business_db" )) 
+	foreach (idx, v in sqlite3( "SELECT * FROM business_db" )) 
 	{
+		business_pos[v["number"]] <- [v["x"], v["y"], v["z"]]
+
 		business_number++
 	}
 	print("[business_number] "+business_number)
@@ -4010,10 +4016,11 @@ addEventHandler( "onPlayerDeath", playerDeath )
 addEventHandler( "onPlayerSpawn",
 function( playerid )
 {
-	if (logged[playerid] == 0) 
+	if (logged[playerid] == 0)
 	{
 		sendMessage(playerid, "[TIPS] Если у вас нету счетчика FPS, перезайдите!", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] F2 - скрыть или показать худ", color_tips[0], color_tips[1], color_tips[2])
+		sendMessage(playerid, "[TIPS] F3 - скрыть или показать список игроков", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] TAB - открыть инвентарь, левая часть экрана - использовать предмет, правая - выкинуть", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] X - крафт предметов", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] Листать чат page up и page down", color_tips[0], color_tips[1], color_tips[2])
@@ -6285,7 +6292,7 @@ function (playerid)
 			{
 				triggerClientEvent( playerid, "event_blip_create", x, y, 0,4, max_blip )
 				triggerClientEvent( playerid, "event_blip_create", x, y, 6,0, max_blip )
-				triggerClientEvent( playerid, "event_bussines_house_fun", dim, x, y, z, "house", house_bussiness_radius, 0, 0 )
+				triggerClientEvent( playerid, "event_bussines_house_fun", dim, x, y, z, "house", house_bussiness_radius )
 			}
 
 			sqlite3( "INSERT INTO house_db (number, nalog, x, y, z, inventory) VALUES ('"+dim+"', '5', '"+x+"', '"+y+"', '"+z+"', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
@@ -6370,7 +6377,7 @@ function (playerid, id)
 				{
 					triggerClientEvent( playerid, "event_blip_create", x, y, 0,4, max_blip )
 					triggerClientEvent( playerid, "event_blip_create", x, y, interior_business[id][2],0, max_blip )
-					triggerClientEvent( playerid, "event_bussines_house_fun", dim, x, y, z, "biz", house_bussiness_radius, 0, 0 )
+					triggerClientEvent( playerid, "event_bussines_house_fun", dim, x, y, z, "biz", house_bussiness_radius )
 				}
 
 				sqlite3( "INSERT INTO business_db (number, type, price, money, nalog, warehouse, x, y, z, interior) VALUES ('"+dim+"', '"+interior_business[id][1]+"', '0', '0', '5', '0', '"+x+"', '"+y+"', '"+z+"', '"+id+"')" )
