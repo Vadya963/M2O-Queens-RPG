@@ -433,7 +433,7 @@ function guiGetCountGridList (window)
 function guiSetTextGridList (window, slot, text)
 {
 	if (window)
-	{	
+	{
 		return guiSetText(gridlist_table_text[ window[1] ][ slot ], text )
 	}
 	else 
@@ -682,6 +682,31 @@ foreach (k,v in phone_stats)
 }
 guiSetVisibleGridList (phone_stats_menu, false)
 
+local player_menu_value = 1
+local player_table = {}
+for (local i = 0; i < getMaxPlayers(); i++)
+{	
+	if(getPlayerName(i))
+	{
+		player_table[i] <- getPlayerName(i)
+	}
+	else
+	{
+		player_table[i] <- ""
+	}
+}
+for (local i = getMaxPlayers(); i < getMaxPlayers()+30; i++)
+{
+	player_table[i] <- ""
+}
+local player_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(450.0/2), 400.0, 450.0)
+foreach (k,v in player_table)
+{
+	local text = k+" "+v
+	guiGridListAddRow (player_menu, text)
+}
+guiSetVisibleGridList (player_menu, false)
+
 local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 400.0, 30.0, false )
 guiSetVisible( shop_menu_button, false )
 
@@ -689,6 +714,11 @@ local shop_menu_button2 = guiCreateElement( 2, "<", (screen[0]/2)-(400.0/2), (sc
 guiSetVisible( shop_menu_button2, false )
 local shop_menu_button3 = guiCreateElement( 2, ">", (screen[0]/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
 guiSetVisible( shop_menu_button3, false )
+
+local shop_menu_button4 = guiCreateElement( 2, "<", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
+guiSetVisible( shop_menu_button4, false )
+local shop_menu_button5 = guiCreateElement( 2, ">", (screen[0]/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
+guiSetVisible( shop_menu_button5, false )
 
 function tune_close ()//--закрытие окна
 {
@@ -1201,6 +1231,36 @@ function f2_down()
 	guiSetVisible(sleep_gui, sync_timer)
 }
 
+function f3_down()
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+
+	if(guiGetVisibleGridList(player_menu))
+	{
+		showCursor( false )
+		guiSetVisibleGridList (player_menu, false)
+		guiSetVisible( shop_menu_button4, false )
+		guiSetVisible( shop_menu_button5, false )
+	}
+	else
+	{
+		showCursor( true )
+
+		local pos = guiGetSize( player_menu[0] )
+		gridlist_button_width_height = [pos[0],pos[1]+60.0]
+
+		guiSetPosition(shop_menu_button4, (screen[0]/2)-(400.0/2), (screen[1]/2)+((gridlist_button_width_height[1]-60.0)/2), false)
+		guiSetPosition(shop_menu_button5, (screen[0]/2), (screen[1]/2)+((gridlist_button_width_height[1]-60.0)/2), false)
+
+		guiSetVisibleGridList (player_menu, true)
+		guiSetVisible( shop_menu_button4, true )
+		guiSetVisible( shop_menu_button5, true )
+	}
+}
+
 addEventHandler("onClientScriptInit", 
 function() 
 {
@@ -1213,6 +1273,7 @@ function()
 	bindKey( "page_up", "down", up_down )
 	bindKey( "page_down", "down", down_down )
 	bindKey( "f2", "down", f2_down )
+	bindKey( "f3", "down", f3_down )
 
 	setRenderNametags(false)
 	setRenderHealthbar(false)
@@ -2016,6 +2077,62 @@ function( element )
 			{
 				local text = motor_show[i][3]+"("+motor_show[i][0]+") "+(motor_show[i][1]*10)+"$"
 				guiSetTextGridList (avto_menu, i-max_lable*(avto_menu_value-1), text)
+			}
+		}
+	}
+
+	//список игроков
+	else if (element == shop_menu_button4)
+	{
+		if (guiGetVisibleGridList(player_menu))
+		{
+			player_menu_value--
+
+			if (player_menu_value <= 0)
+			{
+				player_menu_value = 1
+				return
+			}
+
+			for (local i = max_lable*(player_menu_value-1); i < max_lable*player_menu_value; i++)
+			{
+				if(getPlayerName(i))
+				{
+					local text = i+" "+getPlayerName(i)
+					guiSetTextGridList (player_menu, i-max_lable*(player_menu_value-1), text)
+				}
+				else
+				{
+					local text = i+" "
+					guiSetTextGridList (player_menu, i-max_lable*(player_menu_value-1), text)
+				}
+			}
+		}
+	}
+	else if (element == shop_menu_button5)
+	{
+		if (guiGetVisibleGridList(player_menu))
+		{
+			player_menu_value++
+			
+			if (player_menu_value > (guiGetCountGridList(player_menu)/max_lable).tointeger())
+			{
+				player_menu_value = (guiGetCountGridList(player_menu)/max_lable).tointeger()
+				return
+			}
+
+			for (local i = max_lable*(player_menu_value-1); i < max_lable*player_menu_value; i++)
+			{
+				if(getPlayerName(i))
+				{
+					local text = i+" "+getPlayerName(i)
+					guiSetTextGridList (player_menu, i-max_lable*(player_menu_value-1), text)
+				}
+				else
+				{
+					local text = i+" "
+					guiSetTextGridList (player_menu, i-max_lable*(player_menu_value-1), text)
+				}
 			}
 		}
 	}

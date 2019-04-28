@@ -153,8 +153,7 @@ function dxdrawtext(text, x, y, color, shadow, font, scale)
 local house_bussiness_radius = 0//--радиус размещения бизнесов и домов
 local house_pos = {}
 local business_pos = {}
-local job_pos = {}
-function bussines_house_fun (i, x,y,z, value, radius, text, radius1)
+function bussines_house_fun (i, x,y,z, value, radius)
 {
 	if (value == "biz")
 	{
@@ -163,10 +162,6 @@ function bussines_house_fun (i, x,y,z, value, radius, text, radius1)
 	else if (value == "house")
 	{
 		house_pos[i] <- [x,y,z]
-	}
-	else if (value == "job")
-	{
-		job_pos[i] <- [x,y,z, text, radius1]
 	}
 
 	house_bussiness_radius = radius
