@@ -3,23 +3,26 @@ function sqlite3(text)
 {
 	local result = database.query(text)
 
-	/*local posfile = file("db.txt", "a")
-
-	local date = split(getDateTime(), ": ")//установка времени
-	local month = date[1].tostring()
-	local day = date[2].tostring()
-	local chas = date[3].tostring()
-	local min = date[4].tostring()
-	local sec = date[5].tostring()
-
-	local say = "["+day+" "+month+" "+chas+":"+min+":"+sec+"] "+text
-	for (local i = 0; i < say.len(); i++) 
+	if(text.find("U") == 0 || text.find("I") == 0 || text.find("D") == 0)
 	{
-		posfile.writen(say[i], 'b')
+		local posfile = file("save_sqlite.txt", "a")
+
+		local date = split(getDateTime(), ": ")//установка времени
+		local month = date[1].tostring()
+		local day = date[2].tostring()
+		local chas = date[3].tostring()
+		local min = date[4].tostring()
+		local sec = date[5].tostring()
+
+		local say = "["+day+" "+month+" "+chas+":"+min+":"+sec+"] "+text
+		for (local i = 0; i < say.len(); i++) 
+		{
+			posfile.writen(say[i], 'b')
+		}
+		
+		posfile.writen('\n', 'b')
+		posfile.close()
 	}
-	
-	posfile.writen('\n', 'b')
-	posfile.close()*/
 
 	return result
 }
@@ -853,7 +856,7 @@ function sendMessage_log(playerid, text, r, g, b)
 //сохранение действий игрока
 function save_player_action (name, text)
 {
-	local coord = text.tostring()
+	/*local coord = text.tostring()
 	
 	local posfile = file("player_action/"+name+".txt", "a")
 
@@ -876,7 +879,7 @@ function save_player_action (name, text)
 	}
 	
 	posfile.writen('\n', 'b')
-	posfile.close()
+	posfile.close()*/
 
 	//triggerClientEvent(playerid, "event_save_player_action", text)
 }
@@ -1303,8 +1306,6 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 						sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+cash+" "+info_png[id1][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
 
 						sendMessage(playerid, "[TIPS] Отвезите украшения в Кингстон к Гарри", color_tips[0], color_tips[1], color_tips[2])
-
-						save_player_action(playername, "[robbery] "+playername+" ["+text+"], ["+info_png[id1][0]+", "+cash+"]")
 					}
 					else 
 					{
@@ -1319,8 +1320,6 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 					sendMessage(playerid, "Вы унесли "+cash+"$", green[0], green[1], green[2])
 
 					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+cash, playername )
-
-					save_player_action(playername, "[robbery] "+playername+" ["+text+"], [+"+cash+"$, "+array_player_2[playerid][0]+"$]")
 				}
 			}
 			else
@@ -1373,8 +1372,6 @@ function player_hotel (playerid, id)
 
 		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(price_hotel), playerid )
 					
-		save_player_action(playername, "[player_hotel] "+playername+" [-"+(price_hotel)+"$, "+array_player_2[playerid][0]+"$]")
-
 		return true
 	}
 	else 
@@ -1406,8 +1403,6 @@ function random_sub (playerid, id)//выпадение предметов
 				if (inv_player_empty(playerid, id1, id2)) 
 				{
 					sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
-
-					save_player_action(playername, "[random_sub] "+playername+" ["+info_png[id1][0]+", "+id2+"]")
 				}
 			}
 			break
@@ -1747,8 +1742,6 @@ function buy_subject_fun( playerid, text, number, value )
 				if (inv_player_empty(playerid, k, 25))
 				{
 					sendMessage(playerid, "Вы получили "+text, orange[0], orange[1], orange[2])
-
-					save_player_action(playername, "[cops_weapon_fun] "+playername+" [weapon - "+text+"]")
 				}
 				else
 				{
@@ -1771,8 +1764,6 @@ function buy_subject_fun( playerid, text, number, value )
 				if (inv_player_empty(playerid, k, 1))
 				{
 					sendMessage(playerid, "Вы получили "+text, orange[0], orange[1], orange[2])
-
-					save_player_action(playername, "[sub_cops_fun] "+playername+" [sub_cops - "+text+"]")
 				}
 				else
 				{
@@ -1813,8 +1804,6 @@ function buy_subject_fun( playerid, text, number, value )
 						sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange[0], orange[1], orange[2])
 
 						inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(v[2]), playername )
-
-						save_player_action(playername, "[mayoralty_menu_fun] [mayoralty_shop - "+text+"], "+playername+" [-"+v[2]+"$, "+array_player_2[playerid][0]+"$]")
 					}
 					else
 					{
@@ -1872,7 +1861,6 @@ function buy_subject_fun( playerid, text, number, value )
 
 					if (inv_player_empty(playerid, val1, val2))
 					{
-						save_player_action(playername, "[buy_vehicle] "+playername+" [plate - "+val2+"] [-"+(v[1]*coef)+"$, "+(array_player_2[playerid][0]-(v[1]*coef))+"$]")
 					}
 					else
 					{
@@ -1953,8 +1941,6 @@ function buy_subject_fun( playerid, text, number, value )
 						sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange[0], orange[1], orange[2])
 
 						inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(v[2]), playername )
-
-						save_player_action(playername, "[giuseppe] [giuseppe_shop - "+text+"], "+playername+" [-"+v[2]+"$, "+array_player_2[playerid][0]+"$]")
 					}
 					else
 					{
@@ -1999,7 +1985,7 @@ function buy_subject_fun( playerid, text, number, value )
 			sendMessage(playerid, "====[ РЫБЗАВОД ]====", yellow[0], yellow[1], yellow[2])
 			sendMessage(playerid, "[ номер рыбзавода - зарплата - доход от продаж ]", yellow[0], yellow[1], yellow[2])
 
-			foreach (k, v in sqlite3( "SELECT * FROM cow_farms_db" ))
+			foreach (k, v in sqlite3( "SELECT * FROM seagift_db" ))
 			{
 				sendMessage(playerid, "[ "+v["number"]+" - "+v["price"]+"$ - "+v["coef"]+" процентов ]", yellow[0], yellow[1], yellow[2])
 			}
@@ -2048,8 +2034,6 @@ function buy_subject_fun( playerid, text, number, value )
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
 								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
-
-								save_player_action(playername, "[buy_subject_fun] [weapon - "+text+"], "+playername+" [-"+cash*v[2]+"$, "+array_player_2[playerid][0]+"$], "+info_bisiness(number))
 							}
 							else
 							{
@@ -2087,8 +2071,6 @@ function buy_subject_fun( playerid, text, number, value )
 							sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash+"' WHERE number = '"+number+"'")
 
 							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playername )
-
-							save_player_action(playername, "[buy_subject_fun] [skin - "+text+"], "+playername+" [-"+cash+"$, "+array_player_2[playerid][0]+"$], "+info_bisiness(number))
 						}
 						else
 						{
@@ -2121,8 +2103,6 @@ function buy_subject_fun( playerid, text, number, value )
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
 								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
-
-								save_player_action(playername, "[buy_subject_fun] [24/7 - "+text+"], "+playername+" [-"+cash*v[2]+"$, "+array_player_2[playerid][0]+"$], "+info_bisiness(number))
 							}
 							else
 							{
@@ -2152,8 +2132,6 @@ function buy_subject_fun( playerid, text, number, value )
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
 								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
-
-								save_player_action(playername, "[buy_subject_fun] [gas - "+text+"], "+playername+" [-"+cash*v[2]+"$, "+array_player_2[playerid][0]+"$], "+info_bisiness(number))
 							}
 							else
 							{
@@ -2183,8 +2161,6 @@ function buy_subject_fun( playerid, text, number, value )
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
 								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
-
-								save_player_action(playername, "[buy_subject_fun] [repair_shop - "+text+"], "+playername+" [-"+cash*v[2]+"$, "+array_player_2[playerid][0]+"$], "+info_bisiness(number))
 							}
 							else
 							{
@@ -2214,8 +2190,6 @@ function buy_subject_fun( playerid, text, number, value )
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
 								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
-
-								save_player_action(playername, "[buy_subject_fun] [eda - "+text+"], "+playername+" [-"+cash*v[2]+"$, "+array_player_2[playerid][0]+"$], "+info_bisiness(number))
 							}
 							else
 							{
@@ -2253,8 +2227,6 @@ function till_fun( playerid, number, money, value )
 			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
 
 			sendMessage(playerid, "Вы забрали из кассы "+money+"$", green[0], green[1], green[2])
-
-			save_player_action(playername, "[till_fun_withdraw] "+playername+" [+"+money+"$, "+array_player_2[playerid][0]+"$], "+info_bisiness(number))
 		}
 		else
 		{
@@ -2271,8 +2243,6 @@ function till_fun( playerid, number, money, value )
 			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-money, playername )
 
 			sendMessage(playerid, "Вы положили в кассу "+money+"$", orange[0], orange[1], orange[2])
-
-			save_player_action(playername, "[till_fun_deposit] "+playername+" [-"+money+"$, "+array_player_2[playerid][0]+"$], "+info_bisiness(number))
 		}
 		else
 		{
@@ -2286,8 +2256,6 @@ function till_fun( playerid, number, money, value )
 		sqlite3( "UPDATE business_db SET price = '"+money+"' WHERE number = '"+number+"'")
 
 		sendMessage(playerid, "Вы установили стоимость товара "+money+"$", yellow[0], yellow[1], yellow[2])
-
-		save_player_action(playername, "[till_fun_price] "+playername+" "+info_bisiness(number))
 	}
 	/*else if (value == "buyprod")
 	{
@@ -2296,8 +2264,6 @@ function till_fun( playerid, number, money, value )
 		sqlite3( "UPDATE business_db SET buyprod = '"+money+"' WHERE number = '"+number+"'")
 
 		sendMessage(playerid, "Вы установили цену закупки товара "+money+"$", yellow[0], yellow[1], yellow[2])
-
-		save_player_action(playername, "[till_fun_buyprod] "+playername+" "+info_bisiness(number))
 	}*/
 }
 
@@ -2362,8 +2328,6 @@ function craft_fun( playerid, text )
 							}
 
 							sendMessage(playerid, "Вы создали "+v[0], orange[0], orange[1], orange[2])
-
-							save_player_action(playername, "[craft_fun] "+playername+" craft ["+v[0]+"]")
 						}
 						else
 						{
@@ -2405,8 +2369,6 @@ function auction_buy_sell(playerid, value, i, id1, id2, money)//--продажа
 			sendMessage(playerid, "Вы выставили на аукцион "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" за "+money+"$", green[0], green[1], green[2])
 
 			sqlite3( "INSERT INTO auction (i, name_sell, id1, id2, money) VALUES ('"+randomize+"', '"+playername+"', '"+id1+"', '"+id2+"', '"+money+"')" )
-
-			save_player_action(playername, "[auction_sell] "+playername+" [i - "+randomize+", "+info_png[id1][0]+", "+id2+", "+money+"$]")
 		}
 		else
 		{
@@ -2453,13 +2415,9 @@ function auction_buy_sell(playerid, value, i, id1, id2, money)//--продажа
 
 							array_player_2[50][0] = array_player_2[50][0]+result[1]["money"]
 
-							save_player_action(result[1]["name_sell"], "[auction_buy] "+playername+" [i - "+i+", name - "+result[1]["name_sell"]+", "+info_png[result[1]["id1"]][0]+", "+result[1]["id2"]+"], [+"+result[1]["money"]+"$, "+array_player_2[50][0]+"$]")
-
 							sqlite3( "UPDATE account SET inventory = '"+save_inv(50, "player")+"' WHERE name = '"+result[1]["name_sell"]+"'")
 						}
 					}
-
-					save_player_action(playername, "[auction_buy] "+playername+" [i - "+i+", name - "+result[1]["name_sell"]+", "+info_png[result[1]["id1"]][0]+", "+result[1]["id2"]+"], [-"+result[1]["money"]+"$, "+array_player_2[playerid][0]+"$]")
 
 					sqlite3( "DELETE FROM auction WHERE i = '"+i+"'" )
 				}
@@ -2491,8 +2449,6 @@ function auction_buy_sell(playerid, value, i, id1, id2, money)//--продажа
 				if (inv_player_empty(playerid, result[1]["id1"], result[1]["id2"]))
 				{
 					sendMessage(playerid, "Вы забрали "+info_png[result[1]["id1"]][0]+" "+result[1]["id2"]+" "+info_png[result[1]["id1"]][1], orange[0], orange[1], orange[2])
-
-					save_player_action(playername, "[auction_return] "+playername+" [i - "+i+", name - "+result[1]["name_sell"]+", "+info_png[result[1]["id1"]][0]+", "+result[1]["id2"]+"]")
 
 					sqlite3( "DELETE FROM auction WHERE i = '"+i+"'" )
 				}
@@ -2527,7 +2483,7 @@ function cow_farms(playerid, value, val1, val2)
 	local lic = 85
 
 	if (value == "buy") {
-		local result = sqlite3( "SELECT COUNT() FROM cow_farms_db" )
+		local result = sqlite3( "SELECT COUNT() FROM seagift_db" )
 		result = result[1]["COUNT()"]+1
 		if (cash*result > array_player_2[playerid][0]) {
 			sendMessage(playerid, "[ERROR] У вас недостаточно средств, необходимо "+(cash*result)+"$", red[0], red[1], red[2])
@@ -2535,15 +2491,13 @@ function cow_farms(playerid, value, val1, val2)
 		}
 
 		if (inv_player_empty(playerid, doc, result)) {
-			sqlite3( "INSERT INTO cow_farms_db (number, price, coef, money, nalog, warehouse, prod) VALUES ('"+result+"', '0', '50', '0', '5', '0', '0')" )
+			sqlite3( "INSERT INTO seagift_db (number, price, coef, money, nalog, warehouse, prod) VALUES ('"+result+"', '0', '50', '0', '5', '0', '0')" )
 
 			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash*result, playername )
 
 			sendMessage(playerid, "Вы купили рыбзавод за "+(cash*result)+"$", orange[0], orange[1], orange[2])
 
 			sendMessage(playerid, "Вы получили "+info_png[doc][0]+" "+result+" "+info_png[doc][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
-
-			save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result+"] [-"+(cash*result)+"$, "+array_player_2[playerid][0]+"$]")
 		}
 		else
 		{
@@ -2558,38 +2512,34 @@ function cow_farms(playerid, value, val1, val2)
 				return
 			}
 
-			local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+			local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 			if (result[1]["COUNT()"] == 0) {
 				return
 			}
 
-			result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+			result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
-			sqlite3( "UPDATE cow_farms_db SET price = '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+			sqlite3( "UPDATE seagift_db SET price = '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 			sendMessage(playerid, "Вы установили зарплату "+val2+"$", yellow[0], yellow[1], yellow[2])
-
-			save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", price - "+val2+"]")
 		}
 		else if ( val1 == "coef") {
 			if (val2 < 1 || val2 > 100) {
 				return
 			}
 
-			local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+			local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 			if (result[1]["COUNT()"] == 0) {
 				return
 			}
 
-			result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+			result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
-			sqlite3( "UPDATE cow_farms_db SET coef = '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+			sqlite3( "UPDATE seagift_db SET coef = '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 			sendMessage(playerid, "Вы установили доход от продаж "+val2+" процентов", yellow[0], yellow[1], yellow[2])
-
-			save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", coef - "+val2+"]")
 		}
 		else if ( val1 == "balance") {
 			if (val2 == 0) {
@@ -2597,23 +2547,22 @@ function cow_farms(playerid, value, val1, val2)
 			}
 
 			if (val2 < 1) {
-				local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+				local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 				if (result[1]["COUNT()"] == 0) {
 					return
 				}
 
-				result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+				result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 				if ((val2*-1) <= result[1]["money"]) {
 					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+(val2*-1), playername )
 
-					sqlite3( "UPDATE cow_farms_db SET money = money - '"+(val2*-1)+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+					sqlite3( "UPDATE seagift_db SET money = money - '"+(val2*-1)+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 					sendMessage(playerid, "Вы забрали из кассы "+(val2*-1)+"$", green[0], green[1], green[2])
 
-					local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
-					save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", money - "+result[1]["money"]+"] [+"+(val2*-1)+"$, "+array_player_2[playerid][0]+"$]")
+					local result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 				}
 				else
 				{
@@ -2623,22 +2572,21 @@ function cow_farms(playerid, value, val1, val2)
 			else
 			{
 				if (val2 <= array_player_2[playerid][0]) {
-					local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+					local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 					if (result[1]["COUNT()"] == 0) {
 						return
 					}
 
-					result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+					result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-val2, playername )
 
-					sqlite3( "UPDATE cow_farms_db SET money = money + '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+					sqlite3( "UPDATE seagift_db SET money = money + '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 					sendMessage(playerid, "Вы положили в кассу "+val2+"$", orange[0], orange[1], orange[2])
 
-					local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
-					save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", money - "+result[1]["money"]+"] [-"+val2+"$, "+array_player_2[playerid][0]+"$]")
+					local result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 				}
 				else
 				{
@@ -2647,22 +2595,21 @@ function cow_farms(playerid, value, val1, val2)
 			}
 		}
 		else if ( val1 == "tax") {
-			local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+			local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 			if (result[1]["COUNT()"] == 0) {
 				return
 			}
 
-			result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
+			result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 			if (search_inv_player(playerid, 49, 7) != 0) {
 				if (inv_player_delet(playerid, 49, 7)) {
-					sqlite3( "UPDATE cow_farms_db SET nalog = nalog + '7' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'")
+					sqlite3( "UPDATE seagift_db SET nalog = nalog + '7' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'")
 
 					sendMessage(playerid, "Вы оплатили налог "+search_inv_player_2_parameter(playerid, doc)+" рыбзавода", yellow[0], yellow[1], yellow[2])
 
-					local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
-					save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", nalog - "+result[1]["nalog"]+"]")
+					local result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 				}
 			}
 			else
@@ -2675,33 +2622,32 @@ function cow_farms(playerid, value, val1, val2)
 		give_subject(playerid, "player", lic, val1)
 	}
 	else if ( value == "load") {
-		local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 
 		if (result[1]["COUNT()"] == 0) {
 			return false
 		}
 
-		result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 		if ( result[1]["warehouse"]-val1 < 0) {
 			sendMessage(playerid, "[ERROR] Склад пуст", red[0], red[1], red[2])
 			return false
 		}
 
-		sqlite3( "UPDATE cow_farms_db SET warehouse = warehouse - '"+val1+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
+		sqlite3( "UPDATE seagift_db SET warehouse = warehouse - '"+val1+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
 
-		local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
-		save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", warehouse - "+result[1]["warehouse"]+"]")
+		local result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 
 		return true
 	}
 	else if ( value == "unload") {
-		local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 
 		if (result[1]["COUNT()"] == 0) {
 			return true
 		}
 
-		result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 		if ( !isPointInCircle3D(x,y,z, down_car_subject[4][0], down_car_subject[4][1],down_car_subject[4][2], down_car_subject[4][3])) {
 			return false
 		}
@@ -2723,22 +2669,21 @@ function cow_farms(playerid, value, val1, val2)
 
 		sendMessage(playerid, "Вы разгрузили из т/с "+info_png[83][0]+" "+val1+" шт ("+val2+"$ за 1 шт) за "+cash+"$", green[0], green[1], green[2])
 
-		sqlite3( "UPDATE cow_farms_db SET money = money + '"+cash2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
+		sqlite3( "UPDATE seagift_db SET money = money + '"+cash2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
 
-		local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
-		save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", count - "+val1+", price - "+val2+", money - "+result[1]["money"]+", cash2 - "+cash2+"], [+"+cash+"$, "+array_player_2[playerid][0]+"$]")
+		local result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 
 		return true
 	}
 	else if ( value == "unload_prod") {
 		local money = val1*val2
-		local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 
 		if (result[1]["COUNT()"] == 0) {
 			return true
 		}
 
-		result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
+		result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 		if ( result[1]["money"] < money) {
 			sendMessage(playerid, "[ERROR] Недостаточно средств на балансе бизнеса", red[0], red[1], red[2])
 			return true
@@ -2763,10 +2708,9 @@ function cow_farms(playerid, value, val1, val2)
 
 		sendMessage(playerid, "Вы разгрузили из т/с "+info_png[82][0]+" "+val1+" шт ("+val2+"$ за 1 шт) за "+money+"$", green[0], green[1], green[2])
 
-		sqlite3( "UPDATE cow_farms_db SET money = money - '"+money+"', prod = prod + '"+val1+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
+		sqlite3( "UPDATE seagift_db SET money = money - '"+money+"', prod = prod + '"+val1+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
 
-		local result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
-		save_player_action(playername, "[cow_farms_db] "+playername+" [value - "+value+", number - "+result[1]["number"]+", count - "+val1+", prod - "+result[1]["prod"]+", price - "+val2+", money - "+result[1]["money"]+", cash2 - "+money+"], [+"+money+"$, "+array_player_2[playerid][0]+"$]")
+		local result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 
 		return true
 	}
@@ -3055,8 +2999,6 @@ function job_timer2 ()
 
 									sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
 
-									save_player_action(playername, "[taxi_job_timer] "+playername+" [+"+randomize+"$, "+array_player_2[playerid][0]+"$]")
-
 									triggerClientEvent(playerid, "removegps")
 									
 									job_pos[playerid] = 0
@@ -3240,8 +3182,6 @@ function job_timer2 ()
 
 							sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
 
-							save_player_action(playername, "[car_theft_job_timer] "+playername+" [+"+randomize+"$, "+array_player_2[playerid][0]+"$]")
-
 							job_pos[playerid] = 0
 							job_call[playerid] = 3
 
@@ -3279,10 +3219,10 @@ function job_timer2 ()
 					}
 					else if (job_call[playerid] == 12)
 					{
-						local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+						local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
 						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && result[1]["COUNT()"] == 1)
 						{
-							result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+							result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
 
 							local id1 = search_inv_player(playerid, 81, search_inv_player_2_parameter(playerid, 81))
 							local id2 = search_inv_player_2_parameter(playerid, 81)
@@ -3302,13 +3242,11 @@ function job_timer2 ()
 									inv_player_delet(playerid, 81, id2)
 								}
 
-								sqlite3( "UPDATE cow_farms_db SET warehouse = warehouse + '1', prod = prod - '1', money = money - '"+randomize+"' WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+								sqlite3( "UPDATE seagift_db SET warehouse = warehouse + '1', prod = prod - '1', money = money - '"+randomize+"' WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
 
 								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 
 								sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
-
-								save_player_action(playername, "[seagift_job] "+playername+" [number - "+result[1]["number"]+", money - "+(result[1]["money"]-randomize)+", warehouse - "+(result[1]["warehouse"]+1)+", prod - "+(result[1]["prod"]-1)+"] [+"+randomize+"$, "+array_player_2[playerid][0]+"$]")
 													
 								job_call[playerid] = 0
 
@@ -3666,12 +3604,12 @@ function pay_nalog()
 			}
 		}
 
-		local result = sqlite3( "SELECT * FROM cow_farms_db" )
+		local result = sqlite3( "SELECT * FROM seagift_db" )
 		foreach (k, v in result) 
 		{
 			if (v["nalog"] > 0)
 			{
-				sqlite3( "UPDATE cow_farms_db SET nalog = nalog - '1' WHERE number = '"+v["number"]+"'")
+				sqlite3( "UPDATE seagift_db SET nalog = nalog - '1' WHERE number = '"+v["number"]+"'")
 			}
 		}
 
@@ -3733,8 +3671,6 @@ function prison()//--таймер заключения
 				setPlayerPosition( playerid, interior_job[0][2],interior_job[0][3],interior_job[0][4] )
 
 				sendMessage(playerid, "Вы свободны, больше не нарушайте", yellow[0], yellow[1], yellow[2])
-
-				save_player_action(playername, "[prison_timer] "+playername+" exit prison")
 			}
 			else if (crimes[playerid] > 1)
 			{
@@ -3795,11 +3731,11 @@ function()
 
 
 	local cow_farms_db_number = 0
-	foreach (idx, value in sqlite3( "SELECT * FROM cow_farms_db" )) 
+	foreach (idx, value in sqlite3( "SELECT * FROM seagift_db" )) 
 	{
 		cow_farms_db_number++
 	}
-	print("[cow_farms_db] "+cow_farms_db_number)
+	print("[seagift_db] "+cow_farms_db_number)
 
 
 	foreach (idx, value in sqlite3( "SELECT * FROM car_db" )) 
@@ -3929,8 +3865,6 @@ function playerDisconnect( playerid, reason )
 		car_theft_fun(playerid)
 
 		logged[playerid] = 0
-
-		save_player_action(playername, "[disconnect] name: "+playername+" [reason - "+reason+", heal - "+heal+"]")
 	}
 }
 addEventHandler( "onPlayerDisconnect", playerDisconnect )
@@ -3989,9 +3923,7 @@ function playerDeath( playerid, attacker )
 
 				sendMessage(attacker, "Вы получили премию "+(cash*(crimes[playerid]))+"$", green[0], green[1], green[2] )
 
-				inv_server_load( attacker, "player", 0, 1, array_player_2[attacker][0]+(cash*(crimes[playerid])), attacker )
-				
-				save_player_action(playername_a, "[police_prison_kill] "+playername_a+" prison "+playername+" time "+(crimes[playerid])+" [+"+(crimes[playerid]*cash)+"$, "+array_player_2[attacker][0]+"$]")
+				inv_server_load( attacker, "player", 0, 1, array_player_2[attacker][0]+(cash*(crimes[playerid])), attacker )		
 			}
 		}
 	}
@@ -4005,7 +3937,7 @@ function playerDeath( playerid, attacker )
 		sendMessageAll(playerid, "[НОВОСТИ] "+playername_a+" убил "+playername+" Причина: "+reason.tostring(), green[0], green[1], green[2])
 	}
 
-	save_player_action(playername, "[onPlayerDeath] "+playername+" [attacker - "+playername_a.tostring()+", reason - "+reason.tostring()+"]")
+	print("[onPlayerDeath] "+playername+" [attacker - "+playername_a.tostring()+", reason - "+reason.tostring()+"]")
 
 	robbery_kill(playerid)
 	job_0( playerid )
@@ -4143,7 +4075,7 @@ function reg_or_login(playerid)
 
 		//sqlite_save_player_action( "CREATE TABLE "+playername+" (player_action TEXT)" )
 
-		save_player_action(playername, "[ACCOUNT REGISTER] "+playername+" [ip - "+ip+", serial - "+serial+"]")
+		print("[ACCOUNT REGISTER] "+playername+" [ip - "+ip+", serial - "+serial+"]")
 
 		house_bussiness_job_pos_load( playerid )
 	}
@@ -4198,8 +4130,6 @@ function reg_or_login(playerid)
 		}
 
 		sendMessage(playerid, "Вы удачно зашли!", turquoise[0], turquoise[1], turquoise[2])
-
-		save_player_action(playername, "[log_fun] "+playername+" [ip - "+ip+", serial - "+serial+"]")
 
 		house_bussiness_job_pos_load( playerid )
 
@@ -4443,8 +4373,6 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 
 				sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], yellow[0], yellow[1], yellow[2])
 
-				save_player_action(playername, "[throw_earth_job] "+playername+" [+"+id2+"$, "+array_player_2[playerid][0]+"$] ["+info_png[id1][0]+", "+id2+"]")
-
 				return
 			}
 		}
@@ -4503,8 +4431,6 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 
 	me_chat(playerid, playername+" выбросил(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 	//sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], yellow[0], yellow[1], yellow[2])
-
-	save_player_action(playername, "[throw_earth] "+playername+" [value - "+value+", x - "+myPos[0]+", y - "+myPos[1]+", z - "+myPos[2]+"] ["+info_png[ id1 ][0]+", "+id2+"]")
 }
 addEventHandler ( "event_throw_earth_server", throw_earth_server )
 
@@ -4605,8 +4531,6 @@ function e_down (playerid)//--подбор предметов с земли
 			{
 				me_chat(playerid, playername+" поднял(а) "+info_png[ v[3] ][0]+" "+v[4]+" "+info_png[ v[3] ][1])
 				//sendMessage(playerid, "Вы подняли "+info_png[ v[3] ][0]+" "+v[4]+" "+info_png[ v[3] ][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
-
-				save_player_action(playername, "[e_down] "+playername+" [x - "+v[0]+", y - "+v[1]+", z - "+v[2]+"] ["+info_png[ v[3] ][0]+", "+v[4]+"]")
 
 				delete earth[i]
 
@@ -4807,8 +4731,6 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 		{
 			sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
 
-			save_player_action(playername, "[give_subject] "+playername+" [value - "+value+"] ["+info_png[id1][0]+", "+id2+"]")
-
 			random_sub (playerid, id1)
 		}
 		else
@@ -4917,8 +4839,6 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			{
 				sendMessage(playerid, "[TIPS] Езжайте в порт, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
 			}
-
-			save_player_action(playername, "[give_subject] "+playername+" [value - "+value+", count - "+count+"] ["+info_png[id1][0]+", "+id2+"]")
 		}
 		else
 		{
@@ -4994,7 +4914,6 @@ function delet_subject(playerid, id)//--удаление предметов из
 
 					sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт ("+sic2p+"$ за 1 шт) за "+money+"$", green[0], green[1], green[2])
 
-					save_player_action(playername, "[delet_subject_business] "+playername+" [count - "+count+"], [+"+money+"$, "+array_player_2[playerid][0]+"$], "+info_bisiness(v["number"]))
 					return
 				}
 			}
@@ -5019,7 +4938,6 @@ function delet_subject(playerid, id)//--удаление предметов из
 
 						sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт ("+sic2p+"$ за 1 шт) за "+money+"$", green[0], green[1], green[2])
 
-						save_player_action(playername, "[delet_subject_job] "+playername+" [count - "+count+", price - "+sic2p+"], [+"+money+"$, "+array_player_2[playerid][0]+"$]")
 						return
 					}
 				}
@@ -5711,8 +5629,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					
 					me_chat(playerid, playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" и оплатил(а) "+v["number"]+" дом")
 
-					save_player_action(playername, "[use_48] "+playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" и оплатил(а) "+v["number"]+" дом")
-
 					id2 = 0
 					count = 1
 					break
@@ -5735,8 +5651,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					sqlite3( "UPDATE business_db SET nalog = nalog + '"+id2+"' WHERE number = '"+v["number"]+"'")
 					
 					me_chat(playerid, playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" и оплатил(а) "+v["number"]+" бизнес")
-
-					save_player_action(playername, "[use_49] "+playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" и оплатил(а) "+v["number"]+" бизнес")
 
 					id2 = 0
 					count = 1
@@ -5761,8 +5675,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					sqlite3( "UPDATE car_db SET nalog = nalog + '"+id2+"' WHERE number = '"+plate+"'")
 
 					me_chat(playerid, playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" и оплатил(а) "+plate+" авто")
-
-					save_player_action(playername, "[use_50] "+playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" и оплатил(а) "+plate+" авто")
 
 					id2 = 0
 				}
@@ -5983,8 +5895,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 
 				sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
-
-				save_player_action(playername, "[eb_telephone_service] "+playername+" [+"+randomize+"$, "+array_player_2[playerid][0]+"$]")
 									
 				job_call[playerid] = 0
 
@@ -6146,10 +6056,10 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 84)
 		{
-			local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+id2+"'" )
+			local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+id2+"'" )
 			if (result[1]["COUNT()"] == 1)
 			{
-				result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+id2+"'" )
+				result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+id2+"'" )
 				local farms = [
 					[result[1]["number"], "Зарплата", result[1]["price"]+"$"],
 					[result[1]["number"], "Баланс", split(result[1]["money"].tostring(),".")[0]+"$"],
@@ -6175,10 +6085,10 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 
-			local result = sqlite3( "SELECT COUNT() FROM cow_farms_db WHERE number = '"+id2+"'" )
+			local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+id2+"'" )
 			if (result[1]["COUNT()"] == 1)
 			{
-				result = sqlite3( "SELECT * FROM cow_farms_db WHERE number = '"+id2+"'" )
+				result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+id2+"'" )
 				local farms = [
 					[result[1]["number"], "Зарплата", result[1]["price"]+"$"],
 					[result[1]["number"], "Доход от продаж", result[1]["coef"]+" процентов"],
@@ -6214,8 +6124,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 
 		//--------------------------------------------------------------------------------------------------------------------------------
-		save_player_action(playername, "[use_inv] "+playername+" [value - "+value+"] ["+info_png[id1][0]+", "+id2+"("+id_2+")]")
-
 		if (id2 == 0)
 		{
 			id1 = 0
@@ -6298,8 +6206,6 @@ function (playerid)
 			sqlite3( "INSERT INTO house_db (number, nalog, x, y, z, inventory) VALUES ('"+dim+"', '5', '"+x+"', '"+y+"', '"+z+"', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
 			sendMessage(playerid, "Вы получили "+info_png[25][0]+" "+dim+" "+info_png[25][0], orange[0], orange[1], orange[2])
-
-			save_player_action(playername, "[sellhouse] "+playername+" [house - "+dim+", x - "+x+", y - "+y+", z - "+z+"]")
 		}
 		else
 		{
@@ -6382,9 +6288,7 @@ function (playerid, id)
 
 				sqlite3( "INSERT INTO business_db (number, type, price, money, nalog, warehouse, x, y, z, interior) VALUES ('"+dim+"', '"+interior_business[id][1]+"', '0', '0', '5', '0', '"+x+"', '"+y+"', '"+z+"', '"+id+"')" )
 
-				sendMessage(playerid, "Вы получили "+info_png[36][0]+" "+dim+" "+info_png[36][1], orange[0], orange[1], orange[2])
-					
-				save_player_action(playername, "[sellbusiness] "+playername+" [business - "+dim+", x - "+x+", y - "+y+", z - "+z+"]")
+				sendMessage(playerid, "Вы получили "+info_png[36][0]+" "+dim+" "+info_png[36][1], orange[0], orange[1], orange[2])					
 			}
 			else
 			{
@@ -6446,8 +6350,6 @@ function win_roulette( playerid, cash, ratio )
 	sendMessage(playerid, "Вы заработали "+money+"$ X"+ratio, green[0], green[1], green[2])
 
 	inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
-
-	save_player_action(playername, "[win_roulette] "+playername+" [+"+money+"$, "+array_player_2[playerid][0]+"$]")
 }
 
 addCommandHandler ( "roulette",//--играть в рулетку
@@ -6580,7 +6482,6 @@ function (playerid, id, cash)
 					}
 				}
 
-				save_player_action(playername, "[los_roulette] "+playername+" [-"+cash+"$, "+array_player_2[playerid][0]+"$]")
 				return
 			}
 		}
@@ -6649,8 +6550,6 @@ function (playerid, id)
 		sendMessage(playerid, "Вы получили премию "+(cash*(crimes[id]))+"$", green[0], green[1], green[2])
 
 		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+(cash*(crimes[id])), playername )
-
-		save_player_action(playername, "[police_prison] "+playername+" prison "+getPlayerName ( id )+" time "+(crimes[id])+" [+"+(crimes[id]*cash)+"$, "+array_player_2[playerid][0]+"$]")
 	}
 	else
 	{
@@ -6708,8 +6607,6 @@ function (playerid, id)
 		sendMessage(id, "Ждите освобождения", yellow[0], yellow[1], yellow[2])
 
 		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*(crimes[id])), playername )
-
-		save_player_action(playername, "[lawyer] "+playername+" exit prison "+getPlayerName(id)+" [-"+(crimes[id]*cash)+"$, "+array_player_2[playerid][0]+"$]")
 	
 		crimes[id] = 1
 	}
@@ -6897,8 +6794,6 @@ function (playerid, id)
 	{
 		sendMessage(playerid, "Вы забрали у "+getPlayerName ( id )+" "+info_png[10][0], yellow[0], yellow[1], yellow[2])
 		sendMessage(id, playername+" забрал(а) у вас "+info_png[10][0], yellow[0], yellow[1], yellow[2])
-
-		save_player_action(playername, "[police_take_sub] "+playername+" ["+info_png[10][0]+", "+getPlayerName ( id )+"]")
 	}
 	else
 	{
@@ -6940,8 +6835,6 @@ function (playerid, id, rang)
 		{
 			sendMessage(playerid, "Вы забрали у "+getPlayerName ( id )+" "+info_png[rang][0], yellow[0], yellow[1], yellow[2])
 			sendMessage(id, playername+" забрал(а) у вас "+info_png[rang][0], yellow[0], yellow[1], yellow[2])
-
-			save_player_action(playername, "[police_take_sub] "+playername+" ["+info_png[rang][0]+", "+getPlayerName ( id )+"]")
 		}
 		else
 		{
@@ -7122,9 +7015,6 @@ function (playerid, id, cash)
 			inv_server_load( id, "player", 0, 1, array_player_2[id][0]+cash, id )
 
 			me_chat(playerid, playername+" передал(а) "+player_name+" "+cash+"$")
-
-			save_player_action(playername, "[pay] "+playername+" give money "+player_name+" [-"+cash+"$, "+array_player_2[playerid][0]+"$]")
-			save_player_action(player_name, "[pay] "+playername+" give money "+player_name+" [+"+cash+"$, "+array_player_2[id][0]+"$]")
 		}
 		else
 		{
@@ -7193,8 +7083,6 @@ function (playerid, id)
 							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playerid )
 
 							sendMessage(playerid, "Вы эвакуировали т/с за "+cash+"$", orange[0], orange[1], orange[2])
-
-							save_player_action(playername, "[evacuationcar] "+playername+" [-"+cash+"$, "+array_player_2[playerid][0]+"$]")
 						}
 						else
 						{
@@ -7350,8 +7238,6 @@ function (playerid, plate)
 					car_spawn(plate)
 
 					sendMessage(playerid, "Вы забрали т/с с номером "+plate, yellow[0], yellow[1], yellow[2])
-
-					save_player_action(playername, "[spawn_carparking] "+playername+" [plate - "+plate+"]")
 				}
 			}
 			else
@@ -7548,8 +7434,6 @@ function(playerid, id1, id2)
 	if (inv_player_empty(playerid, val1, val2))
 	{
 		sendMessage(playerid, "Вы создали "+info_png[val1][0]+" "+val2+" "+info_png[val1][1], lyme[0], lyme[1], lyme[2])
-
-		save_player_action(playername, "[admin_sub] "+playername+" ["+val1+", "+val2+"]")
 	}
 	else
 	{
@@ -7585,8 +7469,6 @@ function (playerid, id1, id2 )
 	if (inv_car_empty(playerid, val1, val2))
 	{
 		sendMessage(playerid, "Вы создали "+info_png[val1][0]+" "+val2+" "+info_png[val1][1], lyme[0], lyme[1], lyme[2])
-
-		save_player_action(playername, "[admin_subcar] "+playername+" ["+val1+", "+val2+"]")
 	}
 	else
 	{
@@ -7631,8 +7513,6 @@ function (playerid, id, time, ...)
 
 	arrest[id] = 1
 	crimes[id] = time
-
-	save_player_action(playername, "[admin_prisonplayer] "+playername+" prisonplayer "+getPlayerName ( id )+" time "+time+" reason "+reason)
 })
 
 addCommandHandler("v",
