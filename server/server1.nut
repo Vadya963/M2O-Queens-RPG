@@ -4368,7 +4368,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 		{
 			if (isPointInCircle3D(x,y,z, v[0],v[1],v[2], v[3]) && id1 == v[4])//--получение прибыли за предметы
 			{
-				inv_server_load( playerid, value, id3, 0, 0, tabpanel )
+				inv_player_delet( playerid, id1, id2 )
 				inv_server_load( playerid, value, 0, 1, array_player_2[playerid][0]+id2, tabpanel )
 
 				sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], yellow[0], yellow[1], yellow[2])
@@ -4383,9 +4383,8 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 			{
 				local randomize = random(1,v[6])
 
-				inv_server_load( playerid, value, id3, 0, 0, tabpanel )
-
-				inv_server_load( playerid, value, id3, v[5], randomize, tabpanel )
+				inv_player_delet( playerid, id1, id2 )
+				inv_player_empty( playerid, v[5], randomize )
 
 				sendMessage(playerid, "Вы получили "+info_png[v[5]][0]+" "+randomize+" "+info_png[v[5]][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
 
