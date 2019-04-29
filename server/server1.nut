@@ -2535,8 +2535,6 @@ function cow_farms(playerid, value, val1, val2)
 				return
 			}
 
-			result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
-
 			sqlite3( "UPDATE seagift_db SET coef = '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 			sendMessage(playerid, "Вы установили доход от продаж "+val2+" процентов", yellow[0], yellow[1], yellow[2])
@@ -2561,8 +2559,6 @@ function cow_farms(playerid, value, val1, val2)
 					sqlite3( "UPDATE seagift_db SET money = money - '"+(val2*-1)+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 					sendMessage(playerid, "Вы забрали из кассы "+(val2*-1)+"$", green[0], green[1], green[2])
-
-					local result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 				}
 				else
 				{
@@ -2578,15 +2574,11 @@ function cow_farms(playerid, value, val1, val2)
 						return
 					}
 
-					result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
-
 					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-val2, playername )
 
 					sqlite3( "UPDATE seagift_db SET money = money + '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 					sendMessage(playerid, "Вы положили в кассу "+val2+"$", orange[0], orange[1], orange[2])
-
-					local result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 				}
 				else
 				{
@@ -2608,8 +2600,6 @@ function cow_farms(playerid, value, val1, val2)
 					sqlite3( "UPDATE seagift_db SET nalog = nalog + '7' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'")
 
 					sendMessage(playerid, "Вы оплатили налог "+search_inv_player_2_parameter(playerid, doc)+" рыбзавода", yellow[0], yellow[1], yellow[2])
-
-					local result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 				}
 			}
 			else
@@ -2635,8 +2625,6 @@ function cow_farms(playerid, value, val1, val2)
 		}
 
 		sqlite3( "UPDATE seagift_db SET warehouse = warehouse - '"+val1+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
-
-		local result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 
 		return true
 	}
@@ -2709,8 +2697,6 @@ function cow_farms(playerid, value, val1, val2)
 		sendMessage(playerid, "Вы разгрузили из т/с "+info_png[82][0]+" "+val1+" шт ("+val2+"$ за 1 шт) за "+money+"$", green[0], green[1], green[2])
 
 		sqlite3( "UPDATE seagift_db SET money = money - '"+money+"', prod = prod + '"+val1+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
-
-		local result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 
 		return true
 	}
