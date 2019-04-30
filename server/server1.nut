@@ -91,6 +91,7 @@ local lyme = [130,255,0]//--лайм админский цвет
 local svetlo_zolotoy = [255,255,130]//--светло-золотой
 local crimson = [220,20,60]//--малиновый
 local purple = [175,0,255]//--фиолетовый
+local gray = [150,150,150]//--серый
 
 local color_table = [
 	[168,228,160],
@@ -944,6 +945,21 @@ function do_chat_player(playerid, text)
 	}
 }
 
+function b_chat_player(playerid, text)
+{
+	local myPos = getPlayerPosition(playerid)
+
+	foreach (player, playername in getPlayers())
+	{
+		local Pos = getPlayerPosition(player)
+
+		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
+		{
+			sendMessage(player, text, gray[0], gray[1], gray[2])
+		}
+	}
+}
+
 function try_chat_player(playerid, text)
 {
 	local myPos = getPlayerPosition(playerid)
@@ -1011,8 +1027,8 @@ function(playerid, text)
 	}
 
 	local count = 0
-	local say = "(Всем) "+getPlayerName( playerid )+" ["+playerid+"]: " + text
-	local say_10_r = "(10 метров) "+getPlayerName( playerid )+" ["+playerid+"]: " + text
+	local say = "(Всем OOC) "+getPlayerName( playerid )+" ["+playerid+"]: " + text
+	local say_10_r = "(Ближний IC) "+getPlayerName( playerid )+" ["+playerid+"]: " + text
 
 	foreach(i, playername in getPlayers())
 	{
@@ -1027,7 +1043,7 @@ function(playerid, text)
 	
 	if (count == 0)
 	{
-		sendMessageAll( playerid, say, white[0], white[1], white[2] )
+		sendMessageAll( playerid, say, gray[0], gray[1], gray[2] )
 
 		print("[CHAT] "+say)
 	}
@@ -7352,6 +7368,25 @@ function (playerid, ...)
 	try_chat_player(playerid, playername+" "+text)
 })
 
+addCommandHandler("b",
+function (playerid, ...)
+{
+	local playername = getPlayerName( playerid )
+
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	local text = ""
+	for(local i = 0; i < vargv.len(); i++)
+	{
+		text = text+vargv[i]+" "
+	}
+
+	b_chat_player(playerid, "(Ближний OOC) "+getPlayerName( playerid )+" ["+playerid+"]: " + text)
+})
+
 addCommandHandler("cmd",//все команды
 function (playerid)
 {
@@ -7377,7 +7412,7 @@ function (playerid)
 		"/auc [buy | return] [номер слота] - купить или забрать предмет с аукциона",
 		"/takecar [номер т/с] - забрать т/с со штрафстоянки",
 		"/lawyer [ИД игрока] - заплатить залог за игрока",
-		"/enshot [ИД игрока] - выстрелить в двигатель",
+		"/enshot [ИД игрока] - выстрелить в двигатель (для полицейских)",
 		"/sg buy - купить рыбзавод",
 		"/sg job [номер рыбзавода] - устроиться на рыбзавод",
 		"/sg menu [pay | coef] [сумма] - установить зарплату или доход от продаж",
@@ -7386,6 +7421,7 @@ function (playerid)
 		"/me [текст] - описание действия от 1 лица",
 		"/do [текст] - описание от 3 лица",
 		"/try [текст] - попытка действия",
+		"/b [текст] - ближний OOC чат",
 		"/idpng - ид предметов сервера",
 	]
 
@@ -7532,7 +7568,7 @@ function(playerid, id1, id2)
 		return
 	}
 
-	if (id1 <= 23 && id2 <= 59)
+	if (id1 >= 0 && id1 <= 23 && id2 >= 0 && id2 <= 59)
 	{
 		hour = id1
 		minute = id2
@@ -7562,7 +7598,7 @@ function ( playerid, ... )
 		text = text+vargv[i]+" "
 	}
 
-	local result = sqlite3( "INSERT INTO position (description, pos) VALUES ('"+text+"', '"+pos[0]+","+pos[1]+","+pos[2]+"')" )
+	local result = sqlite3( "INSERT INTO position (description, pos) VALUES ('"+text+"', '["+pos[0]+","+pos[1]+","+pos[2]+"]')" )
 	sendMessage(playerid, "save pos "+text, lyme[0], lyme[1], lyme[2])
 })
 
