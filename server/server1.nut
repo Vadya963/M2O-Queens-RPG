@@ -252,7 +252,7 @@ local info_png = {
 	[51] = ["коробка с продуктами", "$ за штуку"],
 	[52] = ["компос", "шт"],
 	[53] = ["лицензия таксиста", "шт"],
-	[54] = ["инкасаторская сумка", "$ в сумке"],
+	[54] = ["инкассаторская сумка", "$ в сумке"],
 	[55] = ["лист металла", "кг"],
 	[56] = ["пила", "шт"],
 	[57] = ["шпала", "$ за штуку"],
@@ -3062,7 +3062,7 @@ function job_timer2 ()
 				}
 			}
 
-			else if (job[playerid] == 3) //--работа инкасатора
+			else if (job[playerid] == 3) //--работа инкассатора
 			{
 				if (isPlayerInVehicle(playerid))
 				{
@@ -3688,6 +3688,7 @@ addEventHandler( "onScriptInit",
 function()
 {	
 	setSummer(pogoda)
+	setGameModeText( "discord.gg/000000" )//ссылка на дискорд
 
 	timer( EngineState, 1000, -1 )//двигатель машины
 	timer( fuel_down, 1000, -1 )//система топлива
@@ -4774,7 +4775,7 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			{
 				if (search_inv_player(playerid, 72, 1) == 0) 
 				{
-					sendMessage(playerid, "[ERROR] Вы не инкасатор", red[0], red[1], red[2])
+					sendMessage(playerid, "[ERROR] Вы не инкассатор", red[0], red[1], red[2])
 					return
 				}
 			}
@@ -5725,7 +5726,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			return
 		}
-		else if (id1 == 54) //--инкасаторский сумка
+		else if (id1 == 54) //--инкассаторский сумка
 		{
 			local randomize = id2
 
@@ -5907,7 +5908,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 		}
-		else if (id1 == 72) //--лиц. инкасатора
+		else if (id1 == 72) //--лиц. инкассатора
 		{
 			if (crimes[playerid] != 0)
 			{
@@ -5919,7 +5920,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				job[playerid] = 3
 
-				me_chat(playerid, playername+" вышел(ла) на работу Инкасатор")
+				me_chat(playerid, playername+" вышел(ла) на работу Инкассатор")
 			}
 			else
 			{
@@ -5995,7 +5996,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (id2 != 0)
 			{
-				sendMessage(playerid, "[ERROR] Рядом нет инкасаторской машины", red[0], red[1], red[2])
+				sendMessage(playerid, "[ERROR] Рядом нет инкассаторской машины", red[0], red[1], red[2])
 				return
 			}
 		}
