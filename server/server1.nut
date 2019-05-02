@@ -5,7 +5,7 @@ function sqlite3(text)
 
 	if(text.find("U") == 0 || text.find("I") == 0 || text.find("D") == 0)
 	{
-		local posfile = file("save_sqlite.txt", "a")
+		local posfile = file("resources/inventory/scriptfiles/save_sqlite.sql", "a")
 
 		local date = split(getDateTime(), ": ")//установка времени
 		local month = date[1].tostring()
