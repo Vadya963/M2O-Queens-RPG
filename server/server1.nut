@@ -284,6 +284,7 @@ local info_png = {
 	[83] = ["ящик с рыбным филе", "$ за штуку"],
 	[84] = ["документы на рыбзавод под номером", ""],
 	[85] = ["трудовой договор обработчика рыбы на", "рыбзаводе"],
+	[86] = ["ордер на обыск", "", "гражданина", "т/с", "дома"],
 }
 
 //цены автосалона
@@ -700,6 +701,7 @@ local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, 
 	[1332.08,1284.72,-0.306898, 15.0, 61, 35, 100],//--нефтебаза
 	[-217.361,-724.751,-21.4251, 15.0, 82, 38, 50],//--погрузка рыбы для рз
 	[374.967,117.759,-21.0186, 5.0, 83, 38, 300],//--погрузка рыбы с рз
+	//зп 250 свободна
 ]
 
 local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, скин 6}
@@ -707,6 +709,7 @@ local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, с
 	[-85.0723,1736.84,-18.7004, 5.0, 40, 1, 0],//--свалка бруски
 	[826.577,565.208,-11.196, 5.0, 56, 1, 62],//--банк металла
 	[26.051,1828.37,-16.9628, 2.0, 39, 1, 131],//--мясокомбинат
+	[1234.46,1188.59,0.489151, 5.0, 59, 1, 134],//--рудокоп
 ]
 
 //--места сброса предметов
@@ -726,6 +729,7 @@ local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4}
 	[-1292.64,1608.78,4.30491, 5.0, 66],//--гарри
 	[1.93655,1825.94,-16.963, 1.0, 68],//--мясокомбинат
 	[341.981,99.035,-21.2723, 5.0, 73],//--рз рыба
+	[1235.09,1208.75,1.15567, 5.0, 60],//--склад руды
 ]
 
 local anim_player_subject = [//--{x,y,z, радиус 3, ид пнг1 4, ид пнг2 5, зп 6, время работы анимации 7}
@@ -756,6 +760,10 @@ local anim_player_subject = [//--{x,y,z, радиус 3, ид пнг1 4, ид п
 	[-0.415082,1817.96,-16.963, 1.0, 39, 68, 1, 5],
 	[-0.203448,1815.39,-16.963, 1.0, 39, 68, 1, 5],
 	[1.79924,1815.35,-16.963, 1.0, 39, 68, 1, 5],
+
+	//рудокоп
+	[1256.68,1226.0,4.1122, 10.0, 59, 60, 100, 5],
+	[1257.59,1207.59,4.00177, 8.0, 59, 60, 100, 5],
 ]
 
 for (local i = 0; i <= 9; i++)
@@ -5405,7 +5413,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 11)//--газета
 		{
-			if (pogoda)
+			/*if (pogoda) переделать
 			{
 				if (pogoda_string_true == 1)
 				{
@@ -5430,19 +5438,17 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				{
 					sendMessage(playerid, "[ПОГОДА] Сегодня обещают туманный день", yellow[0], yellow[1], yellow[2])
 				}
-			}
+			}*/
 
-			local wanted = ""
+			sendMessage(playerid, "====[ РОЗЫСК ]====", blue[0], blue[1], blue[2])
 
-			foreach (k, v in getPlayers()) 
+			foreach (k, v in getPlayers())
 			{
 				if (crimes[k] != 0 && arrest[k] == 0)
 				{
-					wanted = wanted+v+"("+crimes[k]+"),"
+					sendMessage(playerid, v+" "+crimes[k]+" преступлений", blue[0], blue[1], blue[2])
 				}
 			}
-
-			sendMessage(playerid, "[РОЗЫСК] "+wanted, yellow[0], yellow[1], yellow[2])
 
 			me_chat(playerid, playername+" прочитал(а) газету")
 			return
@@ -6056,7 +6062,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			return
 		}
-		else if (id1 == 84)
+		else if (id1 == 84)//документы на рыбзавод
 		{
 			local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+id2+"'" )
 			if (result[1]["COUNT()"] == 1)
@@ -6079,7 +6085,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			return
 		}
-		else if (id1 == 85)
+		else if (id1 == 85)// лиц обр рыбы
 		{
 			if(getPlayerModel(playerid) != 133)
 			{
@@ -6117,6 +6123,11 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				me_chat(playerid, playername+" закончил(а) работу")
 			}
+			return
+		}
+		else if(id1 == 86)//ордер
+		{
+			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+info_png[id1][id2+1])
 			return
 		}
 		else 
@@ -6684,7 +6695,13 @@ function (playerid, value, id)
 		}
 	}
 	else if (value == "car")
-	{	
+	{
+		if(search_inv_player(playerid, 86, 2) == 0)
+		{
+			sendMessage(playerid, "[ERROR] У вас нет "+info_png[86][0]+" "+info_png[86][2+1], red[0], red[1], red[2])
+			return
+		}
+
 		foreach (k, vehicleid in getVehicles()) 
 		{
 			local plate = getVehiclePlateText(vehicleid)
@@ -6698,6 +6715,8 @@ function (playerid, value, id)
 				if (isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
 				{
 					me_chat(playerid, playername+" обыскал(а) т/с с номером "+id)
+
+					inv_player_delet(playerid, 86, 2)
 
 					foreach (k, v in weapon) 
 					{
@@ -6728,6 +6747,12 @@ function (playerid, value, id)
 	}
 	else if (value == "house")
 	{
+		if(search_inv_player(playerid, 86, 3) == 0)
+		{
+			sendMessage(playerid, "[ERROR] У вас нет "+info_png[86][0]+" "+info_png[86][3+1], red[0], red[1], red[2])
+			return
+		}
+
 		foreach (k, v in sqlite3( "SELECT * FROM house_db" )) 
 		{
 			if (v["number"] == id)
@@ -6735,6 +6760,8 @@ function (playerid, value, id)
 				if (isPointInCircle3D(x,y,z, v["x"],v["y"],v["z"], 10.0))
 				{
 					me_chat(playerid, playername+" обыскал(а) дом с номером "+id)
+
+					inv_player_delet(playerid, 86, 3)
 
 					foreach (k, v in weapon) 
 					{
