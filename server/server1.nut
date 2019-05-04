@@ -289,61 +289,61 @@ local info_png = {
 
 //цены автосалона
 local motor_show = [
-	//[ид(0), цена(1), вместимость бака(2), название(3)]
-	[0,4995,60,"Ascot Bailey"],
-	[1,5000,90,"Berkley Kingfisher"],
-	[2,0,0,"Trailer_1"],
-	[3,0,200,"GAI 353 Military Truck"],
-	[4,0,200,"Hank B"],
-	[5,0,200,"Hank B Fuel Tank"],
-	[6,7000,70,"Walter Hot Rod"],
-	[7,6000,70,"Smith 34 Hot Rod"],
-	[8,6000,70,"Shubert Pickup Hot Rod"],
-	[9,2740,70,"Houston Wasp"],
-	[10,5000,70,"ISW 508"],
-	[11,910,58,"Walter Military"],
-	[12,910,58,"Walter Utility"],
-	[13,5000,90,"Jefferson Futura"],
-	[14,3200,70,"Jefferson Provincial"],
-	[15,3500,90,"Lassister Series 69"],
-	[16,0,90,"Lassister Series 69"],//копия
-	[17,0,90,"Lassister Series 75 Hollywood"],//копия
-	[18,5170,90,"Lassister Series 75 Hollywood"],
-	[19,1250,80,"Milk Truck"],
-	[20,0,150,"Parry Bus"],
-	[21,0,150,"Parry Bus Prison"],
-	[22,2100,70,"Potomac Indian"],
-	[23,2350,60,"Quicksilver Windsor"],
-	[24,2350,60,"Quicksilver Windsor Taxi"],
-	[25,730,65,"Shubert 38"],
-	[26,0,65,"Shubert 38"],//копия
-	[27,4000,100,"Shubert Armored Van"],
-	[28,2300,80,"Shubert Beverly"],
-	[29,3500,70,"Shubert Frigate"],
-	[30,850,65,"Shubert Hearse"],
-	[31,730,65,"Shubert 38 Panel Truck"],
-	[32,0,65,"Shubert 38 Panel Truck"],//копия
-	[33,730,65,"Shubert 38 Taxi"],
-	[34,0,100,"Shubert Truck"],
-	[35,3000,100,"Shubert Truck Flatbed"],//копия
-	[36,0,100,"Shubert Truck Flatbed"],
-	[37,3000,100,"Shubert Truck Covered"],
-	[38,2000,100,"Shubert Truck Seagift"],
-	[39,0,100,"Shubert Show Plow"],
-	[40,0,80,"Military Truck"],
-	[41,2140,80,"Smith Custom 200"],
-	[42,4280,80,"Smith Custom 200 Police Special"],
-	[43,450,50,"Smith Coupe"],
-	[44,1700,65,"Smith Mainline"],
-	[45,2700,70,"Smith Thunderbolt"],
-	[46,0,80,"Smith Truck"],
-	[47,530,65,"Smith V8"],
-	[48,1500,50,"Smith Deluxe Station Wagon"],
-	[49,0,0,"Trailer_2"],
-	[50,1475,70,"Culver Empire"],
-	[51,2950,70,"Culver Empire Police Special"],
-	[52,2450,80,"Walker Rocket"],
-	[53,770,40,"Walter Coupe"]
+	//[ид(0), цена(1), вместимость бака(2), название(3), кол-во пасс-их мест(4)]
+	[0,4995,60,"Ascot Bailey",1],
+	[1,5000,90,"Berkley Kingfisher",1],
+	[2,0,0,"Trailer_1",0],
+	[3,0,200,"GAI 353 Military Truck",1],
+	[4,0,200,"Hank B",1],
+	[5,0,200,"Hank B Fuel Tank",1],
+	[6,7000,70,"Walter Hot Rod",1],
+	[7,6000,70,"Smith 34 Hot Rod",1],
+	[8,6000,70,"Shubert Pickup Hot Rod",1],
+	[9,2740,70,"Houston Wasp",3],
+	[10,5000,70,"ISW 508",1],
+	[11,910,58,"Walter Military",1],
+	[12,910,58,"Walter Utility",1],
+	[13,5000,90,"Jefferson Futura",1],
+	[14,3200,70,"Jefferson Provincial",1],
+	[15,3500,90,"Lassister Series 69",3],
+	[16,0,90,"Lassister Series 69",3],//копия
+	[17,0,90,"Lassister Series 75 Hollywood",3],//копия
+	[18,5170,90,"Lassister Series 75 Hollywood",3],
+	[19,1250,80,"Milk Truck",1],
+	[20,0,150,"Parry Bus",20],
+	[21,0,150,"Parry Bus Prison",20],
+	[22,2100,70,"Potomac Indian",3],
+	[23,2350,60,"Quicksilver Windsor",3],
+	[24,2350,60,"Quicksilver Windsor Taxi",3],
+	[25,730,65,"Shubert 38",3],
+	[26,0,65,"Shubert 38",3],//копия
+	[27,4000,100,"Shubert Armored Van",1],
+	[28,2300,80,"Shubert Beverly",1],
+	[29,3500,70,"Shubert Frigate",1],
+	[30,850,65,"Shubert Hearse",1],
+	[31,730,65,"Shubert 38 Panel Truck",1],
+	[32,0,65,"Shubert 38 Panel Truck",1],//копия
+	[33,730,65,"Shubert 38 Taxi",3],
+	[34,0,100,"Shubert Truck",1],
+	[35,3000,100,"Shubert Truck Flatbed",1],//копия
+	[36,0,100,"Shubert Truck Flatbed",1],
+	[37,3000,100,"Shubert Truck Covered",1],
+	[38,2000,100,"Shubert Truck Seagift",1],
+	[39,0,100,"Shubert Show Plow",1],
+	[40,0,80,"Military Truck",1],
+	[41,2140,80,"Smith Custom 200",3],
+	[42,4280,80,"Smith Custom 200 Police Special",3],
+	[43,450,50,"Smith Coupe",1],
+	[44,1700,65,"Smith Mainline",1],
+	[45,2700,70,"Smith Thunderbolt",1],
+	[46,0,80,"Smith Truck",1],
+	[47,530,65,"Smith V8",3],
+	[48,1500,50,"Smith Deluxe Station Wagon",3],
+	[49,0,0,"Trailer_2",0],
+	[50,1475,70,"Culver Empire",3],
+	[51,2950,70,"Culver Empire Police Special",3],
+	[52,2450,80,"Walker Rocket",3],
+	[53,770,40,"Walter Coupe",1]
 ]
 
 local pogoda = true//зима(false) или лето(true)
@@ -790,6 +790,7 @@ local state_inv_player = array(getMaxPlayers(), 0)
 local state_gui_window = array(getMaxPlayers(), 0)//--состояние гуи окна 0-выкл, 1-вкл
 local logged = array(getMaxPlayers(), 0)
 local sead = array(getMaxPlayers(), 0)
+local sead_custom = array(getMaxPlayers(), 0)
 local crimes = array(getMaxPlayers(), 0)
 local enter_house = array(getMaxPlayers(), 0)
 local enter_job = array(getMaxPlayers(), 0)
@@ -2747,6 +2748,18 @@ function EngineState()//двигатель вкл или выкл
 	}
 }
 
+function custom_seat_car()//кастомная синхра пасс-их мест
+{
+	foreach(playerid, playername in getPlayers()) 
+	{
+		if(sead_custom[playerid][0] != -1)
+		{
+			local pos = getVehiclePosition(sead_custom[playerid][0])
+			setPlayerPosition(playerid, pos[0],pos[1],pos[2]+sead_custom[playerid][1]*3)
+		}
+	}
+}
+
 function fuel_down()//--система топлива авто
 {
 	foreach(i, vehicleid in getVehicles()) 
@@ -3710,6 +3723,7 @@ function()
 	timer(prison, 60000, -1)//--таймер заключения в тюрьме
 	timer(prison_timer, 1000, -1)//--античит если не в тюрьме
 	timer(job_timer2, 1000, -1)//--работы в цикле
+	timer(custom_seat_car, 500, -1)//--синхра пасс-их мест
 
 
 	local result = sqlite3( "SELECT COUNT() FROM account" )
@@ -3800,7 +3814,8 @@ function( playerid, name, ip, serial )
 	state_inv_player[playerid] = 0
 	state_gui_window[playerid] = 0
 	logged[playerid] = 0
-	sead[playerid] = 0
+	sead[playerid] = -1
+	sead_custom[playerid] = [-1/*car id*/, 0/*sead 1,2,3*/]
 	crimes[playerid] = 0
 	enter_house[playerid] = 0
 	enter_job[playerid] = 0
@@ -4247,6 +4262,7 @@ function PlayerVehicleExit( playerid, vehicleid, seat )
 	local plate = getVehiclePlateText(vehicleid)
 	local carpos = getVehiclePosition(vehicleid)
 	local carrot = getVehicleRotation(vehicleid)
+	sead[playerid] = -1
 
 	if (seat == 0)
 	{
@@ -6896,6 +6912,7 @@ function (playerid, id)
 	{
 		if (logged[id] == 0 || !isPlayerInVehicle(id))
 		{
+			sendMessage(playerid, "[ERROR] Игрок не в т/с", red[0], red[1], red[2])
 			return
 		}
 
@@ -7137,6 +7154,95 @@ function (playerid, id)
 	else
 	{
 		sendMessage(playerid, "[ERROR] Нужно иметь "+cash+"$", red[0], red[1], red[2])
+	}
+})
+
+function getVehicleIdFromPlate( number )
+{
+	local number = number.tostring()
+
+	foreach(vehicleid,v in getVehicles())
+	{
+		local plate = getVehiclePlateText(vehicleid)
+		if (number == plate)
+		{
+			return vehicleid
+		}
+	}
+
+	return -1
+}
+
+addCommandHandler( "cseat",//сесть в тс
+function( playerid, plate, seat)
+{
+	local playername = getPlayerName ( playerid )
+	local myPos = getPlayerPosition(playerid)
+	local vehicleid = getVehicleIdFromPlate( plate )
+	local seat = seat.tointeger()
+
+	if (logged[playerid] == 0)
+	{
+		return
+	}
+	else if (seat <= 0 || seat >= 21)
+	{
+		sendMessage(playerid, "[ERROR] От 1 до 20", red[0], red[1], red[2])
+		return
+	}
+
+	if(vehicleid != -1)
+	{		
+		local model = getVehicleModel(vehicleid)
+		if(motor_show[model][4] < seat || motor_show[model][4] == 0)
+		{
+			sendMessage(playerid, "[ERROR] Неверное место", red[0], red[1], red[2])
+			return
+		}
+
+		local Pos = getVehiclePosition(vehicleid)
+		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], 5.0))
+		{
+			sead_custom[playerid][0] = vehicleid
+			sead_custom[playerid][1] = seat
+
+			me_chat(playerid, playername+" сел(а) в машину")
+		}
+		else
+		{
+			sendMessage(playerid, "[ERROR] Т/с далеко", red[0], red[1], red[2])
+		}		
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Т/с не найдено", red[0], red[1], red[2])
+	}
+})
+
+addCommandHandler( "cexit",//выйти из тс
+function( playerid )
+{
+	local playername = getPlayerName ( playerid )
+
+	if (logged[playerid] == 0)
+	{
+		return
+	}
+
+	if(sead_custom[playerid][0] != -1)
+	{
+		local vehicleid = sead_custom[playerid][0]
+
+		sead_custom[playerid] = [-1,0]
+
+		local Pos = getVehiclePosition(vehicleid)
+		setPlayerPosition(playerid, Pos[0]+2,Pos[1]+2,Pos[2])
+
+		me_chat(playerid, playername+" вышел(ла) из машины")
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 	}
 })
 
@@ -7430,6 +7536,8 @@ function (playerid)
 		"/let [ИД игрока] [текст] - отправить письмо игроку",
 		"/pay [ИД игрока] [сумма] - передача денег",
 		"/ec [номер т/с] - эвакуция т/с",
+		"/cseat [номер т/с] [место от 1 до 20] - сесть на пассажирское место",
+		"/cexit - выйти из т/с",
 		"/till [withdraw, deposit, price] [сумма] - установить цены в бизнесе",
 		"/search [player | car | house] [ИД игрока | номер т/с | номер дома] - обыскать игрока, т/с или дом (для полицейских)",
 		"/takepolicetoken [ИД игрока] - забрать полицейский жетон (для полицейских)",
