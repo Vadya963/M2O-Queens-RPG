@@ -150,6 +150,7 @@ local info_png = {
 	[84] = ["документы на рыбзавод под номером", ""],
 	[85] = ["трудовой договор обработчика рыбы на", "рыбзаводе"],
 	[86] = ["ордер на обыск", "", "гражданина", "т/с", "дома"],
+	[87] = ["стройматериалы", "$ за штуку"],
 }
 
 //цены автосалона
@@ -178,7 +179,7 @@ local motor_show = [
 	//[20,0,150,"Parry Bus"],
 	//[21,0,150,"Parry Bus Prison"],
 	[22,2100,70,"Potomac Indian"],
-	[23,2350,60,"Quicksilver Windsor"],
+	[23,2000,60,"Quicksilver Windsor"],
 	[24,2350,60,"Quicksilver Windsor Taxi"],
 	[25,730,65,"Shubert 38"],
 	//[26,0,65,"Shubert 38"],//копия
@@ -334,7 +335,7 @@ for (local i = 200; i >= 50; i-=50) {
 //--------------------------------------------грайдлист--------------------------------------------
 function guiCreateGridList (x,y, width, height)
 {
-	local window = guiCreateElement( 5, "", x,y, width, height+4.0, false )
+	local window = guiCreateElement( 5, "", x,y, width, height+3.0, false )
 
 	if (window)
 	{
