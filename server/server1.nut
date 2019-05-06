@@ -38,9 +38,6 @@ local max_fuel = 50.0//--объем бака авто
 local max_heal = 720.0//--макс здоровье игрока
 local house_bussiness_radius = 5.0//--радиус размещения бизнесов и домов
 local max_blip = 250.0//--радиус блипов
-local zakon_nalog_car = 500
-local zakon_nalog_house = 1000
-local zakon_nalog_business = 2000
 local time_nalog = 12//--время когда будет взиматься налог
 local price_hotel = 100//цена за отель
 local max_text_len = 90//макс длина сообщения
@@ -64,6 +61,9 @@ local zakon_kill_crimes = 1
 local zakon_robbery_crimes = 1
 local zakon_54_crimes = 1
 local zakon_car_theft_crimes = 1
+local zakon_nalog_car = 500
+local zakon_nalog_house = 1000
+local zakon_nalog_business = 2000
 //зп
 local zp_player_taxi = 1000
 local zp_car_63 = 150
@@ -285,6 +285,7 @@ local info_png = {
 	[84] = ["документы на рыбзавод под номером", ""],
 	[85] = ["трудовой договор обработчика рыбы на", "рыбзаводе"],
 	[86] = ["ордер на обыск", "", "гражданина", "т/с", "дома"],
+	[87] = ["стройматериалы", "$ за штуку"],
 }
 
 //цены автосалона
@@ -313,7 +314,7 @@ local motor_show = [
 	[20,0,150,"Parry Bus",20],
 	[21,0,150,"Parry Bus Prison",20],
 	[22,2100,70,"Potomac Indian",3],
-	[23,2350,60,"Quicksilver Windsor",3],
+	[23,2000,60,"Quicksilver Windsor",3],
 	[24,2350,60,"Quicksilver Windsor Taxi",3],
 	[25,730,65,"Shubert 38",3],
 	[26,0,65,"Shubert 38",3],//копия
@@ -347,14 +348,14 @@ local motor_show = [
 ]
 
 local pogoda = true//зима(false) или лето(true)
-local pogoda_string_true = 1
+local pogoda_string_true = [1,1]
 local weather_server_true = {
 	[1] =["DT_RTRclear_day_night", "DT_RTRclear_day_morning", "DT_RTRclear_day_afternoon", "DT_RTRclear_day_evening"],
 	[2] =["DT_RTRrainy_day_night", "DT_RTRrainy_day_morning", "DT_RTRrainy_day_afternoon", "DT_RTRrainy_day_evening"],
 	[3] =["DT_RTRfoggy_day_night", "DT_RTRfoggy_day_morning", "DT_RTRfoggy_day_afternoon", "DT_RTRfoggy_day_evening"],
 }
 
-local pogoda_string_false = 1
+local pogoda_string_false = [1,1]
 local weather_server_false = {
 	[1] =["DT04part02", "DT05part01JoesFlat", "DT05part03HarrysGunshop", "DT02part02JoesFlat"],
 	[2] =["DT02NewStart2", "DT05part04Distillery", "DT05part05ElGreco", "DT03part02FreddysBar"],
@@ -622,7 +623,7 @@ local interior_business = [
 ]
 
 //--здания для работ и фракций
-local interior_job = [//--12
+local interior_job = [
 //	 0              1                 2       3      4        5    6    7   8
 	[0, "Полицейский департамент", -378.987,654.699,-11.5013, 24, "0", 5.0, 0],
 	[1, "Мэрия", -115.11,-63.1035,-12.041, 23, "0", 5.0, 0],
@@ -700,8 +701,8 @@ local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, 
 	[-632.282,955.495,-17.7324, 15.0, 24, 35, 50],//--сигаретный завод
 	[1332.08,1284.72,-0.306898, 15.0, 61, 35, 100],//--нефтебаза
 	[-217.361,-724.751,-21.4251, 15.0, 82, 38, 50],//--погрузка рыбы для рз
+	[-1671.4,-300.838,-20.38, 15.0, 87, 35, 250],//стройматериалы
 	[374.967,117.759,-21.0186, 5.0, 83, 38, 300],//--погрузка рыбы с рз
-	//зп 250 свободна
 ]
 
 local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, скин 6}
@@ -720,6 +721,7 @@ local down_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5
 	[119.838,-202.878,-20.2502, 15.0, 54, 27],//банк
 	[-299.495,-734.244,-21.422, 15.0, 83, 38],//порт
 	[365.745,116.044,-21.2489, 5.0, 82, 38],//--рыбзавод
+	[18.5541,1195.61,66.7179, 15.0, 87, 35],//--стройплощадка
 ]
 
 local down_player_subject = [//--{x,y,z, радиус 3, ид пнг 4}
@@ -2806,7 +2808,7 @@ function timer_earth_clear()
 {	
 	if (hour == 0)
 	{
-		local count_earth = 0
+		local count_earth = -1
 
 		foreach (k, v in earth) 
 		{
@@ -2855,7 +2857,7 @@ function debuginfo ()
 		setElementData(playerid, "6", "crimes[playerid] "+crimes[playerid].tostring())
 		setElementData(playerid, "7", "min_chat[playerid] "+min_chat[playerid].tostring())
 		setElementData(playerid, "8", "max_chat[playerid] "+max_chat[playerid].tostring())
-		setElementData(playerid, "9", "enter_house[playerid] "+enter_house[playerid])
+		setElementData(playerid, "9", "enter_house[playerid] "+enter_house[playerid][0]+", "+enter_house[playerid][1])
 		setElementData(playerid, "10", "arrest[playerid] "+arrest[playerid])
 		setElementData(playerid, "11", "gps_device[playerid] "+gps_device[playerid])
 		setElementData(playerid, "12", "robbery_player[playerid] "+robbery_player[playerid])
@@ -3386,15 +3388,17 @@ function timeserver()//время сервера
 
 			if (pogoda)
 			{
-				pogoda_string_true = random(1,3)
+				pogoda_string_true[0] = pogoda_string_true[1]
+				pogoda_string_true[1] = random(1,3)
 
-				print("[timeserver] pogoda_string_true "+pogoda_string_true)
+				print("[timeserver] pogoda_string_true "+pogoda_string_true[1])
 			}
 			else 
 			{
-				pogoda_string_false = random(1,2)
+				pogoda_string_false[0] = pogoda_string_false[1]
+				pogoda_string_false[1] = random(1,2)
 
-				print("[timeserver] pogoda_string_false "+pogoda_string_false)
+				print("[timeserver] pogoda_string_false "+pogoda_string_false[1])
 			}
 
 			timer_earth_clear()//--очистка земли от предметов
@@ -3410,38 +3414,38 @@ function random_weather (hour)
 	{
 		if (hour == 0)
 		{
-			setWeather( weather_server_true[pogoda_string_true][0] )
+			setWeather( weather_server_true[pogoda_string_true[0]][0] )
 		}
 		else if (hour == 6) 
 		{
-			setWeather( weather_server_true[pogoda_string_true][1] )
+			setWeather( weather_server_true[pogoda_string_true[0]][1] )
 		}
 		else if (hour == 12) 
 		{
-			setWeather( weather_server_true[pogoda_string_true][2] )
+			setWeather( weather_server_true[pogoda_string_true[0]][2] )
 		}
 		else if (hour == 18) 
 		{
-			setWeather( weather_server_true[pogoda_string_true][3] )
+			setWeather( weather_server_true[pogoda_string_true[0]][3] )
 		}
 	}
 	else 
 	{
 		if (hour == 0)
 		{
-			setWeather( weather_server_false[pogoda_string_false][0] )
+			setWeather( weather_server_false[pogoda_string_false[0]][0] )
 		}
 		else if (hour == 6) 
 		{
-			setWeather( weather_server_false[pogoda_string_false][1] )
+			setWeather( weather_server_false[pogoda_string_false[0]][1] )
 		}
 		else if (hour == 12) 
 		{
-			setWeather( weather_server_false[pogoda_string_false][2] )
+			setWeather( weather_server_false[pogoda_string_false[0]][2] )
 		}
 		else if (hour == 18) 
 		{
-			setWeather( weather_server_false[pogoda_string_false][3] )
+			setWeather( weather_server_false[pogoda_string_false[0]][3] )
 		}
 	}
 }
@@ -3452,38 +3456,38 @@ function spawn_weather (hour)
 	{
 		if (hour >= 0 && hour <= 5)
 		{
-			setWeather( weather_server_true[pogoda_string_true][0] )
+			setWeather( weather_server_true[pogoda_string_true[0]][0] )
 		}
 		else if (hour >= 6 && hour <= 11)
 		{
-			setWeather( weather_server_true[pogoda_string_true][1] )
+			setWeather( weather_server_true[pogoda_string_true[0]][1] )
 		}
 		else if (hour >= 12 && hour <= 17)
 		{
-			setWeather( weather_server_true[pogoda_string_true][2] )
+			setWeather( weather_server_true[pogoda_string_true[0]][2] )
 		}
 		else if (hour >= 18 && hour <= 23)
 		{
-			setWeather( weather_server_true[pogoda_string_true][3] )
+			setWeather( weather_server_true[pogoda_string_true[0]][3] )
 		}
 	}
 	else 
 	{
 		if (hour >= 0 && hour <= 5)
 		{
-			setWeather( weather_server_false[pogoda_string_false][0] )
+			setWeather( weather_server_false[pogoda_string_false[0]][0] )
 		}
 		else if (hour >= 6 && hour <= 11)
 		{
-			setWeather( weather_server_false[pogoda_string_false][1] )
+			setWeather( weather_server_false[pogoda_string_false[0]][1] )
 		}
 		else if (hour >= 12 && hour <= 17)
 		{
-			setWeather( weather_server_false[pogoda_string_false][2] )
+			setWeather( weather_server_false[pogoda_string_false[0]][2] )
 		}
 		else if (hour >= 18 && hour <= 23)
 		{
-			setWeather( weather_server_false[pogoda_string_false][3] )
+			setWeather( weather_server_false[pogoda_string_false[0]][3] )
 		}
 	}
 }
@@ -3661,7 +3665,7 @@ function prison_timer()//--античит если не в тюрьме
 
 				state_inv_player[playerid] = 0
 				state_gui_window[playerid] = 0
-				enter_house[playerid] = 0
+				enter_house[playerid] = [0,0]
 				enter_job[playerid] = 0
 
 				takeAllWeapons ( playerid )
@@ -3817,7 +3821,7 @@ function( playerid, name, ip, serial )
 	sead[playerid] = -1
 	sead_custom[playerid] = [-1/*car id*/, 0/*sead 1,2,3*/]
 	crimes[playerid] = 0
-	enter_house[playerid] = 0
+	enter_house[playerid] = [0,0]
 	enter_job[playerid] = 0
 	health[playerid] = 720
 	arrest[playerid] = 0
@@ -3976,7 +3980,7 @@ function( playerid )
 {
 	if (logged[playerid] == 0)
 	{
-		sendMessage(playerid, "[TIPS] Если у вас нету счетчика FPS, перезайдите!", color_tips[0], color_tips[1], color_tips[2])
+		sendMessage(playerid, "[TIPS] Если у вас нету счетчика FPS или 3D текстов, перезайдите!", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] F2 - скрыть или показать худ", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] F3 - скрыть или показать список игроков", color_tips[0], color_tips[1], color_tips[2])
 		sendMessage(playerid, "[TIPS] TAB - открыть инвентарь, левая часть экрана - использовать предмет, правая - выкинуть", color_tips[0], color_tips[1], color_tips[2])
@@ -4331,25 +4335,42 @@ function tab_down(playerid)
 
 		foreach (idx, value in sqlite3( "SELECT * FROM house_db" )) 
 		{	
-			if (isPointInCircle3D( myPos[0], myPos[1], myPos[2], value["x"], value["y"], value["z"], house_bussiness_radius) && search_inv_player(playerid, 25, value["number"]) != 0)
+			if (isPointInCircle3D( myPos[0], myPos[1], myPos[2], value["x"], value["y"], value["z"], house_bussiness_radius))
 			{	
-				if (value["nalog"] > 0)
+				local count = 0
+				foreach (k, v in getPlayers()) 
+				{
+					if(enter_house[k][1] == value["number"])
+					{
+						count = 1
+						break
+					}
+				}
+
+				if (value["nalog"] <= 0)
+				{
+					sendMessage(playerid, "[ERROR] Дом арестован за уклонение от уплаты налогов", red[0], red[1], red[2])
+				}
+				else if (value["door"] == 0)
+				{
+					sendMessage(playerid, "[ERROR] Дверь закрыта", red[0], red[1], red[2])
+				}
+				else if (count != 0)
+				{
+
+				}
+				else 
 				{
 					for (local id3 = 0; id3 < max_inv; id3++)
 					{
 						triggerClientEvent( playerid, "event_inv_load", "house", id3, array_house_1[value["number"]][id3].tofloat(), array_house_2[value["number"]][id3].tostring() )
 					}
 
-					local result = sqlite3( "SELECT * FROM house_db WHERE number = '"+value["number"]+"'" )
-					sendMessage(playerid, "Налог дома оплачен на "+result[1]["nalog"]+" дней", yellow[0], yellow[1], yellow[2])
+					sendMessage(playerid, "Налог дома оплачен на "+value["nalog"]+" дней", yellow[0], yellow[1], yellow[2])
 
 					triggerClientEvent( playerid, "event_tab_load", "house", value["number"] )
 
-					enter_house[playerid] = 1
-				}
-				else 
-				{
-					sendMessage(playerid, "[ERROR] Дом арестован за уклонение от уплаты налогов", red[0], red[1], red[2])
+					enter_house[playerid] = [1,value["number"]]
 				}
 
 				break
@@ -4370,7 +4391,7 @@ function tab_down(playerid)
 		triggerClientEvent( playerid, "event_tab_load", "house", "" )
 
 		state_inv_player[playerid] = 0
-		enter_house[playerid] = 0
+		enter_house[playerid] = [0,0]
 		enter_job[playerid] = 0
 
 		triggerClientEvent( playerid, "event_tab_down_fun", state_inv_player[playerid] )
@@ -4440,7 +4461,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 	local j = max_earth
 	earth[j] <- [myPos[0],myPos[1],myPos[2],id1,id2]
 
-	if (search_inv_player(playerid, 25, id2) != 0 && id1 == 25) {//--когда выбрасываешь ключ в инв-ре исчезают картинки
+	if (enter_house[playerid][1] == id2 && id1 == 25) {//--когда выбрасываешь ключ в инв-ре исчезают картинки
 		triggerClientEvent( playerid, "event_tab_load", "house", "" )
 	}
 
@@ -4779,7 +4800,7 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 				sendMessage(playerid, "[ERROR] Багажник заполнен", red[0], red[1], red[2])
 				return
 			}
-			else if (id1 == 24 || id1 == 61) 
+			else if (id1 == 24 || id1 == 61 || id1 == 87)
 			{
 				if (search_inv_player(playerid, 34, 1) == 0) 
 				{
@@ -4865,6 +4886,10 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			{
 				sendMessage(playerid, "[TIPS] Езжайте в порт, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
 			}
+			else if (id1 == 87) 
+			{
+				sendMessage(playerid, "[TIPS] Езжайте на стройплощадку в Хилвуд, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
+			}
 		}
 		else
 		{
@@ -4938,7 +4963,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 
 					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
 
-					sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт ("+sic2p+"$ за 1 шт) за "+money+"$", green[0], green[1], green[2])
+					sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт за "+money+"$", green[0], green[1], green[2])
 
 					return
 				}
@@ -4962,7 +4987,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 
 						inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
 
-						sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт ("+sic2p+"$ за 1 шт) за "+money+"$", green[0], green[1], green[2])
+						sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт за "+money+"$", green[0], green[1], green[2])
 
 						return
 					}
@@ -5237,7 +5262,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					return
 				}
 
-				if (enter_house[playerid] == 1)
+				if (enter_house[playerid][0] == 1)
 				{
 					id2 = id2 - 1
 					hygiene[playerid] = hygiene[playerid]+sleep_hygiene_plus
@@ -5271,7 +5296,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					return
 				}
 
-				if (enter_house[playerid] == 1)
+				if (enter_house[playerid][0] == 1)
 				{
 					id2 = id2 - 1
 					sleep[playerid] = sleep[playerid]+sleep_hygiene_plus
@@ -5358,6 +5383,37 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			return
 		}
+		else if (id1 == 25)//--ключ дома
+		{
+			local h = id2
+			local result = sqlite3( "SELECT COUNT() FROM house_db WHERE number = '"+h+"'" )
+			if (result[1]["COUNT()"] == 1)
+			{
+				local result = sqlite3( "SELECT * FROM house_db WHERE number = '"+h+"'" )
+				if (isPointInCircle3D(result[1]["x"],result[1]["y"],result[1]["z"], x,y,z, house_bussiness_radius))
+				{
+					local house_door = result[1]["door"]
+
+					if (house_door == 0)
+					{
+						house_door = 1
+						me_chat(playerid, playername+" открыл(а) дверь дома")
+					}
+					else
+					{
+						house_door = 0
+						me_chat(playerid, playername+" закрыл(а) дверь дома")
+					}
+
+					sqlite3( "UPDATE house_db SET door = '"+house_door+"' WHERE number = '"+h+"'")
+
+					return
+				}
+			}
+
+			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
+			return
+		}
 		else if (id1 == 5)//канистра
 		{
 			if (isPlayerInVehicle(playerid))
@@ -5429,32 +5485,32 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 11)//--газета
 		{
-			/*if (pogoda) переделать
+			if (pogoda)
 			{
-				if (pogoda_string_true == 1)
+				if (pogoda_string_true[1] == 1)
 				{
-					sendMessage(playerid, "[ПОГОДА] Сегодня обещают солнечный день", yellow[0], yellow[1], yellow[2])
+					sendMessage(playerid, "[ПОГОДА] Завтра обещают солнечный день", yellow[0], yellow[1], yellow[2])
 				}
-				else if (pogoda_string_true == 2) 
+				else if (pogoda_string_true[1] == 2) 
 				{
-					sendMessage(playerid, "[ПОГОДА] Сегодня обещают дождливый день", yellow[0], yellow[1], yellow[2])
+					sendMessage(playerid, "[ПОГОДА] Завтра обещают дождливый день", yellow[0], yellow[1], yellow[2])
 				}
-				else if (pogoda_string_true == 3) 
+				else if (pogoda_string_true[1] == 3) 
 				{
-					sendMessage(playerid, "[ПОГОДА] Сегодня обещают туманный день", yellow[0], yellow[1], yellow[2])
+					sendMessage(playerid, "[ПОГОДА] Завтра обещают туманный день", yellow[0], yellow[1], yellow[2])
 				}
 			}
 			else 
 			{
-				if (pogoda_string_false == 1)
+				if (pogoda_string_false[1] == 1)
 				{
-					sendMessage(playerid, "[ПОГОДА] Сегодня обещают солнечный день", yellow[0], yellow[1], yellow[2])
+					sendMessage(playerid, "[ПОГОДА] Завтра обещают солнечный день", yellow[0], yellow[1], yellow[2])
 				}
-				else if (pogoda_string_false == 2) 
+				else if (pogoda_string_false[1] == 2) 
 				{
-					sendMessage(playerid, "[ПОГОДА] Сегодня обещают туманный день", yellow[0], yellow[1], yellow[2])
+					sendMessage(playerid, "[ПОГОДА] Завтра обещают туманный день", yellow[0], yellow[1], yellow[2])
 				}
-			}*/
+			}
 
 			sendMessage(playerid, "====[ РОЗЫСК ]====", blue[0], blue[1], blue[2])
 
@@ -5616,10 +5672,11 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 46)//--алкостестер
 		{
+			id2 = 0
 			local alcohol_test = alcohol[playerid]/100.0
 			
 			me_chat(playerid, playername+" смочил(а) слюной палочку")
-			do_chat(playerid, info_png[id1][0]+" показал "+alcohol_test+" промилле")
+			do_chat(playerid, info_png[id1][0]+" показал "+alcohol_test+" промилле - "+playername)
 
 			if (alcohol_test >= zakon_alcohol)
 			{
@@ -5630,10 +5687,11 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 47)//--наркостестер
 		{
+			id2 = 0
 			local drugs_test = drugs[playerid]
 			
 			me_chat(playerid, playername+" смочил(а) слюной палочку")
-			do_chat(playerid, info_png[id1][0]+" показал "+drugs_test+" процентов зависимости")
+			do_chat(playerid, info_png[id1][0]+" показал "+drugs_test+" процентов зависимости - "+playername)
 
 			if (drugs_test >= zakon_drugs)
 			{
@@ -6089,7 +6147,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					[result[1]["number"], "Баланс", split(result[1]["money"].tostring(),".")[0]+"$"],
 					[result[1]["number"], "Доход от продаж", result[1]["coef"]+" процентов"],
 					[result[1]["number"], "Налог", result[1]["nalog"]+" дней"],
-					[result[1]["number"], "Склад", result[1]["warehouse"]+" филе рыбы"],
+					[result[1]["number"], "Склад", result[1]["warehouse"]+" ящиков с рыбным филе"],
 					[result[1]["number"], "Склад", result[1]["prod"]+" свежей рыбы"],
 				]
 					
@@ -6232,9 +6290,9 @@ function (playerid)
 				triggerClientEvent( playerid, "event_bussines_house_fun", dim, x, y, z, "house", house_bussiness_radius )
 			}
 
-			sqlite3( "INSERT INTO house_db (number, nalog, x, y, z, inventory) VALUES ('"+dim+"', '5', '"+x+"', '"+y+"', '"+z+"', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
+			sqlite3( "INSERT INTO house_db (number, door, nalog, x, y, z, inventory) VALUES ('"+dim+"', '0', '5', '"+x+"', '"+y+"', '"+z+"', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
-			sendMessage(playerid, "Вы получили "+info_png[25][0]+" "+dim+" "+info_png[25][0], orange[0], orange[1], orange[2])
+			sendMessage(playerid, "Вы получили "+info_png[25][0]+" "+dim+" "+info_png[25][1], orange[0], orange[1], orange[2])
 		}
 		else
 		{
@@ -7480,7 +7538,7 @@ function (playerid, ...)
 		text = text+vargv[i]+" "
 	}
 
-	do_chat_player(playerid, playername+" "+text)
+	do_chat_player(playerid, text+"- "+playername)
 })
 
 addCommandHandler("try",
@@ -7734,7 +7792,7 @@ function ( playerid, ... )
 		text = text+vargv[i]+" "
 	}
 
-	local result = sqlite3( "INSERT INTO position (description, pos) VALUES ('"+text+"', '["+pos[0]+","+pos[1]+","+pos[2]+"]')" )
+	local result = sqlite3( "INSERT INTO position (description, pos) VALUES ('"+text+"', '["+pos[0]+","+pos[1]+","+pos[2]+"],')" )
 	sendMessage(playerid, "save pos "+text, lyme[0], lyme[1], lyme[2])
 })
 
