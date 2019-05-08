@@ -2933,51 +2933,47 @@ function debuginfo ()
 
 function job_timer2 ()
 {
-	//--места для таксистов
-	local taxi_pos = {}
+	local taxi_pos = {}//--места для таксистов
+	local collector_pos = {}//позции для инкассатора
 
-	//--загрузка позиций для работы таксист
-	local count = taxi_pos.len()
 	foreach (k, v in sqlite3( "SELECT * FROM house_db" )) 
 	{
-		count = count+1
-		taxi_pos[count] <- [v["x"],v["y"],v["z"]]
+		taxi_pos[taxi_pos.len()] <- [v["x"],v["y"],v["z"]]
 	}
 
 	foreach (k, v in repair) 
 	{
-		count = count+1
-		taxi_pos[count] <- [v[0],v[1],v[2]]
+		taxi_pos[taxi_pos.len()] <- [v[0],v[1],v[2]]
+		collector_pos[collector_pos.len()] <- [v[0],v[1],v[2]]
 	}
 
 	foreach (k, v in gans) 
-	{
-		count = count+1
-		taxi_pos[count] <- [v[0],v[1],v[2]]
+	{	
+		taxi_pos[taxi_pos.len()] <- [v[0],v[1],v[2]]
+		collector_pos[collector_pos.len()] <- [v[0],v[1],v[2]]
 	}
 
 	foreach (k, v in fuel_gas) 
 	{
-		count = count+1
-		taxi_pos[count] <- [v[0],v[1],v[2]]
+		taxi_pos[taxi_pos.len()] <- [v[0],v[1],v[2]]
+		collector_pos[collector_pos.len()] <- [v[0],v[1],v[2]]
 	}
 
 	foreach (k, v in clothing) 
 	{
-		count = count+1
-		taxi_pos[count] <- [v[0],v[1],v[2]]
+		taxi_pos[taxi_pos.len()] <- [v[0],v[1],v[2]]
+		collector_pos[collector_pos.len()] <- [v[0],v[1],v[2]]
 	}
 
 	foreach (k, v in ed) 
 	{
-		count = count+1
-		taxi_pos[count] <- [v[0],v[1],v[2]]
+		taxi_pos[taxi_pos.len()] <- [v[0],v[1],v[2]]
+		collector_pos[collector_pos.len()] <- [v[0],v[1],v[2]]
 	}
 
-	foreach (k, v in interior_job) 
+	foreach (k, v in interior_job)
 	{
-		count = count+1
-		taxi_pos[count] <- [v[2],v[3],v[4]]
+		taxi_pos[taxi_pos.len()] <- [v[2],v[3],v[4]]
 	}
 
 	foreach (playerid, playername in getPlayers()) 
@@ -3106,12 +3102,12 @@ function job_timer2 ()
 						{
 							if (job_call[playerid] == 0) //--нету вызова
 							{
-								local randomize = random(0,taxi_pos.len()-1)
+								local randomize = random(0,collector_pos.len()-1)
 
 								sendMessage(playerid, "Езжайте на место погрузки", yellow[0], yellow[1], yellow[2])
 
 								job_call[playerid] = 1
-								job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
+								job_pos[playerid] = [collector_pos[randomize][0],collector_pos[randomize][1],collector_pos[randomize][2]]
 
 								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
 							}
@@ -5385,7 +5381,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 						putPlayerInVehicle( playerid, v, 0 )
 						sendMessage(playerid, "[ERROR] Перезайдите в т/с", red[0], red[1], red[2])
 						car_27[playerid] = true
-						break
+						return
 					}
 				}
 			}
