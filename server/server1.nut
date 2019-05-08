@@ -64,11 +64,13 @@ local zakon_car_theft_crimes = 1
 local zakon_nalog_car = 500
 local zakon_nalog_house = 1000
 local zakon_nalog_business = 2000
+local zakon_price_house = 300000
+local zakon_price_business = 300000
 //зп
 local zp_player_taxi = 1000
-local zp_car_63 = 150
+local zp_car_63 = 200
 local zp_car_54 = 200
-local zp_player_73 = 20
+local zp_player_73 = 50
 local zp_player_71 = 500
 //вместимость складов бизнесов
 local max_business = 100
@@ -698,15 +700,15 @@ foreach (k, v in color_table)//краска
 
 //-места поднятия предметов
 local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, зп 6}
-	[-632.282,955.495,-17.7324, 15.0, 24, 35, 50],//--сигаретный завод
-	[1332.08,1284.72,-0.306898, 15.0, 61, 35, 100],//--нефтебаза
+	[-632.282,955.495,-17.7324, 15.0, 24, 35, 100],//--склад продуктов
+	[1332.08,1284.72,-0.306898, 15.0, 61, 35, 200],//--нефтебаза
+	[-1671.4,-300.838,-20.38, 15.0, 87, 35, 200],//стройматериалы
+	[374.967,117.759,-21.0186, 5.0, 83, 38, 200],//--погрузка рыбы с рз
 	[-217.361,-724.751,-21.4251, 15.0, 82, 38, 50],//--погрузка рыбы для рз
-	[-1671.4,-300.838,-20.38, 15.0, 87, 35, 250],//стройматериалы
-	[374.967,117.759,-21.0186, 5.0, 83, 38, 300],//--погрузка рыбы с рз
 ]
 
 local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, скин 6}
-	[-427.786,-737.652,-21.7381, 5.0, 51, 80, 63],//--порт
+	[-427.786,-737.652,-21.7381, 5.0, 51, 100, 63],//--порт
 	[-85.0723,1736.84,-18.7004, 5.0, 40, 1, 0],//--свалка бруски
 	[826.577,565.208,-11.196, 5.0, 56, 1, 62],//--банк металла
 	[26.051,1828.37,-16.9628, 2.0, 39, 1, 131],//--мясокомбинат
@@ -764,23 +766,32 @@ local anim_player_subject = [//--{x,y,z, радиус 3, ид пнг1 4, ид п
 	[1.79924,1815.35,-16.963, 1.0, 39, 68, 1, 5],
 
 	//рудокоп
-	[1256.68,1226.0,4.1122, 10.0, 59, 60, 100, 5],
-	[1257.59,1207.59,4.00177, 8.0, 59, 60, 100, 5],
+	[1256.68,1226.0,4.1122, 10.0, 59, 60, 1, 5],
+	[1257.59,1207.59,4.00177, 8.0, 59, 60, 1, 5],
 ]
 
 for (local i = 0; i <= 9; i++)
 {
-	anim_player_subject[i][6] = 20
+	anim_player_subject[i][6] = 50
+	anim_player_subject[i][7] = 10
 }
 
 for (local i = 10; i <= 12; i++)
 {
-	anim_player_subject[i][6] = 40
+	anim_player_subject[i][6] = 100
+	anim_player_subject[i][7] = 10
 }
 
 for (local i = 13; i <= 20; i++)
 {
-	anim_player_subject[i][6] = 60
+	anim_player_subject[i][6] = 100
+	anim_player_subject[i][7] = 10
+}
+
+for (local i = 21; i <= 22; i++)
+{
+	anim_player_subject[i][6] = 100
+	anim_player_subject[i][7] = 10
 }
 
 //слоты игрока
@@ -3058,7 +3069,7 @@ function job_timer2 ()
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
 								{
-									local randomize_zp = random(1,zp_car_63)
+									local randomize_zp = random(zp_car_63/2,zp_car_63)
 
 									job_call[playerid] = 2
 
@@ -3108,7 +3119,7 @@ function job_timer2 ()
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
 								{
-									local randomize_zp = random(1,zp_car_54)
+									local randomize_zp = random(zp_car_54/2,zp_car_54)
 
 									job_call[playerid] = 2
 
@@ -4524,7 +4535,7 @@ function e_down (playerid)//--подбор предметов с земли
 					}
 				}
 
-				give_subject(playerid, "car", v[4], random(1,v[6]))
+				give_subject(playerid, "car", v[4], random(v[6]/2,v[6]))
 			}
 		}
 
@@ -6245,6 +6256,12 @@ function (playerid)
 		return
 	}
 
+	if(array_player_2[playerid][0] < zakon_price_house)
+	{
+		sendMessage(playerid, "[ERROR] Стоимость домов составляет "+zakon_price_house+"$", red[0], red[1], red[2])
+		return
+	}
+
 	local result = sqlite3( "SELECT COUNT() FROM house_db" )
 	local house_number = result[1]["COUNT()"]
 	foreach (k, v in sqlite3( "SELECT * FROM house_db" )) 
@@ -6293,6 +6310,8 @@ function (playerid)
 			sqlite3( "INSERT INTO house_db (number, door, nalog, x, y, z, inventory) VALUES ('"+dim+"', '0', '5', '"+x+"', '"+y+"', '"+z+"', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
 			sendMessage(playerid, "Вы получили "+info_png[25][0]+" "+dim+" "+info_png[25][1], orange[0], orange[1], orange[2])
+
+			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-zakon_price_house, playername )
 		}
 		else
 		{
@@ -6320,6 +6339,12 @@ function (playerid, id)
 
 	if (logged[playerid] == 0)
 	{
+		return
+	}
+
+	if(array_player_2[playerid][0] < zakon_price_business)
+	{
+		sendMessage(playerid, "[ERROR] Стоимость бизнеса составляет "+zakon_price_house+"$", red[0], red[1], red[2])
 		return
 	}
 
@@ -6375,7 +6400,9 @@ function (playerid, id)
 
 				sqlite3( "INSERT INTO business_db (number, type, price, money, nalog, warehouse, x, y, z, interior) VALUES ('"+dim+"', '"+interior_business[id][1]+"', '0', '0', '5', '0', '"+x+"', '"+y+"', '"+z+"', '"+id+"')" )
 
-				sendMessage(playerid, "Вы получили "+info_png[36][0]+" "+dim+" "+info_png[36][1], orange[0], orange[1], orange[2])					
+				sendMessage(playerid, "Вы получили "+info_png[36][0]+" "+dim+" "+info_png[36][1], orange[0], orange[1], orange[2])
+
+				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-zakon_price_business, playername )
 			}
 			else
 			{
@@ -6670,7 +6697,7 @@ function (playerid, id)
 		return
 	}
 
-	if (cash > array_player_2[playerid][0])
+	if (cash*crimes[id] > array_player_2[playerid][0])
 	{
 		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red[0], red[1], red[2])
 		return
