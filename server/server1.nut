@@ -234,7 +234,7 @@ local info_png = {
 	[31] = ["шеврон Лейтенанта", "шт"],
 	[32] = ["шеврон Капитан", "шт"],
 	[33] = ["шеврон Шефа полиции", "шт"],
-	[34] = ["лицензия дальнобойщика", "шт"],
+	[34] = ["лицензия на работу", "вид работы"],
 	[35] = ["лом", "процентов"],
 	[36] = ["документы на бизнес под номером", ""],
 	[37] = ["админский жетон", "шт"],
@@ -253,7 +253,7 @@ local info_png = {
 	[50] = ["квитанция для оплаты т/с на", "дней"],
 	[51] = ["коробка с продуктами", "$ за штуку"],
 	[52] = ["компос", "шт"],
-	[53] = ["лицензия таксиста", "шт"],
+	[53] = ["", ""],
 	[54] = ["инкассаторская сумка", "$ в сумке"],
 	[55] = ["лист металла", "кг"],
 	[56] = ["пила", "шт"],
@@ -262,7 +262,7 @@ local info_png = {
 	[59] = ["кирка", "шт"],
 	[60] = ["руда", "кг"],
 	[61] = ["бочка с нефтью", "$ за штуку"],
-	[62] = ["лицензия водителя мусоровоза", "шт"],
+	[62] = ["", ""],
 	[63] = ["мусор", "кг"],
 	[64] = ["антипохмелин", "шт"],
 	[65] = ["двигатель", "уровень тюнинга"],
@@ -272,15 +272,15 @@ local info_png = {
 	[69] = ["колесо", "марка"],
 	[70] = ["банка краски", "цвет"],
 	[71] = ["ящик с инструментами", "процентов"],
-	[72] = ["лицензия инкассатора", "шт"],
+	[72] = ["", ""],
 	[73] = ["рыба", "кг"],
 	[74] = ["удочка", "процентов"],
-	[75] = ["лицензия ремонтника", "шт"],
+	[75] = ["", ""],
 	[76] = ["динамит", "шт"],
 	[77] = ["шнур", "шт"],
 	[78] = ["тратил", "гр"],
 	[79] = ["отмычка", "процентов"],
-	[80] = ["лицензия угонщика", "шт"],
+	[80] = ["", ""],
 	[81] = ["нож", "процентов"],
 	[82] = ["лоток с рыбой", "$ за штуку"],
 	[83] = ["ящик с рыбным филе", "$ за штуку"],
@@ -312,7 +312,7 @@ local motor_show = [
 	[16,0,90,"Lassister Series 69",3],//копия
 	[17,0,90,"Lassister Series 75 Hollywood",3],//копия
 	[18,5170,90,"Lassister Series 75 Hollywood",3],
-	[19,1250,80,"Milk Truck",1],
+	[19,2000,80,"Milk Truck",1],
 	[20,0,150,"Parry Bus",20],
 	[21,0,150,"Parry Bus Prison",20],
 	[22,2100,70,"Potomac Indian",3],
@@ -676,12 +676,12 @@ local gas = {
 	[5] = [info_png[5][0], 25, 250],
 }
 
-local giuseppe = {
-	[58] = [info_png[58][0], 78, 1000],
-	[78] = [info_png[78][0], 100, 1000],
-	[79] = [info_png[79][0], 5, 500],
-	[80] = [info_png[80][0], 1, 5000],
-}
+local giuseppe = [
+	[info_png[58][0], 78, 1000, 57],
+	[info_png[78][0], 100, 1000, 78],
+	[info_png[79][0], 5, 500, 79],
+	[info_png[34][0]+" Угонщик", 5, 5000, 34],
+]
 
 local repair_shop = [
 	[info_png[23][0], 1, 100, 23],
@@ -1816,28 +1816,28 @@ function buy_subject_fun( playerid, text, number, value )
 	{
 		local day_nalog = 7//кол-во дней для оплаты налога
 
-		local mayoralty_shop = {
-			[2] = [info_png[2][0], 1, 1000],
-			[41] = [info_png[41][0], 1, 10000],
-			[53] = [info_png[53][0], 1, 5000],
-			[34] = [info_png[34][0], 1, 5000],
-			[62] = [info_png[62][0], 1, 5000],
-			[67] = [info_png[67][0], 1, 10],
-			[72] = [info_png[72][0], 1, 5000],
-			[75] = [info_png[75][0], 1, 1000],
-			[48] = ["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog)],
-			[49] = ["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog)],
-			[50] = ["квитанция для оплаты т/с на", day_nalog, (zakon_nalog_car*day_nalog)],
-		}
+		local mayoralty_shop = [
+			[info_png[2][0], 1, 1000, 2],
+			[info_png[41][0], 1, 10000, 41],
+			[info_png[34][0]+" Таксист", 1, 5000, 34],
+			[info_png[34][0]+" Мусоровозчик", 2, 5000, 34],
+			[info_png[34][0]+" Инкассатор", 3, 5000, 34],
+			[info_png[34][0]+" Ремонтник", 4, 1000, 34],
+			[info_png[34][0]+" Дальнобойщик", 6, 5000, 34],
+			[info_png[67][0], 1, 10, 67],
+			["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog), 48],
+			["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog), 49],
+			["квитанция для оплаты т/с на", day_nalog, (zakon_nalog_car*day_nalog), 50],
+		]
 
 		foreach (k, v in mayoralty_shop)
 		{
-			local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+			local text1 = v[0]+" "+v[1]+" "+info_png[v[3]][1]+" "+v[2]+"$"
 			if (text1 == text)
 			{
 				if (v[2] <= array_player_2[playerid][0])
 				{
-					if (inv_player_empty(playerid, k, v[1]))
+					if (inv_player_empty(playerid, v[3], v[1]))
 					{
 						sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange[0], orange[1], orange[2])
 
@@ -1969,7 +1969,7 @@ function buy_subject_fun( playerid, text, number, value )
 	{
 		foreach (k, v in giuseppe)
 		{
-			local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+			local text1 = v[0]+" "+v[1]+" "+info_png[v[3]][1]+" "+v[2]+"$"
 			if (text1 == text)
 			{
 				if (v[2] <= array_player_2[playerid][0])
@@ -3025,7 +3025,7 @@ function job_timer2 ()
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
 								{
-									local randomize = random(1,zp_player_taxi)
+									local randomize = random(zp_player_taxi/2,zp_player_taxi)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 
@@ -4809,7 +4809,7 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			}
 			else if (id1 == 24 || id1 == 61 || id1 == 87)
 			{
-				if (search_inv_player(playerid, 34, 1) == 0) 
+				if (search_inv_player(playerid, 34, 6) == 0) 
 				{
 					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", red[0], red[1], red[2])
 					return
@@ -4817,7 +4817,7 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			}
 			else if (id1 == 63) 
 			{
-				if (search_inv_player(playerid, 62, 1) == 0) 
+				if (search_inv_player(playerid, 34, 2) == 0) 
 				{
 					sendMessage(playerid, "[ERROR] Вы не водитель мусоровоза", red[0], red[1], red[2])
 					return
@@ -4825,7 +4825,7 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			}
 			else if (id1 == 54) 
 			{
-				if (search_inv_player(playerid, 72, 1) == 0) 
+				if (search_inv_player(playerid, 34, 3) == 0)
 				{
 					sendMessage(playerid, "[ERROR] Вы не инкассатор", red[0], red[1], red[2])
 					return
@@ -4833,7 +4833,7 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			}
 			else if (id1 == 83)
 			{
-				if (search_inv_player(playerid, 34, 1) == 0) 
+				if (search_inv_player(playerid, 34, 6) == 0) 
 				{
 					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", red[0], red[1], red[2])
 					return
@@ -4850,7 +4850,7 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			}
 			else if (id1 == 82)
 			{
-				if (search_inv_player(playerid, 34, 1) == 0)
+				if (search_inv_player(playerid, 34, 6) == 0)
 				{
 					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", red[0], red[1], red[2])
 					return
@@ -5574,6 +5574,108 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 		}
+		else if (id1 == 34)//лицензии
+		{
+			if(id2 == 1)
+			{
+				if (job[playerid] == 0)
+				{
+					job[playerid] = 1
+
+					me_chat(playerid, playername+" вышел(ла) на работу Таксист")
+				}
+				else
+				{
+					job[playerid] = 0
+
+					car_theft_fun(playerid)
+
+					me_chat(playerid, playername+" закончил(а) работу")
+				}
+			}
+			else if(id2 == 2)
+			{
+				if (job[playerid] == 0)
+				{
+					job[playerid] = 2
+
+					me_chat(playerid, playername+" вышел(ла) на работу Мусоровозчик")
+				}
+				else
+				{
+					job[playerid] = 0
+
+					car_theft_fun(playerid)
+
+					me_chat(playerid, playername+" закончил(а) работу")
+				}
+			}
+			else if(id2 == 3)
+			{
+				if (crimes[playerid] != 0)
+				{
+					sendMessage(playerid, "[ERROR] У вас плохая репутация", red[0], red[1], red[2])
+					return
+				}
+
+				if (job[playerid] == 0)
+				{
+					job[playerid] = 3
+
+					me_chat(playerid, playername+" вышел(ла) на работу Инкассатор")
+				}
+				else
+				{
+					job[playerid] = 0
+
+					car_theft_fun(playerid)
+
+					me_chat(playerid, playername+" закончил(а) работу")
+				}
+			}
+			else if(id2 == 4)
+			{
+				if (job[playerid] == 0)
+				{
+					job[playerid] = 4
+
+					me_chat(playerid, playername+" вышел(ла) на работу Ремонтник")
+				}
+				else
+				{
+					job[playerid] = 0
+
+					car_theft_fun(playerid)
+
+					me_chat(playerid, playername+" закончил(а) работу")
+				}
+			}
+			else if(id2 == 5)
+			{
+				if (crimes[playerid] < crimes_giuseppe)
+				{
+					sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_giuseppe+" преступлений", red[0], red[1], red[2])
+					return
+				}
+
+				if (job[playerid] == 0)
+				{
+					job[playerid] = 5
+
+					me_chat(playerid, playername+" вышел(ла) на работу Угонщик")
+				}
+				else
+				{
+					job[playerid] = 0
+
+					car_theft_fun(playerid)
+
+					me_chat(playerid, playername+" закончил(а) работу")
+				}
+			}
+
+			return
+		}
 		else if (id1 == 35)//--лом
 		{
 			local count = 0
@@ -5795,24 +5897,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			return
 		}
-		else if (id1 == 53) //--лиц. таксиста
-		{
-			if (job[playerid] == 0)
-			{
-				job[playerid] = 1
-
-				me_chat(playerid, playername+" вышел(ла) на работу Таксист")
-			}
-			else
-			{
-				job[playerid] = 0
-
-				car_theft_fun(playerid)
-
-				me_chat(playerid, playername+" закончил(а) работу")
-			}
-			return
-		}
 		else if (id1 == 54) //--инкассаторский сумка
 		{
 			local randomize = id2
@@ -5828,24 +5912,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+(crimes[playerid]), yellow[0], yellow[1], yellow[2])
 
 			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
-		}
-		else if (id1 == 62) //--лиц. вод мусоровоза
-		{
-			if (job[playerid] == 0)
-			{
-				job[playerid] = 2
-
-				me_chat(playerid, playername+" вышел(ла) на работу Мусоровозчик")
-			}
-			else
-			{
-				job[playerid] = 0
-
-				car_theft_fun(playerid)
-
-				me_chat(playerid, playername+" закончил(а) работу")
-			}
-			return
 		}
 		else if (id1 == 65) //--двигло
 		{
@@ -5979,7 +6045,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0))
 			{
-				local randomize = random(1,zp_player_71)
+				local randomize = random(zp_player_71/2,zp_player_71)
 
 				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 
@@ -5994,30 +6060,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				sendMessage(playerid, "[ERROR] Вы должны быть около телефонной будки", red[0], red[1], red[2])
 				return
 			}
-		}
-		else if (id1 == 72) //--лиц. инкассатора
-		{
-			if (crimes[playerid] != 0)
-			{
-				sendMessage(playerid, "[ERROR] У вас плохая репутация", red[0], red[1], red[2])
-				return
-			}
-
-			if (job[playerid] == 0)
-			{
-				job[playerid] = 3
-
-				me_chat(playerid, playername+" вышел(ла) на работу Инкассатор")
-			}
-			else
-			{
-				job[playerid] = 0
-
-				car_theft_fun(playerid)
-
-				me_chat(playerid, playername+" закончил(а) работу")
-			}
-			return
 		}
 		else if (id1 == 74)//--удочка
 		{
@@ -6047,24 +6089,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				sendMessage(playerid, "[ERROR] Вы должны быть около места ловли рыбы", red[0], red[1], red[2])
 				return
 			}
-		}
-		else if (id1 == 75) //--лиц. ремонтника тел. будок
-		{
-			if (job[playerid] == 0)
-			{
-				job[playerid] = 4
-
-				me_chat(playerid, playername+" вышел(ла) на работу Ремонтник")
-			}
-			else
-			{
-				job[playerid] = 0
-
-				car_theft_fun(playerid)
-
-				me_chat(playerid, playername+" закончил(а) работу")
-			}
-			return
 		}
 		else if (id1 == 76)//динамит
 		{
@@ -6118,30 +6142,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 				return
 			}
-		}
-		else if (id1 == 80) //--лиц. медвежатника
-		{
-			if (crimes[playerid] < crimes_giuseppe)
-			{
-				sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_giuseppe+" преступлений", red[0], red[1], red[2])
-				return
-			}
-
-			if (job[playerid] == 0)
-			{
-				job[playerid] = 5
-
-				me_chat(playerid, playername+" вышел(ла) на работу Угонщик")
-			}
-			else
-			{
-				job[playerid] = 0
-
-				car_theft_fun(playerid)
-
-				me_chat(playerid, playername+" закончил(а) работу")
-			}
-			return
 		}
 		else if (id1 == 84)//документы на рыбзавод
 		{
