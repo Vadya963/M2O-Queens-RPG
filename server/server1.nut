@@ -72,6 +72,7 @@ local zp_car_63 = 200
 local zp_car_54 = 200
 local zp_player_73 = 50
 local zp_player_71 = 500
+local zp_player_53 = 100
 //вместимость складов бизнесов
 local max_business = 100
 local max_sg = 1000
@@ -253,7 +254,7 @@ local info_png = {
 	[50] = ["квитанция для оплаты т/с на", "дней"],
 	[51] = ["коробка с продуктами", "$ за штуку"],
 	[52] = ["компос", "шт"],
-	[53] = ["", ""],
+	[53] = ["молоко", "$ за бутылку"],
 	[54] = ["инкассаторская сумка", "$ в сумке"],
 	[55] = ["лист металла", "кг"],
 	[56] = ["пила", "шт"],
@@ -705,6 +706,7 @@ local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, 
 	[-1671.4,-300.838,-20.38, 15.0, 87, 35, 200],//стройматериалы
 	[374.967,117.759,-21.0186, 5.0, 83, 38, 200],//--погрузка рыбы с рз
 	[-217.361,-724.751,-21.4251, 15.0, 82, 38, 50],//--погрузка рыбы для рз
+	[650.084,-415.088,-20.1636, 15.0, 53, 19, 200],//молокозавод
 ]
 
 local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, скин 6}
@@ -1824,6 +1826,7 @@ function buy_subject_fun( playerid, text, number, value )
 			[info_png[34][0]+" Инкассатор", 3, 5000, 34],
 			[info_png[34][0]+" Ремонтник", 4, 1000, 34],
 			[info_png[34][0]+" Дальнобойщик", 6, 5000, 34],
+			[info_png[34][0]+" Молочник", 7, 5000, 34],
 			[info_png[67][0], 1, 10, 67],
 			["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog), 48],
 			["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog), 49],
@@ -2935,10 +2938,12 @@ function job_timer2 ()
 {
 	local taxi_pos = {}//--места для таксистов
 	local collector_pos = {}//позции для инкассатора
+	local milk_pos = {}//молочник
 
 	foreach (k, v in sqlite3( "SELECT * FROM house_db" )) 
 	{
 		taxi_pos[taxi_pos.len()] <- [v["x"],v["y"],v["z"]]
+		milk_pos[milk_pos.len()] <- [v["x"],v["y"],v["z"]]
 	}
 
 	foreach (k, v in repair) 
@@ -2969,6 +2974,7 @@ function job_timer2 ()
 	{
 		taxi_pos[taxi_pos.len()] <- [v[0],v[1],v[2]]
 		collector_pos[collector_pos.len()] <- [v[0],v[1],v[2]]
+		milk_pos[milk_pos.len()] <- [v[0],v[1],v[2]]
 	}
 
 	foreach (k, v in interior_job)
@@ -3283,6 +3289,60 @@ function job_timer2 ()
 								job_call[playerid] = 0
 
 								triggerClientEvent(playerid, "removegps")
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 7) //--молочник
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == up_car_subject[5][5])
+					{
+						if (getSpeed(vehicleid) < 1)
+						{
+							if (job_call[playerid] == 0) //--нету вызова
+							{
+								sendMessage(playerid, "Езжайте на место погрузки", yellow[0], yellow[1], yellow[2])
+
+								job_call[playerid] = 1
+								job_pos[playerid] = [up_car_subject[5][0],up_car_subject[5][1],up_car_subject[5][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							}
+							else if (job_call[playerid] == 1) //--есть вызов
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[5][3]))
+								{
+									local randomize = random(0,milk_pos.len()-1)
+
+									job_call[playerid] = 2
+
+									job_pos[playerid] = [milk_pos[randomize][0],milk_pos[randomize][1],milk_pos[randomize][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+								}
+							}
+							else if (job_call[playerid] == 2) //--сдаем вызов
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
+								{
+									local randomize = search_inv_car_2_parameter(vehicleid, 53)*amount_inv_car_1_parameter(vehicleid, 53)
+
+									inv_car_delet(playerid, 53, search_inv_car_2_parameter(vehicleid, 53))
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+									sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
+
+									triggerClientEvent(playerid, "removegps")
+									
+									job_pos[playerid] = 0
+									job_call[playerid] = 0
+								}
 							}
 						}
 					}
@@ -4815,6 +4875,14 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 					return
 				}
 			}
+			else if (id1 == 53) 
+			{
+				if (search_inv_player(playerid, 34, 7) == 0) 
+				{
+					sendMessage(playerid, "[ERROR] Вы не молочник", red[0], red[1], red[2])
+					return
+				}
+			}
 			else if (id1 == 63) 
 			{
 				if (search_inv_player(playerid, 34, 2) == 0) 
@@ -4872,6 +4940,10 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			if (id1 == 24) 
 			{
 				sendMessage(playerid, "[TIPS] Езжайте в порт или в любой бизнес, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
+			}
+			else if (id1 == 53) 
+			{
+				sendMessage(playerid, "[TIPS] Доставьте молоко по адресу", color_tips[0], color_tips[1], color_tips[2])
 			}
 			else if (id1 == 54) 
 			{
@@ -5663,6 +5735,23 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					job[playerid] = 5
 
 					me_chat(playerid, playername+" вышел(ла) на работу Угонщик")
+				}
+				else
+				{
+					job[playerid] = 0
+
+					car_theft_fun(playerid)
+
+					me_chat(playerid, playername+" закончил(а) работу")
+				}
+			}
+			else if(id2 == 7)
+			{
+				if (job[playerid] == 0)
+				{
+					job[playerid] = 7
+
+					me_chat(playerid, playername+" вышел(ла) на работу Молочник")
 				}
 				else
 				{
