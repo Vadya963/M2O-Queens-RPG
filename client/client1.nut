@@ -14,6 +14,7 @@ local blip_data = {//ud блипа[0] x[1] y[2] категория[3] ид[4] р
 	//[1] = [0, 0,0, 0,1, 5, false]
 }
 local sync_timer = false
+local sync_timer2 = false
 local number_business = -1//номер бизнеса
 local value_business = -1//тип бизнеса
 local width_need = (screen[0]/5.04)//--ширина нужд 271
@@ -894,6 +895,7 @@ timer(function () {
 
 timer(function () {
 	sync_timer = true
+	sync_timer2 = true
 }, 5000, 1)
 
 timer(function () {
@@ -1420,67 +1422,6 @@ function( post )
 		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*5, ((width_need/100.0)*sleep), 15.0, fromRGB ( 90, 151, 107, 255 ) )
 
 		simpleShake(1.0, (alcohol/100).tofloat(), 1.0)
-
-		for (local i = 0; i < getMaxPlayers(); i++) 
-		{
-			if (isPlayerConnected(i) && i != playerid)
-			{	
-				local Pos = getPlayerPosition(i)
-				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
-				if (area && getElementData("drugs["+i+"]").tofloat() >= getElementData("zakon_drugs").tofloat())
-				{
-					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
-					local dimensions = dxGetTextDimensions( "*effect of drugs*", 1.0, "tahoma-bold" )
-					dxdrawtext( "*effect of drugs*", coords[0]-(dimensions[0]/2), coords[1]-60.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
-				}
-
-				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
-				if (area && (getElementData("alcohol["+i+"]").tofloat()/100) >= getElementData("zakon_alcohol").tofloat())
-				{
-					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
-					local dimensions = dxGetTextDimensions( "*effect of alcohol*", 1.0, "tahoma-bold" )
-					dxdrawtext( "*effect of alcohol*", coords[0]-(dimensions[0]/2), coords[1]-45.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
-				}
-
-				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 35.0 )
-				if (area && getElementData("crimes["+i+"]") != "0")
-				{
-					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
-					local dimensions = dxGetTextDimensions( "WANTED", 1.0, "tahoma-bold" )
-					dxdrawtext( "WANTED", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( red[0], red[1], red[2] ), true, "tahoma-bold", 1.0 )
-				}
-
-				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
-				if (area && getElementData("is_chat_open["+i+"]").tointeger() == 1)
-				{
-					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
-					local dimensions = dxGetTextDimensions( "prints...", 1.0, "tahoma-bold" )
-					dxdrawtext( "prints...", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
-				}
-
-				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
-				if (area && getElementData("afk["+i+"]") != "0")
-				{
-					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
-					local dimensions = dxGetTextDimensions( "[AFK] "+getElementData("afk["+i+"]")+" seconds", 1.0, "tahoma-bold" )
-					dxdrawtext( "[AFK] "+getElementData("afk["+i+"]")+" seconds", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( purple[0], purple[1], purple[2] ), true, "tahoma-bold", 1.0 )
-				}
-			}
-		}
-
-		foreach (k, v in split(getElementData("earth"), "|"))//--отображение предметов на земле
-		{
-			local spl = split(v, "/")
-			if (isPointInCircle3D( myPos[0], myPos[1], myPos[2], spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat(), 20.0 ))
-			{
-				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat() )
-				dxDrawTexture(image[spl[3].tofloat()], coords[0]-(57/2), coords[1], 0.88, 0.88, 0.0, 0.0, 0.0, 255)
-
-				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat()+0.2 )
-				local dimensions = dxGetTextDimensions("Press E", 1.0, "tahoma-bold" )
-				dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
-			}
-		}
 	}
 
 
@@ -1591,6 +1532,71 @@ function( post )
 		local guiSize_lable = guiGetSize( gridlist_lable )
 
 		dxDrawRectangle( guiPos_window[0]+guiPos_lable[0]-10.0, guiPos_window[1]+guiPos_lable[1]+2.0, guiSize_lable[0], guiSize_lable[1], fromRGB( 81, 101, 204, 150 ) )
+	}
+
+
+	if(sync_timer2)
+	{
+		for (local i = 0; i < getMaxPlayers(); i++) 
+		{
+			if (isPlayerConnected(i) && i != playerid)
+			{	
+				local Pos = getPlayerPosition(i)
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
+				if (area && getElementData("drugs["+i+"]").tofloat() >= getElementData("zakon_drugs").tofloat())
+				{
+					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+					local dimensions = dxGetTextDimensions( "*effect of drugs*", 1.0, "tahoma-bold" )
+					dxdrawtext( "*effect of drugs*", coords[0]-(dimensions[0]/2), coords[1]-60.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+				}
+
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
+				if (area && (getElementData("alcohol["+i+"]").tofloat()/100) >= getElementData("zakon_alcohol").tofloat())
+				{
+					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+					local dimensions = dxGetTextDimensions( "*effect of alcohol*", 1.0, "tahoma-bold" )
+					dxdrawtext( "*effect of alcohol*", coords[0]-(dimensions[0]/2), coords[1]-45.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+				}
+
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 35.0 )
+				if (area && getElementData("crimes["+i+"]") != "0")
+				{
+					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+					local dimensions = dxGetTextDimensions( "WANTED", 1.0, "tahoma-bold" )
+					dxdrawtext( "WANTED", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( red[0], red[1], red[2] ), true, "tahoma-bold", 1.0 )
+				}
+
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
+				if (area && getElementData("is_chat_open["+i+"]").tointeger() == 1)
+				{
+					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+					local dimensions = dxGetTextDimensions( "prints...", 1.0, "tahoma-bold" )
+					dxdrawtext( "prints...", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+				}
+
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
+				if (area && getElementData("afk["+i+"]") != "0")
+				{
+					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+					local dimensions = dxGetTextDimensions( "[AFK] "+getElementData("afk["+i+"]")+" seconds", 1.0, "tahoma-bold" )
+					dxdrawtext( "[AFK] "+getElementData("afk["+i+"]")+" seconds", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( purple[0], purple[1], purple[2] ), true, "tahoma-bold", 1.0 )
+				}
+			}
+		}
+
+		foreach (k, v in split(getElementData("earth"), "|"))//--отображение предметов на земле
+		{
+			local spl = split(v, "/")
+			if (isPointInCircle3D( myPos[0], myPos[1], myPos[2], spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat(), 20.0 ))
+			{
+				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat() )
+				dxDrawTexture(image[spl[3].tofloat()], coords[0]-(57/2), coords[1], 0.88, 0.88, 0.0, 0.0, 0.0, 255)
+
+				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat()+0.2 )
+				local dimensions = dxGetTextDimensions("Press E", 1.0, "tahoma-bold" )
+				dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+			}
+		}
 	}
 
 
