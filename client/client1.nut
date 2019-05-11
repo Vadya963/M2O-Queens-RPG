@@ -126,7 +126,7 @@ local info_png = {
 	[59] = ["кирка", "шт"],
 	[60] = ["руда", "кг"],
 	[61] = ["бочка с нефтью", "$ за штуку"],
-	[62] = ["", ""],
+	[62] = ["ящик с виски", "$ за штуку"],
 	[63] = ["мусор", "кг"],
 	[64] = ["антипохмелин", "шт"],
 	[65] = ["двигатель", "уровень тюнинга"],
@@ -136,7 +136,7 @@ local info_png = {
 	[69] = ["колесо", "марка"],
 	[70] = ["банка краски", "цвет"],
 	[71] = ["ящик с инструментами", "процентов"],
-	[72] = ["", ""],
+	[72] = ["виски", "шт"],
 	[73] = ["рыба", "кг"],
 	[74] = ["удочка", "процентов"],
 	[75] = ["", ""],
@@ -579,6 +579,7 @@ local eda = {
 	[22] = [info_png[22][0], 1, 60],
 	[42] = [info_png[42][0], 1, 100],
 	[43] = [info_png[43][0], 1, 50],
+	[72] = [info_png[72][0], 1, 500],
 }
 local eda_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in eda)
@@ -598,6 +599,7 @@ local mayoralty_shop = [
 	[info_png[34][0]+" Ремонтник", 4, 1000, 34],
 	[info_png[34][0]+" Дальнобойщик", 6, 5000, 34],
 	[info_png[34][0]+" Молочник", 7, 5000, 34],
+	[info_png[34][0]+" Развозчик алкоголя", 8, 5000, 34],
 	[info_png[67][0], 1, 10, 67],
 	["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog), 48],
 	["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog), 49],
@@ -1421,8 +1423,6 @@ function( post )
 
 		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*5, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
 		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*5, ((width_need/100.0)*sleep), 15.0, fromRGB ( 90, 151, 107, 255 ) )
-
-		simpleShake(1.0, (alcohol/100).tofloat(), 1.0)
 	}
 
 
@@ -1538,6 +1538,8 @@ function( post )
 
 	if(sync_timer2)
 	{
+		simpleShake(1.0, (getElementData ( "alcohol_data" ).tofloat()/100).tofloat(), 1.0)
+
 		for (local i = 0; i < getMaxPlayers(); i++) 
 		{
 			if (isPlayerConnected(i) && i != playerid)
