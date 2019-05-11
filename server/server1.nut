@@ -7325,8 +7325,8 @@ function( playerid, id, ...)
 
 	local player_name = getPlayerName ( id )
 
-	sendMessage(playerid, "[LETTER TO] "+player_name+" ["+playerid+"]: "+text, yellow[0], yellow[1], yellow[2])
-	sendMessage(id, "[LETTER FROM] "+playername+" ["+id+"]: "+text, yellow[0], yellow[1], yellow[2])
+	sendMessage(playerid, "[LETTER TO] "+player_name+" ["+id+"]: "+text, yellow[0], yellow[1], yellow[2])
+	sendMessage(id, "[LETTER FROM] "+playername+" ["+playerid+"]: "+text, yellow[0], yellow[1], yellow[2])
 })
 
 addCommandHandler("pay",//--передача денег
