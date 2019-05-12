@@ -3684,10 +3684,10 @@ function need()//--нужды
 
 			if (drugs[playerid] == 100)
 			{
-				local hp = getplayerhealth(playerid)-700.0
+				local hp = getplayerhealth(playerid)-720.0
 
 				setplayerhealth( playerid, hp )
-				sendMessage(playerid, "-700 хп", yellow[0], yellow[1], yellow[2])
+				sendMessage(playerid, "-720 хп", yellow[0], yellow[1], yellow[2])
 			}
 
 
