@@ -5639,6 +5639,16 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 						id2 = 0
 
 						sqlite3( "UPDATE car_db SET fuel = '"+fuel[plate]+"' WHERE number = '"+plate+"'")
+
+						local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
+						if (result[1]["COUNT()"] == 1)
+						{
+							local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
+							if (result[1]["nalog"] != 0 && search_inv_player(playerid, 6, plate.tointeger()) != 0 && search_inv_player(playerid, 2, 1) != 0 && sead[playerid] == 0)
+							{
+								dviglo[plate] <- 1
+							}
+						}
 					}
 					else
 					{
