@@ -1545,10 +1545,11 @@ function( post )
 			if (isPlayerConnected(i) && i != playerid)
 			{	
 				local Pos = getPlayerPosition(i)
+				local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
+
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
 				if (area && getElementData("drugs["+i+"]").tofloat() >= getElementData("zakon_drugs").tofloat())
 				{
-					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
 					local dimensions = dxGetTextDimensions( "*effect of drugs*", 1.0, "tahoma-bold" )
 					dxdrawtext( "*effect of drugs*", coords[0]-(dimensions[0]/2), coords[1]-60.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
 				}
@@ -1556,33 +1557,29 @@ function( post )
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
 				if (area && (getElementData("alcohol["+i+"]").tofloat()/100) >= getElementData("zakon_alcohol").tofloat())
 				{
-					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
 					local dimensions = dxGetTextDimensions( "*effect of alcohol*", 1.0, "tahoma-bold" )
 					dxdrawtext( "*effect of alcohol*", coords[0]-(dimensions[0]/2), coords[1]-45.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
-				}
-
-				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 35.0 )
-				if (area && getElementData("crimes["+i+"]") != "0")
-				{
-					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
-					local dimensions = dxGetTextDimensions( "WANTED", 1.0, "tahoma-bold" )
-					dxdrawtext( "WANTED", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( red[0], red[1], red[2] ), true, "tahoma-bold", 1.0 )
 				}
 
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
 				if (area && getElementData("is_chat_open["+i+"]").tointeger() == 1)
 				{
-					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
 					local dimensions = dxGetTextDimensions( "prints...", 1.0, "tahoma-bold" )
-					dxdrawtext( "prints...", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+					dxdrawtext( "prints...", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
 				}
 
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
 				if (area && getElementData("afk["+i+"]") != "0")
 				{
-					local coords = getScreenFromWorld( Pos[0], Pos[1], Pos[2]+2.0 )
 					local dimensions = dxGetTextDimensions( "[AFK] "+getElementData("afk["+i+"]")+" seconds", 1.0, "tahoma-bold" )
-					dxdrawtext( "[AFK] "+getElementData("afk["+i+"]")+" seconds", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( purple[0], purple[1], purple[2] ), true, "tahoma-bold", 1.0 )
+					dxdrawtext( "[AFK] "+getElementData("afk["+i+"]")+" seconds", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( purple[0], purple[1], purple[2] ), true, "tahoma-bold", 1.0 )
+				}
+
+				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 35.0 )
+				if (area && getElementData("crimes["+i+"]") != "0")
+				{
+					local dimensions = dxGetTextDimensions( "WANTED", 1.0, "tahoma-bold" )
+					dxdrawtext( "WANTED", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( red[0], red[1], red[2] ), true, "tahoma-bold", 1.0 )
 				}
 			}
 		}
