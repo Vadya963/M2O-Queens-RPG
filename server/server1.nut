@@ -7267,27 +7267,27 @@ function (playerid, ...)
 	{
 		if (search_inv_player(playerid, 28, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Офицер "+playername+": "+text)
+			police_chat(playerid, "[РАЦИЯ] Офицер "+playername+" ["+playerid+"]: "+text)
 		}
 		else if (search_inv_player(playerid, 29, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Детектив "+playername+": "+text)
+			police_chat(playerid, "[РАЦИЯ] Детектив "+playername+" ["+playerid+"]: "+text)
 		}
 		else if (search_inv_player(playerid, 30, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Сержант "+playername+": "+text)
+			police_chat(playerid, "[РАЦИЯ] Сержант "+playername+" ["+playerid+"]: "+text)
 		}
 		else if (search_inv_player(playerid, 31, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Лейтенант "+playername+": "+text)
+			police_chat(playerid, "[РАЦИЯ] Лейтенант "+playername+" ["+playerid+"]: "+text)
 		}
 		else if (search_inv_player(playerid, 32, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Капитан "+playername+": "+text)
+			police_chat(playerid, "[РАЦИЯ] Капитан "+playername+" ["+playerid+"]: "+text)
 		}
 		else if (search_inv_player(playerid, 33, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Шеф полиции "+playername+": "+text)
+			police_chat(playerid, "[РАЦИЯ] Шеф полиции "+playername+" ["+playerid+"]: "+text)
 		}
 	}
 	else
