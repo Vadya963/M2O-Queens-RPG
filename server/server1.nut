@@ -32,7 +32,7 @@ local minute = 0
 local earth = {//--слоты земли
 	[-1] = [0.0,0.0,0.0, 0,0]
 }
-local max_earth = 0
+local max_earth = 0//мак-ое кол-во выброшенных предметов на землю
 local me_radius = 10.0//--радиус отображения действий игрока в чате
 local max_fuel = 50.0//--объем бака авто
 local max_heal = 720.0//--макс здоровье игрока
@@ -3684,16 +3684,22 @@ function need()//--нужды
 
 			if (drugs[playerid] == 100)
 			{
-				local hp = getplayerhealth(playerid)-100.0
+				local hp = getplayerhealth(playerid)-700.0
 
 				setplayerhealth( playerid, hp )
-				sendMessage(playerid, "-100 хп", yellow[0], yellow[1], yellow[2])
+				sendMessage(playerid, "-700 хп", yellow[0], yellow[1], yellow[2])
 			}
 
 
 			if (alcohol[playerid] != 0)
 			{
 				alcohol[playerid] = alcohol[playerid]-10
+			}
+
+
+			if (drugs[playerid] != 0)
+			{
+				drugs[playerid] = drugs[playerid]-0.1
 			}
 
 
