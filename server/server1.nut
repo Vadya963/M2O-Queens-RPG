@@ -315,7 +315,7 @@ local motor_show = [
 	[17,0,90,"Lassister Series 75 Hollywood",3],//копия
 	[18,5170,90,"Lassister Series 75 Hollywood",3],
 	[19,2000,80,"Milk Truck",1],
-	[20,0,150,"Parry Bus",20],
+	[20,2000,150,"Parry Bus",20],
 	[21,0,150,"Parry Bus Prison",20],
 	[22,2100,70,"Potomac Indian",3],
 	[23,2000,60,"Quicksilver Windsor",3],
@@ -1967,7 +1967,14 @@ function buy_subject_fun( playerid, text, number, value )
 
 					sendMessage(playerid, "Вы купили транспортное средство за "+(v[1]*coef)+"$", orange[0], orange[1], orange[2])
 
-					car_pos = [-205.534, 835.04, -20.9558, 160.0]
+					if(id == 20)
+					{
+						car_pos = [-204.662,832.921,-20.6805, 160.0]
+					}
+					else
+					{
+						car_pos = [-205.534, 835.04, -20.9558, 160.0]
+					}
 				}
 				else
 				{
@@ -2853,7 +2860,7 @@ function fuel_down()//--система топлива авто
 
 		if (result_c[1]["COUNT()"] == 1)
 		{
-			if (getVehicleModel(vehicleid) != 37 && getVehicleModel(vehicleid) != 35 && getVehicleModel(vehicleid) != 27 && getVehicleModel(vehicleid) != 38)
+			if (getVehicleModel(vehicleid) != 37 && getVehicleModel(vehicleid) != 35 && getVehicleModel(vehicleid) != 27 && getVehicleModel(vehicleid) != 38 && getVehicleModel(vehicleid) != 20)
 			{
 				setVehicleWheelTexture(vehicleid, 0, result[1]["wheel"])
 				setVehicleWheelTexture(vehicleid, 1, result[1]["wheel"])
@@ -3306,10 +3313,9 @@ function job_timer2 ()
 						{
 							result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
 
-							local id1 = search_inv_player(playerid, 81, search_inv_player_2_parameter(playerid, 81))
 							local id2 = search_inv_player_2_parameter(playerid, 81)
 
-							if (result[1]["warehouse"] < max_sg && result[1]["money"] >= result[1]["price"] && result[1]["nalog"] != 0 && result[1]["prod"] != 0 && id1 != 0)
+							if (result[1]["warehouse"] < max_sg && result[1]["money"] >= result[1]["price"] && result[1]["nalog"] != 0 && result[1]["prod"] != 0 && id2 != 0)
 							{
 								local randomize = result[1]["price"]
 
@@ -3791,9 +3797,13 @@ function need()//--нужды
 			}
 
 
-			if (drugs[playerid] != 0)
+			if (drugs[playerid]-0.1 >= 0)
 			{
 				drugs[playerid] = drugs[playerid]-0.1
+			}
+			else
+			{
+				drugs[playerid] = 0				
 			}
 
 
@@ -6268,6 +6278,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					sendMessage(playerid, "[ERROR] Остановите т/с", red[0], red[1], red[2])
 					return
 				}
+
+				if (getVehicleModel(vehicleid) == 37 || getVehicleModel(vehicleid) == 35 || getVehicleModel(vehicleid) == 27 || getVehicleModel(vehicleid) == 38 || getVehicleModel(vehicleid) == 20)
+				{
+					sendMessage(playerid, "[ERROR] На это т/с нельзя установить двигатель", red[0], red[1], red[2])
+					return
+				}
 				
 				local plate = getVehiclePlateText(vehicleid)
 
@@ -6318,7 +6334,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					return
 				}
 
-				if (getVehicleModel(vehicleid) == 37 || getVehicleModel(vehicleid) == 35 || getVehicleModel(vehicleid) == 27 || getVehicleModel(vehicleid) == 38)
+				if (getVehicleModel(vehicleid) == 37 || getVehicleModel(vehicleid) == 35 || getVehicleModel(vehicleid) == 27 || getVehicleModel(vehicleid) == 38 || getVehicleModel(vehicleid) == 20)
 				{
 					sendMessage(playerid, "[ERROR] На это т/с нельзя установить колеса", red[0], red[1], red[2])
 					return

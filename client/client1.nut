@@ -177,7 +177,7 @@ local motor_show = [
 	//[17,0,90,"Lassister Series 75 Hollywood"],//копия
 	[18,5170,90,"Lassister Series 75 Hollywood"],
 	[19,2000,80,"Milk Truck"],
-	//[20,0,150,"Parry Bus"],
+	[20,2000,150,"Parry Bus"],
 	//[21,0,150,"Parry Bus Prison"],
 	[22,2100,70,"Potomac Indian"],
 	[23,2000,60,"Quicksilver Windsor"],
