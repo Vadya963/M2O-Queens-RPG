@@ -61,6 +61,7 @@ local zakon_drugs_crimes = 1
 local zakon_kill_crimes = 1
 local zakon_robbery_crimes = 1
 local zakon_54_crimes = 1
+local zakon_66_crimes = 1
 local zakon_car_theft_crimes = 1
 local zakon_nalog_car = 500
 local zakon_nalog_house = 1000
@@ -69,7 +70,7 @@ local zakon_price_house = 300000
 local zakon_price_business = 300000
 //зп
 local zp_player_taxi = 1000
-local zp_player_busdriver = 50000
+local zp_player_busdriver = 25000
 local zp_car_63 = 200
 local zp_car_54 = 200
 local zp_player_73 = 50
@@ -282,7 +283,7 @@ local info_png = {
 	[77] = ["шнур", "шт"],
 	[78] = ["тратил", "гр"],
 	[79] = ["отмычка", "процентов"],
-	[80] = ["", ""],
+	[80] = ["ящик с оружием", "$ за штуку"],
 	[81] = ["нож", "процентов"],
 	[82] = ["лоток с рыбой", "$ за штуку"],
 	[83] = ["ящик с рыбным филе", "$ за штуку"],
@@ -735,6 +736,7 @@ local mayoralty_shop = [
 	[info_png[34][0]+" Молочник", 7, 5000, 34],
 	[info_png[34][0]+" Развозчик алкоголя", 8, 5000, 34],
 	[info_png[34][0]+" Водитель автобуса", 9, 5000, 34],
+	[info_png[34][0]+" Перевозчик оружия", 10, 5000, 34],
 	[info_png[67][0], 1, 10, 67],
 	["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog), 48],
 	["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog), 49],
@@ -773,6 +775,7 @@ local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, 
 	[-217.361,-724.751,-21.4251, 15.0, 82, 38, 50],//--погрузка рыбы для рз
 	[650.084,-415.088,-20.1636, 15.0, 53, 19, 200],//молокозавод
 	[-1547.07,-108.065,-18.4974, 15.0, 62, 35, 200],//алко склад
+	[-266.696,-723.971,-21.5144, 15.0, 80, 27, 200],//склад оружия
 ]
 
 local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, скин 6}
@@ -3519,6 +3522,65 @@ function job_timer2 ()
 				}
 			}
 
+			else if (job[playerid] == 10) //--перевозчик оружия
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == up_car_subject[7][5])
+					{
+						if (getSpeed(vehicleid) < 1)
+						{
+							if (job_call[playerid] == 0) //--нету вызова
+							{
+								sendMessage(playerid, "Езжайте на место погрузки", yellow[0], yellow[1], yellow[2])
+
+								job_call[playerid] = 1
+								job_pos[playerid] = [up_car_subject[7][0],up_car_subject[7][1],up_car_subject[7][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+
+								if(amount_inv_car_1_parameter(vehicleid, up_car_subject[7][4]) != 0)
+								{
+									job_pos[playerid] = [x,y,z]
+								}
+							}
+							else if (job_call[playerid] == 1) //--есть вызов
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[7][3]))
+								{
+									local randomize = random(0,gans.len()-1)
+
+									job_call[playerid] = 2
+
+									job_pos[playerid] = [gans[randomize][0],gans[randomize][1],gans[randomize][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+								}
+							}
+							else if (job_call[playerid] == 2) //--сдаем вызов
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
+								{
+									local randomize = search_inv_car_2_parameter(vehicleid, up_car_subject[7][4])*amount_inv_car_1_parameter(vehicleid, up_car_subject[7][4])
+
+									inv_car_delet(playerid, up_car_subject[7][4], search_inv_car_2_parameter(vehicleid, up_car_subject[7][4]), true)
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+									sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
+
+									triggerClientEvent(playerid, "removegps")
+									
+									job_pos[playerid] = 0
+									job_call[playerid] = 0
+								}
+							}
+						}
+					}
+				}
+			}
+
 			else if (job[playerid] == 0)//--нету работы
 			{
 				job_0( playerid )
@@ -4549,6 +4611,12 @@ function explode_car(vehicleid)
 			local sic2p = search_inv_car_2_parameter(vehicleid, 54)
 			inv_car_throw_earth(vehicleid, 54, sic2p)
 		}
+
+		for (local i = 0; i < max_inv; i++) 
+		{
+			local sic2p = search_inv_car_2_parameter(vehicleid, 80)
+			inv_car_throw_earth(vehicleid, 80, sic2p)
+		}
 	}
 
 	explodeVehicle(vehicleid)
@@ -4816,7 +4884,7 @@ function e_down (playerid)//--подбор предметов с земли
 
 		if (area && v[3] != 0)
 		{
-			if ((v[3] == 51 || v[3] == 40 || v[3] == 56) && search_inv_player(playerid, v[3], search_inv_player_2_parameter(playerid, v[3])) >= 1) {
+			if ((v[3] == 51 || v[3] == 40 || v[3] == 56 || v[3] == 39 || v[3] == 59) && search_inv_player(playerid, v[3], search_inv_player_2_parameter(playerid, v[3])) >= 1) {
 				sendMessage(playerid, "[ERROR] Можно переносить только один предмет", red[0], red[1], red[2])
 				return
 			}
@@ -5087,6 +5155,14 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 					return
 				}
 			}
+			else if (id1 == 80) 
+			{
+				if (search_inv_player(playerid, 34, 10) == 0)
+				{
+					sendMessage(playerid, "[ERROR] Вы не перевозчик оружия", red[0], red[1], red[2])
+					return
+				}
+			}
 			else if (id1 == 83)
 			{
 				if (search_inv_player(playerid, 34, 6) == 0) 
@@ -5148,6 +5224,10 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			else if (id1 == 63) 
 			{
 				sendMessage(playerid, "[TIPS] Езжайте на свалку(около заброшенной литейной фабрики), чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
+			}
+			else if (id1 == 80) 
+			{
+				sendMessage(playerid, "[TIPS] Езжайте в аммунацию, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
 			}
 			else if (id1 == 82) 
 			{
@@ -6029,6 +6109,29 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					me_chat(playerid, playername+" закончил(а) работу")
 				}
 			}
+			else if(id2 == 10)
+			{
+				if (crimes[playerid] != 0)
+				{
+					sendMessage(playerid, "[ERROR] У вас плохая репутация", red[0], red[1], red[2])
+					return
+				}
+
+				if (job[playerid] == 0)
+				{
+					job[playerid] = 10
+
+					me_chat(playerid, playername+" вышел(ла) на работу Перевозчик оружия")
+				}
+				else
+				{
+					job[playerid] = 0
+
+					car_theft_fun(playerid)
+
+					me_chat(playerid, playername+" закончил(а) работу")
+				}
+			}
 
 			return
 		}
@@ -6265,7 +6368,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			local crimes_plus = zakon_54_crimes
 			crimes[playerid] = crimes[playerid]+crimes_plus
-			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+(crimes[playerid]), yellow[0], yellow[1], yellow[2])
+			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
 
 			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 		}
@@ -6504,6 +6607,23 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				sendMessage(playerid, "[ERROR] Вы не в т/с", red[0], red[1], red[2])
 				return
 			}
+		}
+		else if (id1 == 80)//--ящик с оружием
+		{
+			local array_weapon = [9,12,13,14,15,16,17,18,19]
+
+			local randomize = random(0,array_weapon.len()-1)
+
+			me_chat(playerid, playername+" открыл(а) "+info_png[id1][0])
+
+			inv_player_delet(playerid, id1, id2, false)
+			inv_player_empty(playerid, array_weapon[randomize], 25)
+
+			local crimes_plus = zakon_66_crimes
+			crimes[playerid] = crimes[playerid]+crimes_plus
+			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+
+			return
 		}
 		else if (id1 == 84)//документы на рыбзавод
 		{
