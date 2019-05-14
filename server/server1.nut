@@ -61,7 +61,7 @@ local zakon_drugs_crimes = 1
 local zakon_kill_crimes = 1
 local zakon_robbery_crimes = 1
 local zakon_54_crimes = 1
-local zakon_66_crimes = 1
+local zakon_80_crimes = 1
 local zakon_car_theft_crimes = 1
 local zakon_nalog_car = 500
 local zakon_nalog_house = 1000
@@ -6619,7 +6619,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			inv_player_delet(playerid, id1, id2, false)
 			inv_player_empty(playerid, array_weapon[randomize], 25)
 
-			local crimes_plus = zakon_66_crimes
+			local crimes_plus = zakon_80_crimes
 			crimes[playerid] = crimes[playerid]+crimes_plus
 			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
 
