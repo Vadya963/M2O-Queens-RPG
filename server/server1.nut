@@ -47,6 +47,7 @@ local crimes_giuseppe = 25//прес-ия для джузеппе
 local business_pos = {}//--позиции бизнесов
 local house_pos = {}//--позиции домов
 local day_nalog = 7//кол-во дней для оплаты налога
+local no_use_wheel_and_engine = [20,27,35,37,38]
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -70,7 +71,7 @@ local zakon_price_house = 300000
 local zakon_price_business = 300000
 //зп
 local zp_player_taxi = 1000
-local zp_player_busdriver = 25000
+local zp_player_busdriver = 24000
 local zp_car_63 = 200
 local zp_car_54 = 200
 local zp_player_73 = 50
@@ -2863,7 +2864,16 @@ function fuel_down()//--система топлива авто
 
 		if (result_c[1]["COUNT()"] == 1)
 		{
-			if (getVehicleModel(vehicleid) != 37 && getVehicleModel(vehicleid) != 35 && getVehicleModel(vehicleid) != 27 && getVehicleModel(vehicleid) != 38 && getVehicleModel(vehicleid) != 20)
+			local count = 0
+			foreach(i, v1 in no_use_wheel_and_engine) 
+			{
+				if(getVehicleModel(vehicleid) != v1)
+				{
+					count++
+				}
+			}
+
+			if (count == no_use_wheel_and_engine.len())
 			{
 				setVehicleWheelTexture(vehicleid, 0, result[1]["wheel"])
 				setVehicleWheelTexture(vehicleid, 1, result[1]["wheel"])
@@ -4884,7 +4894,17 @@ function e_down (playerid)//--подбор предметов с земли
 
 		if (area && v[3] != 0)
 		{
-			if ((v[3] == 51 || v[3] == 40 || v[3] == 56 || v[3] == 39 || v[3] == 59) && search_inv_player(playerid, v[3], search_inv_player_2_parameter(playerid, v[3])) >= 1) {
+			local count = false
+			foreach (i, v1 in up_player_subject)
+			{
+				if(v[3] == v1[4])
+				{
+					count = true
+					break	
+				}
+			}
+
+			if (count && search_inv_player(playerid, v[3], search_inv_player_2_parameter(playerid, v[3])) >= 1) {
 				sendMessage(playerid, "[ERROR] Можно переносить только один предмет", red[0], red[1], red[2])
 				return
 			}
@@ -6382,7 +6402,17 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					return
 				}
 
-				if (getVehicleModel(vehicleid) == 37 || getVehicleModel(vehicleid) == 35 || getVehicleModel(vehicleid) == 27 || getVehicleModel(vehicleid) == 38 || getVehicleModel(vehicleid) == 20)
+				local count = false
+				foreach (i, v1 in no_use_wheel_and_engine)
+				{
+					if(getVehicleModel(vehicleid) == v1)
+					{
+						count = true
+						break	
+					}
+				}
+
+				if (count)
 				{
 					sendMessage(playerid, "[ERROR] На это т/с нельзя установить двигатель", red[0], red[1], red[2])
 					return
@@ -6437,7 +6467,17 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					return
 				}
 
-				if (getVehicleModel(vehicleid) == 37 || getVehicleModel(vehicleid) == 35 || getVehicleModel(vehicleid) == 27 || getVehicleModel(vehicleid) == 38 || getVehicleModel(vehicleid) == 20)
+				local count = false
+				foreach (i, v1 in no_use_wheel_and_engine)
+				{
+					if(getVehicleModel(vehicleid) == v1)
+					{
+						count = true
+						break	
+					}
+				}
+
+				if (count)
 				{
 					sendMessage(playerid, "[ERROR] На это т/с нельзя установить колеса", red[0], red[1], red[2])
 					return
