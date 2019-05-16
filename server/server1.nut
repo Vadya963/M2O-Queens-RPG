@@ -205,7 +205,7 @@ for (local i = 200; i >= 50; i-=50) {
 
 local info_png = {
 	[0] = ["", ""],
-	[1] = ["деньги", "$"],
+	[1] = ["чековая книжка", "$ в банке"],
 	[2] = ["права", "шт"],
 	[3] = ["сигареты Big Break Red", "сигарет"],
 	[4] = ["аптечка", "шт"],
@@ -292,6 +292,7 @@ local info_png = {
 	[85] = ["трудовой договор обработчика рыбы на", "рыбзаводе"],
 	[86] = ["ордер на обыск", "", "гражданина", "т/с", "дома"],
 	[87] = ["стройматериалы", "$ за штуку"],
+	[88] = ["банковский чек на", "$"],
 }
 
 //цены автосалона
@@ -663,6 +664,7 @@ local interior_job = [
 	[6, "Пристань", 566.041,-591.121,-22.7021, 0, "0", 20.0, 2],
 	[7, "Суд", -480.222,244.336,3.22333, 0, "0", 5.0, 5],
 	[8, "Джузеппе", -165.132,519.097,-19.9438, 26, "0", 5.0, 0],
+	[9, "Банк", 67.2002,-202.94,-20.2324, 0, "0", 10.0, 5]
 ]
 
 local weapon = {
@@ -1428,7 +1430,7 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 					if (inv_player_empty(playerid, id1, cash))
 					{
 						crimes[playerid] = crimes[playerid]+crimes_plus
-						sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+						sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue[0], blue[1], blue[2])
 
 						sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+cash+" "+info_png[id1][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
 
@@ -1442,7 +1444,7 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 				else 
 				{
 					crimes[playerid] = crimes[playerid]+crimes_plus
-					sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+					sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue[0], blue[1], blue[2])
 
 					sendMessage(playerid, "Вы унесли "+cash+"$", green[0], green[1], green[2])
 
@@ -2079,11 +2081,11 @@ function buy_subject_fun( playerid, text, number, value )
 		else if ("Аукцион" == text)
 		{
 			sendMessage(playerid, "====[ АУКЦИОН ]====", yellow[0], yellow[1], yellow[2])
-			sendMessage(playerid, "[ номер лота - имя продавца - предмет - стоимость ]", yellow[0], yellow[1], yellow[2])
+			sendMessage(playerid, "[ номер лота - имя продавца - предмет - стоимость - имя покупателя ]", yellow[0], yellow[1], yellow[2])
 
 			foreach (k, v in sqlite3( "SELECT * FROM auction" ))
 			{
-				sendMessage(playerid, "[ "+v["i"]+" - "+v["name_sell"]+" - "+info_png[v["id1"]][0]+" "+v["id2"]+" "+info_png[v["id1"]][1]+" - "+v["money"]+"$ ]", yellow[0], yellow[1], yellow[2])
+				sendMessage(playerid, "[ "+v["i"]+" - "+v["name_sell"]+" - "+info_png[v["id1"]][0]+" "+v["id2"]+" "+info_png[v["id1"]][1]+" - "+v["money"]+"$ - "+v["name_buy"]+" ]", yellow[0], yellow[1], yellow[2])
 			}
 		}
 		else if ("Рыбзавод" == text)
@@ -2449,7 +2451,7 @@ function craft_fun( playerid, text )
 }
 addEventHandler ( "event_craft_fun", craft_fun )
 
-function auction_buy_sell(playerid, value, i, id1, id2, money)//--продажа покупка вещей
+function auction_buy_sell(playerid, value, i, id1, id2, money, name_buy)//--продажа покупка вещей
 {
 	local playername = getPlayerName ( playerid )
 	local randomize = random(1,99999)
@@ -2474,7 +2476,7 @@ function auction_buy_sell(playerid, value, i, id1, id2, money)//--продажа
 
 			sendMessage(playerid, "Вы выставили на аукцион "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" за "+money+"$", green[0], green[1], green[2])
 
-			sqlite3( "INSERT INTO auction (i, name_sell, id1, id2, money) VALUES ('"+randomize+"', '"+playername+"', '"+id1+"', '"+id2+"', '"+money+"')" )
+			sqlite3( "INSERT INTO auction (i, name_sell, id1, id2, money, name_buy) VALUES ('"+randomize+"', '"+playername+"', '"+id1+"', '"+id2+"', '"+money+"', '"+name_buy+"')" )
 		}
 		else
 		{
@@ -2488,6 +2490,12 @@ function auction_buy_sell(playerid, value, i, id1, id2, money)//--продажа
 		if (result[1]["COUNT()"] == 1)
 		{
 			local result = sqlite3( "SELECT * FROM auction WHERE i = '"+i+"'" )
+
+			if (result[1]["name_buy"] != playername && result[1]["name_buy"] != "all")
+			{
+				sendMessage(playerid, "[ERROR] Вы не можете купить этот предмет", red[0], red[1], red[2])
+				return
+			}
 
 			if (array_player_2[playerid][0] >= result[1]["money"])
 			{
@@ -3289,7 +3297,7 @@ function job_timer2 ()
 
 							local crimes_plus = zakon_car_theft_crimes
 							crimes[playerid] = crimes[playerid]+crimes_plus
-							sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+							sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue[0], blue[1], blue[2])
 
 							car_theft_fun(playerid)
 						}
@@ -4262,7 +4270,7 @@ function playerDeath( playerid, attacker )
 		{
 			local crimes_plus = zakon_kill_crimes
 			crimes[attacker] = crimes[attacker]+crimes_plus
-			sendMessage(attacker, "+"+crimes_plus+" преступление, всего преступлений "+crimes[attacker], yellow[0], yellow[1], yellow[2])
+			sendMessage(attacker, "+"+crimes_plus+" преступление, всего преступлений "+crimes[attacker], blue[0], blue[1], blue[2])
 		}
 		else
 		{
@@ -5568,7 +5576,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				sendMessage(playerid, "-"+hygiene_minys+" ед. чистоплотности", yellow[0], yellow[1], yellow[2])
 			}
 
-			me_chat(playerid, playername+" выпил(а) пиво")
+			me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
 		}
 		else if (id1 == 72)//виски
 		{
@@ -5610,7 +5618,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					sendMessage(playerid, "-"+hygiene_minys+" ед. чистоплотности", yellow[0], yellow[1], yellow[2])
 				}
 
-				me_chat(playerid, playername+" выпил(а) виски")
+				me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
 			}
 		}
 		else if (id1 == 42 || id1 == 43)//--бургер, пицца
@@ -6270,7 +6278,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				local crimes_plus = zakon_alcohol_crimes
 				crimes[playerid] = crimes[playerid]+crimes_plus
-				sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+				sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue[0], blue[1], blue[2])
 			}
 		}
 		else if (id1 == 47)//--наркостестер
@@ -6285,7 +6293,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				local crimes_plus = zakon_drugs_crimes
 				crimes[playerid] = crimes[playerid]+crimes_plus
-				sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+				sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue[0], blue[1], blue[2])
 			}
 		}
 		else if (id1 == 48)//--налог дома
@@ -6388,7 +6396,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			local crimes_plus = zakon_54_crimes
 			crimes[playerid] = crimes[playerid]+crimes_plus
-			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue[0], blue[1], blue[2])
 
 			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 		}
@@ -6661,7 +6669,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			local crimes_plus = zakon_80_crimes
 			crimes[playerid] = crimes[playerid]+crimes_plus
-			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], yellow[0], yellow[1], yellow[2])
+			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue[0], blue[1], blue[2])
 
 			return
 		}
@@ -6732,6 +6740,22 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+info_png[id1][id2+1])
 			return
+		}
+		else if (id1 == 88) //чек
+		{
+			if (!isPointInCircle3D(myPos[0],myPos[1],myPos[2], interior_job[9][2],interior_job[9][3],interior_job[9][4], interior_job[9][7]))
+			{
+				sendMessage(playerid, "[ERROR] Вы не около банка", red[0], red[1], red[2])
+				return
+			}
+
+			local randomize = id2
+
+			id2 = 0
+
+			me_chat(playerid, playername+" обналичил(а) "+info_png[id1][0]+" "+randomize+" "+info_png[id1][1])
+
+			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 		}
 		else 
 		{
@@ -7620,59 +7644,33 @@ function( playerid, id, ...)
 	sendMessage(id, "[LETTER FROM] "+playername+" ["+playerid+"]: "+text, yellow[0], yellow[1], yellow[2])
 })
 
-addCommandHandler("pay",//--передача денег
-function (playerid, id, cash)
+addCommandHandler("writecheck",//выдача чека
+function(playerid, id)
 {
+	local id = id.tointeger()
 	local playername = getPlayerName ( playerid )
 	local myPos = getPlayerPosition(playerid)
-	local cash = cash.tointeger()
-	local id = id.tointeger()
 
-	if (id < 0 || id >= getMaxPlayers()) 
-	{
-		return
-	}
-	else if (logged[playerid] == 0)
+	if (logged[playerid] == 0 || id < 1 || arrest[playerid] == 1)
 	{
 		return
 	}
 
-	if (arrest[playerid] == 1) 
-	{
-		return
-	}
-
-	if (cash < 1)
-	{
-		return
-	}
-
-	if (cash > array_player_2[playerid][0])
+	if (id > array_player_2[playerid][0])
 	{
 		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red[0], red[1], red[2])
 		return
 	}
 
-	if (logged[id] == 1)
+	if(inv_player_empty(playerid, 88, id))
 	{
-		local player_name = getPlayerName ( id )
-		local Pos = getPlayerPosition(id)
-		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], 10.0))
-		{
-			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playerid )
+		me_chat(playerid, playername+" выписал(а) "+info_png[88][0]+" "+id+" "+info_png[88][1])
 
-			inv_server_load( id, "player", 0, 1, array_player_2[id][0]+cash, id )
-
-			me_chat(playerid, playername+" передал(а) "+player_name+" "+cash+"$")
-		}
-		else
-		{
-			sendMessage(playerid, "[ERROR] Игрок далеко", red[0], red[1], red[2])
-		}
+		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-id, playername )
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Такого игрока нет", red[0], red[1], red[2])
+		sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
 	}
 })
 
@@ -7887,6 +7885,7 @@ function (playerid, value, ...)
 	local x = myPos[0]
 	local y = myPos[1]
 	local z = myPos[2]
+	local name_buy = "all"
 
 	if (logged[playerid] == 0) 
 	{
@@ -7907,7 +7906,7 @@ function (playerid, value, ...)
 		{
 			if (value == "buy" || value == "return")
 			{
-				auction_buy_sell(playerid, value, spl[0].tointeger(), 0, 0, 0)
+				auction_buy_sell(playerid, value, spl[0].tointeger(), 0, 0, 0, 0)
 			}
 			else if (value == "sell")
 			{
@@ -7916,9 +7915,17 @@ function (playerid, value, ...)
 					return
 				}
 
+				if(spl.len() <= 3)
+				{
+				}
+				else
+				{
+					name_buy = spl[3].tostring()
+				}
+
 				if(spl[0].tointeger() >= 2 && spl[0].tointeger() <= (info_png.len()-1))
 				{
-					auction_buy_sell(playerid, "sell", 0, spl[0].tointeger(), spl[1].tointeger(), spl[2].tointeger())
+					auction_buy_sell(playerid, "sell", 0, spl[0].tointeger(), spl[1].tointeger(), spl[2].tointeger(), name_buy)
 				}
 				else
 				{
@@ -8147,11 +8154,12 @@ function (playerid)
 		"/takepolicerank [ИД игрока] [ИД шеврона от 28 до 32] - забрать шеврон (для полицейских)",
 		"/sellhouse - создать дом (для риэлторов)",
 		"/sellbusiness [номер бизнеса от 0 до 5] - создать бизнес (для риэлторов)",
-		"/auc sell [ид предмета] [кол-во предмета] [сумма] - выставить предмет на аукцион",
+		"/auc sell [ид предмета] [кол-во предмета] [сумма] [имя покупателя, если нету ничего не пишите] - выставить предмет на аукцион",
 		"/auc [buy | return] [номер слота] - купить или забрать предмет с аукциона",
 		"/takecar [номер т/с] - забрать т/с со штрафстоянки",
 		"/lawyer [ИД игрока] - заплатить залог за игрока",
 		"/enshot [ИД игрока] - выстрелить в двигатель (для полицейских)",
+		"/writecheck [сумма] - выписать чек",
 		"/sg buy - купить рыбзавод",
 		"/sg job [номер рыбзавода] - устроиться на рыбзавод",
 		"/sg menu [pay | coef] [сумма] - установить зарплату или доход от продаж",
@@ -8464,8 +8472,8 @@ function(command, params)
 	log( "Commands - " +command )
 
 	if(command == "z")
-	{	
-	
+	{
+
 	}
 
 	if(command == "x")

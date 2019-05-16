@@ -65,7 +65,7 @@ local info2_selection_1 = -1// --значение картинки
 
 local info_png = {
 	[0] = ["", ""],
-	[1] = ["деньги", "$"],
+	[1] = ["чековая книжка", "$ в банке"],
 	[2] = ["права", "шт"],
 	[3] = ["сигареты Big Break Red", "сигарет"],
 	[4] = ["аптечка", "шт"],
@@ -152,6 +152,7 @@ local info_png = {
 	[85] = ["трудовой договор обработчика рыбы на", "рыбзаводе"],
 	[86] = ["ордер на обыск", "", "гражданина", "т/с", "дома"],
 	[87] = ["стройматериалы", "$ за штуку"],
+	[88] = ["банковский чек на", "$"],
 }
 
 //цены автосалона
@@ -1593,7 +1594,10 @@ function( post )
 			{
 				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat() )
 				dxDrawTexture(image[spl[3].tofloat()], coords[0]-(57/2), coords[1], 0.88, 0.88, 0.0, 0.0, 0.0, 255)
+			}
 
+			if (isPointInCircle3D( myPos[0], myPos[1], myPos[2], spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat(), 10.0 ))
+			{
 				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat()+0.2 )
 				local dimensions = dxGetTextDimensions("Press E", 1.0, "tahoma-bold" )
 				dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
