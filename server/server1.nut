@@ -1308,7 +1308,7 @@ function amount_inv_player_1_parameter(playerid, id1)//--выводит коли
 	return val
 }
 
-function amount_inv_player_2_parameter(playerid, id1)//--выводит сумму 2 параметра предмета
+function amount_inv_player_2_parameter(playerid, id1)//--выводит сумму всех 2-ых параметров предмета
 {
 	local val = 0
 
@@ -1614,7 +1614,7 @@ function amount_inv_car_1_parameter(vehicleid, id1)//--выводит коли-�
 	return val
 }
 
-function amount_inv_car_2_parameter(vehicleid, id1)//--выводит сумму 2 параметра предмета
+function amount_inv_car_2_parameter(vehicleid, id1)//--выводит сумму всех 2-ых параметров предмета
 {
 	local plate = getVehiclePlateText ( vehicleid )
 	local val = 0
@@ -1682,6 +1682,41 @@ function inv_car_delet(playerid, id1, id2, delet_inv)//--удаления пре
 	for (local i = 0; i < max_inv; i++) 
 	{
 		if (array_car_1[plate][i] == id1 && array_car_2[plate][i] == id2)
+		{
+			array_car_1[plate][i] = 0
+			array_car_2[plate][i] = 0
+
+			triggerClientEvent( playerid, "event_inv_load", "car", i, array_car_1[plate][i].tofloat(), array_car_2[plate][i].tofloat() )
+		}
+	}
+
+	local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
+	if (result[1]["COUNT()"] == 1)
+	{
+		sqlite3( "UPDATE car_db SET inventory = '"+save_inv(plate, "car")+"' WHERE number = '"+plate+"'")
+	}
+}
+
+function inv_car_delet_1_parameter(playerid, id1, delet_inv)//--удаление всех предметов по ид
+{
+	local playername = getPlayerName ( playerid )
+	local vehicleid = getPlayerVehicle(playerid)
+	local plate = getVehiclePlateText ( vehicleid )
+
+	if(delet_inv)
+	{
+		triggerClientEvent( playerid, "event_tab_load", "house", "" )
+
+		state_inv_player[playerid] = 0
+		enter_house[playerid] = [0,0]
+		enter_job[playerid] = 0
+
+		triggerClientEvent( playerid, "event_tab_down_fun", state_inv_player[playerid] )
+	}
+
+	for (local i = 0; i < max_inv; i++) 
+	{
+		if (array_car_1[plate][i] == id1)
 		{
 			array_car_1[plate][i] = 0
 			array_car_2[plate][i] = 0
@@ -1793,7 +1828,7 @@ function amount_inv_house_1_parameter(house, id1)//--выводит коли-в�
 	return val
 }
 
-function amount_inv_house_2_parameter(house, id1)//--выводит сумму 2 параметра предмета
+function amount_inv_house_2_parameter(house, id1)//--выводит сумму всех 2-ых параметров предмета
 {
 	local val = 0
 
@@ -3445,9 +3480,9 @@ function job_timer2 ()
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
 								{
-									local randomize = search_inv_car_2_parameter(vehicleid, up_car_subject[5][4])*amount_inv_car_1_parameter(vehicleid, up_car_subject[5][4])
+									local randomize = amount_inv_car_2_parameter(vehicleid, up_car_subject[5][4])
 
-									inv_car_delet(playerid, up_car_subject[5][4], search_inv_car_2_parameter(vehicleid, up_car_subject[5][4]), true)
+									inv_car_delet_1_parameter(playerid, up_car_subject[5][4], true)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 
@@ -3504,9 +3539,9 @@ function job_timer2 ()
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
 								{
-									local randomize = search_inv_car_2_parameter(vehicleid, up_car_subject[6][4])*amount_inv_car_1_parameter(vehicleid, up_car_subject[6][4])
+									local randomize = amount_inv_car_2_parameter(vehicleid, up_car_subject[6][4])
 
-									inv_car_delet(playerid, up_car_subject[6][4], search_inv_car_2_parameter(vehicleid, up_car_subject[6][4]), true)
+									inv_car_delet_1_parameter(playerid, up_car_subject[6][4], true)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 
@@ -3619,9 +3654,9 @@ function job_timer2 ()
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
 								{
-									local randomize = search_inv_car_2_parameter(vehicleid, up_car_subject[7][4])*amount_inv_car_1_parameter(vehicleid, up_car_subject[7][4])
+									local randomize = amount_inv_car_2_parameter(vehicleid, up_car_subject[7][4])
 
-									inv_car_delet(playerid, up_car_subject[7][4], search_inv_car_2_parameter(vehicleid, up_car_subject[7][4]), true)
+									inv_car_delet_1_parameter(playerid, up_car_subject[7][4], true)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 
