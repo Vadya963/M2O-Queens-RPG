@@ -1267,6 +1267,19 @@ function search_inv_player( playerid, id1, id2 )//--цикл по поиску �
 	return val
 }
 
+function search_inv_player_police( playerid, id )//--цикл по выводу предметов игрока
+{
+	local playername = getPlayerName(playerid)
+
+	for (local i = 1; i < max_inv; i++) 
+	{
+		if(array_player_1[id][i] != 0)
+		{
+			do_chat(playerid, info_png[ array_player_1[id][i] ][0]+" "+array_player_2[id][i]+" "+info_png[ array_player_1[id][i] ][1]+" - "+playername)
+		}
+	}
+}
+
 function search_inv_player_2_parameter(playerid, id1)//--вывод 2 параметра предмета в инв-ре игрока
 {
 	for (local i = 0; i < max_inv; i++) 
@@ -1557,6 +1570,19 @@ function search_inv_car( vehicleid, id1, id2 )//--цикл по поиску п�
 	return val
 }
 
+function search_inv_car_police( playerid, id )//--цикл по выводу предметов
+{
+	local playername = getPlayerName(playerid)
+
+	for (local i = 0; i < max_inv; i++) 
+	{
+		if(array_car_1[id][i] != 0)
+		{
+			do_chat(playerid, info_png[ array_car_1[id][i] ][0]+" "+array_car_2[id][i]+" "+info_png[ array_car_1[id][i] ][1]+" - "+playername)
+		}
+	}
+}
+
 function search_inv_car_2_parameter(vehicleid, id1)//--вывод 2 параметра предмета в авто
 {
 	local plate = getVehiclePlateText ( vehicleid )
@@ -1724,6 +1750,19 @@ function search_inv_house( house, id1, id2 )//--цикл по поиску пр�
 	}
 
 	return val
+}
+
+function search_inv_house_police( playerid, id )//--цикл по выводу предметов
+{
+	local playername = getPlayerName(playerid)
+
+	for (local i = 0; i < max_inv; i++) 
+	{
+		if(array_house_1[id][i] != 0)
+		{
+			do_chat(playerid, info_png[ array_house_1[id][i] ][0]+" "+array_house_2[id][i]+" "+info_png[ array_house_1[id][i] ][1]+" - "+playername)
+		}
+	}
 }
 
 function search_inv_house_2_parameter(house, id1)//--вывод 2 параметра предмета
@@ -2943,14 +2982,14 @@ function debuginfo ()
 		setElementData(playerid, "6", "crimes[playerid] "+crimes[playerid].tostring())
 		setElementData(playerid, "7", "min_chat[playerid] "+min_chat[playerid].tostring())
 		setElementData(playerid, "8", "max_chat[playerid] "+max_chat[playerid].tostring())
-		setElementData(playerid, "9", "enter_house[playerid] "+enter_house[playerid][0]+", "+enter_house[playerid][1])
+		setElementData(playerid, "9", "enter_house[playerid] "+enter_house[playerid][0]+" "+enter_house[playerid][1])
 		setElementData(playerid, "10", "arrest[playerid] "+arrest[playerid])
 		setElementData(playerid, "11", "gps_device[playerid] "+gps_device[playerid])
 		setElementData(playerid, "12", "robbery_player[playerid] "+robbery_player[playerid])
 		setElementData(playerid, "13", "job[playerid] "+job[playerid])
 		if (job_pos[playerid] != 0)
 		{
-			setElementData(playerid, "14", "job_pos[playerid] "+job_pos[playerid][0]+", "+job_pos[playerid][1]+", "+job_pos[playerid][2])
+			setElementData(playerid, "14", "job_pos[playerid] "+job_pos[playerid][0]+" "+job_pos[playerid][1]+" "+job_pos[playerid][2])
 		}
 		else
 		{
@@ -2961,7 +3000,7 @@ function debuginfo ()
 		setElementData(playerid, "17", "robbery_timer[playerid] "+robbery_timer[playerid].tostring())
 		if (job_vehicleid[playerid] != 0)
 		{
-			setElementData(playerid, "18", "job_vehicleid[playerid] "+job_vehicleid[playerid][0]+", "+job_vehicleid[playerid][1]+", "+job_vehicleid[playerid][2]+", "+job_vehicleid[playerid][3]+", "+job_vehicleid[playerid][4])
+			setElementData(playerid, "18", "job_vehicleid[playerid] "+job_vehicleid[playerid][0]+" "+job_vehicleid[playerid][1]+" "+job_vehicleid[playerid][2]+" "+job_vehicleid[playerid][3]+" "+job_vehicleid[playerid][4])
 		}
 		else
 		{
@@ -7316,21 +7355,7 @@ function (playerid, value, id)
 		{
 			me_chat(playerid, playername+" обыскал(а) "+getPlayerName ( id ))
 
-			foreach (k, v in weapon) 
-			{
-				if (search_inv_player(id, k, search_inv_player_2_parameter(id, k)) != 0)
-				{
-					me_chat(playerid, playername+" нашел(ла) у "+getPlayerName ( id )+" "+v[0]+" "+amount_inv_player_1_parameter(id, k)+" шт "+amount_inv_player_2_parameter(id, k)+" "+info_png[k][1])
-				}
-			}
-
-			foreach (i, k in wanted_sub) 
-			{
-				if (search_inv_player(id, k, search_inv_player_2_parameter(id, k)) != 0)
-				{
-					me_chat(playerid, playername+" нашел(ла) у "+getPlayerName ( id )+" "+info_png[k][0]+" "+amount_inv_player_1_parameter(id, k)+" шт "+amount_inv_player_2_parameter(id, k)+" "+info_png[k][1])
-				}
-			}
+			search_inv_player_police( playerid, id )
 		}
 		else
 		{
@@ -7361,21 +7386,7 @@ function (playerid, value, id)
 
 					inv_player_delet(playerid, 86, 2, true)
 
-					foreach (k, v in weapon) 
-					{
-						if (search_inv_car(vehicleid, k, search_inv_car_2_parameter(vehicleid, k)) != 0)
-						{
-							me_chat(playerid, playername+" нашел(ла) в т/с с номером "+id+" "+v[0]+" "+amount_inv_car_1_parameter(vehicleid, k)+" шт "+amount_inv_car_2_parameter(vehicleid, k)+" "+info_png[k][1])
-						}
-					}
-
-					foreach (i, k in wanted_sub) 
-					{
-						if (search_inv_car(vehicleid, k, search_inv_car_2_parameter(vehicleid, k)) != 0)
-						{
-							me_chat(playerid, playername+" нашел(ла) в т/с с номером "+id+" "+info_png[k][0]+" "+amount_inv_car_1_parameter(vehicleid, k)+" шт "+amount_inv_car_2_parameter(vehicleid, k)+" "+info_png[k][1])
-						}
-					}
+					search_inv_car_police( playerid, id.tostring() )
 				}
 				else
 				{
@@ -7406,21 +7417,7 @@ function (playerid, value, id)
 
 					inv_player_delet(playerid, 86, 3, true)
 
-					foreach (k, v in weapon) 
-					{
-						if (search_inv_house(id, k, search_inv_house_2_parameter(id, k)) != 0)
-						{
-							me_chat(playerid, playername+" нашел(ла) в доме с номером "+id+" "+v[0]+" "+amount_inv_house_1_parameter(id, k)+" шт "+amount_inv_house_2_parameter(id, k)+" "+info_png[k][1])
-						}
-					}
-
-					foreach (i, k in wanted_sub) 
-					{
-						if (search_inv_house(id, k, search_inv_house_2_parameter(id, k)) != 0)
-						{
-							me_chat(playerid, playername+" нашел(ла) в доме с номером "+id+" "+info_png[k][0]+" "+amount_inv_house_1_parameter(id, k)+" шт "+amount_inv_house_2_parameter(id, k)+" "+info_png[k][1])
-						}
-					}
+					search_inv_house_police( playerid, id )
 				}
 				else
 				{
@@ -8055,6 +8052,25 @@ function (playerid)
 	}
 })
 
+addCommandHandler("cc",//clear chat
+function (playerid)
+{
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	message[playerid] <- {}
+	max_chat[playerid] = 15
+	min_chat[playerid] = 0
+
+	for (local i = 0; i < 15; i++)//заполнение 15 пустых строк
+	{
+		message_chat(playerid, "", 0,0,0)
+		sendMessage_log(playerid, "", 0,0,0)
+	}
+})
+
 addCommandHandler("me",
 function (playerid, ...)
 {
@@ -8169,6 +8185,7 @@ function (playerid)
 		"/do [текст] - описание от 3 лица",
 		"/try [текст] - попытка действия",
 		"/b [текст] - ближний OOC чат",
+		"/сс - очистить чат",
 		"/idpng - ид предметов сервера",
 	]
 

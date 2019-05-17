@@ -902,6 +902,13 @@ timer(function () {
 timer(function () {
 	sync_timer = true
 	sync_timer2 = true
+
+	/*timer(function () {
+		for (local i = 0; i <= 19; i++)
+		{	
+			print ( getElementData(i.tostring()) )
+		}
+	}, 5000, -1)*/
 }, 5000, 1)
 
 timer(function () {
@@ -1232,6 +1239,7 @@ function f2_down()
 	
 	sync_timer = !sync_timer
 	showChat( sync_timer )
+	toggleHud( sync_timer )
 
 	guiSetVisible(health_gui, sync_timer)
 	guiSetVisible(alcohol_gui, sync_timer)
