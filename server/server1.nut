@@ -4259,7 +4259,7 @@ function( playerid, name, ip, serial )
 				setPlayerPosition(playerid, result[1]["x"],result[1]["y"],result[1]["z"])
 			}
 		}
-	}, 10000, 2)//спавн если х и у = 0
+	}, 10000, 3)//спавн если х и у = 0
 
 	print("[serial] "+getPlayerSerial(playerid))
 })
@@ -7676,7 +7676,7 @@ function( playerid, id, ...)
 	sendMessage(id, "[LETTER FROM] "+playername+" ["+playerid+"]: "+text, yellow[0], yellow[1], yellow[2])
 })
 
-addCommandHandler("writecheck",//выдача чека
+addCommandHandler("wc",//выдача чека
 function(playerid, id)
 {
 	local id = id.tointeger()
@@ -8195,7 +8195,6 @@ function (playerid)
 		"/prison [ИД игрока] - посадить игрока в тюрьму (для полицейских)",
 		"/pr [текст] - рация полицейских (для полицейских)",
 		"/let [ИД игрока] [текст] - отправить письмо игроку",
-		"/pay [ИД игрока] [сумма] - передача денег",
 		"/ec [номер т/с] - эвакуция т/с",
 		"/cseat [номер т/с] [место от 1 до 20] - сесть на пассажирское место",
 		"/cexit - выйти из т/с",
@@ -8210,7 +8209,7 @@ function (playerid)
 		"/takecar [номер т/с] - забрать т/с со штрафстоянки",
 		"/lawyer [ИД игрока] - заплатить залог за игрока",
 		"/enshot [ИД игрока] - выстрелить в двигатель (для полицейских)",
-		"/writecheck [сумма] - выписать чек",
+		"/wc [сумма] - выписать чек",
 		"/sg buy - купить рыбзавод",
 		"/sg job [номер рыбзавода] - устроиться на рыбзавод",
 		"/sg menu [pay | coef] [сумма] - установить зарплату или доход от продаж",
@@ -8353,6 +8352,8 @@ function(playerid, id)
 	probeg["0"] <- 0
 	array_car_1["0"] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	array_car_2["0"] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	/*local blipid = createBlip( -300.0, 120.0, 0, 1 )
+	attachBlipToVehicle(blipid, vehicleid)*/
 })
 
 addCommandHandler("stime",
