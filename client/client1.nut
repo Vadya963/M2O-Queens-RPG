@@ -200,7 +200,7 @@ local motor_show = [
 	//[39,0,100,"Shubert Show Plow"],
 	//[40,0,80,"Military Truck"],
 	[41,2140,80,"Smith Custom 200"],
-	[42,4280,80,"Smith Custom 200 Police Special"],
+	[42,2500,80,"Smith Custom 200 Police Special"],
 	[43,450,50,"Smith Coupe"],
 	[44,1700,65,"Smith Mainline"],
 	[45,2700,70,"Smith Thunderbolt"],
