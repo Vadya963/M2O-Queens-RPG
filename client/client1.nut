@@ -1148,7 +1148,7 @@ function getElementData (key)
 
 function element_data_push_client(text)
 {
-	foreach (k, v in split(text, ",")) 
+	foreach (k, v in split(text, ";")) 
 	{
 		local spl = split(v, ":")
 		element_data[spl[0]] <- spl[1]

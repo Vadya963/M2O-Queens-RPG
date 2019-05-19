@@ -1865,7 +1865,7 @@ function element_data_push_client ()
 		local text = ""
 		foreach (k, v in element_data[playerid])
 		{
-			text = text + k+":"+v+","
+			text = text + k+":"+v+";"
 		}
 
 		triggerClientEvent(playerid, "event_element_data_push_client", text)
@@ -3017,14 +3017,14 @@ function debuginfo ()
 		setElementData(playerid, "6", "crimes[playerid] "+crimes[playerid].tostring())
 		setElementData(playerid, "7", "min_chat[playerid] "+min_chat[playerid].tostring())
 		setElementData(playerid, "8", "max_chat[playerid] "+max_chat[playerid].tostring())
-		setElementData(playerid, "9", "enter_house[playerid] "+enter_house[playerid][0]+" "+enter_house[playerid][1])
+		setElementData(playerid, "9", "enter_house[playerid] "+enter_house[playerid][0]+", "+enter_house[playerid][1])
 		setElementData(playerid, "10", "arrest[playerid] "+arrest[playerid])
 		setElementData(playerid, "11", "gps_device[playerid] "+gps_device[playerid])
 		setElementData(playerid, "12", "robbery_player[playerid] "+robbery_player[playerid])
 		setElementData(playerid, "13", "job[playerid] "+job[playerid])
 		if (job_pos[playerid] != 0)
 		{
-			setElementData(playerid, "14", "job_pos[playerid] "+job_pos[playerid][0]+" "+job_pos[playerid][1]+" "+job_pos[playerid][2])
+			setElementData(playerid, "14", "job_pos[playerid] "+job_pos[playerid][0]+", "+job_pos[playerid][1]+", "+job_pos[playerid][2])
 		}
 		else
 		{
@@ -3035,7 +3035,7 @@ function debuginfo ()
 		setElementData(playerid, "17", "robbery_timer[playerid] "+robbery_timer[playerid].tostring())
 		if (job_vehicleid[playerid] != 0)
 		{
-			setElementData(playerid, "18", "job_vehicleid[playerid] "+job_vehicleid[playerid][0]+" "+job_vehicleid[playerid][1]+" "+job_vehicleid[playerid][2]+" "+job_vehicleid[playerid][3]+" "+job_vehicleid[playerid][4])
+			setElementData(playerid, "18", "job_vehicleid[playerid] "+job_vehicleid[playerid][0]+", "+job_vehicleid[playerid][1]+", "+job_vehicleid[playerid][2]+", "+job_vehicleid[playerid][3]+", "+job_vehicleid[playerid][4])
 		}
 		else
 		{
