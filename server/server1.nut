@@ -874,16 +874,16 @@ local max_inv = 24
 local array_player_1 = array((getMaxPlayers()+1), 0)
 local array_player_2 = array((getMaxPlayers()+1), 0)
 
-local state_inv_player = array(getMaxPlayers(), 0)
+local state_inv_player = array(getMaxPlayers(), 0)//состояние инв-ря игрока 0-выкл, 1-вкл
 local state_gui_window = array(getMaxPlayers(), 0)//--состояние гуи окна 0-выкл, 1-вкл
-local logged = array(getMaxPlayers(), 0)
-local sead = array(getMaxPlayers(), 0)
-local sead_custom = array(getMaxPlayers(), 0)
-local crimes = array(getMaxPlayers(), 0)
-local enter_house = array(getMaxPlayers(), 0)
-local enter_job = array(getMaxPlayers(), 0)
-local health = array(getMaxPlayers(), 0)
-local arrest = array(getMaxPlayers(), 0)
+local logged = array(getMaxPlayers(), 0)//0-не вошел, 1-вошел
+local sead = array(getMaxPlayers(), 0)//место в тс
+local sead_custom = array(getMaxPlayers(), 0)//кастомное место в тс
+local crimes = array(getMaxPlayers(), 0)//преступления
+local enter_house = array(getMaxPlayers(), 0)//0-не вошел, 1-вошел (не удалять)
+local enter_job = array(getMaxPlayers(), 0)//0-не вошел, 1-вошел (не удалять)
+local health = array(getMaxPlayers(), 0)//здоровье
+local arrest = array(getMaxPlayers(), 0)//арест игрока, 0-нет, 1-да
 //--нужды
 local alcohol = array(getMaxPlayers(), 0)
 local satiety = array(getMaxPlayers(), 0)
@@ -891,16 +891,16 @@ local hygiene = array(getMaxPlayers(), 0)
 local sleep = array(getMaxPlayers(), 0)
 local drugs = array(getMaxPlayers(), 0)
 //
-local robbery_player = array(getMaxPlayers(), 0)
-local robbery_timer = array(getMaxPlayers(), 0)
-local gps_device = array(getMaxPlayers(), 0)
-local job = array(getMaxPlayers(), 0)
-local job_pos = array(getMaxPlayers(), 0)
-local job_call = array(getMaxPlayers(), 0)
-local job_vehicleid = array(getMaxPlayers(), 0)
-local job_timer = array(getMaxPlayers(), 0)
-local car_27 = array(getMaxPlayers(), 0)
-local tp_player_lh = array(getMaxPlayers(), 0)
+local robbery_player = array(getMaxPlayers(), 0)//ограбление, 0-нет, 1-да
+local robbery_timer = array(getMaxPlayers(), 0)//таймер ограбления
+local gps_device = array(getMaxPlayers(), 0)//отображение координат игрока, 0-выкл, 1-вкл
+local job = array(getMaxPlayers(), 0)//переменная работ
+local job_pos = array(getMaxPlayers(), 0)//позиция места назначения
+local job_call = array(getMaxPlayers(), 0)//переменная для работ
+local job_vehicleid = array(getMaxPlayers(), 0)//позиция авто
+local job_timer = array(getMaxPlayers(), 0)//таймер угона
+local car_27 = array(getMaxPlayers(), 0)//переменная для 27 тс
+local tp_player_lh = array(getMaxPlayers(), 0)//таймер перелета из еб в лх 
 
 //для истории сообщений
 local max_message = 15//максимально отображаемое число сообщений
