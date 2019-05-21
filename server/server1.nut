@@ -48,6 +48,7 @@ local business_pos = {}//--позиции бизнесов
 local house_pos = {}//--позиции домов
 local day_nalog = 7//кол-во дней для оплаты налога
 local no_use_wheel_and_engine = [20,27,35,37,38]
+local police_chanel = 1//канал копов
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -98,6 +99,7 @@ local svetlo_zolotoy = [255,255,130]//--светло-золотой
 local crimson = [220,20,60]//--малиновый
 local purple = [175,0,255]//--фиолетовый
 local gray = [150,150,150]//--серый
+local green_rc = [115,180,97]//--темно зеленый
 
 local color_table = [
 	[168,228,160],
@@ -115,6 +117,7 @@ local color_table = [
 	[150,0,0],
 	[220,20,60],
 	[175,0,255],
+	[115,180,97],
 	[0,0,0],
 
 	/*[62,82,93],
@@ -293,6 +296,7 @@ local info_png = {
 	[86] = ["ордер на обыск", "", "гражданина", "т/с", "дома"],
 	[87] = ["стройматериалы", "$ за штуку"],
 	[88] = ["банковский чек на", "$"],
+	[89] = ["рация", "канал"],
 }
 
 //цены автосалона
@@ -643,6 +647,39 @@ local busdriver_pos = [
 	[-422.731,479.451,0.1],
 ]
 
+local coal_pos = [
+	[-1285.74,1600.94,3.75443],
+	[-1145.61,1189.81,-21.7018],
+	[-839.285,1421.56,-8.95012],
+	[-619.004,1521.83,-14.0474],
+	[-326.743,1781.94,-23.5438],
+	[-329.761,1729.01,-22.7633],
+	[49.5566,874.461,-19.3668],
+	[755.486,932.826,-11.9139],
+	[514.073,758.171,-21.2519],
+	[354.157,731.62,-24.889],
+	[206.186,288.341,-19.8485],
+	[474.607,258.013,-19.8618],
+	[389.525,-282.05,-19.8376],
+	[642.575,-295.493,-19.9856],
+	[725.876,-397.762,-20.1147],
+	[-6.67647,-404.954,-20.0042],
+	[-497.981,-441.141,-14.1712],
+	[-1682.4,285.108,-19.2365],
+	[-1055.03,1669.61,10.7557],
+	[-758.935,1642.93,-14.4585],
+	[-726.526,1822.71,-14.5112],
+	[-730.131,786.25,-18.9143],
+	[-668.467,901.199,-18.4088],
+	[-535.229,354.225,1.43243],
+	[-698.885,7.73414,1.14508],
+	[-51.4879,202.96,-14.3421],
+	[91.7778,141.146,-19.903],
+	[89.9749,192.24,-20.0298],
+	[199.126,-149.583,-19.4556],
+	[-391.621,-748.271,-21.5819],
+]
+
 local interior_business = [
 	[0, "Магазин оружия", 4],
 	[1, "Магазин одежды", 2],
@@ -684,7 +721,7 @@ local shop = {
 	[4] = [info_png[4][0], 1, 250],
 	[7] = [info_png[7][0], 20, 10],
 	[8] = [info_png[8][0], 20, 15],
-	[11] = [info_png[11][0], 1, 100],
+	[11] = [info_png[11][0], 1, 25],
 	[26] = [info_png[26][0], 1, 5000],
 	[44] = [info_png[44][0], 100, 50],
 	[45] = [info_png[45][0], 100, 100],
@@ -692,6 +729,7 @@ local shop = {
 	[64] = [info_png[64][0], 1, 250],
 	[74] = [info_png[74][0], 100, 100],
 	[81] = [info_png[81][0], 100, 100],
+	[89] = [info_png[89][0], 10, 500],
 }
 
 local eda = {
@@ -900,7 +938,7 @@ local job_call = array(getMaxPlayers(), 0)//переменная для рабо
 local job_vehicleid = array(getMaxPlayers(), 0)//позиция авто
 local job_timer = array(getMaxPlayers(), 0)//таймер угона
 local car_27 = array(getMaxPlayers(), 0)//переменная для 27 тс
-local tp_player_lh = array(getMaxPlayers(), 0)//таймер перелета из еб в лх 
+local tp_player_lh = array(getMaxPlayers(), 0)//таймер перелета из еб в лх
 
 //для истории сообщений
 local max_message = 15//максимально отображаемое число сообщений
@@ -1414,9 +1452,22 @@ function police_chat(playerid, text)
 	{
 		local playername = getPlayerName(player)
 
-		if (search_inv_player(player, 10, 1) != 0)
+		if (search_inv_player(player, 10, 1) != 0 && search_inv_player(player, 89, police_chanel) != 0)
 		{
 			sendMessage(player, text, blue[0], blue[1], blue[2])
+		}
+	}
+}
+
+function radio_chat(playerid, text, color)
+{
+	foreach (player, value in getPlayers()) 
+	{
+		local playername = getPlayerName(player)
+
+		if (search_inv_player(player, 89, search_inv_player_2_parameter(playerid, 89)) != 0)
+		{
+			sendMessage(player, text, color[0], color[1], color[2])
 		}
 	}
 }
@@ -3041,7 +3092,8 @@ function debuginfo ()
 		{
 			setElementData(playerid, "18", "job_vehicleid[playerid] "+job_vehicleid[playerid])
 		}
-		setElementData(playerid, "19", "job_timer[playerid] "+job_timer[playerid].tostring())*/
+		setElementData(playerid, "19", "job_timer[playerid] "+job_timer[playerid].tostring())
+		setElementData(playerid, "20", "tp_player_lh[playerid] "+tp_player_lh[playerid])*/
 
 		setElementData(playerid, "serial", getPlayerSerial(playerid))
 		setElementData(playerid, "timeserver", hour+"-"+minute)
@@ -7594,7 +7646,34 @@ function (playerid, id)
 	}
 })
 
-addCommandHandler ( "pr",//--пол-ая волна
+addCommandHandler( "setchanel",//сменить канал в рации
+function( playerid, id )
+{
+	local playername = getPlayerName ( playerid )
+	local id = id.tointeger()
+
+	if (id <= 0)
+	{
+		return
+	}
+	else if (logged[playerid] == 0)
+	{
+		return
+	}
+	else if (amount_inv_player_1_parameter(playerid, 89) == 0)
+	{
+		sendMessage(playerid, "[ERROR] У вас нет рации", red[0], red[1], red[2])
+		return
+	}
+
+	inv_player_delet(playerid, 89, search_inv_player_2_parameter(playerid, 89), true)
+
+	inv_player_empty(playerid, 89, id)
+
+	me_chat(playerid, playername+" сменил(а) канал в рации на "+id)
+})
+
+addCommandHandler ( "r",//рация
 function (playerid, ...)
 {
 	local playername = getPlayerName ( playerid )
@@ -7604,42 +7683,49 @@ function (playerid, ...)
 	{
 		return
 	}
+	else if (amount_inv_player_1_parameter(playerid, 89) == 0)
+	{
+		sendMessage(playerid, "[ERROR] У вас нет рации", red[0], red[1], red[2])
+		return
+	}
 
 	for(local i = 0; i < vargv.len(); i++)
 	{
 		text = text+vargv[i]+" "
 	}
 
-	if (search_inv_player(playerid, 10, 1) != 0)
+	local radio_chanel = search_inv_player_2_parameter(playerid, 89)
+
+	if(radio_chanel == police_chanel)
 	{
 		if (search_inv_player(playerid, 28, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Офицер "+playername+" ["+playerid+"]: "+text)
+			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Офицер "+playername+" ["+playerid+"]: "+text)
 		}
 		else if (search_inv_player(playerid, 29, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Детектив "+playername+" ["+playerid+"]: "+text)
+			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Детектив "+playername+" ["+playerid+"]: "+text)
 		}
 		else if (search_inv_player(playerid, 30, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Сержант "+playername+" ["+playerid+"]: "+text)
+			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Сержант "+playername+" ["+playerid+"]: "+text)
 		}
 		else if (search_inv_player(playerid, 31, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Лейтенант "+playername+" ["+playerid+"]: "+text)
+			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Лейтенант "+playername+" ["+playerid+"]: "+text)
 		}
 		else if (search_inv_player(playerid, 32, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Капитан "+playername+" ["+playerid+"]: "+text)
+			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Капитан "+playername+" ["+playerid+"]: "+text)
 		}
 		else if (search_inv_player(playerid, 33, 1) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ] Шеф полиции "+playername+" ["+playerid+"]: "+text)
+			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Шеф полиции "+playername+" ["+playerid+"]: "+text)
 		}
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Вы не полицейский", red[0], red[1], red[2])
+		radio_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] "+playername+" ["+playerid+"]: "+text, green_rc)	
 	}
 })
 
@@ -8193,7 +8279,8 @@ function (playerid)
 	local commands = [
 		"/roulette [режим игры (красное, черное, четное, нечетное, 1-18, 19-36, 1-12, 2-12, 3-12, 3-1, 3-2, 3-3)] [сумма] - сыграть в рулетку",
 		"/prison [ИД игрока] - посадить игрока в тюрьму (для полицейских)",
-		"/pr [текст] - рация полицейских (для полицейских)",
+		"/r [текст] - рация",
+		"/setchanel [канал] - сменить канал в рации",
 		"/let [ИД игрока] [текст] - отправить письмо игроку",
 		"/ec [номер т/с] - эвакуция т/с",
 		"/cseat [номер т/с] [место от 1 до 20] - сесть на пассажирское место",
