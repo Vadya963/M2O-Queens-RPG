@@ -5053,9 +5053,9 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 	local j = max_earth
 	earth[j] <- [myPos[0],myPos[1],myPos[2],id1,id2]
 
-	if (enter_house[playerid][1] == id2 && id1 == 25) {//--когда выбрасываешь ключ в инв-ре исчезают картинки
+	/*if (enter_house[playerid][1] == id2 && id1 == 25) {//--когда выбрасываешь ключ в инв-ре исчезают картинки(выкл из-за фичи)
 		triggerClientEvent( playerid, "event_tab_load", "house", "" )
-	}
+	}*/
 
 	if (isPlayerInVehicle(playerid)) 
 	{
@@ -8908,7 +8908,16 @@ function(command, params)
 
 	if(command == "z")
 	{
+		/*foreach(k,v in getWhoWas())
+		{	
+			print("----"+k+"----")
+			foreach(k1,v1 in v)
+			{
+				print(k1+" "+v1)
+			}
+		}
 
+		print("getWhoWasCount "+getWhoWasCount())*/
 	}
 
 	if(command == "x")

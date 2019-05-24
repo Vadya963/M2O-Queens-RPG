@@ -1497,8 +1497,8 @@ function( post )
 		{
 			dxDrawRectangle( 0.0, screen[1]-16.0*6, 250.0, 16.0*3, fromRGB( 0, 0, 0, 150 ) )
 			dxdrawtext ( "Time: "+spl_gz[6]+" sec | Guns Zone #"+spl_gz[1], 2.0, screen[1]-16*6, fromRGB( white[0], white[1], white[2] ), false, "tahoma-bold", 1.0 )
-			dxdrawtext ( "Attaker "+spl_gz[2]+": "+spl_gz[3]+" points", 2.0, screen[1]-16*5, fromRGB( 255,0,50 ), false, "tahoma-bold", 1.0 )
-			dxdrawtext ( "Difiend "+spl_gz[4]+": "+spl_gz[5]+" points", 2.0, screen[1]-16*4, fromRGB( 0,50,255 ), false, "tahoma-bold", 1.0 )
+			dxdrawtext ( "Attack "+spl_gz[2]+": "+spl_gz[3]+" points", 2.0, screen[1]-16*5, fromRGB( 255,0,50 ), false, "tahoma-bold", 1.0 )
+			dxdrawtext ( "Defense "+spl_gz[4]+": "+spl_gz[5]+" points", 2.0, screen[1]-16*4, fromRGB( 0,50,255 ), false, "tahoma-bold", 1.0 )
 		}
 		
 		if (isCursorShowing)
@@ -1688,8 +1688,8 @@ function( post )
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
 				if (area && getElementData("afk["+i+"]") != "0")
 				{
-					local dimensions = dxGetTextDimensions( "[AFK] "+getElementData("afk["+i+"]")+" seconds", 1.0, "tahoma-bold" )
-					dxdrawtext( "[AFK] "+getElementData("afk["+i+"]")+" seconds", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( purple[0], purple[1], purple[2] ), true, "tahoma-bold", 1.0 )
+					local dimensions = dxGetTextDimensions( "[AFK] "+getElementData("afk["+i+"]")+" sec", 1.0, "tahoma-bold" )
+					dxdrawtext( "[AFK] "+getElementData("afk["+i+"]")+" sec", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( purple[0], purple[1], purple[2] ), true, "tahoma-bold", 1.0 )
 				}
 
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 35.0 )
