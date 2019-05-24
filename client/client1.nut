@@ -154,6 +154,8 @@ local info_png = {
 	[87] = ["стройматериалы", "$ за штуку"],
 	[88] = ["банковский чек на", "$"],
 	[89] = ["рация", "канал"],
+	[90] = ["уголь", "кг"],
+	[91] = ["шляпа", ""],
 }
 
 //цены автосалона
@@ -219,9 +221,11 @@ local motor_show = [
 local color_tips = [168,228,160]//--бабушкины яблоки
 local yellow = [255,255,0]//--желтый
 local red = [255,0,0]//--красный
+local red_try = [200,0,0]//--красный
 local blue = [0,150,255]//--синий
 local white = [255,255,255]//--белый
 local green = [0,255,0]//--зеленый
+local green_try = [0,200,0]//--зеленый
 local turquoise = [0,255,255]//--бирюзовый
 local orange = [255,100,0]//--оранжевый
 local orange_do = [255,150,0]//--оранжевый do
@@ -909,7 +913,7 @@ timer(function () {
 	sync_timer2 = true
 
 	/*timer(function () {
-		for (local i = 0; i <= 20; i++)
+		for (local i = 0; i <= 22; i++)
 		{	
 			print ( getElementData(i.tostring()) )
 		}
@@ -1131,6 +1135,18 @@ function getSpeed()
 	return speed*2.27*1.6
 }
 
+function isPointInRectangle2D(x, y, x1, y1, x2, y2) 
+{
+	if( x1 <= x && x <= x2 && y1 >= y && y >= y2 )
+	{
+		return true
+	}
+	else
+	{
+		return false
+	}
+}
+
 //------------------------------------Element Data-------------------------------------------------
 function setElementData (key, value)
 {
@@ -1155,7 +1171,7 @@ function element_data_push_client(text)
 {
 	foreach (k, v in split(text, ";")) 
 	{
-		local spl = split(v, ":")
+		local spl = split(v.tostring(), ":")
 		element_data[spl[0]] <- spl[1]
 	}
 	//print("event_element_data_push_client["+key+"] = "+value)
@@ -1284,6 +1300,66 @@ function f3_down()
 	}
 }
 
+function w_down()
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+	
+	triggerServerEvent( "event_tp_player", "w" )	
+}
+
+function s_down()
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+	
+	triggerServerEvent( "event_tp_player", "s" )	
+}
+
+function a_down()
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+	
+	triggerServerEvent( "event_tp_player", "a" )	
+}
+
+function d_down()
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+	
+	triggerServerEvent( "event_tp_player", "d" )	
+}
+
+function q_down()
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+	
+	triggerServerEvent( "event_tp_player", "q" )	
+}
+
+function key_up()
+{
+	if(isMainMenuShowing())
+	{
+		return
+	}
+	
+	triggerServerEvent( "event_tp_player", "kill" )	
+}
+
 addEventHandler("onClientScriptInit", 
 function() 
 {
@@ -1291,7 +1367,18 @@ function()
 	bindKey( "f1", "down", f1_down )
 	bindKey( "m", "down", fone1 )
 	bindKey( "m", "up", fone2 )
+	bindKey( "w", "down", w_down )
+	bindKey( "w", "up", key_up )
+	bindKey( "s", "down", s_down )
+	bindKey( "s", "up", key_up )
+	bindKey( "a", "down", a_down )
+	bindKey( "a", "up", key_up )
+	bindKey( "d", "down", d_down )
+	bindKey( "d", "up", key_up )
 	bindKey( "e", "down", e_down )
+	bindKey( "e", "up", key_up )
+	bindKey( "q", "down", q_down )
+	bindKey( "q", "up", key_up )
 	bindKey( "x", "down", x_down )
 	bindKey( "page_up", "down", up_down )
 	bindKey( "page_down", "down", down_down )
@@ -1394,16 +1481,30 @@ function( post )
 
 			dxdrawtext ( "[X  "+x_table[0]+", Y  "+y_table[0]+"]", coords[0]-(dimensions[0]/2), coords[1], fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
+
+		foreach (k, v in split(getElementData("guns_zone"), "|"))//--отображение guns_zone
+		{
+			local spl = split(v.tostring(), "/")
+			if (isPointInRectangle2D( myPos[0], myPos[1], spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat(), spl[3].tofloat() ))
+			{
+				//local dimensions = dxGetTextDimensions("Guns Zone - "+spl[4]+" MAFIA", 1.0, "tahoma-bold" )
+				dxdrawtext ( "Guns Zone #"+spl[5]+" - "+spl[4], 2.0, screen[1]-16*2, fromRGB( green[0], green[1], green[2] ), true, "tahoma-bold", 1.0 )
+			}
+		}
+
+		local spl_gz = split(getElementData("guns_zone2"), "/")
+		if(spl_gz[0].tointeger() == 1)
+		{
+			dxDrawRectangle( 0.0, screen[1]-16.0*6, 250.0, 16.0*3, fromRGB( 0, 0, 0, 150 ) )
+			dxdrawtext ( "Time: "+spl_gz[6]+" sec | Guns Zone #"+spl_gz[1], 2.0, screen[1]-16*6, fromRGB( white[0], white[1], white[2] ), false, "tahoma-bold", 1.0 )
+			dxdrawtext ( "Attaker "+spl_gz[2]+": "+spl_gz[3]+" points", 2.0, screen[1]-16*5, fromRGB( 255,0,50 ), false, "tahoma-bold", 1.0 )
+			dxdrawtext ( "Difiend "+spl_gz[4]+": "+spl_gz[5]+" points", 2.0, screen[1]-16*4, fromRGB( 0,50,255 ), false, "tahoma-bold", 1.0 )
+		}
 		
 		if (isCursorShowing)
 		{
 			local pos = getMousePosition()
 			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-		
-			/*for (local i = 0; i <= 19; i++) 
-			{	
-				dxdrawtext ( getElementData(i.tostring()), 10.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-			}*/
 
 			/*for (local i = 0; i < local_param.len(); i++) 
 			{	
@@ -1602,7 +1703,7 @@ function( post )
 
 		foreach (k, v in split(getElementData("earth"), "|"))//--отображение предметов на земле
 		{
-			local spl = split(v, "/")
+			local spl = split(v.tostring(), "/")
 			if (isPointInCircle3D( myPos[0], myPos[1], myPos[2], spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat(), 20.0 ))
 			{
 				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat() )
@@ -1699,6 +1800,7 @@ function e_down()//поднять предмет
 	}
 
 	triggerServerEvent( "event_e_down" )
+	triggerServerEvent( "event_tp_player", "e" )
 }
 
 function x_down()//меню магазинов и зданий
