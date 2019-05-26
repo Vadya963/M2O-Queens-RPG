@@ -2375,6 +2375,25 @@ function()
 	destroyHudTimer()
 })
 
+local addCommandHandler_marker = 0
+addCommandHandler ( "marker",
+function ( playerid, x,y )
+{
+	local playername = getPlayerName ( playerid )
+	local x = x.tofloat()
+	local y = y.tofloat()
+
+	if (addCommandHandler_marker == 0)
+	{
+		addCommandHandler_marker = createBlip(x,y, 17, 0)
+	}
+	else
+	{
+		destroyBlip(addCommandHandler_marker)
+		addCommandHandler_marker = 0
+	}
+})
+
 /*addCommandHandler("shake",
 function (playerid, i1, i2) 
 {
