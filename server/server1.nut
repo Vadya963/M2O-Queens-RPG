@@ -4387,9 +4387,6 @@ function( playerid, name, ip, serial )
 	sleep[playerid] = 0
 	drugs[playerid] = 0
 
-	setElementData(playerid, "is_chat_open", 0)
-	setElementData(playerid, "afk", "0")
-
 	timer(function () {
 		local result = sqlite3( "SELECT COUNT() FROM account WHERE name = '"+playername+"'" )
 		if (result[1]["COUNT()"] == 1 && logged[playerid] == 1)
@@ -4754,6 +4751,9 @@ function reg_or_login(playerid)
 			}, 5000, -1)*/
 		}
 	}
+
+	setElementData(playerid, "is_chat_open", 0)
+	setElementData(playerid, "afk", "0")
 }
 
 //вход в авто
