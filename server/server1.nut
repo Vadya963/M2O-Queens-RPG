@@ -88,10 +88,10 @@ local point_guns_zone = [0,0, 0,0, 0,0]//0-идет ли захват, 1-ном�
 local time_gz = 1*60
 local time_guns_zone = time_gz
 local name_mafia = {
-	[0] = "no",
-	[1] = "American Mafia",
-	[2] = "Italian Mafia",
-	[3] = "Chinese Mafia",
+	[0] = ["no", [255,255,255]],
+	[1] = ["American Mafia", [0,0,255]],
+	[2] = ["Italian Mafia", [255,100,0]],
+	[3] = ["Chinese Mafia", [255,0,0]],
 }
 local guns_zone = {}
 //----------------------------------------------------------------------------------------------------------------
@@ -3078,10 +3078,10 @@ function debuginfo ()
 	local text_guns_zone = ""
 	foreach(i, v in guns_zone)
 	{
-		text_guns_zone = text_guns_zone + v[0]+"/"+v[1]+"/"+v[2]+"/"+v[3]+"/"+name_mafia[v[4]]+"/"+i+"|"
+		text_guns_zone = text_guns_zone + v[0]+"/"+v[1]+"/"+v[2]+"/"+v[3]+"/"+name_mafia[v[4]][0]+"/"+i+"|"
 	}
 
-	local text_guns_zone2 = point_guns_zone[0]+"/"+point_guns_zone[1]+"/"+name_mafia[point_guns_zone[2]]+"/"+point_guns_zone[3]+"/"+name_mafia[point_guns_zone[4]]+"/"+point_guns_zone[5]+"/"+time_guns_zone
+	local text_guns_zone2 = point_guns_zone[0]+"/"+point_guns_zone[1]+"/"+name_mafia[point_guns_zone[2]][0]+"/"+point_guns_zone[3]+"/"+name_mafia[point_guns_zone[4]][0]+"/"+point_guns_zone[5]+"/"+time_guns_zone
 
 	if(point_guns_zone[0] == 1)
 	{
@@ -3095,7 +3095,7 @@ function debuginfo ()
 			{
 				guns_zone[point_guns_zone[1]][4] = point_guns_zone[2]
 
-				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[2]]+" захватила Guns Zone #"+point_guns_zone[1], green[0], green[1], green[2])
+				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[2]][0]+" захватила Guns Zone #"+point_guns_zone[1], green[0], green[1], green[2])
 
 				sqlite3( "UPDATE guns_zone SET mafia = '"+point_guns_zone[2]+"' WHERE number = '"+point_guns_zone[1]+"'")
 			}
@@ -3103,7 +3103,7 @@ function debuginfo ()
 			{
 				guns_zone[point_guns_zone[1]][4] = point_guns_zone[4]
 
-				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[4]]+" удержала Guns Zone #"+point_guns_zone[1], green[0], green[1], green[2])
+				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[4]][0]+" удержала Guns Zone #"+point_guns_zone[1], green[0], green[1], green[2])
 			}
 
 			point_guns_zone[0] = 0
@@ -4712,6 +4712,10 @@ function reg_or_login(playerid)
 		else if (search_inv_player(playerid, 10, 1) != 0)
 		{
 			setPlayerColour(playerid, fromRGB(blue[0],blue[1],blue[2]))
+		}
+		else if (search_inv_player_2_parameter(playerid, 91) != 0)
+		{
+			setPlayerColour(playerid, fromRGB(name_mafia[search_inv_player_2_parameter(playerid, 91)][1][0],name_mafia[search_inv_player_2_parameter(playerid, 91)][1][1],name_mafia[search_inv_player_2_parameter(playerid, 91)][1][2]))
 		}
 		else 
 		{
@@ -7010,9 +7014,9 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			local count = 0
 			local count2 = 0
-			do_chat(playerid, "на голове "+info_png[id1][0]+" "+name_mafia[id2]+" - "+playername)
+			do_chat(playerid, "на голове "+info_png[id1][0]+" "+name_mafia[id2][0]+" - "+playername)
 
-			sendMessage(playerid, "====[ ПОД КОНТРОЛЕМ "+name_mafia[id2]+" ]====", yellow[0], yellow[1], yellow[2])
+			sendMessage(playerid, "====[ ПОД КОНТРОЛЕМ "+name_mafia[id2][0]+" ]====", yellow[0], yellow[1], yellow[2])
 
 			foreach(k,v in guns_zone)
 			{
@@ -8349,7 +8353,7 @@ function (playerid)
 			point_guns_zone[4] = v[4]
 			point_guns_zone[5] = 0
 
-			sendMessageAll(playerid, "[НОВОСТИ] "+playername+" из "+name_mafia[search_inv_player_2_parameter(playerid, 91)]+" захватывает Guns Zone #"+k+" - "+name_mafia[v[4]], green[0], green[1], green[2])
+			sendMessageAll(playerid, "[НОВОСТИ] "+playername+" из "+name_mafia[search_inv_player_2_parameter(playerid, 91)][0]+" захватывает Guns Zone #"+k+" - "+name_mafia[v[4]][0], green[0], green[1], green[2])
 			return
 		}
 	}
