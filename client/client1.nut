@@ -1442,7 +1442,7 @@ function( post )
 
 		if (getPlayerVehicle(playerid) != -1)
 		{
-			local speed_vehicle = "plate "+plate+" | fuel "+split(getElementData("fuel_data"), ".")[0]+" | kilometrage "+split(getElementData("probeg_data"), ".")[0]
+			local speed_vehicle = "plate "+plate+" | kilometrage "+split(getElementData("probeg_data"), ".")[0]
 			dxdrawtext ( speed_vehicle, 2.0, screen[1]-16.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
 

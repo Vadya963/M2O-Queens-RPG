@@ -82,14 +82,13 @@ local max_business = 100
 local max_sg = 1000
 
 //капты-----------------------------------------------------------------------------------------------------------
-local guns_zone_x = [-1965.0, 1365.0]
-local guns_zone_y = 2000.0
 local money_guns_zone = 5000
 local money_guns_zone_business = 1000
 local point_guns_zone = [0,0, 0,0, 0,0]//0-идет ли захват, 1-номер зоны, 2-атакующие, 3-очки захвата, 4-защищающие, 5-очки захвата
 local time_gz = 1*60
 local time_guns_zone = time_gz
 local name_mafia = {
+	[0] = "no",
 	[1] = "American Mafia",
 	[2] = "Italian Mafia",
 	[3] = "Chinese Mafia",
@@ -670,6 +669,7 @@ local coal_pos = [
 	[89.9749,192.24,-20.0298],
 	[199.126,-149.583,-19.4556],
 	[-391.621,-748.271,-21.5819],
+	[-280.0,769.465,-19.5924],
 ]
 
 local interior_business = [
@@ -1619,11 +1619,11 @@ function points_add_in_gz(playerid, value)
 	{	
 		if(isPointInRectangle2D(x,y, v[0],v[1],v[2],v[3]) && k == point_guns_zone[1])
 		{
-			if (search_inv_player_2_parameter(playerid, 91) != 0 && name_mafia[search_inv_player_2_parameter(playerid, 91)] == point_guns_zone[2])
+			if (search_inv_player_2_parameter(playerid, 91) != 0 && search_inv_player_2_parameter(playerid, 91) == point_guns_zone[2])
 			{
 				point_guns_zone[3] = point_guns_zone[3]+1*value
 			}
-			else if(search_inv_player_2_parameter(playerid, 91) != 0 && name_mafia[search_inv_player_2_parameter(playerid, 91)] == point_guns_zone[4])
+			else if(search_inv_player_2_parameter(playerid, 91) != 0 && search_inv_player_2_parameter(playerid, 91) == point_guns_zone[4])
 			{
 				point_guns_zone[5] = point_guns_zone[5]+1*value
 			}
@@ -2969,8 +2969,7 @@ function EngineState()//двигатель вкл или выкл
 			
 		if(dviglo[plate] == 1)
 		{
-
-			setVehicleFuel(vehicleid, max_fuel)
+			setVehicleFuel(vehicleid, (motor_show[getVehicleModel(vehicleid)][2]/max_fuel)*fuel[plate])
 		}
 		else
 		{
@@ -3079,10 +3078,10 @@ function debuginfo ()
 	local text_guns_zone = ""
 	foreach(i, v in guns_zone)
 	{
-		text_guns_zone = text_guns_zone + v[0]+"/"+v[1]+"/"+v[2]+"/"+v[3]+"/"+v[4]+"/"+i+"|"
+		text_guns_zone = text_guns_zone + v[0]+"/"+v[1]+"/"+v[2]+"/"+v[3]+"/"+name_mafia[v[4]]+"/"+i+"|"
 	}
 
-	local text_guns_zone2 = point_guns_zone[0]+"/"+point_guns_zone[1]+"/"+point_guns_zone[2]+"/"+point_guns_zone[3]+"/"+point_guns_zone[4]+"/"+point_guns_zone[5]+"/"+time_guns_zone
+	local text_guns_zone2 = point_guns_zone[0]+"/"+point_guns_zone[1]+"/"+name_mafia[point_guns_zone[2]]+"/"+point_guns_zone[3]+"/"+name_mafia[point_guns_zone[4]]+"/"+point_guns_zone[5]+"/"+time_guns_zone
 
 	if(point_guns_zone[0] == 1)
 	{
@@ -3096,7 +3095,7 @@ function debuginfo ()
 			{
 				guns_zone[point_guns_zone[1]][4] = point_guns_zone[2]
 
-				sendMessageAll(0, "[НОВОСТИ] "+point_guns_zone[2]+" захватила Guns Zone #"+point_guns_zone[1], green[0], green[1], green[2])
+				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[2]]+" захватила Guns Zone #"+point_guns_zone[1], green[0], green[1], green[2])
 
 				sqlite3( "UPDATE guns_zone SET mafia = '"+point_guns_zone[2]+"' WHERE number = '"+point_guns_zone[1]+"'")
 			}
@@ -3104,7 +3103,7 @@ function debuginfo ()
 			{
 				guns_zone[point_guns_zone[1]][4] = point_guns_zone[4]
 
-				sendMessageAll(0, "[НОВОСТИ] "+point_guns_zone[4]+" удержала Guns Zone #"+point_guns_zone[1], green[0], green[1], green[2])
+				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[4]]+" удержала Guns Zone #"+point_guns_zone[1], green[0], green[1], green[2])
 			}
 
 			point_guns_zone[0] = 0
@@ -3176,7 +3175,7 @@ function debuginfo ()
 		setElementData(playerid, "hygiene_data", hygiene[playerid])
 		setElementData(playerid, "sleep_data", sleep[playerid])
 		setElementData(playerid, "drugs_data", drugs[playerid])
-		setElementData(playerid, "fuel_data", 0)
+		//setElementData(playerid, "fuel_data", 0)
 		setElementData(playerid, "probeg_data", 0)
 		setElementData(playerid, "gps_device_data", gps_device[playerid])
 		setElementData(playerid, "zakon_alcohol", zakon_alcohol)
@@ -3209,7 +3208,7 @@ function debuginfo ()
 		if (isPlayerInVehicle(playerid))
 		{
 			local plate = getVehiclePlateText(vehicleid)
-			setElementData(playerid, "fuel_data", fuel[plate])
+			//setElementData(playerid, "fuel_data", fuel[plate])
 			setElementData(playerid, "probeg_data", probeg[plate])
 		}
 
@@ -4509,7 +4508,7 @@ function playerDeath( playerid, attacker )
 			{	
 				if(isPointInRectangle2D(myPos[0],myPos[1], v[0],v[1],v[2],v[3]) && k == point_guns_zone[1])
 				{
-					if(name_mafia[search_inv_player_2_parameter(playerid, 91)] == point_guns_zone[4] && name_mafia[search_inv_player_2_parameter(attacker, 91)] != point_guns_zone[4])
+					if(search_inv_player_2_parameter(playerid, 91) == point_guns_zone[4] && search_inv_player_2_parameter(attacker, 91) != point_guns_zone[4])
 					{
 						points_add_in_gz(attacker, 2)
 					}
@@ -7013,11 +7012,11 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			local count2 = 0
 			do_chat(playerid, "на голове "+info_png[id1][0]+" "+name_mafia[id2]+" - "+playername)
 
-			sendMessage(playerid, "====[ ПОД КОНТРОЛЕМ "+name_mafia[id2].toupper()+" ]====", yellow[0], yellow[1], yellow[2])
+			sendMessage(playerid, "====[ ПОД КОНТРОЛЕМ "+name_mafia[id2]+" ]====", yellow[0], yellow[1], yellow[2])
 
 			foreach(k,v in guns_zone)
 			{
-				if(v[4] == name_mafia[id2])
+				if(v[4] == id2)
 				{
 					count = count+1
 
@@ -8339,18 +8338,18 @@ function (playerid)
 
 	foreach (k, v in guns_zone)
 	{
-		if (isPointInRectangle2D(x,y, v[0],v[1],v[2],v[3]) && name_mafia[search_inv_player_2_parameter(playerid, 91)] != v[4])
+		if (isPointInRectangle2D(x,y, v[0],v[1],v[2],v[3]) && search_inv_player_2_parameter(playerid, 91) != v[4])
 		{
 			point_guns_zone[0] = 1
 			point_guns_zone[1] = k
 
-			point_guns_zone[2] = name_mafia[search_inv_player_2_parameter(playerid, 91)]
+			point_guns_zone[2] = search_inv_player_2_parameter(playerid, 91)
 			point_guns_zone[3] = 0
 
 			point_guns_zone[4] = v[4]
 			point_guns_zone[5] = 0
 
-			sendMessageAll(playerid, "[НОВОСТИ] "+playername+" из "+name_mafia[search_inv_player_2_parameter(playerid, 91)]+" захватывает Guns Zone #"+k+" - "+v[4], green[0], green[1], green[2])
+			sendMessageAll(playerid, "[НОВОСТИ] "+playername+" из "+name_mafia[search_inv_player_2_parameter(playerid, 91)]+" захватывает Guns Zone #"+k+" - "+name_mafia[v[4]], green[0], green[1], green[2])
 			return
 		}
 	}
