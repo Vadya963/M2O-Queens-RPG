@@ -533,7 +533,7 @@ local repair_shop = [
 	[info_png[65][0], 3, 15000, 65],
 	[info_png[71][0], 100, 50, 71],
 ]
-for (local i = 1; i <= 11; i++)//колеса
+for (local i = 0; i <= 11; i++)//колеса
 {
 	repair_shop.push([info_png[69][0], i, 1000, 69])
 }

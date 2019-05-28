@@ -749,7 +749,7 @@ local repair_shop = [
 	[info_png[65][0], 3, 15000, 65],
 	[info_png[71][0], 100, 50, 71],
 ]
-for (local i = 1; i <= 11; i++)//колеса
+for (local i = 0; i <= 11; i++)//колеса
 {
 	repair_shop.push([info_png[69][0], i, 1000, 69])
 }
@@ -1827,8 +1827,7 @@ function inv_car_throw_earth(vehicleid, id1, id2)//--выброс предмет
 			count = count+1
 
 			max_earth = max_earth+1
-			local j = max_earth
-			earth[j] <- [pos[0],pos[1],pos[2],id1,id2]
+			earth[max_earth] <- [pos[0],pos[1],pos[2],id1,id2]
 		}
 	}
 
@@ -5027,8 +5026,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 	}
 
 	max_earth = max_earth+1
-	local j = max_earth
-	earth[j] <- [myPos[0],myPos[1],myPos[2],id1,id2]
+	earth[max_earth] <- [myPos[0],myPos[1],myPos[2],id1,id2]
 
 	/*if (enter_house[playerid][1] == id2 && id1 == 25) {//--когда выбрасываешь ключ в инв-ре исчезают картинки(выкл из-за фичи)
 		triggerClientEvent( playerid, "event_tab_load", "house", "" )
@@ -6753,7 +6751,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				me_chat(playerid, playername+" установил(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 
-				id2 = result[1]["wheel"]
+				id2 = 0
 			}
 			else 
 			{
@@ -6773,7 +6771,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				
 				local plate = getVehiclePlateText(vehicleid)
 				local color = fromRGB(color_table[id2][0], color_table[id2][1], color_table[id2][2])
-				print(color_table[id2][0]+","+color_table[id2][1]+","+color_table[id2][2])
 
 				setVehicleColour(vehicleid, color_table[id2][0], color_table[id2][1], color_table[id2][2], color_table[id2][0], color_table[id2][1], color_table[id2][2])
 
@@ -8584,6 +8581,36 @@ function (playerid, id1, id2 )
 	{
 		sendMessage(playerid, "[ERROR] Инвентарь полон", red[0], red[1], red[2])
 	}
+})
+
+addCommandHandler ( "subearth",//--выдача предметов с числом
+function (playerid, id1, id2, count )
+{
+	local val1 = id1.tointeger()
+	local val2 = id2.tointeger()
+	local count = count.tointeger()
+	local playername = getPlayerName ( playerid )
+	local vehicleid = getPlayerVehicle ( playerid )
+	local pos = getPlayerPosition(playerid)
+
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	{
+		return
+	}
+
+	if (val1 > (info_png.len()-1) || val1 < 2)
+	{
+		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red[0], red[1], red[2])
+		return
+	}
+
+	for (local i = 0; i < count; i++) 
+	{
+		max_earth = max_earth+1
+		earth[max_earth] <- [pos[0],pos[1],pos[2],val1,val2]
+	}
+
+	sendMessage(playerid, "Вы создали на земле "+info_png[val1][0]+" "+val2+" "+info_png[val1][1]+" "+count+" шт", lyme[0], lyme[1], lyme[2])
 })
 
 addCommandHandler ( "prisonplayer",//--(посадить игрока в тюрьму)
