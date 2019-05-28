@@ -932,6 +932,7 @@ local job_timer = array(getMaxPlayers(), 0)//таймер угона
 local car_27 = array(getMaxPlayers(), 0)//переменная для 27 тс
 local tp_player_lh = array(getMaxPlayers(), 0)//таймер перелета из еб в лх
 local admin_tp = array(getMaxPlayers(), 0)//админ тп
+local skin_timer = array(getMaxPlayers(), 0)//смена скина
 
 //для истории сообщений
 local max_message = 15//максимально отображаемое число сообщений
@@ -4018,29 +4019,33 @@ function spawn_weather (hour)
 	}
 }
 
-function need_1 ()
+function need_1 (playerid, value)//смена скина на бомжа
 {
-	foreach (playerid, playername in getPlayers()) 
+	if (value != "stop")
 	{
-		local playername = getPlayerName(playerid)
+		skin_timer[playerid] = timer(function () {
+			local playername = getPlayerName(playerid)
+			local result = sqlite3( "SELECT * FROM account WHERE name = '"+playername+"'" )
 
-		if (logged[playerid] == 1)
-		{	
-			if (!isPlayerInVehicle(playerid))
+			//--нужды
+			if (hygiene[playerid] == 0 && getPlayerModel(playerid) != 153)
 			{
-				local result = sqlite3( "SELECT * FROM account WHERE name = '"+playername+"'" )
-
-				//--нужды
-				if (hygiene[playerid] == 0 && getPlayerModel(playerid) != 153)
-				{
-					setPlayerModel(playerid, 153)
-				}
-				else if (hygiene[playerid] > 0 && getPlayerModel(playerid) != result[1]["skin"])
-				{
-					setPlayerModel(playerid, result[1]["skin"])
-				}
+				setPlayerModel(playerid, 153)
 			}
+			else if (hygiene[playerid] > 0 && getPlayerModel(playerid) != result[1]["skin"])
+			{
+				setPlayerModel(playerid, result[1]["skin"])
+			}
+			print(playerid+" "+result[1]["skin"]+" "+hygiene[playerid])
+		}, 10000, -1)
+	}
+	else
+	{	
+		if(skin_timer[playerid] != 0)
+		{
+			skin_timer[playerid].Kill()
 		}
+		skin_timer[playerid] = 0
 	}
 }
 
@@ -4257,7 +4262,6 @@ function()
 	timer( element_data_push_client, 1000, -1)//--элементдата
 	timer( timeserver, 1000, -1 )//время сервера 1 игровой час = 1 мин реальных
 	timer(need, 60000, -1)//--уменьшение потребностей
-	timer(need_1, 5000, -1)//--смена скина на бомжа
 	timer(pay_nalog, (60*60000), -1)//--списание налогов
 	timer(prison, 60000, -1)//--таймер заключения в тюрьме
 	timer(prison_timer, 1000, -1)//--античит если не в тюрьме
@@ -4377,6 +4381,7 @@ function( playerid, name, ip, serial )
 	job_timer[playerid] = 0
 	tp_player_lh[playerid] = 0
 	admin_tp[playerid] = [0,0]
+	skin_timer[playerid] = 0
 
 	//--нужды
 	alcohol[playerid] = 0
@@ -4435,6 +4440,7 @@ function playerDisconnect( playerid, reason )
 		job_0(playerid)
 		car_theft_fun(playerid)
 		tp_player(playerid, "kill")
+		need_1(playerid, "stop")
 
 		logged[playerid] = 0
 	}
@@ -4530,6 +4536,7 @@ function playerDeath( playerid, attacker )
 	robbery_kill(playerid)
 	job_0( playerid )
 	car_theft_fun(playerid)
+	tp_player(playerid, "kill")
 }
 addEventHandler( "onPlayerDeath", playerDeath )
 
@@ -4756,6 +4763,8 @@ function reg_or_login(playerid)
 			}, 5000, -1)*/
 		}
 	}
+
+	need_1(playerid, "start")
 }
 
 //вход в авто
@@ -4764,6 +4773,8 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 	local playername = getPlayerName ( playerid )
 	local plate = getVehiclePlateText(vehicleid)
 	sead[playerid] = seat
+
+	need_1(playerid, "stop")
 
 	if (seat == 0)
 	{
@@ -4829,6 +4840,8 @@ function PlayerVehicleExit( playerid, vehicleid, seat )
 	local carpos = getVehiclePosition(vehicleid)
 	local carrot = getVehicleRotation(vehicleid)
 	sead[playerid] = -1
+
+	need_1(playerid, "start")
 
 	if (seat == 0)
 	{
