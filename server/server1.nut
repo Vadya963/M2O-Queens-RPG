@@ -27,6 +27,7 @@ function sqlite3(text)
 	return result
 }
 local element_data = {}
+local pogoda = false//зима(false) или лето(true)
 local hour = 6
 local minute = 0
 local earth = {//--слоты земли
@@ -349,7 +350,6 @@ local motor_show = [
 	[53,770,40,"Walter Coupe",1]
 ]
 
-local pogoda = true//зима(false) или лето(true)
 local pogoda_string_true = [1,1]
 local weather_server_true = {
 	[1] =["DT_RTRclear_day_night", "DT_RTRclear_day_morning", "DT_RTRclear_day_afternoon", "DT_RTRclear_day_evening"],
@@ -770,6 +770,7 @@ local mayoralty_shop = [
 	[info_png[34][0]+" Развозчик алкоголя", 8, 5000, 34],
 	[info_png[34][0]+" Водитель автобуса", 9, 5000, 34],
 	[info_png[34][0]+" Перевозчик оружия", 10, 5000, 34],
+	[info_png[34][0]+" Развозчик угля", 11, 5000, 34],
 	[info_png[67][0], 1, 10, 67],
 	["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog), 48],
 	["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog), 49],
@@ -802,13 +803,14 @@ local weapon_cops = {
 //-места поднятия предметов
 local up_car_subject = [//--{x,y,z, радиус 3, ид пнг 4, ид тс 5, зп 6}
 	[-632.282,955.495,-17.7324, 15.0, 24, 35, 100],//--склад продуктов
-	[1332.08,1284.72,-0.306898, 15.0, 61, 35, 200],//--нефтебаза
+	[1332.08,1284.72,-0.306898, 10.0, 61, 35, 200],//--нефтебаза
 	[-1671.4,-300.838,-20.38, 15.0, 87, 35, 200],//стройматериалы
 	[374.967,117.759,-21.0186, 5.0, 83, 38, 200],//--погрузка рыбы с рз
 	[-217.361,-724.751,-21.4251, 15.0, 82, 38, 50],//--погрузка рыбы для рз
 	[650.084,-415.088,-20.1636, 15.0, 53, 19, 200],//молокозавод
 	[-1547.07,-108.065,-18.4974, 15.0, 62, 35, 200],//алко склад
 	[-266.696,-723.971,-21.5144, 15.0, 80, 27, 200],//склад оружия
+	[1318.41,1301.02,0.0099332, 10.0, 90, 35, 200],//склад угля
 ]
 
 local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, скин 6}
@@ -3809,6 +3811,65 @@ function job_timer2 ()
 				}
 			}
 
+			else if (job[playerid] == 11) //--перевозчик угля
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == up_car_subject[8][5])
+					{
+						if (getSpeed(vehicleid) < 1)
+						{
+							if (job_call[playerid] == 0) //--нету вызова
+							{
+								sendMessage(playerid, "Езжайте на место погрузки", yellow[0], yellow[1], yellow[2])
+
+								job_call[playerid] = 1
+								job_pos[playerid] = [up_car_subject[8][0],up_car_subject[8][1],up_car_subject[8][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+
+								if(amount_inv_car_1_parameter(vehicleid, up_car_subject[8][4]) != 0)
+								{
+									job_pos[playerid] = [x,y,z]
+								}
+							}
+							else if (job_call[playerid] == 1) //--есть вызов
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[8][3]))
+								{
+									local randomize = random(0,coal_pos.len()-1)
+
+									job_call[playerid] = 2
+
+									job_pos[playerid] = [coal_pos[randomize][0],coal_pos[randomize][1],coal_pos[randomize][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+								}
+							}
+							else if (job_call[playerid] == 2) //--сдаем вызов
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
+								{
+									local randomize = amount_inv_car_2_parameter(vehicleid, up_car_subject[8][4])
+
+									inv_car_delet_1_parameter(playerid, up_car_subject[8][4], true)
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+									sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
+
+									triggerClientEvent(playerid, "removegps")
+									
+									job_pos[playerid] = 0
+									job_call[playerid] = 0
+								}
+							}
+						}
+					}
+				}
+			}
+
 			else if (job[playerid] == 0)//--нету работы
 			{
 				job_0( playerid )
@@ -4036,7 +4097,6 @@ function need_1 (playerid, value)//смена скина на бомжа
 			{
 				setPlayerModel(playerid, result[1]["skin"])
 			}
-			print(playerid+" "+result[1]["skin"]+" "+hygiene[playerid])
 		}, 10000, -1)
 	}
 	else
@@ -5468,6 +5528,19 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 					return
 				}
 			}
+			else if (id1 == 90)
+			{
+				if (search_inv_player(playerid, 34, 11) == 0)
+				{
+					sendMessage(playerid, "[ERROR] Вы не развозчик угля", red[0], red[1], red[2])
+					return
+				}
+				else if (pogoda)
+				{
+					sendMessage(playerid, "[ERROR] Работа доступна зимой", red[0], red[1], red[2])
+					return
+				}
+			}
 
 
 			inv_car_empty(playerid, id1, id2)
@@ -5515,6 +5588,10 @@ function give_subject( playerid, value, id1, id2 )//--выдача предме�
 			else if (id1 == 87) 
 			{
 				sendMessage(playerid, "[TIPS] Езжайте на стройплощадку в Хилвуд, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
+			}
+			else if (id1 == 90) 
+			{
+				sendMessage(playerid, "[TIPS] Езжайте на место, чтобы разгрузиться", color_tips[0], color_tips[1], color_tips[2])
 			}
 		}
 		else
@@ -6397,6 +6474,23 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					job[playerid] = 10
 
 					me_chat(playerid, playername+" вышел(ла) на работу Перевозчик оружия")
+				}
+				else
+				{
+					job[playerid] = 0
+
+					car_theft_fun(playerid)
+
+					me_chat(playerid, playername+" закончил(а) работу")
+				}
+			}
+			else if(id2 == 11)
+			{
+				if (job[playerid] == 0)
+				{
+					job[playerid] = 11
+
+					me_chat(playerid, playername+" вышел(ла) на работу Развозчик угля")
 				}
 				else
 				{
