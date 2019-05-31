@@ -27,7 +27,7 @@ function sqlite3(text)
 	return result
 }
 local element_data = {}
-local pogoda = false//зима(false) или лето(true)
+local pogoda = true//зима(false) или лето(true)
 local hour = 6
 local minute = 0
 local earth = {//--слоты земли
@@ -289,6 +289,7 @@ local info_png = {
 	[89] = ["рация", "канал"],
 	[90] = ["уголь", "кг"],
 	[91] = ["шляпа", ""],
+	[92] = ["jetpack", "шт"],
 }
 
 //цены автосалона
@@ -6607,7 +6608,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 		}
-		else if (id1 == 37) //--адм
+		else if (id1 == 92) //--адм
 		{
 			if (admin_tp[playerid][0] == 0)
 			{
