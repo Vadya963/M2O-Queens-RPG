@@ -272,7 +272,7 @@ local info_png = {
 	[72] = ["виски", "шт"],
 	[73] = ["рыба", "кг"],
 	[74] = ["удочка", "процентов"],
-	[75] = ["маршрутный лист", "из 20 ост."],
+	[75] = ["#1 маршрутный лист", "ост."],
 	[76] = ["динамит", "шт"],
 	[77] = ["шнур", "шт"],
 	[78] = ["тратил", "гр"],
@@ -747,7 +747,7 @@ local giuseppe = [
 local repair_shop = [
 	[info_png[23][0], 1, 100, 23],
 	[info_png[35][0], 10, 500, 35],
-	[info_png[65][0], 3, 15000, 65],
+	[info_png[65][0], 3, 30000, 65],
 	[info_png[71][0], 100, 50, 71],
 ]
 for (local i = 0; i <= 11; i++)//колеса
@@ -4907,7 +4907,7 @@ function PlayerVehicleExit( playerid, vehicleid, seat )
 	if (seat == 0)
 	{
 		local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
-		if (result[1]["COUNT()"] == 1 && search_inv_player(playerid, 6, plate.tointeger()) != 0)
+		if (result[1]["COUNT()"] == 1)
 		{	
 			sqlite3( "UPDATE car_db SET x = '"+carpos[0]+"', y = '"+carpos[1]+"', z = '"+carpos[2]+"', rot = '"+carrot[0]+"', fuel = '"+fuel[plate]+"', probeg = '"+probeg[plate]+"' WHERE number = '"+plate+"'")
 		}
