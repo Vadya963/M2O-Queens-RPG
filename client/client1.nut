@@ -1437,9 +1437,10 @@ function( post )
 		local sleep = getElementData ( "sleep_data" ).tofloat()//--макс 100
 		local drugs = getElementData ( "drugs_data" ).tofloat()//--макс 100
 		local heal_player = split(getPlayerHealth(playerid).tostring(), ".")
+		local timeserver = split(getElementData("timeserver"), "-")
 
 		local client_time = getDateTime()
-		local text = "FPS: "+FPS+" | Ping: "+getPlayerPing(playerid)+" | ID: "+playerid+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | Time: "+getElementData("timeserver")+" | "+client_time
+		local text = "FPS: "+FPS+" | Ping: "+getPlayerPing(playerid)+" | ID: "+playerid+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | Time: "+timeserver[0]+":"+timeserver[1]+" | "+client_time
 		dxdrawtext ( text, 2.0, 0.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 
 		if (getPlayerVehicle(playerid) != -1)

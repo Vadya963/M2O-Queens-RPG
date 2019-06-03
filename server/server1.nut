@@ -957,17 +957,17 @@ local array_house_2 = {}
 function sendMessage(playerid, text, r, g, b)
 {
 	local date = split(getDateTime(), ": ")//установка времени
-	local chas = date[3].tointeger()
-	local min = date[4].tointeger()
-	local sec = date[5].tointeger()
+	local chas = date[3]
+	local min = date[4]
+	local sec = date[5]
 
 	for (local i = min_chat[playerid]; i < message[playerid].len(); i++) 
 	{
 		sendPlayerMessage(playerid, message[playerid][i][0], message[playerid][i][1],message[playerid][i][2], message[playerid][i][3] )
 	}
 
-	sendPlayerMessage(playerid, "[ "+chas+":"+min+":"+sec+" ] "+text, r, g, b)
-	message_chat(playerid, "[ "+chas+":"+min+":"+sec+" ] "+text, r,g,b)
+	sendPlayerMessage(playerid, "["+chas+":"+min+":"+sec+"] "+text, r, g, b)
+	message_chat(playerid, "["+chas+":"+min+":"+sec+"] "+text, r,g,b)
 
 	max_chat[playerid] = message[playerid].len()
 	min_chat[playerid] = max_chat[playerid] - max_message
@@ -3172,7 +3172,6 @@ function debuginfo ()
 		setElementData(playerid, "22", "sead_custom[playerid] "+sead_custom[playerid][0]+", "+sead_custom[playerid][1])*/
 
 		setElementData(playerid, "serial", getPlayerSerial(playerid))
-		setElementData(playerid, "timeserver", hour+"-"+minute)
 		setElementData(playerid, "alcohol_data", alcohol[playerid])
 		setElementData(playerid, "satiety_data", satiety[playerid])
 		setElementData(playerid, "hygiene_data", hygiene[playerid])
@@ -3193,6 +3192,15 @@ function debuginfo ()
 		else
 		{
 			setElementData(playerid, "guns_zone2", "0/0/0/0/0/0/0")
+		}
+
+		if (minute < 10)
+		{
+			setElementData(playerid, "timeserver", hour+"-0"+minute)
+		}
+		else
+		{
+			setElementData(playerid, "timeserver", hour+"-"+minute)
 		}
 
 		for (local i = 0; i < getMaxPlayers(); i++) 
