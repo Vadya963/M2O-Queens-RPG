@@ -27,7 +27,7 @@ function sqlite3(text)
 	return result
 }
 local element_data = {}
-local pogoda = true//зима(false) или лето(true)
+local pogoda = false//зима(false) или лето(true)
 local hour = 6
 local minute = 0
 local earth = {//--слоты земли
@@ -48,7 +48,7 @@ local crimes_giuseppe = 25//прес-ия для джузеппе
 local business_pos = {}//--позиции бизнесов
 local house_pos = {}//--позиции домов
 local day_nalog = 7//кол-во дней для оплаты налога
-local no_use_wheel_and_engine = [20,27,35,37,38]
+local no_use_wheel_and_engine = [20,27,35,37,38,39]
 local police_chanel = 1//канал копов
 //нужды
 local max_alcohol = 500
@@ -78,6 +78,7 @@ local zp_car_63 = 200
 local zp_car_54 = 200
 local zp_player_73 = 50
 local zp_player_71 = 500
+local zp_player_93 = 24000
 //вместимость складов бизнесов
 local max_business = 100
 local max_sg = 1000
@@ -290,6 +291,7 @@ local info_png = {
 	[90] = ["уголь", "кг"],
 	[91] = ["шляпа", ""],
 	[92] = ["jetpack", "шт"],
+	[93] = ["#2 маршрутный лист", "ост."],
 }
 
 //цены автосалона
@@ -334,7 +336,7 @@ local motor_show = [
 	[36,0,100,"Shubert Truck Flatbed",1],
 	[37,30000,100,"Shubert Truck Covered",1],
 	[38,2000,100,"Shubert Truck Seagift",1],
-	[39,0,100,"Shubert Show Plow",1],
+	[39,2000,100,"Shubert Show Plow",1],
 	[40,0,80,"Military Truck",1],
 	[41,21400,80,"Smith Custom 200",3],
 	[42,25000,80,"Smith Custom 200 Police Special",3],
@@ -772,6 +774,7 @@ local mayoralty_shop = [
 	[info_png[34][0]+" Водитель автобуса", 9, 5000, 34],
 	[info_png[34][0]+" Перевозчик оружия", 10, 5000, 34],
 	[info_png[34][0]+" Развозчик угля", 11, 5000, 34],
+	[info_png[34][0]+" Уборщик снега ЭБ", 12, 5000, 34],
 	[info_png[67][0], 1, 10, 67],
 	["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog), 48],
 	["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog), 49],
@@ -820,7 +823,8 @@ local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, с
 	[826.577,565.208,-11.196, 5.0, 56, 1, 62],//--банк металла
 	[26.051,1828.37,-16.9628, 2.0, 39, 1, 131],//--мясокомбинат
 	[1234.46,1188.59,0.489151, 5.0, 59, 1, 134],//--рудокоп
-	[-422.731,479.451,0.1, 5.0, 75, 1, 171],//автобусное депо
+	[-422.731,485.439,0.10922, 5.0, 75, 1, 171],//автобусное депо
+	[-422.731,473.258,0.109216, 5.0, 93, 1, 0],//автобусное депо уборка снега
 ]
 
 //--места сброса предметов
@@ -3709,7 +3713,7 @@ function job_timer2 ()
 			{
 				if (isPlayerInVehicle(playerid))
 				{
-					if (getVehicleModel(vehicleid) == 20)
+					if (getVehicleModel(vehicleid) == 20 && getPlayerModel(playerid) == 171)
 					{
 						if (getSpeed(vehicleid) < 1 && search_inv_player_2_parameter(playerid, 75) != 0)
 						{
@@ -3870,6 +3874,62 @@ function job_timer2 ()
 
 									triggerClientEvent(playerid, "removegps")
 									
+									job_pos[playerid] = 0
+									job_call[playerid] = 0
+								}
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 12) //--уборка снега
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == 39)
+					{
+						if (getSpeed(vehicleid) < 41*1.6 && search_inv_player_2_parameter(playerid, 93) != 0)
+						{
+							if (job_call[playerid] == 0) //--нету вызова
+							{
+								sendMessage(playerid, "Езжайте по маршруту", yellow[0], yellow[1], yellow[2])
+
+								job_call[playerid] = search_inv_player_2_parameter(playerid, 93)
+								job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							}
+							else if (job_call[playerid] >= 1 && job_call[playerid] <= 19) //--есть вызов
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 10.0))
+								{
+									inv_player_delet(playerid, 93, job_call[playerid], true)
+
+									job_call[playerid] = job_call[playerid]+1
+
+									inv_player_empty(playerid, 93, job_call[playerid])
+
+									job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+								}
+							}
+							else if (job_call[playerid] == 20) //--сдаем вызов
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 15.0))
+								{
+									local randomize = random(zp_player_93/2,zp_player_93)
+
+									inv_player_delet(playerid, 93, job_call[playerid], true)
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", green[0], green[1], green[2])
+
+									triggerClientEvent(playerid, "removegps")
+										
 									job_pos[playerid] = 0
 									job_call[playerid] = 0
 								}
@@ -6334,8 +6394,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				{
 					job[playerid] = 0
 
-					car_theft_fun(playerid)
-
 					me_chat(playerid, playername+" закончил(а) работу")
 				}
 			}
@@ -6350,8 +6408,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				else
 				{
 					job[playerid] = 0
-
-					car_theft_fun(playerid)
 
 					me_chat(playerid, playername+" закончил(а) работу")
 				}
@@ -6374,8 +6430,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				{
 					job[playerid] = 0
 
-					car_theft_fun(playerid)
-
 					me_chat(playerid, playername+" закончил(а) работу")
 				}
 			}
@@ -6390,8 +6444,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				else
 				{
 					job[playerid] = 0
-
-					car_theft_fun(playerid)
 
 					me_chat(playerid, playername+" закончил(а) работу")
 				}
@@ -6414,8 +6466,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				{
 					job[playerid] = 0
 
-					car_theft_fun(playerid)
-
 					me_chat(playerid, playername+" закончил(а) работу")
 				}
 			}
@@ -6430,8 +6480,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				else
 				{
 					job[playerid] = 0
-
-					car_theft_fun(playerid)
 
 					me_chat(playerid, playername+" закончил(а) работу")
 				}
@@ -6448,8 +6496,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				{
 					job[playerid] = 0
 
-					car_theft_fun(playerid)
-
 					me_chat(playerid, playername+" закончил(а) работу")
 				}
 			}
@@ -6464,8 +6510,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				else
 				{
 					job[playerid] = 0
-
-					car_theft_fun(playerid)
 
 					me_chat(playerid, playername+" закончил(а) работу")
 				}
@@ -6488,8 +6532,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				{
 					job[playerid] = 0
 
-					car_theft_fun(playerid)
-
 					me_chat(playerid, playername+" закончил(а) работу")
 				}
 			}
@@ -6505,10 +6547,34 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				{
 					job[playerid] = 0
 
-					car_theft_fun(playerid)
+					me_chat(playerid, playername+" закончил(а) работу")
+				}
+			}
+			else if(id2 == 12)
+			{
+				if (pogoda)
+				{
+					sendMessage(playerid, "[ERROR] Работа доступна зимой", red[0], red[1], red[2])
+					return
+				}
+
+				if (job[playerid] == 0)
+				{
+					job[playerid] = 12
+
+					me_chat(playerid, playername+" вышел(ла) на работу Уборщик снега ЭБ")
+				}
+				else
+				{
+					job[playerid] = 0
 
 					me_chat(playerid, playername+" закончил(а) работу")
 				}
+			}
+
+			if(job[playerid] == 0)
+			{
+				car_theft_fun(playerid)
 			}
 
 			return

@@ -157,6 +157,7 @@ local info_png = {
 	[90] = ["уголь", "кг"],
 	[91] = ["шляпа", ""],
 	[92] = ["jetpack", "шт"],
+	[93] = ["#2 маршрутный лист", "ост."],
 }
 
 //цены автосалона
@@ -201,7 +202,7 @@ local motor_show = [
 	//[36,0,100,"Shubert Truck Flatbed"],
 	//[37,30000,100,"Shubert Truck Covered"],
 	[38,2000,100,"Shubert Truck Seagift",1],
-	//[39,0,100,"Shubert Show Plow"],
+	[39,2000,100,"Shubert Show Plow"],
 	//[40,0,80,"Military Truck"],
 	[41,21400,80,"Smith Custom 200",3],
 	[42,25000,80,"Smith Custom 200 Police Special",3],
