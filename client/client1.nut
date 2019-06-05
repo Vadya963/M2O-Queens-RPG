@@ -705,14 +705,14 @@ guiSetVisibleGridList (player_menu, false)
 local shop_menu_button = guiCreateElement( 2, "купить", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 400.0, 30.0, false )
 guiSetVisible( shop_menu_button, false )
 
-local shop_menu_button2 = guiCreateElement( 2, "<", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
+local shop_menu_button2 = guiCreateElement( 2, "<--", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
 guiSetVisible( shop_menu_button2, false )
-local shop_menu_button3 = guiCreateElement( 2, ">", (screen[0]/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
+local shop_menu_button3 = guiCreateElement( 2, "-->", (screen[0]/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
 guiSetVisible( shop_menu_button3, false )
 
-local shop_menu_button4 = guiCreateElement( 2, "<", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
+local shop_menu_button4 = guiCreateElement( 2, "<--", (screen[0]/2)-(400.0/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
 guiSetVisible( shop_menu_button4, false )
-local shop_menu_button5 = guiCreateElement( 2, ">", (screen[0]/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
+local shop_menu_button5 = guiCreateElement( 2, "-->", (screen[0]/2), (screen[1]/2)+(320.0/2), 200.0, 30.0, false )
 guiSetVisible( shop_menu_button5, false )
 
 function tune_close ()//--закрытие окна

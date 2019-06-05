@@ -27,7 +27,7 @@ function sqlite3(text)
 	return result
 }
 local element_data = {}
-local pogoda = false//зима(false) или лето(true)
+local pogoda = true //зима(false) или лето(true)
 local hour = 6
 local minute = 0
 local earth = {//--слоты земли
