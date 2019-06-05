@@ -1855,6 +1855,24 @@ function getSpeed(vehicleid)
 	local speed = getDistanceBetweenPoints3D(0.0,0.0,0.0, velo[0],velo[1],velo[2])
 	return speed*2.27*1.6
 }
+
+function setVehiclePartOpen_fun(playerid, value)
+{
+	local vehicleid = getPlayerVehicle(playerid)
+
+	if(vehicleid != -1)
+	{
+		if(value == "true")
+		{
+			setVehiclePartOpen( vehicleid, VEHICLE_PART_TRUNK, true )
+		}
+		else
+		{
+			setVehiclePartOpen( vehicleid, VEHICLE_PART_TRUNK, false )
+		}
+	}
+}
+addEventHandler("event_setVehiclePartOpen_fun", setVehiclePartOpen_fun)
 //-------------------------------------------------------------------------------------------------
 
 //---------------------------------------дом-------------------------------------------------------------

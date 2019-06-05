@@ -1748,6 +1748,8 @@ function tab_down_fun(value)//инв-рь игрока
 		showCursor( false )
 
 		guiSetVisible( gui_fon, false )
+
+		triggerServerEvent("event_setVehiclePartOpen_fun", "false")
 	}
 	else if (value == 1)
 	{
@@ -1998,6 +2000,8 @@ function( element )
 			state_inv_player = false
 			state_inv_car = true
 			state_inv_house = false
+
+			triggerServerEvent("event_setVehiclePartOpen_fun", "true")
 		}
 		else if ( house != "" && ((button_pos[2][2]+pos_x_3d_image)) < pos[0] && ((button_pos[2][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[2][3])) < pos[1] && ((pos_y_3d_image-button_pos[2][3])+button_pos[2][3]) > pos[1] )
 		{
