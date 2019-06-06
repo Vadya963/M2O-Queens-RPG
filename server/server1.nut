@@ -208,7 +208,7 @@ local info_png = {
 	[7] = ["сигареты Big Break Blue", "сигарет"],
 	[8] = ["сигареты Big Break White", "сигарет"],
 	[9] = ["ПП Томпсона обр. 1928 г.", "боеприпасов"],
-	[10] = ["полицейский жетон", "шт"],
+	[10] = ["полицейский жетон", "ранг"],
 	[11] = ["газета", "шт"],
 	[12] = ["Револьвер кал. 38", "боеприпасов"],
 	[13] = ["Кольт 1911 п/авт.", "боеприпасов"],
@@ -289,7 +289,7 @@ local info_png = {
 	[88] = ["банковский чек на", "$"],
 	[89] = ["рация", "канал"],
 	[90] = ["уголь", "кг"],
-	[91] = ["шляпа", ""],
+	[91] = ["шляпа", "опг"],
 	[92] = ["jetpack", "шт"],
 	[93] = ["#2 маршрутный лист", "ост."],
 }
@@ -781,16 +781,15 @@ local mayoralty_shop = [
 	["квитанция для оплаты т/с на", day_nalog, (zakon_nalog_car*day_nalog), 50],
 ]
 
-local sub_cops = {
-	[10] = [info_png[10][0]],
-	[28] = [info_png[28][0]],
-	[29] = [info_png[29][0]],
-	[30] = [info_png[30][0]],
-	[31] = [info_png[31][0]],
-	[32] = [info_png[32][0]],
-	[46] = [info_png[46][0]],
-	[47] = [info_png[47][0]],
-}
+local sub_cops = [
+	[info_png[10][0]+" Офицера", 1, 10],
+	[info_png[10][0]+" Детектива", 2, 10],
+	[info_png[10][0]+" Сержанта", 3, 10],
+	[info_png[10][0]+" Лейтенанта", 4, 10],
+	[info_png[10][0]+" Капитан", 5, 10],
+	[info_png[46][0], 1, 46],
+	[info_png[47][0], 1, 47],
+]
 
 local weapon_cops = {
 	[9] = [info_png[9][0], 11, 4700],
@@ -2050,13 +2049,13 @@ function buy_subject_fun( playerid, text, number, value )
 			local text1 = v[0]
 			if (text1 == text)
 			{
-				if (search_inv_player(playerid, 33, 1) == 0)
+				if (search_inv_player(playerid, 10, 6) == 0)
 				{
 					sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red[0], red[1], red[2])
 					return
 				}
 
-				if (inv_player_empty(playerid, k, 1))
+				if (inv_player_empty(playerid, v[2], v[1]))
 				{
 					sendMessage(playerid, "Вы получили "+text, orange[0], orange[1], orange[2])
 				}
@@ -2125,7 +2124,7 @@ function buy_subject_fun( playerid, text, number, value )
 				{
 					foreach (k1, v1 in police_car) 
 					{
-						if (v1 == id && (search_inv_player(playerid, 10, 1) == 0 || search_inv_player(playerid, 33, 1) == 0))
+						if (v1 == id && (search_inv_player(playerid, 10, 6) == 0))
 						{
 							sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red[0], red[1], red[2])
 							return
@@ -4862,7 +4861,7 @@ function reg_or_login(playerid)
 		{
 			setPlayerColour(playerid, fromRGB(green[0],green[1],green[2]))
 		}
-		else if (search_inv_player(playerid, 10, 1) != 0)
+		else if (search_inv_player_2_parameter(playerid, 10) != 0)
 		{
 			setPlayerColour(playerid, fromRGB(blue[0],blue[1],blue[2]))
 		}
@@ -5425,7 +5424,7 @@ function x_down (playerid)
 
 			if ( isPointInCircle3D(x,y,z, interior_job[0][2],interior_job[0][3],interior_job[0][4], interior_job[0][7]) )//пд
 			{
-				if (search_inv_player(playerid, 10, 1) == 0)
+				if (search_inv_player_2_parameter(playerid, 10) == 0)
 				{
 					sendMessage(playerid, "[ERROR] Вы не полицейский", red[0], red[1], red[2])
 					return
@@ -6283,34 +6282,27 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{	
 			if (search_inv_player(playerid, 10, 1) != 0)
 			{
-				if (search_inv_player(playerid, 28, 1) != 0)
-				{
-					me_chat(playerid, "Офицер "+playername+" показал(а) "+info_png[id1][0])
-				}
-				else if (search_inv_player(playerid, 29, 1) != 0)
-				{
-					me_chat(playerid, "Детектив "+playername+" показал(а) "+info_png[id1][0])
-				}
-				else if (search_inv_player(playerid, 30, 1) != 0)
-				{
-					me_chat(playerid, "Сержант "+playername+" показал(а) "+info_png[id1][0])
-				}
-				else if (search_inv_player(playerid, 31, 1) != 0)
-				{
-					me_chat(playerid, "Лейтенант "+playername+" показал(а) "+info_png[id1][0])
-				}
-				else if (search_inv_player(playerid, 32, 1) != 0)
-				{
-					me_chat(playerid, "Капитан "+playername+" показал(а) "+info_png[id1][0])
-				}
-				else if (search_inv_player(playerid, 33, 1) != 0)
-				{
-					me_chat(playerid, "Шеф полиции "+playername+" показал(а) "+info_png[id1][0])
-				}
+				me_chat(playerid, "Офицер "+playername+" показал(а) "+info_png[id1][0])
 			}
-			else
+			else if (search_inv_player(playerid, 10, 2) != 0)
 			{
-				sendMessage(playerid, "[ERROR] Вы не полицейский", red[0], red[1], red[2])
+				me_chat(playerid, "Детектив "+playername+" показал(а) "+info_png[id1][0])
+			}
+			else if (search_inv_player(playerid, 10, 3) != 0)
+			{
+				me_chat(playerid, "Сержант "+playername+" показал(а) "+info_png[id1][0])
+			}
+			else if (search_inv_player(playerid, 10, 4) != 0)
+			{
+				me_chat(playerid, "Лейтенант "+playername+" показал(а) "+info_png[id1][0])
+			}
+			else if (search_inv_player(playerid, 10, 5) != 0)
+			{
+				me_chat(playerid, "Капитан "+playername+" показал(а) "+info_png[id1][0])
+			}
+			else if (search_inv_player(playerid, 10, 6) != 0)
+			{
+				me_chat(playerid, "Шеф полиции "+playername+" показал(а) "+info_png[id1][0])
 			}
 			return
 		}
@@ -7656,7 +7648,7 @@ function (playerid, id)
 		return
 	}
 
-	if (search_inv_player(playerid, 10, 1) == 0)
+	if (search_inv_player_2_parameter(playerid, 10) == 0)
 	{
 		sendMessage(playerid, "[ERROR] Вы не полицейский", red[0], red[1], red[2])
 		return
@@ -7771,7 +7763,7 @@ function (playerid, value, id)
 		return
 	}
 
-	if (search_inv_player(playerid, 10, 1) == 0)
+	if (search_inv_player_2_parameter(playerid, 10) == 0)
 	{
 		sendMessage(playerid, "[ERROR] Вы не полицейский", red[0], red[1], red[2])
 		return
@@ -7896,7 +7888,7 @@ function (playerid, id)
 		return
 	}
 
-	if (search_inv_player(playerid, 10, 1) == 0 || search_inv_player(playerid, 33, 1) == 0)
+	if (search_inv_player(playerid, 10, 6) == 0)
 	{
 		sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red[0], red[1], red[2])
 		return
@@ -7935,7 +7927,7 @@ function (playerid, id, rang)
 		return
 	}
 
-	if (search_inv_player(playerid, 10, 1) == 0 || search_inv_player(playerid, 33, 1) == 0)
+	if (search_inv_player(playerid, 10, 6) == 0)
 	{
 		sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red[0], red[1], red[2])
 		return
@@ -7975,7 +7967,7 @@ function (playerid, id)
 		return
 	}
 
-	if (search_inv_player(playerid, 10, 1) != 0)
+	if (search_inv_player_2_parameter(playerid, 10) != 0)
 	{
 		if (logged[id] == 0 || !isPlayerInVehicle(id))
 		{
@@ -8054,27 +8046,27 @@ function (playerid, ...)
 
 	if(radio_chanel == police_chanel)
 	{
-		if (search_inv_player(playerid, 28, 1) != 0)
+		if (search_inv_player(playerid, 10, 1) != 0)
 		{
 			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Офицер "+playername+" ["+playerid+"]: "+text)
 		}
-		else if (search_inv_player(playerid, 29, 1) != 0)
+		else if (search_inv_player(playerid, 10, 2) != 0)
 		{
 			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Детектив "+playername+" ["+playerid+"]: "+text)
 		}
-		else if (search_inv_player(playerid, 30, 1) != 0)
+		else if (search_inv_player(playerid, 10, 3) != 0)
 		{
 			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Сержант "+playername+" ["+playerid+"]: "+text)
 		}
-		else if (search_inv_player(playerid, 31, 1) != 0)
+		else if (search_inv_player(playerid, 10, 4) != 0)
 		{
 			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Лейтенант "+playername+" ["+playerid+"]: "+text)
 		}
-		else if (search_inv_player(playerid, 32, 1) != 0)
+		else if (search_inv_player(playerid, 10, 5) != 0)
 		{
 			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Капитан "+playername+" ["+playerid+"]: "+text)
 		}
-		else if (search_inv_player(playerid, 33, 1) != 0)
+		else if (search_inv_player(playerid, 10, 6) != 0)
 		{
 			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Шеф полиции "+playername+" ["+playerid+"]: "+text)
 		}
