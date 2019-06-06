@@ -6584,6 +6584,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if(job[playerid] == 0)
 			{
+				job_0(playerid)
 				car_theft_fun(playerid)
 			}
 
