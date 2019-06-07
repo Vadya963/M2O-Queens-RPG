@@ -1464,7 +1464,7 @@ function police_chat(playerid, text)
 	{
 		local playername = getPlayerName(player)
 
-		if (search_inv_player(player, 10, 1) != 0 && search_inv_player(player, 89, police_chanel) != 0)
+		if (search_inv_player_2_parameter(player, 10) != 0 && search_inv_player(player, 89, police_chanel) != 0)
 		{
 			sendMessage(player, text, blue[0], blue[1], blue[2])
 		}
@@ -6335,16 +6335,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				}
 			}
 
-			sendMessage(playerid, "====[ РОЗЫСК ]====", blue[0], blue[1], blue[2])
-
-			foreach (k, v in getPlayers())
-			{
-				if (crimes[k] != 0 && arrest[k] == 0)
-				{
-					sendMessage(playerid, v+" "+crimes[k]+" преступлений", blue[0], blue[1], blue[2])
-				}
-			}
-
 			me_chat(playerid, playername+" прочитал(а) газету")
 			return
 		}
@@ -8043,6 +8033,12 @@ function (playerid, ...)
 		text = text+vargv[i]+" "
 	}
 
+	if (text.len() > max_text_len)
+	{
+		sendMessage(playerid, "[ERROR] Максимальная длина сообщения "+max_text_len+" символов", red[0], red[1], red[2])
+		return
+	}
+
 	local radio_chanel = search_inv_player_2_parameter(playerid, 89)
 
 	if(radio_chanel == police_chanel)
@@ -8103,6 +8099,12 @@ function( playerid, id, ...)
 	for(local i = 0; i < vargv.len(); i++)
 	{
 		text = text+vargv[i]+" "
+	}
+
+	if (text.len() > max_text_len)
+	{
+		sendMessage(playerid, "[ERROR] Максимальная длина сообщения "+max_text_len+" символов", red[0], red[1], red[2])
+		return
 	}
 
 	local player_name = getPlayerName ( id )

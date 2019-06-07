@@ -318,6 +318,38 @@ for (local i = 200; i >= 50; i-=50) {
 	color_table.push([250,0,i])
 }*/
 
+//------------------------------------Element Data-------------------------------------------------
+function setElementData (key, value)
+{
+	triggerServerEvent( "event_setElementData", key, value )
+	//print("setElementData["+key+"] = "+value)
+}
+
+function getElementData (key)
+{	
+	if (element_data[key])
+	{
+		//print("getElementData["+key+"] = "+element_data[playerid][key])
+		return element_data[key]
+	}
+	else 
+	{
+		return "0"
+	}
+}
+
+function element_data_push_client(text)
+{
+	foreach (k, v in split(text, ";")) 
+	{
+		local spl = split(v.tostring(), ":")
+		element_data[spl[0]] <- spl[1]
+	}
+	//print("event_element_data_push_client["+key+"] = "+value)
+}
+addEventHandler ( "event_element_data_push_client", element_data_push_client )
+//-------------------------------------------------------------------------------------------------
+
 //--------------------------------------------грайдлист--------------------------------------------
 function guiCreateGridList (x,y, width, height)
 {
@@ -682,7 +714,7 @@ for (local i = 0; i < getMaxPlayers(); i++)
 {	
 	if(getPlayerName(i))
 	{
-		player_table[i] <- getPlayerName(i)
+		player_table[i] <- getPlayerName(i)+" (ОП - 0)"
 	}
 	else
 	{
@@ -1122,38 +1154,6 @@ function isPointInRectangle2D(x, y, x1, y1, x2, y2)
 		return false
 	}
 }
-
-//------------------------------------Element Data-------------------------------------------------
-function setElementData (key, value)
-{
-	triggerServerEvent( "event_setElementData", key, value )
-	//print("setElementData["+key+"] = "+value)
-}
-
-function getElementData (key)
-{	
-	if (element_data[key])
-	{
-		//print("getElementData["+key+"] = "+element_data[playerid][key])
-		return element_data[key]
-	}
-	else 
-	{
-		return "0"
-	}
-}
-
-function element_data_push_client(text)
-{
-	foreach (k, v in split(text, ";")) 
-	{
-		local spl = split(v.tostring(), ":")
-		element_data[spl[0]] <- spl[1]
-	}
-	//print("event_element_data_push_client["+key+"] = "+value)
-}
-addEventHandler ( "event_element_data_push_client", element_data_push_client )
-//-------------------------------------------------------------------------------------------------
 
 function blip_create(x, y, lib, icon, r)
 {
@@ -2208,7 +2208,7 @@ function( element )
 			{
 				if(getPlayerName(i))
 				{
-					local text = i+" "+getPlayerName(i)
+					local text = i+" "+getPlayerName(i)+" (ОП - "+getElementData("crimes["+i+"]")+")"
 					guiSetTextGridList (player_menu, i-max_lable*(player_menu_value-1), text)
 				}
 				else
