@@ -2235,7 +2235,7 @@ function( element )
 			{
 				if(getPlayerName(i))
 				{
-					local text = i+" "+getPlayerName(i)
+					local text = i+" "+getPlayerName(i)+" (ОП - "+getElementData("crimes["+i+"]")+")"
 					guiSetTextGridList (player_menu, i-max_lable*(player_menu_value-1), text)
 				}
 				else
