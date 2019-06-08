@@ -3851,48 +3851,32 @@ function job_timer2 ()
 						{
 							if (job_call[playerid] == 0) 
 							{
-								sendMessage(playerid, "Езжайте на место погрузки", yellow[0], yellow[1], yellow[2])
+								local randomize = random(0,coal_pos.len()-1)
+
+								sendMessage(playerid, "Езжайте в Северный Милвилл чтобы загрузить уголь, а потом доставьте его по адресу", yellow[0], yellow[1], yellow[2])
 
 								job_call[playerid] = 1
-								job_pos[playerid] = [up_car_subject[8][0],up_car_subject[8][1],up_car_subject[8][2]]
+								job_pos[playerid] = [coal_pos[randomize][0],coal_pos[randomize][1],coal_pos[randomize][2]]
 
 								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-
-								if(amount_inv_car_1_parameter(vehicleid, up_car_subject[8][4]) != 0)
-								{
-									job_pos[playerid] = [x,y,z]
-								}
 							}
 							else if (job_call[playerid] == 1) 
 							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[8][3]))
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[8][3]) && amount_inv_car_1_parameter(vehicleid, up_car_subject[8][4]) != 0)
 								{
+									local sic2p = amount_inv_car_2_parameter(vehicleid, up_car_subject[8][4])
 									local randomize = random(0,coal_pos.len()-1)
-
-									job_call[playerid] = 2
 
 									job_pos[playerid] = [coal_pos[randomize][0],coal_pos[randomize][1],coal_pos[randomize][2]]
 
 									triggerClientEvent(playerid, "removegps")
 									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-								}
-							}
-							else if (job_call[playerid] == 2) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
-								{
-									local randomize = amount_inv_car_2_parameter(vehicleid, up_car_subject[8][4])
 
 									inv_car_delet_1_parameter(playerid, up_car_subject[8][4], true)
 
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
 
-									sendMessage(playerid, "Вы получили "+randomize+"$", green[0], green[1], green[2])
-
-									triggerClientEvent(playerid, "removegps")
-									
-									job_pos[playerid] = 0
-									job_call[playerid] = 0
+									sendMessage(playerid, "Вы получили "+sic2p+"$", green[0], green[1], green[2])
 								}
 							}
 						}
