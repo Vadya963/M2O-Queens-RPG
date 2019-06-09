@@ -3292,10 +3292,10 @@ function job_timer2 ()
 	local collector_pos = {}//позции для инкассатора
 	local milk_pos = {}//молочник
 
-	foreach (k, v in sqlite3( "SELECT * FROM house_db" )) 
+	foreach (k, v in house_pos) 
 	{
-		taxi_pos[taxi_pos.len()] <- [v["x"],v["y"],v["z"]]
-		milk_pos[milk_pos.len()] <- [v["x"],v["y"],v["z"]]
+		taxi_pos[taxi_pos.len()] <- [v[0],v[1],v[2]]
+		milk_pos[milk_pos.len()] <- [v[0],v[1],v[2]]
 	}
 
 	foreach (k, v in repair) 
