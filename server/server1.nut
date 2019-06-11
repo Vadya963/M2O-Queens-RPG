@@ -77,13 +77,13 @@ local zp_player_busdriver = 24000
 local zp_player_73 = 50
 local zp_player_71 = 500
 local zp_player_93 = 24000
+local money_guns_zone = 5000
+local money_guns_zone_business = 1000
 //вместимость складов бизнесов
 local max_business = 100
 local max_sg = 1000
 
 //капты-----------------------------------------------------------------------------------------------------------
-local money_guns_zone = 5000
-local money_guns_zone_business = 1000
 local point_guns_zone = [0,0, 0,0, 0,0]//0-идет ли захват, 1-номер зоны, 2-атакующие, 3-очки захвата, 4-защищающие, 5-очки захвата
 local time_gz = 1*60
 local time_guns_zone = time_gz
@@ -1637,6 +1637,30 @@ function points_add_in_gz(playerid, value)
 				point_guns_zone[5] = point_guns_zone[5]+1*value
 			}
 		}
+	}
+}
+
+function setPlayerColour_fun(playerid) 
+{
+	if (search_inv_player(playerid, 37, 1) != 0)
+	{
+		setPlayerColour(playerid, fromRGB(lyme[0],lyme[1],lyme[2]))
+	}
+	else if (search_inv_player(playerid, 38, 1) != 0)
+	{
+		setPlayerColour(playerid, fromRGB(green[0],green[1],green[2]))
+	}
+	else if (search_inv_player_2_parameter(playerid, 10) != 0)
+	{
+		setPlayerColour(playerid, fromRGB(blue[0],blue[1],blue[2]))
+	}
+	else if (search_inv_player_2_parameter(playerid, 91) != 0)
+	{
+		setPlayerColour(playerid, fromRGB(name_mafia[search_inv_player_2_parameter(playerid, 91)][1][0],name_mafia[search_inv_player_2_parameter(playerid, 91)][1][1],name_mafia[search_inv_player_2_parameter(playerid, 91)][1][2]))
+	}
+	else 
+	{
+		setPlayerColour(playerid, fromRGB(white[0],white[1],white[2]))
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -3748,13 +3772,13 @@ function job_timer2 ()
 				{
 					if (getVehicleModel(vehicleid) == 20 && getPlayerModel(playerid) == 171)
 					{
-						if (getSpeed(vehicleid) < 1 && search_inv_player_2_parameter(playerid, 75) != 0)
+						if (getSpeed(vehicleid) < 1 && search_inv_player_2_parameter(playerid, up_player_subject[5][4]) != 0)
 						{
 							if (job_call[playerid] == 0) 
 							{
 								sendMessage(playerid, "Езжайте по маршруту", yellow[0], yellow[1], yellow[2])
 
-								job_call[playerid] = search_inv_player_2_parameter(playerid, 75)
+								job_call[playerid] = search_inv_player_2_parameter(playerid, up_player_subject[5][4])
 								job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
 
 								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
@@ -3763,11 +3787,11 @@ function job_timer2 ()
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 10.0))
 								{
-									inv_player_delet(playerid, 75, job_call[playerid], true)
+									inv_player_delet(playerid, up_player_subject[5][4], job_call[playerid], true)
 
 									job_call[playerid] = job_call[playerid]+1
 
-									inv_player_empty(playerid, 75, job_call[playerid])
+									inv_player_empty(playerid, up_player_subject[5][4], job_call[playerid])
 
 									job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
 
@@ -3781,7 +3805,7 @@ function job_timer2 ()
 								{
 									local randomize = random(zp_player_busdriver/2,zp_player_busdriver)
 
-									inv_player_delet(playerid, 75, job_call[playerid], true)
+									inv_player_delet(playerid, up_player_subject[5][4], job_call[playerid], true)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 
@@ -3890,13 +3914,13 @@ function job_timer2 ()
 				{
 					if (getVehicleModel(vehicleid) == 39)
 					{
-						if (getSpeed(vehicleid) < 41*1.6 && search_inv_player_2_parameter(playerid, 93) != 0)
+						if (getSpeed(vehicleid) < 41*1.6 && search_inv_player_2_parameter(playerid, up_player_subject[6][4]) != 0)
 						{
 							if (job_call[playerid] == 0) 
 							{
 								sendMessage(playerid, "Езжайте по маршруту", yellow[0], yellow[1], yellow[2])
 
-								job_call[playerid] = search_inv_player_2_parameter(playerid, 93)
+								job_call[playerid] = search_inv_player_2_parameter(playerid, up_player_subject[6][4])
 								job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
 
 								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
@@ -3905,11 +3929,11 @@ function job_timer2 ()
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 10.0))
 								{
-									inv_player_delet(playerid, 93, job_call[playerid], true)
+									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true)
 
 									job_call[playerid] = job_call[playerid]+1
 
-									inv_player_empty(playerid, 93, job_call[playerid])
+									inv_player_empty(playerid, up_player_subject[6][4], job_call[playerid])
 
 									job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
 
@@ -3923,7 +3947,7 @@ function job_timer2 ()
 								{
 									local randomize = random(zp_player_93/2,zp_player_93)
 
-									inv_player_delet(playerid, 93, job_call[playerid], true)
+									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 
@@ -4843,26 +4867,7 @@ function reg_or_login(playerid)
 		setplayerhealth( playerid, result[1]["heal"] )
 		setPlayerModel(playerid, result[1]["skin"])
 
-		if (search_inv_player(playerid, 37, 1) != 0)
-		{
-			setPlayerColour(playerid, fromRGB(lyme[0],lyme[1],lyme[2]))
-		}
-		else if (search_inv_player(playerid, 38, 1) != 0)
-		{
-			setPlayerColour(playerid, fromRGB(green[0],green[1],green[2]))
-		}
-		else if (search_inv_player_2_parameter(playerid, 10) != 0)
-		{
-			setPlayerColour(playerid, fromRGB(blue[0],blue[1],blue[2]))
-		}
-		else if (search_inv_player_2_parameter(playerid, 91) != 0)
-		{
-			setPlayerColour(playerid, fromRGB(name_mafia[search_inv_player_2_parameter(playerid, 91)][1][0],name_mafia[search_inv_player_2_parameter(playerid, 91)][1][1],name_mafia[search_inv_player_2_parameter(playerid, 91)][1][2]))
-		}
-		else 
-		{
-			setPlayerColour(playerid, fromRGB(white[0],white[1],white[2]))
-		}
+		setPlayerColour_fun(playerid)
 
 		sendMessage(playerid, "Вы удачно зашли!", turquoise[0], turquoise[1], turquoise[2])
 
@@ -5192,6 +5197,8 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 
 	inv_server_load( playerid, value, id3, 0, 0, tabpanel )
 
+	setPlayerColour_fun(playerid)
+
 	me_chat(playerid, playername+" выбросил(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 	//sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], yellow[0], yellow[1], yellow[2])
 }
@@ -5302,6 +5309,8 @@ function e_down (playerid)//--подбор предметов с земли
 
 			if (inv_player_empty(playerid, v[3], v[4])) 
 			{
+				setPlayerColour_fun(playerid)
+				
 				me_chat(playerid, playername+" поднял(а) "+info_png[ v[3] ][0]+" "+v[4]+" "+info_png[ v[3] ][1])
 				//sendMessage(playerid, "Вы подняли "+info_png[ v[3] ][0]+" "+v[4]+" "+info_png[ v[3] ][1], svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2])
 
