@@ -159,65 +159,88 @@ local info_png = {
 	[92] = ["jetpack", "шт"],
 	[93] = ["#2 маршрутный лист", "ост."],
 }
+local craft_table = [//--[предмет 0, рецепт 1, предметы для крафта 2, кол-во предметов для крафта 3, предмет который скрафтится 4]
+	[info_png[76][0]+" 1 "+info_png[76][1], info_png[77][0]+" 1 "+info_png[77][1]+" + "+info_png[78][0]+" 100 "+info_png[78][1], "77,78", "1,100", "76,1"],
+	[info_png[20][0]+" 1 "+info_png[20][1], info_png[58][0]+" 3 "+info_png[58][1]+" + "+info_png[58][0]+" 78 "+info_png[58][1], "58,58", "3,78", "20,1"],
+]
 
 //цены автосалона
 local motor_show = [
-	//[ид(0), цена(1), вместимость бака(2), название(3)]
+	//[ид(0), цена(1), вместимость бака(2), название(3), кол-во пасс-их мест(4)]
 	[0,49950,60,"Ascot Bailey",1],
 	[1,50000,90,"Berkley Kingfisher",1],
-	//[2,0,0,"Trailer_1"],
-	//[3,0,200,"GAI 353 Military Truck"],
-	//[4,0,200,"Hank B"],
-	//[5,0,200,"Hank B Fuel Tank"],
+	[2,0,0,"Trailer_1",0],
+	[3,0,200,"GAI 353 Military Truck",1],
+	[4,0,200,"Hank B",1],
+	[5,0,200,"Hank B Fuel Tank",1],
 	[6,70000,70,"Walter Hot Rod",1],
 	[7,60000,70,"Smith 34 Hot Rod",1],
 	[8,60000,70,"Shubert Pickup Hot Rod",1],
 	[9,27400,70,"Houston Wasp",3],
 	[10,50000,70,"ISW 508",1],
-	//[11,9100,58,"Walter Military"],
+	[11,0,58,"Walter Military",1],
 	[12,9100,58,"Walter Utility",1],
 	[13,50000,90,"Jefferson Futura",1],
 	[14,32000,70,"Jefferson Provincial",1],
 	[15,35000,90,"Lassister Series 69",3],
-	//[16,0,90,"Lassister Series 69"],//копия
-	//[17,0,90,"Lassister Series 75 Hollywood"],//копия
+	[16,0,90,"Lassister Series 69",3],//копия
+	[17,0,90,"Lassister Series 75 Hollywood",3],//копия
 	[18,51700,90,"Lassister Series 75 Hollywood",3],
-	[19,2000,80,"Milk Truck",1],
-	[20,2000,150,"Parry Bus",20],
-	//[21,0,150,"Parry Bus Prison"],
+	[19,20000,80,"Milk Truck",1],
+	[20,20000,150,"Parry Bus",20],
+	[21,0,150,"Parry Bus Prison",20],
 	[22,21000,70,"Potomac Indian",3],
 	[23,20000,60,"Quicksilver Windsor",3],
-	[24,2350,60,"Quicksilver Windsor Taxi",3],
+	[24,23500,60,"Quicksilver Windsor Taxi",3],
 	[25,7300,65,"Shubert 38",3],
-	//[26,0,65,"Shubert 38"],//копия
-	[27,4000,100,"Shubert Armored Van",1],
+	[26,0,65,"Shubert 38",3],//копия
+	[27,40000,100,"Shubert Armored Van",1],
 	[28,23000,80,"Shubert Beverly",1],
 	[29,35000,70,"Shubert Frigate",1],
-	//[30,8500,65,"Shubert Hearse"],
+	[30,0,65,"Shubert Hearse",1],
 	[31,7300,65,"Shubert 38 Panel Truck",1],
-	//[32,0,65,"Shubert 38 Panel Truck"],//копия
-	//[33,7300,65,"Shubert 38 Taxi"],
-	//[34,0,100,"Shubert Truck"],
-	[35,3000,100,"Shubert Truck Flatbed",1],//копия
-	//[36,0,100,"Shubert Truck Flatbed"],
-	//[37,30000,100,"Shubert Truck Covered"],
-	[38,2000,100,"Shubert Truck Seagift",1],
-	[39,2000,100,"Shubert Show Plow"],
-	//[40,0,80,"Military Truck"],
+	[32,0,65,"Shubert 38 Panel Truck",1],//копия
+	[33,0,65,"Shubert 38 Taxi",3],
+	[34,0,100,"Shubert Truck",1],
+	[35,30000,100,"Shubert Truck Flatbed",1],//копия
+	[36,0,100,"Shubert Truck Flatbed",1],
+	[37,0,100,"Shubert Truck Covered",1],
+	[38,20000,100,"Shubert Truck Seagift",1],
+	[39,20000,100,"Shubert Show Plow",1],
+	[40,0,80,"Military Truck",1],
 	[41,21400,80,"Smith Custom 200",3],
 	[42,25000,80,"Smith Custom 200 Police Special",3],
 	[43,4500,50,"Smith Coupe",1],
 	[44,17000,65,"Smith Mainline",1],
 	[45,27000,70,"Smith Thunderbolt",1],
-	//[46,0,80,"Smith Truck"],
+	[46,0,80,"Smith Truck",1],
 	[47,5300,65,"Smith V8",3],
 	[48,15000,50,"Smith Deluxe Station Wagon",3],
-	//[49,0,0,"Trailer_2"],
+	[49,0,0,"Trailer_2",0],
 	[50,14750,70,"Culver Empire",3],
-	//[51,29500,70,"Culver Empire Police Special",3],
+	[51,0,70,"Culver Empire Police Special",3],
 	[52,24500,80,"Walker Rocket",3],
 	[53,7700,40,"Walter Coupe",1]
 ]
+
+local car_cash_coef = 10
+local car_cash_no = [19,20,24,27,35,38,39]
+for (local i = 0; i < motor_show.len(); i++) 
+{
+	local count = 0
+	foreach (_,v1 in car_cash_no)
+	{
+		if (motor_show[i][0] != v1)
+		{
+			count = count+1
+		}
+	}
+
+	if (count == car_cash_no.len())
+	{
+		motor_show[i][1] = motor_show[i][1]*car_cash_coef
+	}
+}
 
 //----цвета----
 local color_tips = [168,228,160]//--бабушкины яблоки
@@ -463,28 +486,32 @@ function guiSetTextGridList (window, slot, text)
 }
 //-------------------------------------------------------------------------------------------------
 
+local motor_show_gl = {}
+for (local i = 0; i < motor_show.len(); i++) 
+{
+	if(motor_show[i][1] != 0)
+	{
+		motor_show_gl[motor_show_gl.len()] <- [i, motor_show[i][1], motor_show[i][2], motor_show[i][3], motor_show[i][4]]
+	}
+}
 local avto_menu_value = 1
 local avto_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(450.0/2), 400.0, 450.0)
-for (local i = 0; i <= 29; i++) 
+for (local i = 0; i <= 29; i++)
 {
-	motor_show.push([0, 0, 0, "none"])
+	motor_show_gl[motor_show_gl.len()] <- [0, 0, 0, "none", 0]
 }
-foreach (k,v in motor_show)
+foreach (k,v in motor_show_gl)
 {
-	local text = v[3]+"("+v[0]+") "+(v[1]*10)+"$"
+	local text = v[3]+"("+v[0]+") "+v[1]+"$"
 	guiGridListAddRow (avto_menu, text)
 }
 for (local i = max_lable*(avto_menu_value-1); i < max_lable*avto_menu_value; i++)
 {
-	local text = motor_show[i][3]+"("+motor_show[i][0]+") "+(motor_show[i][1]*10)+"$"
+	local text = motor_show_gl[i][3]+"("+motor_show_gl[i][0]+") "+motor_show_gl[i][1]+"$"
 	guiSetTextGridList (avto_menu, i-max_lable*(avto_menu_value-1), text)
 }
 guiSetVisibleGridList (avto_menu, false)
 
-local craft_table = [//--[предмет 0, рецепт 1, предметы для крафта 2, кол-во предметов для крафта 3, предмет который скрафтится 4]
-		[info_png[76][0]+" 1 "+info_png[76][1], info_png[77][0]+" 1 "+info_png[77][1]+" + "+info_png[78][0]+" 100 "+info_png[78][1], "77,78", "1,100", "76,1"],
-		[info_png[20][0]+" 1 "+info_png[20][1], info_png[58][0]+" 3 "+info_png[58][1]+" + "+info_png[58][0]+" 78 "+info_png[58][1], "58,58", "3,78", "20,1"],
-	]
 local craft_menu = guiCreateGridList((screen[0]/2)-(650.0/2), (screen[1]/2)-(320.0/2), 650.0, 320.0)
 foreach (k,v in craft_table)
 {
@@ -564,6 +591,8 @@ local repair_shop_menu_value = 1
 local repair_shop = [
 	[info_png[23][0], 1, 100, 23],
 	[info_png[35][0], 10, 500, 35],
+	[info_png[65][0], 1, 10000, 65],
+	[info_png[65][0], 2, 20000, 65],
 	[info_png[65][0], 3, 30000, 65],
 	[info_png[71][0], 100, 50, 71],
 ]
@@ -2135,7 +2164,7 @@ function( element )
 
 			for (local i = max_lable*(avto_menu_value-1); i < max_lable*avto_menu_value; i++)
 			{
-				local text = motor_show[i][3]+"("+motor_show[i][0]+") "+(motor_show[i][1]*10)+"$"
+				local text = motor_show_gl[i][3]+"("+motor_show_gl[i][0]+") "+motor_show_gl[i][1]+"$"
 				guiSetTextGridList (avto_menu, i-max_lable*(avto_menu_value-1), text)
 			}
 		}
@@ -2185,7 +2214,7 @@ function( element )
 
 			for (local i = max_lable*(avto_menu_value-1); i < max_lable*avto_menu_value; i++)
 			{
-				local text = motor_show[i][3]+"("+motor_show[i][0]+") "+(motor_show[i][1]*10)+"$"
+				local text = motor_show_gl[i][3]+"("+motor_show_gl[i][0]+") "+motor_show_gl[i][1]+"$"
 				guiSetTextGridList (avto_menu, i-max_lable*(avto_menu_value-1), text)
 			}
 		}
