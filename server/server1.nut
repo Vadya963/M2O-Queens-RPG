@@ -9038,8 +9038,17 @@ function (playerid, value, id)
 		if (result[1]["COUNT()"] == 1)
 		{
 			local result = sqlite3( "SELECT * FROM account WHERE name = '"+id+"'" )
-			
-			triggerClientEvent(playerid, "event_save_player_action", value+"-"+id+" "+result[1]["inventory"])
+			local text = ""
+
+			triggerClientEvent(playerid, "event_save_player_action", value+"-"+id)
+
+			foreach (k,v in split(result[1]["inventory"], ","))
+			{
+				local spl = split(v, ":")
+				text = info_png[spl[0].tointeger()][0]+" "+spl[1]+" "+info_png[spl[0].tointeger()][1]
+
+				triggerClientEvent(playerid, "event_save_player_action", text)
+			}
 
 			sendMessage(playerid, "Инвентарь "+value+"-"+id+" загружен и сохранен в core.log", lyme[0], lyme[1], lyme[2])
 		}
@@ -9054,8 +9063,17 @@ function (playerid, value, id)
 		if (result[1]["COUNT()"] == 1)
 		{
 			local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+id+"'" )
-			
-			triggerClientEvent(playerid, "event_save_player_action", value+"-"+id+" "+result[1]["inventory"])
+			local text = ""
+
+			triggerClientEvent(playerid, "event_save_player_action", value+"-"+id)
+
+			foreach (k,v in split(result[1]["inventory"], ","))
+			{
+				local spl = split(v, ":")
+				text = info_png[spl[0].tointeger()][0]+" "+spl[1]+" "+info_png[spl[0].tointeger()][1]
+
+				triggerClientEvent(playerid, "event_save_player_action", text)
+			}
 
 			sendMessage(playerid, "Инвентарь "+value+"-"+id+" загружен и сохранен в core.log", lyme[0], lyme[1], lyme[2])
 		}
@@ -9070,8 +9088,17 @@ function (playerid, value, id)
 		if (result[1]["COUNT()"] == 1)
 		{
 			local result = sqlite3( "SELECT * FROM house_db WHERE number = '"+id+"'" )
+			local text = ""
 
-			triggerClientEvent(playerid, "event_save_player_action", value+"-"+id+" "+result[1]["inventory"])
+			triggerClientEvent(playerid, "event_save_player_action", value+"-"+id)
+
+			foreach (k,v in split(result[1]["inventory"], ","))
+			{
+				local spl = split(v, ":")
+				text = info_png[spl[0].tointeger()][0]+" "+spl[1]+" "+info_png[spl[0].tointeger()][1]
+
+				triggerClientEvent(playerid, "event_save_player_action", text)
+			}
 
 			sendMessage(playerid, "Инвентарь "+value+"-"+id+" загружен и сохранен в core.log", lyme[0], lyme[1], lyme[2])
 		}
