@@ -4663,7 +4663,7 @@ function playerDeath( playerid, attacker )
 			}
 		}
 
-		if (search_inv_player(attacker, 10, 1) == 0)
+		if (search_inv_player_2_parameter(attacker, 10) == 0)
 		{
 			local crimes_plus = zakon_kill_crimes
 			crimes[attacker] = crimes[attacker]+crimes_plus
