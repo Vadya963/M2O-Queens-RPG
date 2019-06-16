@@ -72,7 +72,7 @@ local zakon_nalog_business = 2000
 local zakon_price_house = 300000
 local zakon_price_business = 300000
 //зп
-local zp_player_taxi = 1000
+local zp_player_taxi = 2500
 local zp_player_busdriver = 24000
 local zp_player_73 = 50
 local zp_player_71 = 500
