@@ -45,6 +45,7 @@ local max_text_len = 90//макс длина сообщения
 local car_number = 0//count car
 local car_theft_time = 10//время для угона
 local crimes_giuseppe = 25//прес-ия для джузеппе
+local crimes_capture = crimes_giuseppe*2//--прес-ия для захвата
 local business_pos = {}//--позиции бизнесов
 local house_pos = {}//--позиции домов
 local day_nalog = 7//кол-во дней для оплаты налога
@@ -8524,6 +8525,11 @@ function (playerid)
 	else if(point_guns_zone[0] == 1)
 	{
 		sendMessage(playerid, "[ERROR] Идет захват территории", red)
+		return
+	}
+	else if(crimes[playerid] < crimes_capture)
+	{
+		sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_capture+" преступлений", red)
 		return
 	}
 
