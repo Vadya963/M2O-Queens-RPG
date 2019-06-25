@@ -7881,60 +7881,22 @@ function (playerid, id)
 		return
 	}
 
-	if (inv_player_delet(id, 10, 1, true))
+	if (search_inv_player(id, 10, 6) == 1)
+	{
+		sendMessage(playerid, "[ERROR] "+getPlayerName ( id )+" Шеф полиции", red)
+		return
+	}
+
+	if (inv_player_delet(id, 10, search_inv_player_2_parameter(id, 10), true))
 	{
 		sendMessage(playerid, "Вы забрали у "+getPlayerName ( id )+" "+info_png[10][0], yellow)
 		sendMessage(id, playername+" забрал(а) у вас "+info_png[10][0], yellow)
+
+		setPlayerColour_fun(id)
 	}
 	else
 	{
 		sendMessage(playerid, "[ERROR] У игрока нет жетона", red)
-	}
-})
-
-addCommandHandler("takepolicerank",//--забрать шеврон
-function (playerid, id, rang)
-{
-	local playername = getPlayerName ( playerid )
-	local id = id.tointeger()
-	local rang = rang.tointeger()
-
-	if (id < 0 || id >= getMaxPlayers()) 
-	{
-		return
-	}
-	else if (logged[playerid] == 0)
-	{
-		return
-	}
-
-	if(logged[id] == 0)
-	{
-		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
-		return
-	}
-
-	if (search_inv_player(playerid, 10, 6) == 0)
-	{
-		sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red)
-		return
-	}
-
-	if (rang >= 28 && rang <= 32)
-	{
-		if (inv_player_delet(id, rang, 1, true))
-		{
-			sendMessage(playerid, "Вы забрали у "+getPlayerName ( id )+" "+info_png[rang][0], yellow)
-			sendMessage(id, playername+" забрал(а) у вас "+info_png[rang][0], yellow)
-		}
-		else
-		{
-			sendMessage(playerid, "[ERROR] У игрока нет жетона", red)
-		}
-	}
-	else 
-	{
-		sendMessage(playerid, "[ERROR] от 28 до 32", red)
 	}
 })
 
@@ -8683,7 +8645,6 @@ function (playerid)
 		"/till [withdraw, deposit, price] [сумма] - установить цены в бизнесе",
 		"/search [player | car | house] [ИД игрока | номер т/с | номер дома] - обыскать игрока, т/с или дом (для полицейских)",
 		"/takepolicetoken [ИД игрока] - забрать полицейский жетон (для полицейских)",
-		"/takepolicerank [ИД игрока] [ИД шеврона от 28 до 32] - забрать шеврон (для полицейских)",
 		"/sellhouse - создать дом (для риэлторов)",
 		"/sellbusiness [номер бизнеса от 0 до 5] - создать бизнес (для риэлторов)",
 		"/auc sell [ид предмета] [кол-во предмета] [сумма] [имя покупателя, если нету ничего не пишите] - выставить предмет на аукцион",
