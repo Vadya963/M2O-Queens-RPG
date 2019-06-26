@@ -9107,6 +9107,10 @@ function(command, params)
 			}
 		}
 
+		for (local i = 1; i <= 14; i++) {
+			sqlite3( "INSERT INTO guns_zone (number, x1, y1, x2, y2, mafia) VALUES ('"+i+"', '"+(-1965+((i-1)*250))+"', '2000', '"+(-1965+(i*250))+"', '-1000', '0')" )
+		}
+
 		print("getWhoWasCount "+getWhoWasCount())*/
 	}
 
