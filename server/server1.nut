@@ -7716,6 +7716,11 @@ function (playerid, id)
 		sendMessage(playerid, "[ERROR] Игрок не в тюрьме", red)
 		return
 	}
+	else if (crimes[id] == 1)
+	{
+		sendMessage(playerid, "[ERROR] Маленький срок заключения", red)
+		return
+	}
 
 	if (isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
 	{
