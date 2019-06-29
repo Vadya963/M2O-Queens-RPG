@@ -51,6 +51,7 @@ local house_pos = {}//--позиции домов
 local day_nalog = 7//кол-во дней для оплаты налога
 local no_use_wheel_and_engine = [20,27,35,37,38,39]
 local police_chanel = 1//канал копов
+local admin_chanel = 2//--канал админов
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -234,7 +235,7 @@ local info_png = {
 	[34] = ["лицензия на работу", "вид работы"],
 	[35] = ["лом", "процентов"],
 	[36] = ["документы на бизнес под номером", ""],
-	[37] = ["админский жетон", "шт"],
+	[37] = ["админский жетон", "ранг"],
 	[38] = ["риэлторская лицензия", "шт"],
 	[39] = ["тушка свиньи", "шт"],
 	[40] = ["молоток", "шт"],
@@ -1487,6 +1488,19 @@ function player_position( playerid )
 	return [x_table[0].tofloat(),y_table[0].tofloat()]
 }
 
+function admin_chat(playerid, text)
+{
+	foreach (player, value in getPlayers()) 
+	{
+		local playername = getPlayerName(player)
+
+		if (search_inv_player_2_parameter(player, 37) != 0 && search_inv_player(player, 89, admin_chanel) != 0)
+		{
+			sendMessage(player, text, lyme)
+		}
+	}
+}
+
 function police_chat(playerid, text)
 {
 	foreach (player, value in getPlayers()) 
@@ -1669,7 +1683,7 @@ function points_add_in_gz(playerid, value)
 
 function setPlayerColour_fun(playerid) 
 {
-	if (search_inv_player(playerid, 37, 1) != 0)
+	if (search_inv_player_2_parameter(playerid, 37) != 0)
 	{
 		setPlayerColour(playerid, fromRGB(lyme[0],lyme[1],lyme[2]))
 	}
@@ -6849,6 +6863,15 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					}
 				}
 
+				foreach (i, v1 in car_cash_no)
+				{
+					if(getVehicleModel(vehicleid) == v1)
+					{
+						count = true
+						break	
+					}
+				}
+
 				if (count)
 				{
 					sendMessage(playerid, "[ERROR] На это т/с нельзя установить двигатель", red)
@@ -8029,6 +8052,13 @@ function (playerid, ...)
 		else if (search_inv_player(playerid, 10, 6) != 0)
 		{
 			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Шеф полиции "+playername+" ["+playerid+"]: "+text)
+		}
+	}
+	else if (radio_chanel == admin_chanel)
+	{
+		if (search_inv_player_2_parameter(playerid, 37) != 0)
+		{
+			admin_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Админ "+search_inv_player_2_parameter(playerid, 37)+" "+info_png[37][1]+" "+playername+" ["+playerid+"]: "+text)
 		}
 	}
 	else
