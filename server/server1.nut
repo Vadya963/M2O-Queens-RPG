@@ -9109,6 +9109,78 @@ function (playerid, value, id)
 	}
 })
 
+addCommandHandler ( "tp",//--телепорт
+function (playerid, value, id)
+{
+	local playername = getPlayerName ( playerid )
+	local id = id.tointeger()
+
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	{
+		return
+	}
+
+	if (value == "player")
+	{
+		if (logged[id] == 1)
+		{
+			local pos = getPlayerPosition(id)
+			setPlayerPosition(playerid, pos[0],pos[1],pos[2])
+
+			admin_chat(playerid, getPlayerName(playerid)+" ["+playerid+"] телепортировался к "+getPlayerName(id)+" ["+id+"]")
+		}
+		else
+		{
+			sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+		}
+	}
+	else if (value == "business")
+	{
+		local result = sqlite3( "SELECT COUNT() FROM business_db WHERE number = '"+id+"'" )
+		if (result[1]["COUNT()"] == 1)
+		{
+			result = sqlite3( "SELECT * FROM business_db WHERE number = '"+id+"'" )
+
+			setPlayerPosition(playerid, result[1]["x"],result[1]["y"],result[1]["z"])
+
+			sendMessage(playerid, "Вы телепортировались к "+id+" бизнесу", lyme)
+		}
+		else
+		{
+			sendMessage(playerid, "[ERROR] Такого бизнеса нет", red)
+		}
+	}
+	else if (value == "house")
+	{
+		local result = sqlite3( "SELECT COUNT() FROM house_db WHERE number = '"+id+"'" )
+		if (result[1]["COUNT()"] == 1)
+		{
+			result = sqlite3( "SELECT * FROM house_db WHERE number = '"+id+"'" )
+
+			setPlayerPosition(playerid, result[1]["x"],result[1]["y"],result[1]["z"])
+
+			sendMessage(playerid, "Вы телепортировались к "+id+" дому", lyme)
+		}
+		else
+		{
+			sendMessage(playerid, "[ERROR] Такого дома нет", red)
+		}
+	}
+	else if (value == "interior")
+	{
+		if (0 <= id && id <= interior_job.len()-1)
+		{
+			setPlayerPosition(playerid, interior_job[id][2],interior_job[id][3],interior_job[id][4])
+
+			sendMessage(playerid, "Вы телепортировались к "+interior_job[id][1], lyme)
+		}
+		else
+		{
+			sendMessage(playerid, "[ERROR] Такого здания нет", red)
+		}
+	}
+})
+
 function chat(mess) 
 {
 	local ansi = ["а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", "ь", "э", "ю", "я"]
