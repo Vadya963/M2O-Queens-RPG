@@ -764,10 +764,13 @@ local gas = {
 }
 
 local giuseppe = [
+	[info_png[34][0]+" Угонщик", 5, 5000, 34],
 	[info_png[58][0], 78, 1000, 57],
 	[info_png[78][0], 100, 1000, 78],
 	[info_png[79][0], 5, 500, 79],
-	[info_png[34][0]+" Угонщик", 5, 5000, 34],
+	[info_png[91][0]+" "+name_mafia[1][0], 1, 5000, 91],
+	[info_png[91][0]+" "+name_mafia[2][0], 2, 5000, 91],
+	[info_png[91][0]+" "+name_mafia[3][0], 3, 5000, 91],
 ]
 
 local repair_shop = [
