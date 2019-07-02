@@ -1542,7 +1542,7 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 			local z = myPos[2]
 			local playername = getPlayerName ( playerid )
 			local crimes_plus = zakon
-			local cash = random(1,money)
+			local cash = random(money/2,money)
 
 			if (isPointInCircle3D(x1,y1,z1, x,y,z, radius))
 			{	
