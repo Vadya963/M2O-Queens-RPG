@@ -4887,8 +4887,6 @@ function reg_or_login(playerid)
 		setplayerhealth( playerid, result[1]["heal"] )
 		setPlayerModel(playerid, result[1]["skin"])
 
-		setPlayerColour_fun(playerid)
-
 		sendMessage(playerid, "Вы удачно зашли!", turquoise)
 
 		house_bussiness_job_pos_load( playerid )
@@ -4926,6 +4924,7 @@ function reg_or_login(playerid)
 	}
 
 	need_1(playerid, "start")
+	setPlayerColour_fun(playerid)
 }
 
 //вход в авто
@@ -5208,8 +5207,6 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 
 	inv_server_load( playerid, value, id3, 0, 0, tabpanel )
 
-	setPlayerColour_fun(playerid)
-
 	me_chat(playerid, playername+" выбросил(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
 	//sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], yellow)
 }
@@ -5319,9 +5316,7 @@ function e_down (playerid)//--подбор предметов с земли
 			}
 
 			if (inv_player_empty(playerid, v[3], v[4])) 
-			{
-				setPlayerColour_fun(playerid)
-				
+			{			
 				me_chat(playerid, playername+" поднял(а) "+info_png[ v[3] ][0]+" "+v[4]+" "+info_png[ v[3] ][1])
 				//sendMessage(playerid, "Вы подняли "+info_png[ v[3] ][0]+" "+v[4]+" "+info_png[ v[3] ][1], svetlo_zolotoy)
 
@@ -5785,6 +5780,8 @@ function inv_server_load (playerid, value, id3, id1, id2, tabpanel)//измен�
 
 		if(id3 != 24)
 		{
+			setPlayerColour_fun(playerid)
+			
 			triggerClientEvent( playerid, "event_inv_load", value, id3, array_player_1[playerid][id3].tofloat(), array_player_2[playerid][id3].tofloat() )
 		}
 
@@ -7907,8 +7904,6 @@ function (playerid, id)
 	{
 		sendMessage(playerid, "Вы забрали у "+getPlayerName ( id )+" "+info_png[10][0], yellow)
 		sendMessage(id, playername+" забрал(а) у вас "+info_png[10][0], yellow)
-
-		setPlayerColour_fun(id)
 	}
 	else
 	{
