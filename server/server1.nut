@@ -7617,6 +7617,53 @@ function (playerid, id, cash)
 	}
 })
 
+addCommandHandler ( "slots",
+function (playerid, cash)
+{
+	local playername = getPlayerName ( playerid )
+	local myPos = getPlayerPosition(playerid)
+	local x = myPos[0]
+	local y = myPos[1]
+	local z = myPos[2]
+	local cash = cash.tointeger()
+	local randomize1 = random(1,5)
+	local randomize2 = random(1,5)
+	local randomize3 = random(1,5)
+
+	if (logged[playerid] == 0)
+	{
+		return
+	}
+
+	if (cash < 1)
+	{
+		return
+	}
+
+	if (cash > array_player_2[playerid][0])
+	{
+		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+		return
+	}
+
+	if (isPointInCircle3D( x, y, z, interior_job[3][2],interior_job[3][3],interior_job[3][4], interior_job[3][7] ))
+	{
+		sendMessage(playerid, "====[ ОДНОРУКИЙ БАНДИТ ]====", yellow)
+		sendMessage(playerid, "Выпало "+randomize1+" - "+randomize2+" - "+randomize3, yellow)
+
+		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playername )
+
+		if(randomize1 == randomize2 && randomize1 == randomize3)
+		{
+			win_roulette( playerid, cash, 25 )
+		}
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Вы не в казино(кубок на карте)", red)
+	}
+})
+
 addCommandHandler ( "prison",//--команда для копов (посадить игрока в тюрьму)
 function (playerid, id)
 {
@@ -8653,6 +8700,7 @@ function (playerid)
 
 	local commands = [
 		"/roulette [режим игры (красное, черное, четное, нечетное, 1-18, 19-36, 1-12, 2-12, 3-12, 3-1, 3-2, 3-3)] [сумма] - сыграть в рулетку",
+		"/slots [сумма] - сыграть в однорукого бандита",
 		"/prison [ИД игрока] - посадить игрока в тюрьму (для полицейских)",
 		"/r [текст] - рация",
 		"/setchanel [канал] - сменить канал в рации",
