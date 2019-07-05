@@ -7683,8 +7683,7 @@ function (playerid, id)
 	{
 		return
 	}
-
-	if(logged[id] == 0)
+	else if(logged[id] == 0)
 	{
 		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
 		return
@@ -7701,20 +7700,20 @@ function (playerid, id)
 	local y1 = myPos1[1]
 	local z1 = myPos1[2]
 
-	if (crimes[id] == 0)
-	{
-		sendMessage(playerid, "[ERROR] Гражданин чист перед законом", red)
-		return
-	}
-
-	if (arrest[id] != 0)
-	{
-		sendMessage(playerid, "[ERROR] Игрок в тюрьме", red)
-		return
-	}
-
 	if (isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
 	{
+		if (crimes[id] == 0)
+		{
+			sendMessage(playerid, "[ERROR] Гражданин чист перед законом", red)
+			return
+		}
+
+		if (arrest[id] != 0)
+		{
+			sendMessage(playerid, "[ERROR] Игрок в тюрьме", red)
+			return
+		}
+
 		me_chat(playerid, playername+" посадил(а) "+getPlayerName ( id )+" в камеру на "+(crimes[id])+" мин")
 
 		arrest[id] = 1
@@ -7748,16 +7747,9 @@ function (playerid, id)
 	{
 		return
 	}
-
-	if(logged[id] == 0)
+	else if(logged[id] == 0)
 	{
 		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
-		return
-	}
-
-	if (cash*crimes[id] > array_player_2[playerid][0])
-	{
-		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
 		return
 	}
 
@@ -7766,19 +7758,25 @@ function (playerid, id)
 	local y1 = myPos1[1]
 	local z1 = myPos1[2]
 
-	if (arrest[id] == 0 || arrest[id] == 2)
-	{
-		sendMessage(playerid, "[ERROR] Игрок не в тюрьме", red)
-		return
-	}
-	else if (crimes[id] == 1)
-	{
-		sendMessage(playerid, "[ERROR] Маленький срок заключения", red)
-		return
-	}
-
 	if (isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
 	{
+		if (cash*crimes[id] > array_player_2[playerid][0])
+		{
+			sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+			return
+		}
+
+		if (arrest[id] == 0 || arrest[id] == 2)
+		{
+			sendMessage(playerid, "[ERROR] Игрок не в тюрьме", red)
+			return
+		}
+		else if (crimes[id] == 1)
+		{
+			sendMessage(playerid, "[ERROR] Маленький срок заключения", red)
+			return
+		}
+
 		me_chat(playerid, playername+" заплатил(а) залог за "+getPlayerName(id)+" в размере "+(cash*(crimes[id]))+"$")
 
 		sendMessage(id, "Ждите освобождения", yellow)
