@@ -7626,9 +7626,9 @@ function (playerid, cash)
 	local y = myPos[1]
 	local z = myPos[2]
 	local cash = cash.tointeger()
-	local randomize1 = random(1,5)
-	local randomize2 = random(1,5)
-	local randomize3 = random(1,5)
+	local randomize1 = random(1,6)
+	local randomize2 = random(1,6)
+	local randomize3 = random(1,6)
 
 	if (logged[playerid] == 0)
 	{
