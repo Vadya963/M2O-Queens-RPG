@@ -602,6 +602,7 @@ local repair_shop_menu_value = 1
 local repair_shop = [
 	[info_png[23][0], 1, 100, 23],
 	[info_png[35][0], 10, 500, 35],
+	[info_png[65][0], 0, 1000, 65],
 	[info_png[65][0], 1, 10000, 65],
 	[info_png[65][0], 2, 20000, 65],
 	[info_png[65][0], 3, 30000, 65],

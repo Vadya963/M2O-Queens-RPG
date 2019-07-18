@@ -776,6 +776,7 @@ local giuseppe = [
 local repair_shop = [
 	[info_png[23][0], 1, 100, 23],
 	[info_png[35][0], 10, 500, 35],
+	[info_png[65][0], 0, 1000, 65],
 	[info_png[65][0], 1, 10000, 65],
 	[info_png[65][0], 2, 20000, 65],
 	[info_png[65][0], 3, 30000, 65],
@@ -2270,28 +2271,15 @@ function buy_subject_fun( playerid, text, number, value )
 					return
 				}
 
-
-				local vehicleid = createVehicle( id, car_pos[0], car_pos[1], car_pos[2], car_pos[3], 0.0, 0.0 )
-
-				local plate = val2.tostring()
-				setVehiclePlateText(vehicleid, plate)
-
-				local color = getVehicleColour(vehicleid)
-				local carcolor = fromRGB(color[0], color[1], color[2])
-				setVehicleColour(vehicleid, color[0], color[1], color[2], color[0], color[1], color[2])
+				local carcolor = fromRGB(255,255,255)
 
 				local nalog_start = 5
-
-				array_car_1[plate] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-				array_car_2[plate] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-				fuel[plate] <- max_fuel
-				dviglo[plate] <- 0
-				probeg[plate] <- 0
 
 				sendMessage(playerid, "Вы получили "+info_png[val1][0]+" "+val2, orange)
 
 				sqlite3( "INSERT INTO car_db (number, model, nalog, frozen, x, y, z, rot, fuel, car_rgb, tune, wheel, probeg, inventory) VALUES ('"+val2+"', '"+id+"', '"+nalog_start+"', '0', '"+car_pos[0]+"', '"+car_pos[1]+"', '"+car_pos[2]+"', '"+car_pos[3]+"', '"+max_fuel+"', '"+carcolor+"', '0', '0', '0', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
+				car_spawn(val2.tostring())
 				return
 			}
 		}
@@ -9225,7 +9213,7 @@ function chat(mess)
 
 	return mess
 }
-
+local md5_table = {}
 addEventHandler("onConsoleInput",
 function(command, params)
 {
