@@ -158,12 +158,19 @@ local info_png = {
 	[91] = ["шляпа", "опг"],
 	[92] = ["jetpack", "шт"],
 	[93] = ["#2 маршрутный лист", "ост."],
+	[94] = ["уголовное дело", "преступлений"],
 }
 
-local craft_table = [//--[предмет 0, рецепт 1, предметы для крафта 2, кол-во предметов для крафта 3, предмет который скрафтится 4]
-	[info_png[76][0]+" 1 "+info_png[76][1], info_png[77][0]+" 1 "+info_png[77][1]+" + "+info_png[78][0]+" 100 "+info_png[78][1], "77,78", "1,100", "76,1"],
-	[info_png[20][0]+" 1 "+info_png[20][1], info_png[58][0]+" 3 "+info_png[58][1]+" + "+info_png[58][0]+" 78 "+info_png[58][1], "58,58", "3,78", "20,1"],
+local craft_table = [//--[предмет 0, рецепт 1, предметы для крафта 2, кол-во предметов для крафта 3, предмет который скрафтится 4] //переписать
+	["", "", "77,78", "1,100", "76,1"],
+	["", "", "58,58", "3,78", "20,1"],
 ]
+
+foreach (i,v in craft_table)
+{
+	craft_table[i][0] = info_png[split(v[4], ",")[0].tointeger()][0]+" "+split(v[4], ",")[1]+" "+info_png[split(v[4], ",")[0].tointeger()][1]+" "
+	craft_table[i][1] = info_png[split(v[2], ",")[0].tointeger()][0]+" "+split(v[3], ",")[0]+" "+info_png[split(v[2], ",")[0].tointeger()][1]+" + "+info_png[split(v[2], ",")[1].tointeger()][0]+" "+split(v[3], ",")[1]+" "+info_png[split(v[2], ",")[1].tointeger()][1]
+}
 
 local name_mafia = {
 	[0] = ["no", [255,255,255]],
@@ -589,6 +596,7 @@ guiSetVisibleGridList (weapon_menu, false)
 
 local gas = {
 	[5] = [info_png[5][0], 25, 250],
+	[23] = [info_png[23][0], 1, 100],
 }
 local gas_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in gas)
@@ -1703,17 +1711,18 @@ function( post )
 		foreach (k, v in split(getElementData("earth"), "|"))//--отображение предметов на земле
 		{
 			local spl = split(v.tostring(), "/")
+			local dist = getDistanceBetweenPoints3D(spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat(), myPos[0], myPos[1], myPos[2])
 			if (isPointInCircle3D( myPos[0], myPos[1], myPos[2], spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat(), 20.0 ))
 			{
 				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat() )
-				dxDrawTexture(image[spl[3].tofloat()], coords[0]-(57/2), coords[1], 0.88, 0.88, 0.0, 0.0, 0.0, 255)
+				dxDrawTexture(image[spl[3].tofloat()], coords[0]-((57-dist*2.85)/2), coords[1], 0.88-dist*0.044, 0.88-dist*0.044, 0.0, 0.0, 0.0, 255-dist*12.75)
 			}
 
 			if (isPointInCircle3D( myPos[0], myPos[1], myPos[2], spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat(), 10.0 ))
 			{
 				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat()+0.2 )
-				local dimensions = dxGetTextDimensions("Press E", 1.0, "tahoma-bold" )
-				dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+				local dimensions = dxGetTextDimensions("Press E", 1.0-dist*0.05, "tahoma-bold" )
+				dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0-dist*0.05 )
 			}
 		}
 	}
