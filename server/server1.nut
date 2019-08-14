@@ -303,7 +303,7 @@ local craft_table = [//--[предмет 0, рецепт 1, предметы д�
 
 foreach (i,v in craft_table)
 {
-	craft_table[i][0] = info_png[split(v[4], ",")[0].tointeger()][0]+" "+split(v[4], ",")[1]+" "+info_png[split(v[4], ",")[0].tointeger()][1]+" "
+	craft_table[i][0] = info_png[split(v[4], ",")[0].tointeger()][0]+" "+split(v[4], ",")[1]+" "+info_png[split(v[4], ",")[0].tointeger()][1]
 	craft_table[i][1] = info_png[split(v[2], ",")[0].tointeger()][0]+" "+split(v[3], ",")[0]+" "+info_png[split(v[2], ",")[0].tointeger()][1]+" + "+info_png[split(v[2], ",")[1].tointeger()][0]+" "+split(v[3], ",")[1]+" "+info_png[split(v[2], ",")[1].tointeger()][1]
 }
 
@@ -1005,6 +1005,786 @@ local probeg = {}//пробег
 //слоты дома
 local array_house_1 = {}
 local array_house_2 = {}
+
+function debuginfo () 
+{
+	local text_earth = ""
+	foreach(i, v in earth)
+	{
+		text_earth = text_earth + v[0]+"/"+v[1]+"/"+v[2]+"/"+v[3]+"/"+v[4]+"|"
+	}
+
+	local text_guns_zone = ""
+	foreach(i, v in guns_zone)
+	{
+		text_guns_zone = text_guns_zone + v[0]+"/"+v[1]+"/"+v[2]+"/"+v[3]+"/"+name_mafia[v[4]][0]+"/"+i+"|"
+	}
+
+	local text_guns_zone2 = point_guns_zone[0]+"/"+point_guns_zone[1]+"/"+name_mafia[point_guns_zone[2]][0]+"/"+point_guns_zone[3]+"/"+name_mafia[point_guns_zone[4]][0]+"/"+point_guns_zone[5]+"/"+time_guns_zone
+
+	if(point_guns_zone[0] == 1)
+	{
+		time_guns_zone = time_guns_zone-1
+
+		if(time_guns_zone == 0)
+		{
+			time_guns_zone = time_gz
+
+			if(point_guns_zone[3] > point_guns_zone[5])
+			{
+				guns_zone[point_guns_zone[1]][4] = point_guns_zone[2]
+
+				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[2]][0]+" захватила Guns Zone #"+point_guns_zone[1], green)
+
+				sqlite3( "UPDATE guns_zone SET mafia = '"+point_guns_zone[2]+"' WHERE number = '"+point_guns_zone[1]+"'")
+			}
+			else
+			{
+				guns_zone[point_guns_zone[1]][4] = point_guns_zone[4]
+
+				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[4]][0]+" удержала Guns Zone #"+point_guns_zone[1], green)
+			}
+
+			point_guns_zone[0] = 0
+			point_guns_zone[1] = 0//gz
+
+			point_guns_zone[2] = 0//mafia A
+			point_guns_zone[3] = 0//points
+
+			point_guns_zone[4] = 0//mafia D
+			point_guns_zone[5] = 0//points
+		}
+	}
+
+	foreach (playerid, playername in getPlayers())
+	{
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+
+		if(point_guns_zone[0] == 1)
+		{
+			points_add_in_gz(playerid, 1)
+		}
+
+		setElementData(playerid, "serial", getPlayerSerial(playerid))
+		setElementData(playerid, "alcohol_data", alcohol[playerid])
+		setElementData(playerid, "satiety_data", satiety[playerid])
+		setElementData(playerid, "hygiene_data", hygiene[playerid])
+		setElementData(playerid, "sleep_data", sleep[playerid])
+		setElementData(playerid, "drugs_data", drugs[playerid])
+		//setElementData(playerid, "fuel_data", 0)
+		setElementData(playerid, "probeg_data", 0)
+		setElementData(playerid, "gps_device_data", gps_device[playerid])
+		setElementData(playerid, "zakon_alcohol", zakon_alcohol)
+		setElementData(playerid, "zakon_drugs", zakon_drugs)
+		setElementData(playerid, "earth", text_earth)
+		setElementData(playerid, "guns_zone", text_guns_zone)
+		
+		if (search_inv_player_2_parameter(playerid, 91) != 0)
+		{
+			setElementData(playerid, "guns_zone2", text_guns_zone2)
+		}
+		else
+		{
+			setElementData(playerid, "guns_zone2", "0/0/0/0/0/0/0")
+		}
+
+		if (minute < 10)
+		{
+			setElementData(playerid, "timeserver", hour+"-0"+minute)
+		}
+		else
+		{
+			setElementData(playerid, "timeserver", hour+"-"+minute)
+		}
+
+		for (local i = 0; i < getMaxPlayers(); i++) 
+		{	
+			if (isPlayerConnected(i))
+			{
+				setElementData(playerid, "drugs["+i+"]", drugs[i])
+				setElementData(playerid, "alcohol["+i+"]", alcohol[i])
+				setElementData(playerid, "crimes["+i+"]", crimes[i])
+				setElementData(playerid, "is_chat_open["+i+"]", getElementData(i, "is_chat_open"))
+				setElementData(playerid, "afk["+i+"]", getElementData(i, "afk"))
+			}
+		}
+
+		local vehicleid = getPlayerVehicle(playerid)
+		if (isPlayerInVehicle(playerid))
+		{
+			local plate = getVehiclePlateText(vehicleid)
+			//setElementData(playerid, "fuel_data", fuel[plate])
+			setElementData(playerid, "probeg_data", probeg[plate])
+		}
+
+		setPlayerHealth(playerid, health[playerid].tofloat())
+	}
+}
+
+function job_timer2 (playerid)
+{
+	timer_job[playerid] = timer(function(playerid) {
+		local playername = getPlayerName(playerid)
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+
+		if (logged[playerid] == 1)
+		{
+
+			if (job[playerid] == 1) //--работа таксиста
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == 24)
+					{
+						if (getSpeed(vehicleid) < 1)
+						{
+							if (job_call[playerid] == 0) 
+							{
+								local randomize = random(0,taxi_pos.len()-1)
+
+								sendMessage(playerid, "Езжайте на вызов", yellow)
+
+								job_call[playerid] = 1
+								job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							}
+							else if (job_call[playerid] == 1) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
+								{
+									local randomize = random(0,taxi_pos.len()-1)
+
+									sendMessage(playerid, "Отвезите клиента", yellow)
+
+									job_call[playerid] = 2
+									job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+								}
+							}
+							else if (job_call[playerid] == 2) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
+								{
+									local randomize = random(zp_player_taxi/2,zp_player_taxi)
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+									sendMessage(playerid, "Вы получили "+randomize+"$", green)
+
+									triggerClientEvent(playerid, "removegps")
+									
+									job_pos[playerid] = 0
+									job_call[playerid] = 0
+								}
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 2) //--работа водителя мусоровоза
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == down_car_subject_pos[0][5])
+					{
+						if (getSpeed(vehicleid) < 1)
+						{
+							if (job_call[playerid] == 0) 
+							{
+								local randomize = random(0,taxi_pos.len()-1)
+
+								sendMessage(playerid, "Соберите мусор, потом доставьте его на свалку (около заброшенной литейной фабрики)", yellow)
+
+								job_call[playerid] = 1
+								job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							}
+							else if (job_call[playerid] == 1) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
+								{
+									local randomize = random(0,taxi_pos.len()-1)
+									local randomize_zp = random(down_car_subject_pos[0][6]/2,down_car_subject_pos[0][6])
+
+									give_subject( playerid, "car", down_car_subject_pos[0][4], randomize_zp, false )
+
+									job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+								}
+							}
+
+							if (isPointInCircle3D(x,y,z, down_car_subject_pos[0][0],down_car_subject_pos[0][1],down_car_subject_pos[0][2], down_car_subject_pos[0][3]) && amount_inv_car_1_parameter(vehicleid, down_car_subject_pos[0][4]) != 0)
+							{
+								local randomize = amount_inv_car_2_parameter(vehicleid, down_car_subject_pos[0][4])
+
+								inv_car_delet_1_parameter(playerid, down_car_subject_pos[0][4], true)
+
+								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+								sendMessage(playerid, "Вы получили "+randomize+"$", green)
+
+								triggerClientEvent(playerid, "removegps")
+									
+								job_pos[playerid] = 0
+								job_call[playerid] = 0
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 3) //--работа инкассатора
+			{
+				if (isPlayerInVehicle(playerid) && crimes[playerid] == 0)
+				{
+					if (getVehicleModel(vehicleid) == down_car_subject_pos[1][5])
+					{
+						if (getSpeed(vehicleid) < 1)
+						{
+							if (job_call[playerid] == 0) 
+							{
+								local randomize = random(0,collector_pos.len()-1)
+
+								sendMessage(playerid, "Соберите деньги, потом доставьте их в банк в Мидтауне", yellow)
+
+								job_call[playerid] = 1
+								job_pos[playerid] = [collector_pos[randomize][0],collector_pos[randomize][1],collector_pos[randomize][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							}
+							else if (job_call[playerid] == 1) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
+								{
+									local randomize = random(0,collector_pos.len()-1)
+									local randomize_zp = random(down_car_subject_pos[1][6]/2,down_car_subject_pos[1][6])
+
+									give_subject( playerid, "car", down_car_subject_pos[1][4], randomize_zp, false )
+
+									job_pos[playerid] = [collector_pos[randomize][0],collector_pos[randomize][1],collector_pos[randomize][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+								}
+							}
+
+							if (isPointInCircle3D(x,y,z, down_car_subject_pos[1][0],down_car_subject_pos[1][1],down_car_subject_pos[1][2], down_car_subject_pos[1][3]) && amount_inv_car_1_parameter(vehicleid, down_car_subject_pos[1][4]) != 0)
+							{
+								local randomize = amount_inv_car_2_parameter(vehicleid, down_car_subject_pos[1][4])
+
+								inv_car_delet_1_parameter(playerid, down_car_subject_pos[1][4], true)
+
+								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+								sendMessage(playerid, "Вы получили "+randomize+"$", green)
+
+								triggerClientEvent(playerid, "removegps")
+									
+								job_pos[playerid] = 0
+								job_call[playerid] = 0
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 4) //--работа по починке тел будок
+			{
+				if (getPlayerModel(playerid) == 12)
+				{
+					if (job_call[playerid] == 0) 
+					{
+						local randomize = random(0,phohe.len()-1)
+
+						sendMessage(playerid, "Езжайте к телефонной будки", yellow)
+
+						job_call[playerid] = 1
+						job_pos[playerid] = [phohe[randomize][0],phohe[randomize][1],phohe[randomize][2]]
+
+						triggerClientEvent(playerid, "removegps")
+						triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+					}
+				}
+			}
+
+			else if (job[playerid] == 5) //--работа Угонщик
+			{
+				if (crimes[playerid] >= crimes_giuseppe)
+				{
+					if (job_call[playerid] == 0) 
+					{
+						local vehicleid = player_car_theft()
+						if(vehicleid)
+						{
+							local pos = getVehiclePosition(vehicleid)
+							local rot = getVehicleRotation(vehicleid)
+
+							job_call[playerid] = 1
+							job_pos[playerid] = [pos[0],pos[1],pos[2]]
+
+							job_vehicleid[playerid] = [vehicleid,pos[0],pos[1],pos[2],rot[0]]
+							job_timer[playerid] = timer(car_theft_fun, (car_theft_time*60000), 1, playerid, false)
+
+							sendMessage(playerid, "Угоните т/с гос.номер "+getVehiclePlateText(job_vehicleid[playerid][0])+", у вас есть "+car_theft_time+" мин", yellow)
+
+							triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							triggerClientEvent( playerid, "createHudTimer", (60*car_theft_time).tofloat() )
+						}
+					}
+					else if (job_call[playerid] == 1)
+					{
+						if (job_vehicleid[playerid][0] == vehicleid)
+						{
+							local pos = player_position( playerid )
+							local x1 = pos[0]
+							local y1 = pos[1]
+
+							job_call[playerid] = 2
+
+							local randomize = random(0,sell_car_theft.len()-1)
+
+							sendMessage(playerid, "Езжайте на свалку Майка Бруски", yellow)
+
+							police_chat(playerid, "[ДИСПЕТЧЕР] Угон "+motor_show[getVehicleModel(vehicleid)][3]+" гос.номер "+getVehiclePlateText(vehicleid)+", координаты [X  "+x1+", Y  "+y1+"], подозреваемый "+playername)
+
+							job_pos[playerid] = [sell_car_theft[randomize][0],sell_car_theft[randomize][1],sell_car_theft[randomize][2]]
+
+							triggerClientEvent(playerid, "removegps")
+							triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+
+							local crimes_plus = zakon_car_theft_crimes
+							crimes[playerid] = crimes[playerid]+crimes_plus
+							sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
+						}
+					}
+					else if (job_call[playerid] == 2) 
+					{
+						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && job_vehicleid[playerid][0] == vehicleid)
+						{
+							if (getSpeed(vehicleid) < 1)
+							{
+								local randomize = motor_show[getVehicleModel(vehicleid)][1]*0.05
+
+								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+								sendMessage(playerid, "Вы получили "+randomize+"$", green)
+
+								job_pos[playerid] = 0
+								job_call[playerid] = 3
+
+								car_theft_fun(playerid, true)
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 6) //--ор на рз
+			{
+				if (getPlayerModel(playerid) == 133)
+				{
+					if (job_call[playerid] == 0) 
+					{
+						local randomize = random(0,table_sg_pos.len()-1)
+
+						sendMessage(playerid, "Идите к столу", yellow)
+
+						job_call[playerid] = 1
+						job_pos[playerid] = [table_sg_pos[randomize][0],table_sg_pos[randomize][1],table_sg_pos[randomize][2]]
+
+						triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+					}
+					else if (job_call[playerid] >= 1 && job_call[playerid] <= 11)
+					{
+						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0))
+						{
+							job_call[playerid]++
+						}
+					}
+					else if (job_call[playerid] == 12)
+					{
+						local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && result[1]["COUNT()"] == 1)
+						{
+							result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+
+							local id2 = search_inv_player_2_parameter(playerid, 81)
+
+							if (result[1]["warehouse"] < max_sg && result[1]["money"] >= result[1]["price"] && result[1]["nalog"] != 0 && result[1]["prod"] != 0 && id2 != 0)
+							{
+								local randomize = result[1]["price"]
+
+								inv_player_delet(playerid, 81, id2, true)
+
+								id2 = id2 - 1
+
+								inv_player_empty(playerid, 81, id2)
+
+								if (id2 == 0)
+								{
+									inv_player_delet(playerid, 81, id2, true)
+								}
+
+								sqlite3( "UPDATE seagift_db SET warehouse = warehouse + '1', prod = prod - '1', money = money - '"+randomize+"' WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+
+								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+								sendMessage(playerid, "Вы получили "+randomize+"$", green)
+													
+								job_call[playerid] = 0
+
+								triggerClientEvent(playerid, "removegps")
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 7) //--молочник
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == up_car_subject[5][5])
+					{
+						if (getSpeed(vehicleid) < 1)
+						{
+							if (job_call[playerid] == 0) 
+							{
+								local randomize = random(0,milk_pos.len()-1)
+
+								sendMessage(playerid, "Езжайте на молокозавод в Южный Милвилл чтобы загрузить молоко, а потом развезите его по домам и бизнесам", yellow)
+
+								job_call[playerid] = 1
+								job_pos[playerid] = [milk_pos[randomize][0],milk_pos[randomize][1],milk_pos[randomize][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							}
+							else if (job_call[playerid] == 1) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[5][3]) && amount_inv_car_1_parameter(vehicleid, up_car_subject[5][4]) != 0)
+								{
+									local sic2p = search_inv_car_2_parameter(vehicleid, up_car_subject[5][4])
+									local randomize = random(0,milk_pos.len()-1)
+
+									job_pos[playerid] = [milk_pos[randomize][0],milk_pos[randomize][1],milk_pos[randomize][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+
+									inv_car_delet(playerid, up_car_subject[5][4], sic2p, true, false)
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
+
+									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
+								}
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 8) //--алкоперевозчик
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == up_car_subject[6][5])
+					{
+						if (getSpeed(vehicleid) < 1)
+						{
+							if (job_call[playerid] == 0) 
+							{
+								local randomize = random(0,ed.len()-1)
+
+								sendMessage(playerid, "Езжайте на cпиртзавод в Сэнд-Айленд чтобы загрузить ящики с виски, а потом развезите их по бизнесам", yellow)
+
+								job_call[playerid] = 1
+								job_pos[playerid] = [ed[randomize][0],ed[randomize][1],ed[randomize][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							}
+							else if (job_call[playerid] == 1) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[6][3]) && amount_inv_car_1_parameter(vehicleid, up_car_subject[6][4]) != 0)
+								{
+									local sic2p = search_inv_car_2_parameter(vehicleid, up_car_subject[6][4])
+									local randomize = random(0,ed.len()-1)
+
+									job_pos[playerid] = [ed[randomize][0],ed[randomize][1],ed[randomize][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+
+									inv_car_delet(playerid, up_car_subject[6][4], sic2p, true, false)
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
+
+									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
+								}
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 9) //--автобусник
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == 20 && getPlayerModel(playerid) == 171)
+					{
+						if (getSpeed(vehicleid) < 1 && search_inv_player_2_parameter(playerid, up_player_subject[5][4]) != 0)
+						{
+							if (job_call[playerid] == 0) 
+							{
+								sendMessage(playerid, "Езжайте по маршруту", yellow)
+
+								job_call[playerid] = search_inv_player_2_parameter(playerid, up_player_subject[5][4])
+								job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							}
+							else if (job_call[playerid] >= 1 && job_call[playerid] <= 19) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 10.0))
+								{
+									inv_player_delet(playerid, up_player_subject[5][4], job_call[playerid], true)
+
+									job_call[playerid] = job_call[playerid]+1
+
+									inv_player_empty(playerid, up_player_subject[5][4], job_call[playerid])
+
+									job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+								}
+							}
+							else if (job_call[playerid] == 20) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 15.0))
+								{
+									local randomize = random(zp_player_busdriver/2,zp_player_busdriver)
+
+									inv_player_delet(playerid, up_player_subject[5][4], job_call[playerid], true)
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", green)
+
+									triggerClientEvent(playerid, "removegps")
+										
+									job_pos[playerid] = 0
+									job_call[playerid] = 0
+								}
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 10) //--перевозчик оружия
+			{
+				if (isPlayerInVehicle(playerid) && crimes[playerid] == 0)
+				{
+					if (getVehicleModel(vehicleid) == up_car_subject[7][5])
+					{
+						if (getSpeed(vehicleid) < 1)
+						{
+							if (job_call[playerid] == 0) 
+							{
+								local randomize = random(0,guns.len()-1)
+
+								sendMessage(playerid, "Езжайте на cклад в Порт чтобы загрузить ящики с оружием, а потом развезите их по аммунациям", yellow)
+
+								job_call[playerid] = 1
+								job_pos[playerid] = [guns[randomize][0],guns[randomize][1],guns[randomize][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							}
+							else if (job_call[playerid] == 1) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[7][3]) && amount_inv_car_1_parameter(vehicleid, up_car_subject[7][4]) != 0)
+								{
+									local sic2p = search_inv_car_2_parameter(vehicleid, up_car_subject[7][4])
+									local randomize = random(0,guns.len()-1)
+
+									job_pos[playerid] = [guns[randomize][0],guns[randomize][1],guns[randomize][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+
+									inv_car_delet(playerid, up_car_subject[7][4], sic2p, true, false)
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
+
+									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
+								}
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 11) //--перевозчик угля
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == up_car_subject[8][5])
+					{
+						if (getSpeed(vehicleid) < 1)
+						{
+							if (job_call[playerid] == 0) 
+							{
+								local randomize = random(0,coal_pos.len()-1)
+
+								sendMessage(playerid, "Езжайте в Северный Милвилл чтобы загрузить уголь, а потом доставьте его по адресу", yellow)
+
+								job_call[playerid] = 1
+								job_pos[playerid] = [coal_pos[randomize][0],coal_pos[randomize][1],coal_pos[randomize][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							}
+							else if (job_call[playerid] == 1) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[8][3]) && amount_inv_car_1_parameter(vehicleid, up_car_subject[8][4]) != 0)
+								{
+									local sic2p = amount_inv_car_2_parameter(vehicleid, up_car_subject[8][4])
+									local randomize = random(0,coal_pos.len()-1)
+
+									job_pos[playerid] = [coal_pos[randomize][0],coal_pos[randomize][1],coal_pos[randomize][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+
+									inv_car_delet_1_parameter(playerid, up_car_subject[8][4], true)
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
+
+									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
+								}
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 12) //--уборка снега
+			{
+				if (isPlayerInVehicle(playerid))
+				{
+					if (getVehicleModel(vehicleid) == 39)
+					{
+						if (getSpeed(vehicleid) < 41*1.6 && search_inv_player_2_parameter(playerid, up_player_subject[6][4]) != 0)
+						{
+							if (job_call[playerid] == 0) 
+							{
+								sendMessage(playerid, "Езжайте по маршруту", yellow)
+
+								job_call[playerid] = search_inv_player_2_parameter(playerid, up_player_subject[6][4])
+								job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
+
+								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+							}
+							else if (job_call[playerid] >= 1 && job_call[playerid] <= 19) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 10.0))
+								{
+									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true)
+
+									job_call[playerid] = job_call[playerid]+1
+
+									inv_player_empty(playerid, up_player_subject[6][4], job_call[playerid])
+
+									job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
+
+									triggerClientEvent(playerid, "removegps")
+									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+								}
+							}
+							else if (job_call[playerid] == 20) 
+							{
+								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 15.0))
+								{
+									local randomize = random(zp_player_show/2,zp_player_show)
+
+									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true)
+
+									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", green)
+
+									triggerClientEvent(playerid, "removegps")
+										
+									job_pos[playerid] = 0
+									job_call[playerid] = 0
+								}
+							}
+						}
+					}
+				}
+			}
+
+			else if (job[playerid] == 13) //--работа транспортный детектив
+			{
+				if ((getPlayerModel(playerid) == 76) && search_inv_player(playerid, 10, 2) != 0 && crimes[playerid] == 0)
+				{
+					if (job_call[playerid] == 0)
+					{
+						local plate = player_car_police()
+
+						if (plate)
+						{
+							local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
+							local pos = [result[1]["x"],result[1]["y"],result[1]["z"]]
+
+							job_call[playerid] = [1,plate]
+							job_pos[playerid] = [pos[0],pos[1],pos[2]]
+
+							sendMessage(playerid, "Найдите т/с гос.номер "+job_call[playerid][1], yellow)
+
+							triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+						}
+					}
+					else if (job_call[playerid][0] == 1)
+					{
+						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0))
+						{
+							local randomize = random(zp_player_police_car/2,zp_player_police_car)
+
+							sqlite3( "UPDATE car_db SET theft = '0' WHERE number = '"+job_call[playerid][1]+"'")
+
+							car_spawn(job_call[playerid][1])
+
+							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+							sendMessage(playerid, "Вы получили "+randomize+"$", green)
+
+							triggerClientEvent(playerid, "removegps")
+										
+							job_pos[playerid] = 0
+							job_call[playerid] = 0
+						}
+					}
+				}
+			}
+		
+		}
+	}, 1000, -1, playerid)
+}
 
 function sendMessage(playerid, text, color)
 {
@@ -3256,786 +4036,6 @@ function timer_earth_clear()
 			sendMessage(playerid, "[НОВОСТИ] Улицы очищенны от мусора", green)
 		}
 	}
-}
-
-function debuginfo () 
-{
-	local text_earth = ""
-	foreach(i, v in earth)
-	{
-		text_earth = text_earth + v[0]+"/"+v[1]+"/"+v[2]+"/"+v[3]+"/"+v[4]+"|"
-	}
-
-	local text_guns_zone = ""
-	foreach(i, v in guns_zone)
-	{
-		text_guns_zone = text_guns_zone + v[0]+"/"+v[1]+"/"+v[2]+"/"+v[3]+"/"+name_mafia[v[4]][0]+"/"+i+"|"
-	}
-
-	local text_guns_zone2 = point_guns_zone[0]+"/"+point_guns_zone[1]+"/"+name_mafia[point_guns_zone[2]][0]+"/"+point_guns_zone[3]+"/"+name_mafia[point_guns_zone[4]][0]+"/"+point_guns_zone[5]+"/"+time_guns_zone
-
-	if(point_guns_zone[0] == 1)
-	{
-		time_guns_zone = time_guns_zone-1
-
-		if(time_guns_zone == 0)
-		{
-			time_guns_zone = time_gz
-
-			if(point_guns_zone[3] > point_guns_zone[5])
-			{
-				guns_zone[point_guns_zone[1]][4] = point_guns_zone[2]
-
-				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[2]][0]+" захватила Guns Zone #"+point_guns_zone[1], green)
-
-				sqlite3( "UPDATE guns_zone SET mafia = '"+point_guns_zone[2]+"' WHERE number = '"+point_guns_zone[1]+"'")
-			}
-			else
-			{
-				guns_zone[point_guns_zone[1]][4] = point_guns_zone[4]
-
-				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[4]][0]+" удержала Guns Zone #"+point_guns_zone[1], green)
-			}
-
-			point_guns_zone[0] = 0
-			point_guns_zone[1] = 0//gz
-
-			point_guns_zone[2] = 0//mafia A
-			point_guns_zone[3] = 0//points
-
-			point_guns_zone[4] = 0//mafia D
-			point_guns_zone[5] = 0//points
-		}
-	}
-
-	foreach (playerid, playername in getPlayers())
-	{
-		local myPos = getPlayerPosition(playerid)
-		local x = myPos[0]
-		local y = myPos[1]
-		local z = myPos[2]
-
-		if(point_guns_zone[0] == 1)
-		{
-			points_add_in_gz(playerid, 1)
-		}
-
-		setElementData(playerid, "serial", getPlayerSerial(playerid))
-		setElementData(playerid, "alcohol_data", alcohol[playerid])
-		setElementData(playerid, "satiety_data", satiety[playerid])
-		setElementData(playerid, "hygiene_data", hygiene[playerid])
-		setElementData(playerid, "sleep_data", sleep[playerid])
-		setElementData(playerid, "drugs_data", drugs[playerid])
-		//setElementData(playerid, "fuel_data", 0)
-		setElementData(playerid, "probeg_data", 0)
-		setElementData(playerid, "gps_device_data", gps_device[playerid])
-		setElementData(playerid, "zakon_alcohol", zakon_alcohol)
-		setElementData(playerid, "zakon_drugs", zakon_drugs)
-		setElementData(playerid, "earth", text_earth)
-		setElementData(playerid, "guns_zone", text_guns_zone)
-		
-		if (search_inv_player_2_parameter(playerid, 91) != 0)
-		{
-			setElementData(playerid, "guns_zone2", text_guns_zone2)
-		}
-		else
-		{
-			setElementData(playerid, "guns_zone2", "0/0/0/0/0/0/0")
-		}
-
-		if (minute < 10)
-		{
-			setElementData(playerid, "timeserver", hour+"-0"+minute)
-		}
-		else
-		{
-			setElementData(playerid, "timeserver", hour+"-"+minute)
-		}
-
-		for (local i = 0; i < getMaxPlayers(); i++) 
-		{	
-			if (isPlayerConnected(i))
-			{
-				setElementData(playerid, "drugs["+i+"]", drugs[i])
-				setElementData(playerid, "alcohol["+i+"]", alcohol[i])
-				setElementData(playerid, "crimes["+i+"]", crimes[i])
-				setElementData(playerid, "is_chat_open["+i+"]", getElementData(i, "is_chat_open"))
-				setElementData(playerid, "afk["+i+"]", getElementData(i, "afk"))
-			}
-		}
-
-		local vehicleid = getPlayerVehicle(playerid)
-		if (isPlayerInVehicle(playerid))
-		{
-			local plate = getVehiclePlateText(vehicleid)
-			//setElementData(playerid, "fuel_data", fuel[plate])
-			setElementData(playerid, "probeg_data", probeg[plate])
-		}
-
-		setPlayerHealth(playerid, health[playerid].tofloat())
-	}
-}
-
-function job_timer2 (playerid)
-{
-	timer_job[playerid] = timer(function(playerid) {
-		local playername = getPlayerName(playerid)
-		local vehicleid = getPlayerVehicle(playerid)
-		local myPos = getPlayerPosition(playerid)
-		local x = myPos[0]
-		local y = myPos[1]
-		local z = myPos[2]
-
-		if (logged[playerid] == 1)
-		{
-
-			if (job[playerid] == 1) //--работа таксиста
-			{
-				if (isPlayerInVehicle(playerid))
-				{
-					if (getVehicleModel(vehicleid) == 24)
-					{
-						if (getSpeed(vehicleid) < 1)
-						{
-							if (job_call[playerid] == 0) 
-							{
-								local randomize = random(0,taxi_pos.len()-1)
-
-								sendMessage(playerid, "Езжайте на вызов", yellow)
-
-								job_call[playerid] = 1
-								job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
-
-								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-							}
-							else if (job_call[playerid] == 1) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
-								{
-									local randomize = random(0,taxi_pos.len()-1)
-
-									sendMessage(playerid, "Отвезите клиента", yellow)
-
-									job_call[playerid] = 2
-									job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
-
-									triggerClientEvent(playerid, "removegps")
-									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-								}
-							}
-							else if (job_call[playerid] == 2) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
-								{
-									local randomize = random(zp_player_taxi/2,zp_player_taxi)
-
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
-
-									sendMessage(playerid, "Вы получили "+randomize+"$", green)
-
-									triggerClientEvent(playerid, "removegps")
-									
-									job_pos[playerid] = 0
-									job_call[playerid] = 0
-								}
-							}
-						}
-					}
-				}
-			}
-
-			else if (job[playerid] == 2) //--работа водителя мусоровоза
-			{
-				if (isPlayerInVehicle(playerid))
-				{
-					if (getVehicleModel(vehicleid) == down_car_subject_pos[0][5])
-					{
-						if (getSpeed(vehicleid) < 1)
-						{
-							if (job_call[playerid] == 0) 
-							{
-								local randomize = random(0,taxi_pos.len()-1)
-
-								sendMessage(playerid, "Соберите мусор, потом доставьте его на свалку (около заброшенной литейной фабрики)", yellow)
-
-								job_call[playerid] = 1
-								job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
-
-								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-							}
-							else if (job_call[playerid] == 1) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
-								{
-									local randomize = random(0,taxi_pos.len()-1)
-									local randomize_zp = random(down_car_subject_pos[0][6]/2,down_car_subject_pos[0][6])
-
-									give_subject( playerid, "car", down_car_subject_pos[0][4], randomize_zp, false )
-
-									job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
-
-									triggerClientEvent(playerid, "removegps")
-									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-								}
-							}
-
-							if (isPointInCircle3D(x,y,z, down_car_subject_pos[0][0],down_car_subject_pos[0][1],down_car_subject_pos[0][2], down_car_subject_pos[0][3]) && amount_inv_car_1_parameter(vehicleid, down_car_subject_pos[0][4]) != 0)
-							{
-								local randomize = amount_inv_car_2_parameter(vehicleid, down_car_subject_pos[0][4])
-
-								inv_car_delet_1_parameter(playerid, down_car_subject_pos[0][4], true)
-
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
-
-								sendMessage(playerid, "Вы получили "+randomize+"$", green)
-
-								triggerClientEvent(playerid, "removegps")
-									
-								job_pos[playerid] = 0
-								job_call[playerid] = 0
-							}
-						}
-					}
-				}
-			}
-
-			else if (job[playerid] == 3) //--работа инкассатора
-			{
-				if (isPlayerInVehicle(playerid) && crimes[playerid] == 0)
-				{
-					if (getVehicleModel(vehicleid) == down_car_subject_pos[1][5])
-					{
-						if (getSpeed(vehicleid) < 1)
-						{
-							if (job_call[playerid] == 0) 
-							{
-								local randomize = random(0,collector_pos.len()-1)
-
-								sendMessage(playerid, "Соберите деньги, потом доставьте их в банк в Мидтауне", yellow)
-
-								job_call[playerid] = 1
-								job_pos[playerid] = [collector_pos[randomize][0],collector_pos[randomize][1],collector_pos[randomize][2]]
-
-								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-							}
-							else if (job_call[playerid] == 1) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 40.0))
-								{
-									local randomize = random(0,collector_pos.len()-1)
-									local randomize_zp = random(down_car_subject_pos[1][6]/2,down_car_subject_pos[1][6])
-
-									give_subject( playerid, "car", down_car_subject_pos[1][4], randomize_zp, false )
-
-									job_pos[playerid] = [collector_pos[randomize][0],collector_pos[randomize][1],collector_pos[randomize][2]]
-
-									triggerClientEvent(playerid, "removegps")
-									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-								}
-							}
-
-							if (isPointInCircle3D(x,y,z, down_car_subject_pos[1][0],down_car_subject_pos[1][1],down_car_subject_pos[1][2], down_car_subject_pos[1][3]) && amount_inv_car_1_parameter(vehicleid, down_car_subject_pos[1][4]) != 0)
-							{
-								local randomize = amount_inv_car_2_parameter(vehicleid, down_car_subject_pos[1][4])
-
-								inv_car_delet_1_parameter(playerid, down_car_subject_pos[1][4], true)
-
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
-
-								sendMessage(playerid, "Вы получили "+randomize+"$", green)
-
-								triggerClientEvent(playerid, "removegps")
-									
-								job_pos[playerid] = 0
-								job_call[playerid] = 0
-							}
-						}
-					}
-				}
-			}
-
-			else if (job[playerid] == 4) //--работа по починке тел будок
-			{
-				if (getPlayerModel(playerid) == 12)
-				{
-					if (job_call[playerid] == 0) 
-					{
-						local randomize = random(0,phohe.len()-1)
-
-						sendMessage(playerid, "Езжайте к телефонной будки", yellow)
-
-						job_call[playerid] = 1
-						job_pos[playerid] = [phohe[randomize][0],phohe[randomize][1],phohe[randomize][2]]
-
-						triggerClientEvent(playerid, "removegps")
-						triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-					}
-				}
-			}
-
-			else if (job[playerid] == 5) //--работа Угонщик
-			{
-				if (crimes[playerid] >= crimes_giuseppe)
-				{
-					if (job_call[playerid] == 0) 
-					{
-						local vehicleid = player_car_theft()
-						if(vehicleid)
-						{
-							local pos = getVehiclePosition(vehicleid)
-							local rot = getVehicleRotation(vehicleid)
-
-							job_call[playerid] = 1
-							job_pos[playerid] = [pos[0],pos[1],pos[2]]
-
-							job_vehicleid[playerid] = [vehicleid,pos[0],pos[1],pos[2],rot[0]]
-							job_timer[playerid] = timer(car_theft_fun, (car_theft_time*60000), 1, playerid, false)
-
-							sendMessage(playerid, "Угоните т/с гос.номер "+getVehiclePlateText(job_vehicleid[playerid][0])+", у вас есть "+car_theft_time+" мин", yellow)
-
-							triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-							triggerClientEvent( playerid, "createHudTimer", (60*car_theft_time).tofloat() )
-						}
-					}
-					else if (job_call[playerid] == 1)
-					{
-						if (job_vehicleid[playerid][0] == vehicleid)
-						{
-							local pos = player_position( playerid )
-							local x1 = pos[0]
-							local y1 = pos[1]
-
-							job_call[playerid] = 2
-
-							local randomize = random(0,sell_car_theft.len()-1)
-
-							sendMessage(playerid, "Езжайте на свалку Майка Бруски", yellow)
-
-							police_chat(playerid, "[ДИСПЕТЧЕР] Угон "+motor_show[getVehicleModel(vehicleid)][3]+" гос.номер "+getVehiclePlateText(vehicleid)+", координаты [X  "+x1+", Y  "+y1+"], подозреваемый "+playername)
-
-							job_pos[playerid] = [sell_car_theft[randomize][0],sell_car_theft[randomize][1],sell_car_theft[randomize][2]]
-
-							triggerClientEvent(playerid, "removegps")
-							triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-
-							local crimes_plus = zakon_car_theft_crimes
-							crimes[playerid] = crimes[playerid]+crimes_plus
-							sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
-						}
-					}
-					else if (job_call[playerid] == 2) 
-					{
-						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && job_vehicleid[playerid][0] == vehicleid)
-						{
-							if (getSpeed(vehicleid) < 1)
-							{
-								local randomize = motor_show[getVehicleModel(vehicleid)][1]*0.05
-
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
-
-								sendMessage(playerid, "Вы получили "+randomize+"$", green)
-
-								job_pos[playerid] = 0
-								job_call[playerid] = 3
-
-								car_theft_fun(playerid, true)
-							}
-						}
-					}
-				}
-			}
-
-			else if (job[playerid] == 6) //--ор на рз
-			{
-				if (getPlayerModel(playerid) == 133)
-				{
-					if (job_call[playerid] == 0) 
-					{
-						local randomize = random(0,table_sg_pos.len()-1)
-
-						sendMessage(playerid, "Идите к столу", yellow)
-
-						job_call[playerid] = 1
-						job_pos[playerid] = [table_sg_pos[randomize][0],table_sg_pos[randomize][1],table_sg_pos[randomize][2]]
-
-						triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-					}
-					else if (job_call[playerid] >= 1 && job_call[playerid] <= 11)
-					{
-						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0))
-						{
-							job_call[playerid]++
-						}
-					}
-					else if (job_call[playerid] == 12)
-					{
-						local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
-						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && result[1]["COUNT()"] == 1)
-						{
-							result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
-
-							local id2 = search_inv_player_2_parameter(playerid, 81)
-
-							if (result[1]["warehouse"] < max_sg && result[1]["money"] >= result[1]["price"] && result[1]["nalog"] != 0 && result[1]["prod"] != 0 && id2 != 0)
-							{
-								local randomize = result[1]["price"]
-
-								inv_player_delet(playerid, 81, id2, true)
-
-								id2 = id2 - 1
-
-								inv_player_empty(playerid, 81, id2)
-
-								if (id2 == 0)
-								{
-									inv_player_delet(playerid, 81, id2, true)
-								}
-
-								sqlite3( "UPDATE seagift_db SET warehouse = warehouse + '1', prod = prod - '1', money = money - '"+randomize+"' WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
-
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
-
-								sendMessage(playerid, "Вы получили "+randomize+"$", green)
-													
-								job_call[playerid] = 0
-
-								triggerClientEvent(playerid, "removegps")
-							}
-						}
-					}
-				}
-			}
-
-			else if (job[playerid] == 7) //--молочник
-			{
-				if (isPlayerInVehicle(playerid))
-				{
-					if (getVehicleModel(vehicleid) == up_car_subject[5][5])
-					{
-						if (getSpeed(vehicleid) < 1)
-						{
-							if (job_call[playerid] == 0) 
-							{
-								local randomize = random(0,milk_pos.len()-1)
-
-								sendMessage(playerid, "Езжайте на молокозавод в Южный Милвилл чтобы загрузить молоко, а потом развезите его по домам и бизнесам", yellow)
-
-								job_call[playerid] = 1
-								job_pos[playerid] = [milk_pos[randomize][0],milk_pos[randomize][1],milk_pos[randomize][2]]
-
-								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-							}
-							else if (job_call[playerid] == 1) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[5][3]) && amount_inv_car_1_parameter(vehicleid, up_car_subject[5][4]) != 0)
-								{
-									local sic2p = search_inv_car_2_parameter(vehicleid, up_car_subject[5][4])
-									local randomize = random(0,milk_pos.len()-1)
-
-									job_pos[playerid] = [milk_pos[randomize][0],milk_pos[randomize][1],milk_pos[randomize][2]]
-
-									triggerClientEvent(playerid, "removegps")
-									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-
-									inv_car_delet(playerid, up_car_subject[5][4], sic2p, true, false)
-
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
-
-									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
-								}
-							}
-						}
-					}
-				}
-			}
-
-			else if (job[playerid] == 8) //--алкоперевозчик
-			{
-				if (isPlayerInVehicle(playerid))
-				{
-					if (getVehicleModel(vehicleid) == up_car_subject[6][5])
-					{
-						if (getSpeed(vehicleid) < 1)
-						{
-							if (job_call[playerid] == 0) 
-							{
-								local randomize = random(0,ed.len()-1)
-
-								sendMessage(playerid, "Езжайте на cпиртзавод в Сэнд-Айленд чтобы загрузить ящики с виски, а потом развезите их по бизнесам", yellow)
-
-								job_call[playerid] = 1
-								job_pos[playerid] = [ed[randomize][0],ed[randomize][1],ed[randomize][2]]
-
-								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-							}
-							else if (job_call[playerid] == 1) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[6][3]) && amount_inv_car_1_parameter(vehicleid, up_car_subject[6][4]) != 0)
-								{
-									local sic2p = search_inv_car_2_parameter(vehicleid, up_car_subject[6][4])
-									local randomize = random(0,ed.len()-1)
-
-									job_pos[playerid] = [ed[randomize][0],ed[randomize][1],ed[randomize][2]]
-
-									triggerClientEvent(playerid, "removegps")
-									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-
-									inv_car_delet(playerid, up_car_subject[6][4], sic2p, true, false)
-
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
-
-									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
-								}
-							}
-						}
-					}
-				}
-			}
-
-			else if (job[playerid] == 9) //--автобусник
-			{
-				if (isPlayerInVehicle(playerid))
-				{
-					if (getVehicleModel(vehicleid) == 20 && getPlayerModel(playerid) == 171)
-					{
-						if (getSpeed(vehicleid) < 1 && search_inv_player_2_parameter(playerid, up_player_subject[5][4]) != 0)
-						{
-							if (job_call[playerid] == 0) 
-							{
-								sendMessage(playerid, "Езжайте по маршруту", yellow)
-
-								job_call[playerid] = search_inv_player_2_parameter(playerid, up_player_subject[5][4])
-								job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
-
-								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-							}
-							else if (job_call[playerid] >= 1 && job_call[playerid] <= 19) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 10.0))
-								{
-									inv_player_delet(playerid, up_player_subject[5][4], job_call[playerid], true)
-
-									job_call[playerid] = job_call[playerid]+1
-
-									inv_player_empty(playerid, up_player_subject[5][4], job_call[playerid])
-
-									job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
-
-									triggerClientEvent(playerid, "removegps")
-									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-								}
-							}
-							else if (job_call[playerid] == 20) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 15.0))
-								{
-									local randomize = random(zp_player_busdriver/2,zp_player_busdriver)
-
-									inv_player_delet(playerid, up_player_subject[5][4], job_call[playerid], true)
-
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
-
-									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", green)
-
-									triggerClientEvent(playerid, "removegps")
-										
-									job_pos[playerid] = 0
-									job_call[playerid] = 0
-								}
-							}
-						}
-					}
-				}
-			}
-
-			else if (job[playerid] == 10) //--перевозчик оружия
-			{
-				if (isPlayerInVehicle(playerid) && crimes[playerid] == 0)
-				{
-					if (getVehicleModel(vehicleid) == up_car_subject[7][5])
-					{
-						if (getSpeed(vehicleid) < 1)
-						{
-							if (job_call[playerid] == 0) 
-							{
-								local randomize = random(0,guns.len()-1)
-
-								sendMessage(playerid, "Езжайте на cклад в Порт чтобы загрузить ящики с оружием, а потом развезите их по аммунациям", yellow)
-
-								job_call[playerid] = 1
-								job_pos[playerid] = [guns[randomize][0],guns[randomize][1],guns[randomize][2]]
-
-								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-							}
-							else if (job_call[playerid] == 1) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[7][3]) && amount_inv_car_1_parameter(vehicleid, up_car_subject[7][4]) != 0)
-								{
-									local sic2p = search_inv_car_2_parameter(vehicleid, up_car_subject[7][4])
-									local randomize = random(0,guns.len()-1)
-
-									job_pos[playerid] = [guns[randomize][0],guns[randomize][1],guns[randomize][2]]
-
-									triggerClientEvent(playerid, "removegps")
-									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-
-									inv_car_delet(playerid, up_car_subject[7][4], sic2p, true, false)
-
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
-
-									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
-								}
-							}
-						}
-					}
-				}
-			}
-
-			else if (job[playerid] == 11) //--перевозчик угля
-			{
-				if (isPlayerInVehicle(playerid))
-				{
-					if (getVehicleModel(vehicleid) == up_car_subject[8][5])
-					{
-						if (getSpeed(vehicleid) < 1)
-						{
-							if (job_call[playerid] == 0) 
-							{
-								local randomize = random(0,coal_pos.len()-1)
-
-								sendMessage(playerid, "Езжайте в Северный Милвилл чтобы загрузить уголь, а потом доставьте его по адресу", yellow)
-
-								job_call[playerid] = 1
-								job_pos[playerid] = [coal_pos[randomize][0],coal_pos[randomize][1],coal_pos[randomize][2]]
-
-								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-							}
-							else if (job_call[playerid] == 1) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[8][3]) && amount_inv_car_1_parameter(vehicleid, up_car_subject[8][4]) != 0)
-								{
-									local sic2p = amount_inv_car_2_parameter(vehicleid, up_car_subject[8][4])
-									local randomize = random(0,coal_pos.len()-1)
-
-									job_pos[playerid] = [coal_pos[randomize][0],coal_pos[randomize][1],coal_pos[randomize][2]]
-
-									triggerClientEvent(playerid, "removegps")
-									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-
-									inv_car_delet_1_parameter(playerid, up_car_subject[8][4], true)
-
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
-
-									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
-								}
-							}
-						}
-					}
-				}
-			}
-
-			else if (job[playerid] == 12) //--уборка снега
-			{
-				if (isPlayerInVehicle(playerid))
-				{
-					if (getVehicleModel(vehicleid) == 39)
-					{
-						if (getSpeed(vehicleid) < 41*1.6 && search_inv_player_2_parameter(playerid, up_player_subject[6][4]) != 0)
-						{
-							if (job_call[playerid] == 0) 
-							{
-								sendMessage(playerid, "Езжайте по маршруту", yellow)
-
-								job_call[playerid] = search_inv_player_2_parameter(playerid, up_player_subject[6][4])
-								job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
-
-								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-							}
-							else if (job_call[playerid] >= 1 && job_call[playerid] <= 19) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 10.0))
-								{
-									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true)
-
-									job_call[playerid] = job_call[playerid]+1
-
-									inv_player_empty(playerid, up_player_subject[6][4], job_call[playerid])
-
-									job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
-
-									triggerClientEvent(playerid, "removegps")
-									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-								}
-							}
-							else if (job_call[playerid] == 20) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 15.0))
-								{
-									local randomize = random(zp_player_show/2,zp_player_show)
-
-									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true)
-
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
-
-									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", green)
-
-									triggerClientEvent(playerid, "removegps")
-										
-									job_pos[playerid] = 0
-									job_call[playerid] = 0
-								}
-							}
-						}
-					}
-				}
-			}
-
-			else if (job[playerid] == 13) //--работа транспортный детектив
-			{
-				if ((getPlayerModel(playerid) == 76) && search_inv_player(playerid, 10, 2) != 0 && crimes[playerid] == 0)
-				{
-					if (job_call[playerid] == 0)
-					{
-						local plate = player_car_police()
-
-						if (plate)
-						{
-							local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
-							local pos = [result[1]["x"],result[1]["y"],result[1]["z"]]
-
-							job_call[playerid] = [1,plate]
-							job_pos[playerid] = [pos[0],pos[1],pos[2]]
-
-							sendMessage(playerid, "Найдите т/с гос.номер "+job_call[playerid][1], yellow)
-
-							triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-						}
-					}
-					else if (job_call[playerid][0] == 1)
-					{
-						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0))
-						{
-							local randomize = random(zp_player_police_car/2,zp_player_police_car)
-
-							sqlite3( "UPDATE car_db SET theft = '0' WHERE number = '"+job_call[playerid][1]+"'")
-
-							car_spawn(job_call[playerid][1])
-
-							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
-
-							sendMessage(playerid, "Вы получили "+randomize+"$", green)
-
-							triggerClientEvent(playerid, "removegps")
-										
-							job_pos[playerid] = 0
-							job_call[playerid] = 0
-						}
-					}
-				}
-			}
-		
-		}
-	}, 1000, -1, playerid)
 }
 
 function job_0( playerid )
@@ -7747,6 +7747,11 @@ function (playerid, id, cash)
 	local randomize = random(0,36)
 	local roulette_game = ["красное","черное","четное","нечетное","1-18","19-36","1-12","13-24","25-36","3-1","3-2","3-3"]
 
+	for (local i = 0; i < 36; i++)
+	{
+		roulette_game.push(i.tostring())
+	}
+
 	if (logged[playerid] == 0)
 	{
 		return
@@ -7859,6 +7864,19 @@ function (playerid, id, cash)
 						if (randomize == v)
 						{
 							win_roulette(playerid, cash, 3)
+							return
+						}
+					}
+				}
+				else
+				{
+					id = id.tointeger()
+
+					if (id && id >= 0 && id <= 36)
+					{
+						if (randomize == id)
+						{
+							win_roulette(playerid, cash, 36)
 							return
 						}
 					}
@@ -8976,7 +8994,7 @@ function (playerid)
 	}
 
 	local commands = [
-		"/roulette [режим игры (красное, черное, четное, нечетное, 1-18, 19-36, 1-12, 2-12, 3-12, 3-1, 3-2, 3-3)] [сумма] - сыграть в рулетку",
+		"/roulette [режим игры (красное, черное, четное, нечетное, 1-18, 19-36, 1-12, 13-24, 25-36, 3-1, 3-2, 3-3, число от 0 до 36)] [сумма] - сыграть в рулетку",
 		"/slots [сумма] - сыграть в однорукого бандита",
 		"/prison [ИД игрока] - посадить игрока в тюрьму (для полицейских)",
 		"/r [текст] - рация",
