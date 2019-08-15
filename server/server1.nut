@@ -999,7 +999,7 @@ local message = {}//сообщения
 local array_car_1 = {}
 local array_car_2 = {}
 local fuel = {}//--топливный бак
-local dviglo = {}//--топливный бак
+local dviglo = {}//--двигло вкл или выкл
 local probeg = {}//пробег
 
 //слоты дома

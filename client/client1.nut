@@ -1146,7 +1146,6 @@ guiSetAlpha(gui_fon, 0.0)
 guiSetVisible( gui_fon, false )
 
 
-local health_gui = guiCreateElement( 13, "health.png", screen[0]-30.0, height_need-7.5, 30.0, 30.0, false )
 local alcohol_gui = guiCreateElement( 13, "alcohol.png", screen[0]-30.0, height_need-7.5+(20+7.5)*1, 30.0, 30.0, false )
 local drugs_gui = guiCreateElement( 13, "drugs.png", screen[0]-30.0, height_need-7.5+(20+7.5)*2, 30.0, 30.0, false )
 local satiety_gui = guiCreateElement( 13, "satiety.png", screen[0]-30.0, height_need-7.5+(20+7.5)*3, 30.0, 30.0, false )
@@ -1289,7 +1288,6 @@ function f2_down()
 	showChat( sync_timer )
 	toggleHud( sync_timer )
 
-	guiSetVisible(health_gui, sync_timer)
 	guiSetVisible(alcohol_gui, sync_timer)
 	guiSetVisible(drugs_gui, sync_timer)
 	guiSetVisible(satiety_gui, sync_timer)
@@ -1549,9 +1547,6 @@ function( post )
 			dxdrawtext ( myPos[0]+" "+myPos[1]+" "+myPos[2], 300.0, 40.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 			dxdrawtext ( myRot[0]+" "+myRot[1]+" "+myRot[2], 300.0, 55.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
-
-		dxDrawRectangle( screenWidth-width_need-30, height_need, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
-		dxDrawRectangle( screenWidth-width_need-30, height_need, (width_need/720)*heal_player[0].tofloat(), 15.0, fromRGB ( 90, 151, 107, 255 ) )
 
 		//--нужды
 		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*1, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
