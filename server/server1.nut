@@ -228,7 +228,7 @@ local info_png = {
 	[26] = ["таблетки от наркозависимости", "шт"],
 	[27] = ["одежда", ""],
 	[28] = ["наручники", "шт"],
-	[29] = ["шеврон Детектива", "шт"],
+	[29] = ["уголовное дело", "преступлений"],
 	[30] = ["шеврон Сержанта", "шт"],
 	[31] = ["шеврон Лейтенанта", "шт"],
 	[32] = ["шеврон Капитан", "шт"],
@@ -293,7 +293,6 @@ local info_png = {
 	[91] = ["шляпа", "опг"],
 	[92] = ["jetpack", "шт"],
 	[93] = ["#2 маршрутный лист", "ост."],
-	[94] = ["уголовное дело", "преступлений"],
 }
 
 local craft_table = [//--[предмет 0, рецепт 1, предметы для крафта 2, кол-во предметов для крафта 3, предмет который скрафтится 4] //переписать
@@ -6581,6 +6580,14 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				return
 			}
 		}
+		else if(id1 == 29)//оп
+		{
+			local crimes_plus = id2
+			crimes[playerid] = crimes[playerid]+crimes_plus
+			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
+			me_chat(playerid, playername+" прочитал(а) "+info_png[id1][0])
+			id2 = 0
+		}
 		else if (id1 == 34)//лицензии
 		{
 			if(id2 == 1)
@@ -6918,22 +6925,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				sendMessage(playerid, "[ERROR] Ограбление доступно с 0 до 6 часов игрового времени", red)
 				return
 			}
-		}
-		else if (id1 == 92) //--адм
-		{
-			if (admin_tp[playerid][0] == 0)
-			{
-				admin_tp[playerid][0] = 1
-
-				sendMessage(playerid, "перемещение ON", lyme)
-			}
-			else
-			{
-				admin_tp[playerid][0] = 0
-
-				sendMessage(playerid, "перемещение OFF", lyme)
-			}
-			return
 		}
 		else if (id1 == 46)//--алкостестер
 		{
@@ -7469,13 +7460,21 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			sendMessage(playerid, "Бизнесов: "+count2+", Доход: "+(count2*money_guns_zone_business)+"$", yellow)
 			return
 		}
-		else if(id1 == 94)//оп
+		else if (id1 == 92) //--адм
 		{
-			local crimes_plus = id2
-			crimes[playerid] = crimes[playerid]+crimes_plus
-			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
-			me_chat(playerid, playername+" прочитал(а) "+info_png[id1][0])
-			id2 = 0
+			if (admin_tp[playerid][0] == 0)
+			{
+				admin_tp[playerid][0] = 1
+
+				sendMessage(playerid, "перемещение ON", lyme)
+			}
+			else
+			{
+				admin_tp[playerid][0] = 0
+
+				sendMessage(playerid, "перемещение OFF", lyme)
+			}
+			return
 		}
 		else 
 		{
