@@ -1139,6 +1139,16 @@ local button_pos = [//позиция кнопок
 	[2,"HOUSE",130.0,15.0]
 ]
 
+local dgs = {
+	["text"] = [
+		[false, "test dgs", (screen[0]/2)-(dxGetTextDimensions("test dgs", 1.0, "tahoma-bold" )[0]/2),(screen[1]/2)-(15.0/2), fromRGB(255,0,0,255), true, "tahoma-bold", 1.0],
+	],
+
+	["rectangle"] = [
+		[false, (screen[0]/2)-(dxGetTextDimensions("test dgs", 1.0, "tahoma-bold" )[0]/2),(screen[1]/2)-(10.0/2), dxGetTextDimensions("test dgs", 1.0, "tahoma-bold" )[0],10.0 fromRGB(0,0,0,255)],
+	],
+}
+
 gui_fon = guiCreateElement( 2, "фон", 0.0, 0.0, screen[0], screen[1], false )//фон для гуи
 guiSetAlpha(gui_fon, 0.0)
 
@@ -1479,6 +1489,22 @@ function( post )
 
 	if (sync_timer)
 	{
+		foreach (k, v in dgs["rectangle"]) 
+		{	
+			if(v[0])
+			{
+				dxDrawRectangle( v[1], v[2], v[3], v[4], v[5] )
+			}
+		}
+
+		foreach (k, v in dgs["text"]) 
+		{	
+			if(v[0])
+			{
+				dxdrawtext( v[1], v[2], v[3], v[4], v[5], v[6], v[7] )
+			}
+		}
+	
 		local alcohol = getElementData ( "alcohol_data" ).tofloat()//--макс 500
 		local satiety = getElementData ( "satiety_data" ).tofloat()//--макс 100
 		local hygiene = getElementData ( "hygiene_data" ).tofloat()//--макс 100
@@ -2276,31 +2302,7 @@ function( element )
 
 
 //-------------------------------------тестирование разных функций---------------------------------
-	if (element == test_button)
-	{
-		sendMessage("test_button - "+guiGridListGetSelectedItem().tostring())
-	}
-	if (element == test_button2)
-	{
-		sendMessage("test_button2 - "+guiSetVisibleGridList (test, false).tostring())
-	}
-	if (element == test_button3)
-	{
-		sendMessage("test_button3 - "+guiSetVisibleGridList (test, true).tostring())
-	}
 
-	if (element == test_button11)
-	{
-		sendMessage("test_button11 - "+guiGridListGetItemText().tostring())
-	}
-	if (element == test_button22)
-	{
-		sendMessage("test_button22 - "+guiSetVisibleGridList (test1, false).tostring())
-	}
-	if (element == test_button33)
-	{
-		sendMessage("test_button33 - "+guiSetVisibleGridList (test1, true).tostring())
-	}
 })
 
 addEventHandler( "onGuiElementMouseEnter",
@@ -2439,45 +2441,3 @@ function (playerid, i1, i2)
 
 
 //-------------------------------------тестирование разных функций---------------------------------
-/* local mayoralty_shop = {
-		[0] = "права",
-		[1] = "лицензия на оружие", 
-		[2] = "лицензия таксиста",
-		[3] = "лицензия инкасатора", 
-		[4] = "лицензия дальнобойщика",
-		[5] = "лицензия водителя мусоровоза",
-		[6] = "квитанция для оплаты дома на ",
-		[7] = "квитанция для оплаты бизнеса на",
-		[8] = "квитанция для оплаты т/с на "
-	}
-
-	test = guiCreateGridList(200.0, 100.0, 300.0, 135.0)
-
-	foreach (k,v in mayoralty_shop)
-	{
-		guiGridListAddRow (test, v)
-	}
-
-	test_button = guiCreateElement( 2, "вывод", 200.0, 100.0+140.0, 50.0, 50.0, false )
-	test_button2 = guiCreateElement( 2, "скрыть", 250.0, 100.0+140.0, 50.0, 50.0, false )
-	test_button3 = guiCreateElement( 2, "показать", 300.0, 100.0+140.0, 50.0, 50.0, false )
-
-local mayoralty_shop = {
-		[0] = "день",
-		[1] = "деньги",
-		[2] = "права на имя",
-		[3] = "сигареты Big Break Red",
-		[4] = "аптечка",
-		[5] = "канистра с"
-	}
-
-	test1 = guiCreateGridList(550.0, 100.0, 300.0, 135.0)
-
-	foreach (k,v in mayoralty_shop)
-	{
-		guiGridListAddRow (test1, v)
-	}
-
-	test_button11 = guiCreateElement( 2, "вывод", 550.0, 100.0+140.0, 50.0, 50.0, false )
-	test_button22 = guiCreateElement( 2, "скрыть", 600.0, 100.0+140.0, 50.0, 50.0, false )
-	test_button33 = guiCreateElement( 2, "показать", 650.0, 100.0+140.0, 50.0, 50.0, false )*/
