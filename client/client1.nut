@@ -960,6 +960,11 @@ for (local i = 0; i < image.len(); i++)
 }
 
 local mouse = dxLoadTexture("mouse.png")
+local alcohol_png = dxLoadTexture("alcohol.png")
+local drugs_png = dxLoadTexture("drugs.png")
+local satiety_png = dxLoadTexture("satiety.png")
+local hygiene_png = dxLoadTexture("hygiene.png")
+local sleep_png = dxLoadTexture("sleep.png")
 
 //---------------------таймеры-------------------------------------------------------------
 timer(function () {
@@ -1139,27 +1144,10 @@ local button_pos = [//позиция кнопок
 	[2,"HOUSE",130.0,15.0]
 ]
 
-local dgs = {
-	["text"] = [
-		[false, "test dgs", (screen[0]/2)-(dxGetTextDimensions("test dgs", 1.0, "tahoma-bold" )[0]/2),(screen[1]/2)-(15.0/2), fromRGB(255,0,0,255), true, "tahoma-bold", 1.0],
-	],
-
-	["rectangle"] = [
-		[false, (screen[0]/2)-(dxGetTextDimensions("test dgs", 1.0, "tahoma-bold" )[0]/2),(screen[1]/2)-(10.0/2), dxGetTextDimensions("test dgs", 1.0, "tahoma-bold" )[0],10.0 fromRGB(0,0,0,255)],
-	],
-}
-
 gui_fon = guiCreateElement( 2, "фон", 0.0, 0.0, screen[0], screen[1], false )//фон для гуи
 guiSetAlpha(gui_fon, 0.0)
 
 guiSetVisible( gui_fon, false )
-
-
-local alcohol_gui = guiCreateElement( 13, "alcohol.png", screen[0]-30.0, height_need-7.5+(20+7.5)*1, 30.0, 30.0, false )
-local drugs_gui = guiCreateElement( 13, "drugs.png", screen[0]-30.0, height_need-7.5+(20+7.5)*2, 30.0, 30.0, false )
-local satiety_gui = guiCreateElement( 13, "satiety.png", screen[0]-30.0, height_need-7.5+(20+7.5)*3, 30.0, 30.0, false )
-local hygiene_gui = guiCreateElement( 13, "hygiene.png", screen[0]-30.0, height_need-7.5+(20+7.5)*4, 30.0, 30.0, false )
-local sleep_gui = guiCreateElement( 13, "sleep.png", screen[0]-30.0, height_need-7.5+(20+7.5)*5, 30.0, 30.0, false )
 
 function dxdrawtext(text, x, y, color, shadow, font, scale)
 {	
@@ -1296,12 +1284,6 @@ function f2_down()
 	sync_timer = !sync_timer
 	showChat( sync_timer )
 	toggleHud( sync_timer )
-
-	guiSetVisible(alcohol_gui, sync_timer)
-	guiSetVisible(drugs_gui, sync_timer)
-	guiSetVisible(satiety_gui, sync_timer)
-	guiSetVisible(hygiene_gui, sync_timer)
-	guiSetVisible(sleep_gui, sync_timer)
 }
 
 function f3_down()
@@ -1473,6 +1455,7 @@ function( post )
 	local myPos = getPlayerPosition(playerid)
 	local myRot = getPlayerRotation(playerid)
 
+	local pos = getMousePosition()
 	local currentTick = getTickCount()
 	local elapsedTime = currentTick - lastTick
 
@@ -1489,22 +1472,6 @@ function( post )
 
 	if (sync_timer)
 	{
-		foreach (k, v in dgs["rectangle"]) 
-		{	
-			if(v[0])
-			{
-				dxDrawRectangle( v[1], v[2], v[3], v[4], v[5] )
-			}
-		}
-
-		foreach (k, v in dgs["text"]) 
-		{	
-			if(v[0])
-			{
-				dxdrawtext( v[1], v[2], v[3], v[4], v[5], v[6], v[7] )
-			}
-		}
-	
 		local alcohol = getElementData ( "alcohol_data" ).tofloat()//--макс 500
 		local satiety = getElementData ( "satiety_data" ).tofloat()//--макс 100
 		local hygiene = getElementData ( "hygiene_data" ).tofloat()//--макс 100
@@ -1512,82 +1479,70 @@ function( post )
 		local drugs = getElementData ( "drugs_data" ).tofloat()//--макс 100
 		local heal_player = split(getPlayerHealth(playerid).tostring(), ".")
 		local timeserver = split(getElementData("timeserver"), "-")
-
 		local client_time = getDateTime()
 		local text = "FPS: "+FPS+" | Ping: "+getPlayerPing(playerid)+" | ID: "+playerid+" | Players online: "+(getPlayerCount()+1)+" | Minute in game: "+time_game+" | Time: "+timeserver[0]+":"+timeserver[1]+" | "+client_time
-		dxdrawtext ( text, 2.0, 0.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
+		local spl_gz = split(getElementData("guns_zone2"), "/")
 
-		if (getPlayerVehicle(playerid) != -1)
-		{
-			local speed_vehicle = "plate "+plate+" | kilometrage "+split(getElementData("probeg_data"), ".")[0]
-			dxdrawtext ( speed_vehicle, 2.0, screen[1]-16.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-		}
-
-		if (getElementData("gps_device_data").tointeger() == 1)
-		{
-			local coords = getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )
-			local x_table = split(myPos[0].tostring(), ".")
-			local y_table = split(myPos[1].tostring(), ".")
-			local dimensions = dxGetTextDimensions( "[X  "+x_table[0]+", Y  "+y_table[0]+"]", 1.0, "tahoma-bold" )
-
-			dxdrawtext ( "[X  "+x_table[0]+", Y  "+y_table[0]+"]", coords[0]-(dimensions[0]/2), coords[1], fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
-		}
+		local dgs = [
+		[false, (screen[0]/2)-(dxGetTextDimensions("test dgss", 1.0, "tahoma-bold" )[0]/2),(screen[1]/2)-(10.0/2), dxGetTextDimensions("test dgss", 1.0, "tahoma-bold" )[0],10.0 fromRGB(0,0,0,255), "rectangle"],
+		[false, "test dgss", (screen[0]/2)-(dxGetTextDimensions("test dgss", 1.0, "tahoma-bold" )[0]/2),(screen[1]/2)-(15.0/2), fromRGB(255,0,0,255), true, "tahoma-bold", 1.0, "text"],
+		[true, alcohol_png, screen[0]-30.0, height_need-7.5+(20+7.5)*1, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
+		[true, drugs_png, screen[0]-30.0, height_need-7.5+(20+7.5)*2, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
+		[true, satiety_png, screen[0]-30.0, height_need-7.5+(20+7.5)*3, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
+		[true, hygiene_png, screen[0]-30.0, height_need-7.5+(20+7.5)*4, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
+		[true, sleep_png, screen[0]-30.0, height_need-7.5+(20+7.5)*5, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
+		[true, screenWidth-width_need-30, height_need+(20+7.5)*1, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
+		[true, screenWidth-width_need-30, height_need+(20+7.5)*1, ((width_need/500.0)*alcohol), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
+		[true, screenWidth-width_need-30, height_need+(20+7.5)*2, width_need, 15.0 fromRGB ( 0, 0, 0, 200 ), "rectangle"],
+		[true, screenWidth-width_need-30, height_need+(20+7.5)*2, ((width_need/100.0)*drugs), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
+		[true, screenWidth-width_need-30, height_need+(20+7.5)*3, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
+		[true, screenWidth-width_need-30, height_need+(20+7.5)*3,( (width_need/100.0)*satiety), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
+		[true, screenWidth-width_need-30, height_need+(20+7.5)*4, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
+		[true, screenWidth-width_need-30, height_need+(20+7.5)*4, ((width_need/100.0)*hygiene), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
+		[true, screenWidth-width_need-30, height_need+(20+7.5)*5, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
+		[true, screenWidth-width_need-30, height_need+(20+7.5)*5, ((width_need/100.0)*sleep), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
+		[true, text, 2.0, 0.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[getPlayerVehicle(playerid) != -1 || false, "plate "+plate+" | kilometrage "+split(getElementData("probeg_data"), ".")[0], 2.0, screen[1]-16.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[getElementData("gps_device_data").tointeger() == 1 || false, "[X  "+split(myPos[0].tostring(), ".")[0]+", Y  "+split(myPos[1].tostring(), ".")[0]+"]", getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )[0]-(dxGetTextDimensions( "[X  "+split(myPos[0].tostring(), ".")[0]+", Y  "+split(myPos[1].tostring(), ".")[0]+"]", 1.0, "tahoma-bold" )[0]/2), getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )[1], fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[spl_gz[0].tointeger() == 1 || false, 0.0, screen[1]-16.0*6, 250.0, 16.0*3, fromRGB( 0, 0, 0, 150 ), "rectangle"],
+		[spl_gz[0].tointeger() == 1 || false, "Time: "+spl_gz[6]+" sec | Guns Zone #"+spl_gz[1], 2.0, screen[1]-16*6, fromRGB( white[0], white[1], white[2] ), false, "tahoma-bold", 1.0, "text"],
+		[spl_gz[0].tointeger() == 1 || false, "Attack "+spl_gz[2]+": "+spl_gz[3]+" points", 2.0, screen[1]-16*5, fromRGB( 255,0,50 ), false, "tahoma-bold", 1.0, "text"],
+		[spl_gz[0].tointeger() == 1 || false, "Defense "+spl_gz[4]+": "+spl_gz[5]+" points", 2.0, screen[1]-16*4, fromRGB( 0,50,255 ), false, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing || false, pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing || false, heal_player[0], screenWidth-width_need-30-30, height_need, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing || false, (alcohol/100).tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*1, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing || false, drugs.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*2, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing || false, satiety.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*3, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing || false, hygiene.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*4, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing || false, sleep.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*5, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing || false, myPos[0]+" "+myPos[1]+" "+myPos[2], 300.0, 40.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing || false, myRot[0]+" "+myRot[1]+" "+myRot[2], 300.0, 55.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		]
 
 		foreach (k, v in split(getElementData("guns_zone"), "|"))//--отображение guns_zone
 		{
 			local spl = split(v.tostring(), "/")
 			if (isPointInRectangle2D( myPos[0], myPos[1], spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat(), spl[3].tofloat() ))
 			{
-				//local dimensions = dxGetTextDimensions("Guns Zone - "+spl[4]+" MAFIA", 1.0, "tahoma-bold" )
-				dxdrawtext ( "Guns Zone #"+spl[5]+" - "+spl[4], 2.0, screen[1]-16*2, fromRGB( green[0], green[1], green[2] ), true, "tahoma-bold", 1.0 )
+				dgs.push([true, "Guns Zone #"+spl[5]+" - "+spl[4], 2.0, screen[1]-16*2, fromRGB( green[0], green[1], green[2] ), true, "tahoma-bold", 1.0, "text"])
 			}
 		}
 
-		local spl_gz = split(getElementData("guns_zone2"), "/")
-		if(spl_gz[0].tointeger() == 1)
-		{
-			dxDrawRectangle( 0.0, screen[1]-16.0*6, 250.0, 16.0*3, fromRGB( 0, 0, 0, 150 ) )
-			dxdrawtext ( "Time: "+spl_gz[6]+" sec | Guns Zone #"+spl_gz[1], 2.0, screen[1]-16*6, fromRGB( white[0], white[1], white[2] ), false, "tahoma-bold", 1.0 )
-			dxdrawtext ( "Attack "+spl_gz[2]+": "+spl_gz[3]+" points", 2.0, screen[1]-16*5, fromRGB( 255,0,50 ), false, "tahoma-bold", 1.0 )
-			dxdrawtext ( "Defense "+spl_gz[4]+": "+spl_gz[5]+" points", 2.0, screen[1]-16*4, fromRGB( 0,50,255 ), false, "tahoma-bold", 1.0 )
+		foreach (k, v in dgs) 
+		{	
+			if(v[0] && v[6] == "rectangle")
+			{
+				dxDrawRectangle( v[1], v[2], v[3], v[4], v[5] )
+			}
+			else if(v[0] && v[8] == "text")
+			{
+				dxdrawtext( v[1], v[2], v[3], v[4], v[5], v[6], v[7] )
+			}
+			else if(v[0] && v[10] == "texture")
+			{
+				dxDrawTexture(v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9])
+			}
 		}
-		
-		if (isCursorShowing)
-		{
-			local pos = getMousePosition()
-			dxdrawtext ( pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-
-			/*for (local i = 0; i < local_param.len(); i++) 
-			{	
-				dxdrawtext ( local_param[i], 610.0, 280.0+(15.0*i), fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-			}*/
-
-			dxdrawtext ( heal_player[0], screenWidth-width_need-30-30, height_need, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-			dxdrawtext ( (alcohol/100).tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*1, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-			dxdrawtext ( drugs.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*2, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-			dxdrawtext ( satiety.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*3, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-			dxdrawtext ( hygiene.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*4, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-			dxdrawtext ( sleep.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*5, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-
-			dxdrawtext ( myPos[0]+" "+myPos[1]+" "+myPos[2], 300.0, 40.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-			dxdrawtext ( myRot[0]+" "+myRot[1]+" "+myRot[2], 300.0, 55.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0 )
-		}
-
-		//--нужды
-		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*1, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
-		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*1, ((width_need/500.0)*alcohol), 15.0, fromRGB ( 90, 151, 107, 255 ) )
-
-		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*2, width_need, 15.0 fromRGB ( 0, 0, 0, 200 ) )
-		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*2, ((width_need/100.0)*drugs), 15.0, fromRGB ( 90, 151, 107, 255 ) )
-
-		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*3, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
-		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*3,( (width_need/100.0)*satiety), 15.0, fromRGB ( 90, 151, 107, 255 ) )
-
-		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*4, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
-		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*4, ((width_need/100.0)*hygiene), 15.0, fromRGB ( 90, 151, 107, 255 ) )
-
-		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*5, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ) )
-		dxDrawRectangle( screenWidth-width_need-30, height_need+(20+7.5)*5, ((width_need/100.0)*sleep), 15.0, fromRGB ( 90, 151, 107, 255 ) )
 	}
 
 
@@ -1665,7 +1620,6 @@ function( post )
 			}
 		}
 
-		local pos = getMousePosition()
 		dxDrawTexture(mouse, pos[0], pos[1], 0.73, 1.0, 0.0, 0.0, 0.0, 255)
 	}
 
