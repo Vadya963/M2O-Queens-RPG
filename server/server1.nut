@@ -2320,7 +2320,7 @@ function radio_chat(playerid, text, color)
 
 		if (search_inv_player(player, 89, search_inv_player_2_parameter(playerid, 89)) != 0)
 		{
-			sendMessage(player, text, color[0], color[1], color[2])
+			sendMessage(player, text, color)
 		}
 	}
 }
