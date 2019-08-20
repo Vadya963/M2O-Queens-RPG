@@ -172,10 +172,11 @@ foreach (i,v in craft_table)
 }
 
 local name_mafia = {
-	[0] = ["no", [255,255,255]],
-	[1] = ["American Mafia", [0,0,255]],
-	[2] = ["Italian Mafia", [255,100,0]],
-	[3] = ["Chinese Mafia", [255,0,0]],
+	[0] = ["no", [255,255,255], []],
+	[1] = ["Bombers", [255,255,0], [39,40,41]],
+	[2] = ["Grease", [50,50,50], [123,124,125,126,127]],
+	[3] = ["Irishmen", [150,75,0], [24,82,83,84]],
+	[4] = ["Triads", [255,0,0], [51,52,54]],
 }
 
 //цены автосалона
@@ -536,12 +537,13 @@ guiSetVisibleGridList (craft_menu, false)
 
 local giuseppe = [
 	[info_png[34][0]+" Угонщик", 5, 5000, 34],
-	[info_png[58][0], 78, 1000, 58],
+	[info_png[58][0], 78, 1000, 57],
 	[info_png[78][0], 100, 1000, 78],
 	[info_png[79][0], 5, 500, 79],
-	[info_png[91][0]+" "+name_mafia[1][0], 1, 5000, 91],
+	[info_png[91][0]+" "+name_mafia[1][0], 1, 5000, 91],//4
 	[info_png[91][0]+" "+name_mafia[2][0], 2, 5000, 91],
 	[info_png[91][0]+" "+name_mafia[3][0], 3, 5000, 91],
+	[info_png[91][0]+" "+name_mafia[4][0], 4, 5000, 91],//7
 ]
 local giuseppe_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in giuseppe)
