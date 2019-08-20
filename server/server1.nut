@@ -92,9 +92,10 @@ local time_gz = 1*60
 local time_guns_zone = time_gz
 local name_mafia = {
 	[0] = ["no", [255,255,255], []],
-	[1] = ["American Mafia", [0,0,255], [106,107,104]],
-	[2] = ["Italian Mafia", [255,100,0], [91,94,96]],
-	[3] = ["Chinese Mafia", [255,0,0], [51,52,48]],
+	[1] = ["Bombers", [255,255,0], [39,40,41]],
+	[2] = ["Grease", [50,50,50], [123,124,125,126,127]],
+	[3] = ["Irishmen", [150,75,0], [24,82,83,84]],
+	[4] = ["Triads", [255,0,0], [51,52,54]],
 }
 local guns_zone = {}
 //----------------------------------------------------------------------------------------------------------------
@@ -782,7 +783,8 @@ local giuseppe = [
 	[info_png[79][0], 5, 500, 79],
 	[info_png[91][0]+" "+name_mafia[1][0], 1, 5000, 91],//4
 	[info_png[91][0]+" "+name_mafia[2][0], 2, 5000, 91],
-	[info_png[91][0]+" "+name_mafia[3][0], 3, 5000, 91],//6
+	[info_png[91][0]+" "+name_mafia[3][0], 3, 5000, 91],
+	[info_png[91][0]+" "+name_mafia[4][0], 4, 5000, 91],//7
 ]
 
 local repair_shop = [
@@ -3132,7 +3134,7 @@ function buy_subject_fun( playerid, text, number, value )
 			local text1 = v[0]+" "+v[1]+" "+info_png[v[3]][1]+" "+v[2]+"$"
 			if (text1 == text)
 			{	
-				if (k >= 4 && k <= 6)
+				if (k >= 4 && k <= 7)
 				{
 					local count = false
 					local name_mafia_skin = ""
@@ -4933,7 +4935,7 @@ function( playerid )
 		sendMessage(playerid, "[TIPS] Первоначальная работа находится на свалке у Майка Бруски", color_tips)
 		sendMessage(playerid, "[TIPS] Граждане не имеющий дом, могут помыться и выспаться в отеле Титания", color_tips)
 		sendMessage(playerid, "[TIPS] Права можно купить в Мэрии (зеленый пятиугольник)", color_tips)
-		sendMessage(playerid, "[TIPS] Если у вас нету счетчика FPS или 3D текстов, перезайдите!", color_tips)
+		sendMessage(playerid, "[WARNING] Если у вас нету счетчика FPS или 3D текстов, перезайдите!", red)
 
 		reg_or_login(playerid)
 
@@ -8848,9 +8850,20 @@ function (playerid)
 		sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_capture+" преступлений", red)
 		return
 	}
-	else if (getPlayerModel(playerid) != name_mafia[mafia][2][0] && getPlayerModel(playerid) != name_mafia[mafia][2][1] && getPlayerModel(playerid) != name_mafia[mafia][2][2])
+	
+	local skin = false
+	foreach (k,v in name_mafia[mafia][2])
 	{
-		sendMessage(playerid, "[ERROR] Вы должны быть в одежде "+name_mafia[mafia][2][0]+","+name_mafia[mafia][2][1]+","+name_mafia[mafia][2][2], red)
+		if (v == getPlayerModel(playerid))
+		{
+			skin = true
+			break
+		}
+	}
+
+	if (!skin)
+	{
+		sendMessage(playerid, "[ERROR] Вы должны быть в одежде своей банды", red)
 		return
 	}
 
