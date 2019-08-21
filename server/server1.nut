@@ -811,7 +811,7 @@ local mayoralty_shop = [
 	[info_png[34][0]+" Таксист", 1, 5000, 34],
 	[info_png[34][0]+" Мусоровозчик", 2, 5000, 34],
 	[info_png[34][0]+" Инкассатор", 3, 5000, 34],
-	[info_png[34][0]+" Ремонтник", 4, 1000, 34],
+	[info_png[34][0]+" Связист", 4, 1000, 34],
 	[info_png[34][0]+" Дальнобойщик", 6, 5000, 34],
 	[info_png[34][0]+" Молочник", 7, 5000, 34],
 	[info_png[34][0]+" Развозчик алкоголя", 8, 5000, 34],
@@ -6649,7 +6649,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				{
 					job[playerid] = 4
 
-					me_chat(playerid, playername+" вышел(ла) на работу Ремонтник")
+					me_chat(playerid, playername+" вышел(ла) на работу Связист")
 				}
 				else
 				{
@@ -7211,7 +7211,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if(job[playerid] != 4)
 			{
-				sendMessage(playerid, "[ERROR] Вы не ремонтник", red)
+				sendMessage(playerid, "[ERROR] Вы не Связист", red)
 				return
 			}
 
