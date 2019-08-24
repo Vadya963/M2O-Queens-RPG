@@ -2951,6 +2951,29 @@ function buy_subject_fun( playerid, text, number, value )
 
 	if ( value == "pd" )//пд
 	{
+		foreach (k, v in sub_cops)
+		{
+			local text1 = v[0]
+			if (text1 == text)
+			{
+				if (0 <= k && k <= 4 && search_inv_player(playerid, 10, 6) == 0)
+				{
+					sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red)
+					return
+				}
+
+				if (inv_player_empty(playerid, v[2], v[1]))
+				{
+					sendMessage(playerid, "Вы получили "+text, orange)
+				}
+				else
+				{
+					sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+				}
+				return
+			}
+		}
+
 		if (search_inv_player(playerid, 41, 1) == 0)
 		{
 			sendMessage(playerid, "[ERROR] У вас нет лицензии на оружие, приобрести её можно в Мэрии", red)
@@ -2962,29 +2985,7 @@ function buy_subject_fun( playerid, text, number, value )
 			local text1 = v[0]
 			if (text1 == text)
 			{
-				if (inv_player_empty(playerid, k, 25))
-				{
-					sendMessage(playerid, "Вы получили "+text, orange)
-				}
-				else
-				{
-					sendMessage(playerid, "[ERROR] Инвентарь полон", red)
-				}
-			}
-		}
-
-		foreach (k, v in sub_cops)
-		{
-			local text1 = v[0]
-			if (text1 == text)
-			{
-				if (search_inv_player(playerid, 10, 6) == 0)
-				{
-					sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red)
-					return
-				}
-
-				if (inv_player_empty(playerid, v[2], v[1]))
+				if (inv_player_empty(playerid, k, 25*search_inv_player_2_parameter(playerid, 10)))
 				{
 					sendMessage(playerid, "Вы получили "+text, orange)
 				}
@@ -9584,7 +9585,7 @@ function(command, params)
 	}
 
 	if(command == "x")
-	{	
+	{
 
 	}
 
