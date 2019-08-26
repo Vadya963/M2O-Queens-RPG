@@ -1125,22 +1125,14 @@ function debuginfo ()
 	}
 }
 
-function job_timer2 (playerid)
-{
-	timer_job[playerid] = timer(function(playerid) {
-		local playername = getPlayerName(playerid)
+local table_job = {
+	[1] = function (playerid,playername) {//--работа таксиста
 		local vehicleid = getPlayerVehicle(playerid)
 		local myPos = getPlayerPosition(playerid)
 		local x = myPos[0]
 		local y = myPos[1]
 		local z = myPos[2]
-
-		if (logged[playerid] == 1)
-		{
-
-			if (job[playerid] == 1) //--работа таксиста
-			{
-				if (isPlayerInVehicle(playerid))
+		if (isPlayerInVehicle(playerid))
 				{
 					if (getVehicleModel(vehicleid) == 24)
 					{
@@ -1191,11 +1183,15 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 2) //--работа водителя мусоровоза
-			{
-				if (isPlayerInVehicle(playerid))
+	[2] = function (playerid,playername) {//--работа водителя мусоровоза
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (isPlayerInVehicle(playerid))
 				{
 					if (getVehicleModel(vehicleid) == down_car_subject_pos[0][5])
 					{
@@ -1246,11 +1242,15 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 3) //--работа инкассатора
-			{
-				if (isPlayerInVehicle(playerid) && crimes[playerid] == 0)
+	[3] = function (playerid,playername) {//--работа инкассатора
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (isPlayerInVehicle(playerid) && crimes[playerid] == 0)
 				{
 					if (getVehicleModel(vehicleid) == down_car_subject_pos[1][5])
 					{
@@ -1301,11 +1301,15 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 4) //--работа по починке тел будок
-			{
-				if (getPlayerModel(playerid) == 12)
+	[4] = function (playerid,playername) {//--работа по починке тел будок
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (getPlayerModel(playerid) == 12)
 				{
 					if (job_call[playerid] == 0) 
 					{
@@ -1320,16 +1324,20 @@ function job_timer2 (playerid)
 						triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 5) //--работа Угонщик
-			{
-				if (crimes[playerid] >= crimes_giuseppe)
+	[5] = function (playerid,playername) {//--работа Угонщик
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (crimes[playerid] >= crimes_giuseppe)
 				{
 					if (job_call[playerid] == 0) 
 					{
 						local vehicleid = player_car_theft()
-						if(vehicleid)
+						if(vehicleid != false)
 						{
 							local pos = getVehiclePosition(vehicleid)
 							local rot = getVehicleRotation(vehicleid)
@@ -1392,11 +1400,15 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 6) //--ор на рз
-			{
-				if (getPlayerModel(playerid) == 133)
+	[6] = function (playerid,playername) {//--ор на рз
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (getPlayerModel(playerid) == 133)
 				{
 					if (job_call[playerid] == 0) 
 					{
@@ -1453,11 +1465,15 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 7) //--молочник
-			{
-				if (isPlayerInVehicle(playerid))
+	[7] = function (playerid,playername) {//--молочник
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (isPlayerInVehicle(playerid))
 				{
 					if (getVehicleModel(vehicleid) == up_car_subject[5][5])
 					{
@@ -1496,11 +1512,15 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 8) //--алкоперевозчик
-			{
-				if (isPlayerInVehicle(playerid))
+	[8] = function (playerid,playername) {//--алкоперевозчик
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (isPlayerInVehicle(playerid))
 				{
 					if (getVehicleModel(vehicleid) == up_car_subject[6][5])
 					{
@@ -1539,11 +1559,15 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 9) //--автобусник
-			{
-				if (isPlayerInVehicle(playerid))
+	[9] = function (playerid,playername) {//--автобусник
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (isPlayerInVehicle(playerid))
 				{
 					if (getVehicleModel(vehicleid) == 20 && getPlayerModel(playerid) == 171)
 					{
@@ -1595,11 +1619,15 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 10) //--перевозчик оружия
-			{
-				if (isPlayerInVehicle(playerid) && crimes[playerid] == 0)
+	[10] = function (playerid,playername) {//--перевозчик оружия
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (isPlayerInVehicle(playerid) && crimes[playerid] == 0)
 				{
 					if (getVehicleModel(vehicleid) == up_car_subject[7][5])
 					{
@@ -1638,11 +1666,15 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 11) //--перевозчик угля
-			{
-				if (isPlayerInVehicle(playerid))
+	[11] = function (playerid,playername) {//--перевозчик угля
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (isPlayerInVehicle(playerid))
 				{
 					if (getVehicleModel(vehicleid) == up_car_subject[8][5])
 					{
@@ -1681,11 +1713,15 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 12) //--уборка снега
-			{
-				if (isPlayerInVehicle(playerid))
+	[12] = function (playerid,playername) {//--уборка снега
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (isPlayerInVehicle(playerid))
 				{
 					if (getVehicleModel(vehicleid) == 39)
 					{
@@ -1737,11 +1773,15 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
+	},
 
-			else if (job[playerid] == 13) //--работа транспортный детектив
-			{
-				if ((getPlayerModel(playerid) == 76) && search_inv_player(playerid, 10, 2) != 0 && crimes[playerid] == 0)
+	[13] = function (playerid,playername) {//--работа транспортный детектив
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if ((getPlayerModel(playerid) == 76) && search_inv_player(playerid, 10, 2) != 0 && crimes[playerid] == 0)
 				{
 					if (job_call[playerid] == 0)
 					{
@@ -1781,10 +1821,14 @@ function job_timer2 (playerid)
 						}
 					}
 				}
-			}
-		
-		}
-	}, 1000, -1, playerid)
+	},
+}
+
+function job_timer2 (playerid)
+{
+	local playername = getPlayerName(playerid)
+
+	timer_job[playerid] = timer(table_job[job[playerid]], 1000, -1, playerid,playername)
 }
 
 function sendMessage(playerid, text, color)
