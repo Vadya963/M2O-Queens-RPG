@@ -52,6 +52,7 @@ local day_nalog = 7//кол-во дней для оплаты налога
 local no_use_wheel_and_engine = [20,27,35,37,38,39]
 local police_chanel = 1//канал копов
 local admin_chanel = 2//--канал админов
+local loto = [0, [], false]//--лотерея
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -82,6 +83,7 @@ local zp_player_show = 24000
 local money_guns_zone = 5000
 local money_guns_zone_business = 1000
 local zp_player_police_car = 5000
+local zp_loto = 10000
 //вместимость складов бизнесов
 local max_business = 100
 local max_sg = 1000
@@ -230,8 +232,8 @@ local info_png = {
 	[27] = ["одежда", ""],
 	[28] = ["наручники", "шт"],
 	[29] = ["уголовное дело", "преступлений"],
-	[30] = ["шеврон Сержанта", "шт"],
-	[31] = ["шеврон Лейтенанта", "шт"],
+	[30] = ["лотерейный билет с номером", ""],
+	[31] = ["водка сталкер", "шт"],
 	[32] = ["шеврон Капитан", "шт"],
 	[33] = ["шеврон Шефа полиции", "шт"],
 	[34] = ["лицензия на работу", "вид работы"],
@@ -754,6 +756,7 @@ local shop = {
 	[8] = [info_png[8][0], 20, 15],
 	[11] = [info_png[11][0], 1, 25],
 	[26] = [info_png[26][0], 1, 5000],
+	[30] = [info_png[30][0], 1, 100],
 	[44] = [info_png[44][0], 100, 50],
 	[45] = [info_png[45][0], 100, 100],
 	[52] = [info_png[52][0], 1, 100],
@@ -766,6 +769,7 @@ local shop = {
 local eda = {
 	[21] = [info_png[21][0], 1, 45],
 	[22] = [info_png[22][0], 1, 60],
+	[31] = [info_png[31][0], 1, 250],
 	[42] = [info_png[42][0], 1, 100],
 	[43] = [info_png[43][0], 1, 50],
 	[72] = [info_png[72][0], 1, 500],
@@ -3372,6 +3376,59 @@ function buy_subject_fun( playerid, text, number, value )
 			}
 			else if (value == 2)
 			{
+				local v = [shop[30][0], shop[30][1], shop[30][2]]
+				local k = 30
+				local randomize = random(1,1000)
+				local count = false
+
+				while (true)
+				{
+					foreach(k,v in loto[1])
+					{
+						if (v == randomize)
+						{
+							count = true
+						}
+					}
+
+					if (!count)
+					{
+						break
+					}
+					else
+					{
+						randomize = random(1,1000)
+						count = false
+					}
+				}
+
+				local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+				if (text1 == text)
+				{
+					if (cash*v[2] <= array_player_2[playerid][0])
+					{
+						if (inv_player_empty(playerid, k, randomize))
+						{
+							sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", orange)
+
+							sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
+
+							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
+
+							loto[1].push(randomize)
+						}
+						else
+						{
+							sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+						}
+					}
+					else
+					{
+						sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+					}
+					return
+				}
+
 				foreach (k, v in shop)
 				{
 					local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
@@ -4232,6 +4289,12 @@ function timeserver()//время сервера
 
 				print("[timeserver] pogoda_string_false "+pogoda_string_false[1])
 			}
+
+			loto[0] = random(1,1000)
+			loto[2] = true
+			print("[loto] "+loto[0])
+
+			sendMessageAll(null, "[НОВОСТИ] Лотерея объявляется открытой, быстрее трите свои билеты", green)
 
 			timer_earth_clear()//--очистка земли от предметов
 		}
@@ -6228,7 +6291,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
 		}
-		else if (id1 == 72)//виски
+		else if (id1 == 72 || id1 == 31)//виски,водка
 		{
 			if (id1 == 72)
 			{
@@ -6250,6 +6313,46 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				local satiety_plus = 10
 				local hp = max_heal*0.50
+				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
+				sendMessage(playerid, "+"+hp+" хп", yellow)
+
+				if (satiety[playerid]+satiety_plus <= max_satiety)
+				{
+					satiety[playerid] = satiety[playerid]+satiety_plus
+					sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow)
+				}
+
+				alcohol[playerid] = alcohol[playerid]+alcohol_plus
+				sendMessage(playerid, "+"+(alcohol_plus/100.0)+" промилле", yellow)
+
+				if (hygiene[playerid]-hygiene_minys >= 0)
+				{
+					hygiene[playerid] = hygiene[playerid]-hygiene_minys
+					sendMessage(playerid, "-"+hygiene_minys+" ед. чистоплотности", yellow)
+				}
+
+				me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
+			}
+			else if (id1 == 31)
+			{
+				local alcohol_plus = 50.0
+				local hygiene_minys = 10
+
+				if (getplayerhealth(playerid) == max_heal)
+				{
+					sendMessage(playerid, "[ERROR] У вас полное здоровье", red)
+					return
+				}
+				else if (alcohol[playerid]+alcohol_plus > max_alcohol)
+				{
+					sendMessage(playerid, "[ERROR] Вы сильно пьяны", red)
+					return
+				}
+
+				id2 = id2 - 1
+
+				local satiety_plus = 10
+				local hp = max_heal*0.40
 				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
 				sendMessage(playerid, "+"+hp+" хп", yellow)
 
@@ -6634,6 +6737,29 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
 			me_chat(playerid, playername+" прочитал(а) "+info_png[id1][0])
 			id2 = 0
+		}
+		else if (id1 == 30)//лотерея
+		{
+			if (loto[2])
+			{
+				me_chat(playerid, playername+" потер(ла) лотерейный билет")
+
+				if (loto[0] == id2)
+				{
+					local randomize = random(zp_loto/2,zp_loto)
+					loto[2] = false
+
+					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+					sendMessageAll(playerid, "[НОВОСТИ] Лотерея объявляется закрытой, победителем стал "+playername+", выигрыш составил "+randomize+"$", green)
+				}
+
+				id2 = 0
+			}
+			else
+			{
+				sendMessage(playerid, "[ERROR] Лотерея закончилась", red)
+				return
+			}
 		}
 		else if (id1 == 34)//лицензии
 		{
