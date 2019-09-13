@@ -993,6 +993,7 @@ local tp_player_lh = array(getMaxPlayers(), 0)//таймер перелета и
 local admin_tp = array(getMaxPlayers(), 0)//админ тп
 local skin_timer = array(getMaxPlayers(), 0)//смена скина
 local timer_job = array(getMaxPlayers(), 0)//таймер работ
+local frozen_player = array(getMaxPlayers(), 0)//элементы управления
 
 //для истории сообщений
 local max_message = 15//максимально отображаемое число сообщений
@@ -2325,6 +2326,12 @@ function takeAllWeapons (playerid)
 	removePlayerWeapon(playerid, 14, 0)
 	removePlayerWeapon(playerid, 15, 0)
 	removePlayerWeapon(playerid, 17, 0)
+}
+
+function setPlayerFrozen (playerid, value) 
+{
+	togglePlayerControls(playerid, value)
+	frozen_player[playerid] = value
 }
 
 function player_position( playerid )
@@ -4871,6 +4878,7 @@ function( playerid, name, ip, serial )
 	admin_tp[playerid] = [0,0]
 	skin_timer[playerid] = 0
 	timer_job[playerid] = 0
+	frozen_player[playerid] = false
 
 	//--нужды
 	alcohol[playerid] = 0
@@ -5133,7 +5141,7 @@ function reg_or_login(playerid)
 		{	
 			local result = sqlite3( "SELECT * FROM account WHERE reg_serial = '"+serial+"'" )
 			sendMessage(playerid, "[ERROR] Регистрация твинков запрещена, вас кикнет через 10 сек", red)
-			togglePlayerControls(playerid, true)
+			setPlayerFrozen(playerid, true)
 			timer(function () 
 			{	
 				if (logged[playerid] == 0)
@@ -5176,7 +5184,7 @@ function reg_or_login(playerid)
 		if (result[1]["reg_serial"] != serial)
 		{
 			sendMessage(playerid, "[ERROR] Вы не владелец аккаунта, вас кикнет через 10 сек", red)
-			togglePlayerControls(playerid, true)
+			setPlayerFrozen(playerid, true)
 			timer(function () 
 			{
 				if (logged[playerid] == 0)
@@ -5208,7 +5216,7 @@ function reg_or_login(playerid)
 
 		if (result[1]["y"] < -1050.0)
 		{
-			//togglePlayerControls(playerid, true)
+			//setPlayerFrozen(playerid, true)
 			setPlayerPosition( playerid, -1310.0,-222.0,-23.0 )
 			/*sendMessage(playerid, "[TIPS] Вы заморожены, не открывайте чат", color_tips)
 
@@ -5224,7 +5232,7 @@ function reg_or_login(playerid)
 					if((myPos[1]*-1+result[1]["y"]) > -500.0)
 					{
 						sendMessage(playerid, "[TIPS] Прилетели, можно двигаться, спасибо что воспользовались нашими услугами :)", color_tips)
-						//togglePlayerControls(playerid, false)
+						//setPlayerFrozen(playerid, false)
 						setPlayerPosition( playerid, result[1]["x"],result[1]["y"],result[1]["z"] )
 						print(result[1]["x"]+" "+result[1]["y"]+" "+result[1]["z"])
 
@@ -5474,7 +5482,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 
 		foreach (k, v in anim_player_subject) 
 		{
-			if (isPointInCircle3D(x,y,z, v[0],v[1],v[2], v[3]) && id1 == v[4] && !isPlayerInVehicle(playerid))//--обработка предметов
+			if (isPointInCircle3D(x,y,z, v[0],v[1],v[2], v[3]) && id1 == v[4] && !isPlayerInVehicle(playerid) && !frozen_player[playerid])//--обработка предметов
 			{
 				local randomize = random(1,v[6])
 
@@ -5483,7 +5491,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 
 				sendMessage(playerid, "Вы получили "+info_png[v[5]][0]+" "+randomize+" "+info_png[v[5]][1], svetlo_zolotoy)
 
-				togglePlayerControls( playerid, true )
+				setPlayerFrozen( playerid, true )
 
 				sendMessage(playerid, "[TIPS] Вы заморожены, не открывайте чат", color_tips)
 
@@ -5493,7 +5501,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 				{
 					if (logged[playerid] == 1)
 					{
-						togglePlayerControls(playerid, false)
+						setPlayerFrozen(playerid, false)
 
 						sendMessage(playerid, "[TIPS] Можно двигаться", color_tips)
 					}
@@ -9514,11 +9522,11 @@ function tp_player(playerid, value) {
 			admin_tp[playerid][1].Kill()
 		}
 		admin_tp[playerid][1] = 0
-		togglePlayerControls(playerid, false)
+		setPlayerFrozen(playerid, false)
 		return
 	}
 
-	togglePlayerControls(playerid, true)
+	setPlayerFrozen(playerid, true)
 
 	admin_tp[playerid][1] = timer(function() {
 		if(value == "w")
