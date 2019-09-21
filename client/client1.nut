@@ -56,6 +56,7 @@ local house = ""//если около дома
 local no_use_subject = [-1,0,1]//--нельзя использовать
 local no_select_subject = [-1,0,1]//--нельзя выделить
 local no_change_subject = [-1,1]//--нельзя заменить
+local no_throw_earth = [10]//--нельзя выкинуть
 
 //--перемещение картинки
 local lmb = 0//--лкм
@@ -1512,15 +1513,15 @@ function( post )
 		[spl_gz[0].tointeger() == 1 || false, "Time: "+spl_gz[6]+" sec | Guns Zone #"+spl_gz[1], 2.0, screen[1]-16*6, fromRGB( white[0], white[1], white[2] ), false, "tahoma-bold", 1.0, "text"],
 		[spl_gz[0].tointeger() == 1 || false, "Attack "+spl_gz[2]+": "+spl_gz[3]+" points", 2.0, screen[1]-16*5, fromRGB( 255,0,50 ), false, "tahoma-bold", 1.0, "text"],
 		[spl_gz[0].tointeger() == 1 || false, "Defense "+spl_gz[4]+": "+spl_gz[5]+" points", 2.0, screen[1]-16*4, fromRGB( 0,50,255 ), false, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing || false, pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing || false, heal_player[0], screenWidth-width_need-30-30, height_need, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing || false, (alcohol/100).tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*1, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing || false, drugs.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*2, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing || false, satiety.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*3, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing || false, hygiene.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*4, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing || false, sleep.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*5, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing || false, myPos[0]+" "+myPos[1]+" "+myPos[2], 300.0, 40.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing || false, myRot[0]+" "+myRot[1]+" "+myRot[2], 300.0, 55.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, heal_player[0], screenWidth-width_need-30-30, height_need, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, (alcohol/100).tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*1, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, drugs.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*2, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, satiety.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*3, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, hygiene.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*4, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, sleep.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*5, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, myPos[0]+" "+myPos[1]+" "+myPos[2], 300.0, 40.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, myRot[0]+" "+myRot[1]+" "+myRot[2], 300.0, 55.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
 		]
 
 		foreach (k, v in split(getElementData("guns_zone"), "|"))//--отображение guns_zone
@@ -1874,6 +1875,17 @@ function( element )
 							return
 						}*/
 
+						foreach (idx, v in no_throw_earth)
+						{
+							if (v == info1)
+							{
+								gui_selection = false
+								info_tab = ""
+								lmb = 0
+								return
+							}
+						}
+
 						triggerServerEvent( "event_inv_server_load", "player", info3, info1_selection_1, info2_selection_1, playerid )
 
 						zamena_img()
@@ -1930,6 +1942,17 @@ function( element )
 							return
 						}*/
 
+						foreach (idx, v in no_throw_earth)
+						{
+							if (v == info1_selection_1)
+							{
+								gui_selection = false
+								info_tab = ""
+								lmb = 0
+								return
+							}
+						}
+
 						triggerServerEvent( "event_inv_server_load", "car", info3, info1_selection_1, info2_selection_1, plate )
 
 						zamena_img()
@@ -1985,6 +2008,17 @@ function( element )
 							info2_selection_1 = info2
 							return
 						}*/
+
+						foreach (idx, v in no_throw_earth)
+						{
+							if (v == info1_selection_1)
+							{
+								gui_selection = false
+								info_tab = ""
+								lmb = 0
+								return
+							}
+						}
 
 						triggerServerEvent( "event_inv_server_load", "house", info3, info1_selection_1, info2_selection_1, house )
 
@@ -2049,6 +2083,14 @@ function( element )
 		{
 			if (lmb == 1)
 			{
+				foreach (idx, v in no_throw_earth)
+				{
+					if (v == info1)
+					{
+						return
+					}
+				}
+
 				if (info_tab == "player" && state_inv_player)
 				{
 					triggerServerEvent( "event_throw_earth_server", "player", info3, info1, info2, playerid )

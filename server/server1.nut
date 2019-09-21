@@ -53,6 +53,7 @@ local no_use_wheel_and_engine = [20,27,35,37,38,39]
 local police_chanel = 1//канал копов
 local admin_chanel = 2//--канал админов
 local loto = [0, [], false]//--лотерея
+local no_sell_auc = [10]//--нельзя продать
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -8886,6 +8887,15 @@ function (playerid, value, ...)
 
 				if(spl[0].tointeger() >= 2 && spl[0].tointeger() <= (info_png.len()-1))
 				{
+					foreach (idx, v in no_sell_auc)
+					{
+						if (v == spl[0].tointeger())
+						{
+							sendMessage(playerid, "[ERROR] Этот предмет не продается", red)
+							return
+						}
+					}
+
 					auction_buy_sell(playerid, "sell", 0, spl[0].tointeger(), spl[1].tointeger(), spl[2].tointeger(), name_buy)
 				}
 				else
@@ -9218,6 +9228,38 @@ function (playerid)
 		"/сс - очистить чат",
 		"/marker [x координата] [y координата] - поставить маркер",
 		"/idpng - ид предметов сервера",
+		"/cmdadm - команды админа",
+	]
+
+	sendMessage(playerid, "====[ КОМАНДЫ ]====", white)
+
+	foreach (idx, value in commands) 
+	{
+		sendMessage(playerid, value, white)
+	}
+})
+
+addCommandHandler("cmdadm",//все команды
+function (playerid)
+{
+	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0) 
+	{
+		return
+	}
+
+	local commands = [
+		"/sub [ид предмета] [количество] - выдать себе предмет",
+		"/subdel [ИД игрока] [ид предмета] [количество] - удалить предмет",
+		"/subcar [ид предмета] [количество] - выдать предмет в тс",
+		"/subearth [ид предмета] [количество] [количество на земле] - выдать предмет на землю",
+		"/go [и 3 координаты] - тп на заданные координаты",
+		"/pos [текст] - сохранить позицию в бд",
+		"/global [текст] - глобальный чат",
+		"/stime [часов] [минут] - установить время",
+		"/inv [player | car | house] [имя игрока | номер т/с | номер дома] - чекнуть инв-рь",
+		"/prisonplayer [ИД игрока] [время] [причина] - посадить игрока в тюрьму",
+		"/v [ид т/с] - создать тс",
+		"/delv - удалить тс созданные через /v",
 	]
 
 	sendMessage(playerid, "====[ КОМАНДЫ ]====", white)
@@ -9254,6 +9296,44 @@ function(playerid, id1, id2)
 	else
 	{
 		sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+	}
+})
+
+addCommandHandler("subdel",//удаление предмета
+function(playerid, id, id1, id2)
+{
+	local val1 = id1.tointeger()
+	local val2 = id2.tointeger()
+	local id = id.tointeger()
+	local playername = getPlayerName ( playerid )
+
+	if (id < 0 || id >= getMaxPlayers()) 
+	{
+		return
+	}
+	else if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	{
+		return
+	}
+	else if (logged[id] == 0)
+	{
+		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+		return
+	}
+
+	if (val1 > (info_png.len()-1) || val1 < 2)
+	{
+		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red)
+		return
+	}
+
+	if (inv_player_delet(id, val1, val2, true))
+	{
+		admin_chat(playerid, playername+" ["+playerid+"] удалил у "+getPlayerName ( id )+" ["+id+"] "+info_png[val1][0]+" "+val2+" "+info_png[val1][1])
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Предмет не найден", red)
 	}
 })
 
