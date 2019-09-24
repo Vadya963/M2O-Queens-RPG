@@ -209,7 +209,7 @@ local info_png = {
 	[3] = ["сигареты Big Break Red", "сигарет"],
 	[4] = ["аптечка", "шт"],
 	[5] = ["канистра с бензином", "лит."],
-	[6] = ["ключ от автомобиля с номером", ""],
+	[6] = ["ключ от т/с с номером", ""],
 	[7] = ["сигареты Big Break Blue", "сигарет"],
 	[8] = ["сигареты Big Break White", "сигарет"],
 	[9] = ["ПП Томпсона обр. 1928 г.", "боеприпасов"],
@@ -5051,7 +5051,7 @@ function( playerid )
 		sendMessage(playerid, "[TIPS] /cmd - команды сервера", color_tips)
 		sendMessage(playerid, "[TIPS] Первоначальная работа находится на свалке у Майка Бруски", color_tips)
 		sendMessage(playerid, "[TIPS] Граждане не имеющий дом, могут помыться и выспаться в отеле Титания", color_tips)
-		sendMessage(playerid, "[TIPS] Права можно купить в Мэрии (зеленый пятиугольник)", color_tips)
+		sendMessage(playerid, "[TIPS] Права можно получить в Мэрии (зеленый пятиугольник)", color_tips)
 		sendMessage(playerid, "[WARNING] Если у вас нету счетчика FPS или 3D текстов, перезайдите!", red)
 
 		reg_or_login(playerid)
@@ -5153,11 +5153,12 @@ function reg_or_login(playerid)
 			return
 		}
 		
-		local result = sqlite3( "INSERT INTO account (name, ban, reason, x, y, z, reg_ip, reg_serial, heal, alcohol, satiety, hygiene, sleep, drugs, skin, arrest, crimes, inventory) VALUES ('"+playername+"', '0', '0', '0', '0', '0', '"+ip+"', '"+serial+"', '"+max_heal+"', '0', '100', '100', '100', '0', '81', '0', '0', '1:500,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
+		local result = sqlite3( "INSERT INTO account (name, ban, reason, x, y, z, reg_ip, reg_serial, heal, alcohol, satiety, hygiene, sleep, drugs, skin, arrest, crimes, inventory) VALUES ('"+playername+"', '0', '0', '0', '0', '0', '"+ip+"', '"+serial+"', '"+max_heal+"', '0', '100', '100', '100', '0', '81', '0', '0', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
 		local result = sqlite3( "SELECT * FROM account WHERE name = '"+playername+"'" )
 
 		load_inv(playerid, "player", result[1]["inventory"])
+		inv_player_empty(playerid, 1, 500)
 
 		logged[playerid] = 1
 		alcohol[playerid] = result[1]["alcohol"]
