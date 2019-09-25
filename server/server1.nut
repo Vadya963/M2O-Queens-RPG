@@ -297,7 +297,7 @@ local info_png = {
 	[91] = ["шляпа", "опг"],
 	[92] = ["jetpack", "шт"],
 	[93] = ["#2 маршрутный лист", "ост."],
-	[94] = ["паспорт", "шт"],
+	[94] = ["паспорт", "номер"],
 	[95] = ["пустой бланк", "шт"],
 	[96] = ["заявление на пропажу т/с с номером", ""],
 }
@@ -5175,10 +5175,10 @@ function reg_or_login(playerid)
 
 		load_inv(playerid, "player", result[1]["inventory"])
 
-		/*if (inv_player_delet(playerid, 94, search_inv_player_2_parameter(playerid, 94).tointeger()), false)
+		if (inv_player_delet(playerid, 94, search_inv_player_2_parameter(playerid, 94), false))
 		{
-			inv_player_empty(playerid, 94, playerid.tointeger())
-		}*/
+			inv_player_empty(playerid, 94, playerid)
+		}
 
 		logged[playerid] = 1
 		arrest[playerid] = result[1]["arrest"]
@@ -7663,8 +7663,16 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			return
 		}
 		else if (id1 == 94) //--паспорт
-		{
-			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" на имя "+playername)
+		{	
+			local id = getPlayerName(id2)
+			if (id)
+			{
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" на имя "+id)
+			}
+			else 
+			{
+				me_chat(playerid, playername+" показал(а) чужой "+info_png[id1][0])
+			}
 			return
 		}
 		else 
