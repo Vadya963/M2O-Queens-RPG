@@ -75,7 +75,7 @@ local info_png = {
 	[7] = ["сигареты Big Break Blue", "сигарет"],
 	[8] = ["сигареты Big Break White", "сигарет"],
 	[9] = ["ПП Томпсона обр. 1928 г.", "боеприпасов"],
-	[10] = ["полицейский жетон", "ранг"],
+	[10] = ["полицейский жетон", "номер"],
 	[11] = ["газета", "шт"],
 	[12] = ["Револьвер кал. 38", "боеприпасов"],
 	[13] = ["Кольт 1911 п/авт.", "боеприпасов"],
@@ -243,7 +243,7 @@ local motor_show = [
 ]
 
 local car_cash_coef = 10
-local car_cash_no = [19,20,24,27,35,38,39]
+local car_cash_no = [19,20,24,27,35,38,39,42]
 for (local i = 0; i < motor_show.len(); i++) 
 {
 	local count = 0
@@ -666,6 +666,7 @@ guiSetVisibleGridList (eda_menu, false)
 local day_nalog = 7
 local mayoralty_shop = [
 	[info_png[2][0], 1, 1000, 2],
+	[info_png[10][0], 1, 50000, 10],
 	[info_png[41][0], 1, 10000, 41],
 	[info_png[34][0]+" Таксист", 1, 5000, 34],
 	[info_png[34][0]+" Мусоровозчик", 2, 5000, 34],
@@ -693,11 +694,6 @@ foreach (k,v in mayoralty_shop)
 guiSetVisibleGridList (mayoralty_shop_menu, false)
 
 local sub_cops = [
-	[info_png[10][0]+" Офицера", 1, 10],
-	[info_png[10][0]+" Детектива", 2, 10],
-	[info_png[10][0]+" Сержанта", 3, 10],
-	[info_png[10][0]+" Лейтенанта", 4, 10],
-	[info_png[10][0]+" Капитана", 5, 10],
 	[info_png[46][0], 1, 46],
 	[info_png[47][0], 1, 47],
 	[info_png[9][0], 11, 4700, 9],
@@ -709,6 +705,8 @@ local sub_cops = [
 	[info_png[17][0], 3, 1050, 17],
 	[info_png[18][0], 6, 1500, 18],
 	[info_png[19][0], 9, 1990, 19],
+	[info_png[86][0]+" "+info_png[86][2+1], 2, 86],
+	[info_png[86][0]+" "+info_png[86][3+1], 3, 86],
 	[info_png[95][0], 1, 95],
 ]
 local sub_cops_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)

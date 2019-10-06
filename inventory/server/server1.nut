@@ -213,7 +213,7 @@ local info_png = {
 	[7] = ["сигареты Big Break Blue", "сигарет"],
 	[8] = ["сигареты Big Break White", "сигарет"],
 	[9] = ["ПП Томпсона обр. 1928 г.", "боеприпасов"],
-	[10] = ["полицейский жетон", "ранг"],
+	[10] = ["полицейский жетон", "номер"],
 	[11] = ["газета", "шт"],
 	[12] = ["Револьвер кал. 38", "боеприпасов"],
 	[13] = ["Кольт 1911 п/авт.", "боеприпасов"],
@@ -373,7 +373,7 @@ local motor_show = [
 ]
 
 local car_cash_coef = 10
-local car_cash_no = [19,20,24,27,35,38,39]
+local car_cash_no = [19,20,24,27,35,38,39,42]
 for (local i = 0; i < motor_show.len(); i++) 
 {
 	local count = 0
@@ -815,6 +815,7 @@ foreach (k, v in color_table)//краска
 
 local mayoralty_shop = [
 	[info_png[2][0], 1, 1000, 2],
+	[info_png[10][0], 1, 50000, 10],
 	[info_png[41][0], 1, 10000, 41],
 	[info_png[34][0]+" Таксист", 1, 5000, 34],
 	[info_png[34][0]+" Мусоровозчик", 2, 5000, 34],
@@ -835,14 +836,11 @@ local mayoralty_shop = [
 ]
 
 local sub_cops = [
-	[info_png[10][0]+" Офицера", 1, 10],
-	[info_png[10][0]+" Детектива", 2, 10],
-	[info_png[10][0]+" Сержанта", 3, 10],
-	[info_png[10][0]+" Лейтенанта", 4, 10],
-	[info_png[10][0]+" Капитана", 5, 10],
 	[info_png[46][0], 1, 46],
 	[info_png[47][0], 1, 47],
-	[info_png[95][1], 1, 95],
+	[info_png[86][0]+" "+info_png[86][2+1], 2, 86],
+	[info_png[86][0]+" "+info_png[86][3+1], 3, 86],
+	[info_png[95][0], 1, 95],
 ]
 
 local weapon_cops = {
@@ -1129,6 +1127,19 @@ function debuginfo ()
 			local plate = getVehiclePlateText(vehicleid)
 			//setElementData(playerid, "fuel_data", fuel[plate])
 			setElementData(playerid, "probeg_data", probeg[plate])
+		}
+
+		if (crimes[playerid] != 0 && search_inv_player_2_parameter(playerid, 10) != 0)
+		{
+			if (inv_player_delet(playerid, 10, search_inv_player_2_parameter(playerid, 10), true))
+			{
+				sendMessage(playerid, "Вы больше не полицейский", yellow)
+
+				if (job[playerid] == 13)
+				{
+					job_0( playerid )
+				}
+			}
 		}
 
 		setPlayerHealth(playerid, health[playerid].tofloat())
@@ -1791,7 +1802,7 @@ local table_job = {
 		local x = myPos[0]
 		local y = myPos[1]
 		local z = myPos[2]
-		if ((getPlayerModel(playerid) == 76) && search_inv_player(playerid, 10, 2) != 0 && crimes[playerid] == 0 && search_inv_player_2_parameter(playerid, 96) != 0)
+		if ((getPlayerModel(playerid) == 76) && search_inv_player_2_parameter(playerid, 10) != 0 && crimes[playerid] == 0 && search_inv_player_2_parameter(playerid, 96) != 0)
 				{
 					if (job_call[playerid] == 0)
 					{
@@ -2987,12 +2998,6 @@ function buy_subject_fun( playerid, text, number, value )
 			local text1 = v[0]
 			if (text1 == text)
 			{
-				if (0 <= k && k <= 4 && search_inv_player(playerid, 10, 6) == 0)
-				{
-					sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red)
-					return
-				}
-
 				if (inv_player_empty(playerid, v[2], v[1]))
 				{
 					sendMessage(playerid, "Вы получили "+text, orange)
@@ -3038,15 +3043,31 @@ function buy_subject_fun( playerid, text, number, value )
 			{
 				if (v[2] <= array_player_2[playerid][0])
 				{
-					if (inv_player_empty(playerid, v[3], v[1]))
+					if(v[3] == 10)
 					{
-						sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange)
+						if (inv_player_empty(playerid, v[3], playerid+1))
+						{
+							sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange)
 
-						inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(v[2]), playername )
+							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(v[2]), playername )
+						}
+						else
+						{
+							sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+						}
 					}
-					else
+					else 
 					{
-						sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+						if (inv_player_empty(playerid, v[3], v[1]))
+						{
+							sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange)
+
+							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(v[2]), playername )
+						}
+						else
+						{
+							sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+						}
 					}
 				}
 				else
@@ -3084,9 +3105,9 @@ function buy_subject_fun( playerid, text, number, value )
 				{
 					foreach (k1, v1 in police_car) 
 					{
-						if (v1 == id && (search_inv_player(playerid, 10, 6) == 0))
+						if (v1 == id && search_inv_player_2_parameter(playerid, 10) == 0)
 						{
-							sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red)
+							sendMessage(playerid, "[ERROR] Вы не полицейский", red)
 							return
 						}
 					}
@@ -4978,6 +4999,12 @@ function playerDeath( playerid, attacker )
 
 				inv_server_load( attacker, "player", 0, 1, array_player_2[attacker][0]+(cash*(crimes[playerid])), attacker )
 			}
+			else 
+			{
+				local crimes_plus = zakon_kill_crimes
+				crimes[attacker] = crimes[attacker]+crimes_plus
+				sendMessage(attacker, "+"+crimes_plus+" преступление, всего преступлений "+crimes[attacker], blue)
+			}
 		}
 
 		if(point_guns_zone[0] == 1 && search_inv_player_2_parameter(playerid, 91) != 0 && search_inv_player_2_parameter(attacker, 91) != 0)
@@ -5177,7 +5204,12 @@ function reg_or_login(playerid)
 
 		if (inv_player_delet(playerid, 94, search_inv_player_2_parameter(playerid, 94), false))
 		{
-			inv_player_empty(playerid, 94, playerid)
+			inv_player_empty(playerid, 94, playerid+1)
+		}
+
+		if (inv_player_delet(playerid, 10, search_inv_player_2_parameter(playerid, 10), false))
+		{
+			inv_player_empty(playerid, 10, playerid+1)
 		}
 
 		logged[playerid] = 1
@@ -6583,31 +6615,16 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			return
 		}
-		else if (id1 == 10) //--документы копа
+		else if (id1 == 10 || id1 == 94) //--документы копа, паспорт
 		{	
-			if (search_inv_player(playerid, 10, 1) != 0)
+			local id = getPlayerName(id2-1)
+			if (id)
 			{
-				me_chat(playerid, "Офицер "+playername+" показал(а) "+info_png[id1][0])
+				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" на имя "+id)
 			}
-			else if (search_inv_player(playerid, 10, 2) != 0)
+			else 
 			{
-				me_chat(playerid, "Детектив "+playername+" показал(а) "+info_png[id1][0])
-			}
-			else if (search_inv_player(playerid, 10, 3) != 0)
-			{
-				me_chat(playerid, "Сержант "+playername+" показал(а) "+info_png[id1][0])
-			}
-			else if (search_inv_player(playerid, 10, 4) != 0)
-			{
-				me_chat(playerid, "Лейтенант "+playername+" показал(а) "+info_png[id1][0])
-			}
-			else if (search_inv_player(playerid, 10, 5) != 0)
-			{
-				me_chat(playerid, "Капитан "+playername+" показал(а) "+info_png[id1][0])
-			}
-			else if (search_inv_player(playerid, 10, 6) != 0)
-			{
-				me_chat(playerid, "Шеф полиции "+playername+" показал(а) "+info_png[id1][0])
+				me_chat(playerid, playername+" показал(а) чужой "+info_png[id1][0])
 			}
 			return
 		}
@@ -6977,7 +6994,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					sendMessage(playerid, "[ERROR] Вы должны быть в одежде 76", red)
 					return
 				}
-				else if (search_inv_player(playerid, 10, 2) == 0)
+				else if (search_inv_player_2_parameter(playerid, 10) == 0)
 				{
 					sendMessage(playerid, "[ERROR] Вы не детектив полиции", red)
 					return
@@ -7659,19 +7676,6 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				admin_tp[playerid][0] = 0
 
 				sendMessage(playerid, "перемещение OFF", lyme)
-			}
-			return
-		}
-		else if (id1 == 94) //--паспорт
-		{	
-			local id = getPlayerName(id2)
-			if (id)
-			{
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" на имя "+id)
-			}
-			else 
-			{
-				me_chat(playerid, playername+" показал(а) чужой "+info_png[id1][0])
 			}
 			return
 		}
@@ -8385,50 +8389,6 @@ function (playerid, value, id)
 	}
 })
 
-addCommandHandler("takepolicetoken",//--забрать пол-ий жетон
-function (playerid, id)
-{
-	local playername = getPlayerName ( playerid )
-	local id = id.tointeger()
-
-	if (id < 0 || id >= getMaxPlayers()) 
-	{
-		return
-	}
-	else if (logged[playerid] == 0)
-	{
-		return
-	}
-
-	if(logged[id] == 0)
-	{
-		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
-		return
-	}
-
-	if (search_inv_player(playerid, 10, 6) == 0)
-	{
-		sendMessage(playerid, "[ERROR] Вы не Шеф полиции", red)
-		return
-	}
-
-	if (search_inv_player(id, 10, 6) == 1)
-	{
-		sendMessage(playerid, "[ERROR] "+getPlayerName ( id )+" Шеф полиции", red)
-		return
-	}
-
-	if (inv_player_delet(id, 10, search_inv_player_2_parameter(id, 10), true))
-	{
-		sendMessage(playerid, "Вы забрали у "+getPlayerName ( id )+" "+info_png[10][0], yellow)
-		sendMessage(id, playername+" забрал(а) у вас "+info_png[10][0], yellow)
-	}
-	else
-	{
-		sendMessage(playerid, "[ERROR] У игрока нет жетона", red)
-	}
-})
-
 addCommandHandler ( "enshot",//--выстрелить в двигатель
 function (playerid, id)
 {
@@ -8530,29 +8490,9 @@ function (playerid, ...)
 
 	if(radio_chanel == police_chanel)
 	{
-		if (search_inv_player(playerid, 10, 1) != 0)
+		if (search_inv_player_2_parameter(playerid, 10) != 0)
 		{
-			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Офицер "+playername+" ["+playerid+"]: "+text)
-		}
-		else if (search_inv_player(playerid, 10, 2) != 0)
-		{
-			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Детектив "+playername+" ["+playerid+"]: "+text)
-		}
-		else if (search_inv_player(playerid, 10, 3) != 0)
-		{
-			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Сержант "+playername+" ["+playerid+"]: "+text)
-		}
-		else if (search_inv_player(playerid, 10, 4) != 0)
-		{
-			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Лейтенант "+playername+" ["+playerid+"]: "+text)
-		}
-		else if (search_inv_player(playerid, 10, 5) != 0)
-		{
-			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Капитан "+playername+" ["+playerid+"]: "+text)
-		}
-		else if (search_inv_player(playerid, 10, 6) != 0)
-		{
-			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] Шеф полиции "+playername+" ["+playerid+"]: "+text)
+			police_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] "+playername+" ["+playerid+"]: "+text)
 		}
 	}
 	else if (radio_chanel == admin_chanel)
@@ -9259,7 +9199,7 @@ function (playerid)
 		"/cexit - выйти из т/с",
 		"/till [withdraw, deposit, price] [сумма] - установить цены в бизнесе",
 		"/search [player | car | house] [ИД игрока | номер т/с | номер дома] - обыскать игрока, т/с или дом (для полицейских)",
-		"/takepolicetoken [ИД игрока] - забрать полицейский жетон (для полицейских)",
+		"/searchcar [номер т/с] - написать заявление о пропаже т/с",
 		"/sellhouse - создать дом (для риэлторов)",
 		"/sellbusiness [номер бизнеса от 0 до 5] - создать бизнес (для риэлторов)",
 		"/auc sell [ид предмета] [кол-во предмета] [сумма] [имя покупателя, если нету ничего не пишите] - выставить предмет на аукцион",
@@ -9301,7 +9241,7 @@ function (playerid)
 	}
 
 	local commands = [
-		"/sub [ид предмета] [количество] - выдать себе предмет",
+		"/sub [ИД игрока] [ид предмета] [количество] - выдать себе предмет",
 		"/subdel [ИД игрока] [ид предмета] [количество] - удалить предмет",
 		"/subcar [ид предмета] [количество] - выдать предмет в тс",
 		"/subearth [ид предмета] [количество] [количество на земле] - выдать предмет на землю",
@@ -9325,14 +9265,24 @@ function (playerid)
 
 //--------------------------------------------админские команды--------------------------------------------
 addCommandHandler("sub",//выдача предмета и кол-во
-function(playerid, id1, id2)
+function(playerid, id, id1, id2)
 {
+	local id = id.tointeger()
 	local val1 = id1.tointeger()
 	local val2 = id2.tointeger()
 	local playername = getPlayerName ( playerid )
 
-	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	if (id < 0 || id >= getMaxPlayers()) 
 	{
+		return
+	}
+	else if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
+	{
+		return
+	}
+	else if (logged[id] == 0)
+	{
+		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
 		return
 	}
 
@@ -9342,9 +9292,9 @@ function(playerid, id1, id2)
 		return
 	}
 
-	if (inv_player_empty(playerid, val1, val2))
+	if (inv_player_empty(id, val1, val2))
 	{
-		admin_chat(playerid, playername+" ["+playerid+"] создал "+info_png[val1][0]+" "+val2+" "+info_png[val1][1])
+		admin_chat(playerid, playername+" ["+playerid+"] выдал "+getPlayerName ( id )+" ["+id+"] "+info_png[val1][0]+" "+val2+" "+info_png[val1][1])
 	}
 	else
 	{
