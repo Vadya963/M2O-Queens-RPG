@@ -56,7 +56,7 @@ local house = ""//если около дома
 local no_use_subject = [-1,0,1]//--нельзя использовать
 local no_select_subject = [-1,0,1]//--нельзя выделить
 local no_change_subject = [-1,1]//--нельзя заменить
-local no_throw_earth = [10,94]//--нельзя выкинуть
+local no_throw_earth = [94]//--нельзя выкинуть
 
 //--перемещение картинки
 local lmb = 0//--лкм

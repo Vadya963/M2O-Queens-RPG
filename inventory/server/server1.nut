@@ -53,7 +53,7 @@ local no_use_wheel_and_engine = [20,27,35,37,38,39]
 local police_chanel = 1//канал копов
 local admin_chanel = 2//--канал админов
 local loto = [0, [], false]//--лотерея
-local no_throw_earth = [10,94]//--нельзя продать
+local no_throw_earth = [94]//--нельзя продать
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -9390,7 +9390,7 @@ function(playerid, id, id1, id2)
 	}
 })
 
-addCommandHandler ( "subcar",//--выдача предметов с числом
+addCommandHandler ( "subcar",//--выдача предметов в тс
 function (playerid, id1, id2 )
 {
 	local val1 = id1.tointeger()
