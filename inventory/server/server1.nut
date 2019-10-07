@@ -8118,6 +8118,12 @@ function (playerid, cash, value)
 		return
 	}
 
+	if (!isPointInCircle3D( x, y, z, interior_job[3][2],interior_job[3][3],interior_job[3][4], interior_job[3][7] ))
+	{
+		sendMessage(playerid, "[ERROR] Вы не в казино(кубок на карте)", red)
+		return
+	}
+
 	if (cash < 1)
 	{
 		return
