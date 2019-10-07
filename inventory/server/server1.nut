@@ -300,6 +300,7 @@ local info_png = {
 	[94] = ["паспорт", "номер"],
 	[95] = ["пустой бланк", "шт"],
 	[96] = ["заявление на пропажу т/с с номером", ""],
+	[97] = ["колода карт", "шт"],
 }
 
 local craft_table = [//--[предмет 0, рецепт 1, предметы для крафта 2, кол-во предметов для крафта 3, предмет который скрафтится 4] //переписать
@@ -768,6 +769,7 @@ local shop = {
 	[74] = [info_png[74][0], 100, 100],
 	[81] = [info_png[81][0], 100, 100],
 	[89] = [info_png[89][0], 10, 500],
+	[97] = [info_png[97][0], 1, 50],
 }
 
 local eda = {
@@ -997,6 +999,8 @@ local admin_tp = array(getMaxPlayers(), 0)//админ тп
 local skin_timer = array(getMaxPlayers(), 0)//смена скина
 local timer_job = array(getMaxPlayers(), 0)//таймер работ
 local frozen_player = array(getMaxPlayers(), 0)//элементы управления
+local game = array(getMaxPlayers(), 0)//--карты игрока
+local accept_player = array(getMaxPlayers(), 0)//--переменная игры
 
 //для истории сообщений
 local max_message = 15//максимально отображаемое число сообщений
@@ -4876,6 +4880,8 @@ function( playerid, name, ip, serial )
 	skin_timer[playerid] = 0
 	timer_job[playerid] = 0
 	frozen_player[playerid] = false
+	game[playerid] = []
+	accept_player[playerid] = [false,false,false,false]
 
 	//--нужды
 	alcohol[playerid] = 0
@@ -8093,6 +8099,342 @@ function (playerid, id, cash)
 		sendMessage(playerid, "[ERROR] Вы не в казино(кубок на карте)", red)
 	}
 })
+
+addCommandHandler ( "fortune",
+function (playerid, cash, value)
+{
+	local playername = getPlayerName ( playerid )
+	local myPos = getPlayerPosition(playerid)
+	local x = myPos[0]
+	local y = myPos[1]
+	local z = myPos[2]
+	local cash = cash.tointeger()
+	local value = value.tointeger()
+	local wheel_fortune = [40,1,2,1,5,1,2,1,5,1,2,1,10,1,20,1,5,1,2,1,5,2,1,2,1,2,40,1,2,1,5,1,2,1,10,5,2,1,20,1,2,5,1,2,1,10,2,1,5,1,2,1,10,2]
+	local randomize = random(0,wheel_fortune.len()-1)
+
+	if (logged[playerid] == 0)
+	{
+		return
+	}
+
+	if (cash < 1)
+	{
+		return
+	}
+
+	if (cash > array_player_2[playerid][0])
+	{
+		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+		return
+	}
+
+	if(value == 1 || value == 2 || value == 5 || value == 10 || value == 20 || value == 40)
+	{
+		sendMessage(playerid, "====[ КОЛЕСО УДАЧИ ]====", yellow)
+		sendMessage(playerid, "Выпало "+wheel_fortune[randomize], yellow)
+
+		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playername )
+
+		if (value == wheel_fortune[randomize])
+		{
+			win_roulette( playerid, cash, wheel_fortune[randomize] )
+		}
+	}
+	else
+	{
+		sendMessage(playerid, "[ERROR] Выберите число из предложенных 1,2,5,10,20,40", red)
+	}
+})
+
+local blackjack_card = ["2:2", "3:3", "4:4", "5:5", "6:6", "7:7", "8:8", "9:9", "10:10", "В:10", "Д:10", "К:10", "Т:11"]
+function blackjack (playerid, value, ...)
+{
+	local playername = getPlayerName ( playerid )
+	local myPos = getPlayerPosition(playerid)
+	local x = myPos[0]
+	local y = myPos[1]
+	local z = myPos[2]
+
+	if (logged[playerid] == 0)
+	{
+		return
+	}
+	else if (search_inv_player(playerid, 97, 1) == 0)
+	{
+		sendMessage(playerid, "[ERROR] У вас нет "+info_png[97][0], red)
+		return
+	}
+
+	if (value == "invite")
+	{
+		local id = vargv[0].tointeger()
+		local cash = vargv[1].tointeger()
+
+		if (cash < 1)
+		{
+			return
+		}
+
+		if (cash > array_player_2[playerid][0])
+		{
+			sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+			return
+		}
+			
+		if (logged[id] == 1)
+		{
+			local myPos1 = getPlayerPosition(id)
+			local x1 = myPos1[0]
+			local y1 = myPos1[1]
+			local z1 = myPos1[2]
+			if (isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
+			{
+				if (arrest[id] != 0)
+				{
+					sendMessage(playerid, "[ERROR] Игрок в тюрьме", red)
+					return
+				}
+				else if (accept_player[id][0] == true)
+				{
+					sendMessage(playerid, "[ERROR] Игрок играет", red)
+					return
+				}
+				else if (accept_player[playerid][0] == true)
+				{
+					sendMessage(playerid, "[ERROR] Вы играете", red)
+					return
+				}
+				else if (cash > array_player_2[id][0])
+				{
+					sendMessage(playerid, "[ERROR] У игрока недостаточно средств", red)
+					return
+				}
+				else if (playerid == id)
+				{
+					sendMessage(playerid, "[ERROR] На столько всё плохо?", red)
+					return
+				}
+
+				accept_player[id] = [false, playerid, cash, false]
+				accept_player[playerid] = [false, id, cash, false]
+
+				me_chat(playerid, playername+" предложил(а) "+getPlayerName(id)+" сыграть в блэкджек на сумму "+cash+"$")
+				sendMessage(id, "/accept yes - согласиться", yellow)
+				sendMessage(id, "/accept no - отказаться", yellow)
+			}
+			else
+			{
+				sendMessage(playerid, "[ERROR] Игрок далеко", red)
+			}
+		}
+		else
+		{
+			sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+		}
+	}
+	else if (value == "take")
+	{
+		if (accept_player[playerid][0] == false)
+		{
+			sendMessage(playerid, "[ERROR] Вы не играете", red)
+			return
+		}
+		else if (accept_player[playerid][3] == true)
+		{
+			sendMessage(playerid, "[ERROR] Вы готовы вскрыть карты", red)
+			return
+		}
+		else if (game[playerid].len() == 5)
+		{
+			sendMessage(playerid, "[ERROR] У вас 5 карт", red)
+			return
+		}
+
+		if (logged[accept_player[playerid][1]] == 1)
+		{
+			local myPos1 = getPlayerPosition(accept_player[playerid][1])
+			local x1 = myPos1[0]
+			local y1 = myPos1[1]
+			local z1 = myPos1[2]
+			if (!isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
+			{
+				sendMessage(playerid, "[ERROR] Игрок далеко", red)
+				return
+			}
+		}
+		else
+		{
+			sendMessage(playerid, "[ERROR] Игрок далеко", red)
+			return
+		}
+
+		me_chat(playerid, playername+" взял(а) карту")
+
+		local randomize = random(0,blackjack_card.len()-1)
+		local spl = blackjack_card[randomize]
+
+		/*while (true) // --не оригинал
+		{
+			local count = 0
+			foreach (k,v in game[playerid])
+			{
+				if (split(v, ":")[0] == split(spl, ":")[0])
+				{
+					count = count + 1
+				}
+			}
+
+			if (count < 4)
+			{
+				break
+			}
+			else
+			{
+				randomize = random(0,blackjack_card.len()-1)
+				spl = blackjack_card[randomize]
+			}
+		}*/
+
+		game[playerid].push(blackjack_card[randomize])
+
+		local point = 0
+		foreach (k,v in game[playerid])
+		{
+			point = point+split(v, ":")[1].tointeger()
+		}
+
+		sendMessage(playerid, "Вы взяли "+split(spl, ":")[0]+", у вас "+point+" очков", yellow)
+
+		if (point >= 21)
+		{
+			blackjack(playerid, "open")
+		}
+	}
+	else if (value == "open")
+	{
+		if (accept_player[playerid][0] == false)
+		{
+			sendMessage(playerid, "[ERROR] Вы не играете", red)
+			return
+		}
+
+		if (logged[accept_player[playerid][1]] == 1)
+		{
+			local myPos1 = getPlayerPosition(accept_player[playerid][1])
+			local x1 = myPos1[0]
+			local y1 = myPos1[1]
+			local z1 = myPos1[2]
+			if (!isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
+			{
+				sendMessage(playerid, "[ERROR] Игрок далеко", red)
+				return
+			}
+		}
+		else
+		{
+			sendMessage(playerid, "[ERROR] Игрок далеко", red)
+			return
+		}
+
+		if (accept_player[accept_player[playerid][1]][3] == false)
+		{
+			me_chat(playerid, playername+" готов(а) вскрыть карты")
+
+			accept_player[playerid][3] = true
+		}
+		else
+		{
+			me_chat(playerid, playername+" вскрывает карты")
+
+			accept_player[playerid][3] = true
+
+			local point = 0
+			foreach (k,v in game[playerid])
+			{
+				point = point+split(v, ":")[1].tointeger()
+			}
+
+			local point2 = 0
+			foreach (k,v in game[accept_player[playerid][1]])
+			{
+				point2 = point2+split(v, ":")[1].tointeger()
+			}
+
+			do_chat(playerid, point+" очков - "+playername)
+			do_chat(playerid, point2+" очков - "+getPlayerName(accept_player[playerid][1]))
+
+			if (point == point2)
+			{
+			}
+			else if (point < point2 && point2 <= 21 || point2 == 21)
+			{
+				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-accept_player[playerid][2], playername )
+
+				win_roulette(accept_player[playerid][1], accept_player[playerid][2], 1)
+			}
+			else if (point > point2 && point <= 21 || point == 21)
+			{
+				inv_server_load( accept_player[playerid][1], "player", 0, 1, array_player_2[accept_player[playerid][1]][0]-accept_player[playerid][2], playername )
+
+				win_roulette(playerid, accept_player[playerid][2], 1)
+			}
+			else
+			{
+			}
+
+			game[accept_player[playerid][1]] = []
+			game[playerid] = []
+			accept_player[accept_player[playerid][1]] = [false,false,false,false]
+			accept_player[playerid] = [false,false,false,false]
+		}
+	}
+}
+addCommandHandler ( "blackjack", blackjack)
+
+function accept (playerid, value)
+{
+	local playername = getPlayerName ( playerid )
+	local myPos = getPlayerPosition(playerid)
+	local x = myPos[0]
+	local y = myPos[1]
+	local z = myPos[2]
+
+	if (logged[playerid] == 0)
+	{
+		return
+	}
+	else if (accept_player[playerid][1] == false)
+	{
+		sendMessage(playerid, "[ERROR] У вас нет предложений", red)
+		return
+	}
+
+	if (value == "yes")
+	{
+		if (accept_player[playerid][0] == true)
+		{
+			sendMessage(playerid, "[ERROR] Вы играете", red)
+			return
+		}
+
+		accept_player[playerid][0] = true
+		accept_player[accept_player[playerid][1]][0] = true
+
+		me_chat(playerid, playername+" согласился(ась) с "+getPlayerName(accept_player[playerid][1])+" сыграть в блэкджек на сумму "+accept_player[playerid][2]+"$")
+
+		sendMessage(playerid, "/blackjack take - взять карту", yellow)
+		sendMessage(playerid, "/blackjack open - вскрыть карты", yellow)
+	}
+	else if (value == "no")
+	{
+		me_chat(playerid, playername+" отказался(ась) от предложения "+getPlayerName(accept_player[playerid][1])+" сыграть в блэкджек на сумму "+accept_player[playerid][2]+"$")
+
+		game[playerid] = []
+		accept_player[playerid] = [false,false,false,false]
+	}
+}
+addCommandHandler ( "accept", accept)
 
 addCommandHandler ( "slots",
 function (playerid, cash)
