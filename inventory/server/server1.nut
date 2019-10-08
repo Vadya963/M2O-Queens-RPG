@@ -800,7 +800,7 @@ local giuseppe = [
 local repair_shop = [
 	[info_png[23][0], 1, 100, 23],
 	[info_png[35][0], 10, 500, 35],
-	[info_png[65][0], 0, 1000, 65],
+	[info_png[65][0], 0, 5000, 65],
 	[info_png[65][0], 1, 10000, 65],
 	[info_png[65][0], 2, 20000, 65],
 	[info_png[65][0], 3, 30000, 65],
@@ -808,7 +808,7 @@ local repair_shop = [
 ]
 for (local i = 0; i <= 11; i++)//колеса
 {
-	repair_shop.push([info_png[69][0], i, 1000, 69])
+	repair_shop.push([info_png[69][0], i, 4000, 69])
 }
 foreach (k, v in color_table)//краска
 {
