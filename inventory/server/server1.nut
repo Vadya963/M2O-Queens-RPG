@@ -3605,14 +3605,6 @@ function till_fun( playerid, number, money, value )
 
 		sendMessage(playerid, "Вы установили стоимость товара "+money+"$", yellow)
 	}
-	/*else if (value == "buyprod")
-	{
-		local result = sqlite3( "SELECT * FROM business_db WHERE number = '"+number+"'" )
-
-		sqlite3( "UPDATE business_db SET buyprod = '"+money+"' WHERE number = '"+number+"'")
-
-		sendMessage(playerid, "Вы установили цену закупки товара "+money+"$", yellow)
-	}*/
 }
 
 //----------------------------------крафт предметов -----------------------------------------------------------
@@ -5700,7 +5692,6 @@ function business_info (playerid, number)
 	sendMessage(playerid, "Тип "+result[1]["type"], yellow)
 	sendMessage(playerid, "Товаров на складе "+result[1]["warehouse"]+" шт", yellow)
 	sendMessage(playerid, "Стоимость товара (надбавка в N раз) "+result[1]["price"]+"$", green)
-	//sendMessage(playerid, "Цена закупки товара "+result[1]["buyprod"]+"$", green)
 
 	if (search_inv_player(playerid, 36, result[1]["number"]) != 0)
 	{
@@ -6046,12 +6037,6 @@ function delet_subject(playerid, id)//--удаление предметов из
 						sendMessage(playerid, "[ERROR] Нужен только "+info_png[24][0], red)
 						return
 					}
-
-					/*if (v["buyprod"] == 0) 
-					{
-						sendMessage(playerid, "[ERROR] Цена покупки не указана", red)
-						return
-					}*/
 
 					if (v["warehouse"] >= max_business) 
 					{
