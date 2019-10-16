@@ -53,7 +53,7 @@ local no_use_wheel_and_engine = [20,27,35,37,38,39]
 local police_chanel = 1//канал копов
 local admin_chanel = 2//--канал админов
 local loto = [0, [], false]//--лотерея
-local no_throw_earth = [94]//--нельзя продать
+local no_throw_earth = []//--нельзя продать
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -4916,6 +4916,18 @@ function playerDisconnect( playerid, reason )
 			myPos = [pos[0]+2,pos[1]+2,pos[2]]
 		}
 
+		local pass = search_inv_player_2_parameter(playerid, 94)
+		if (pass != 0 && playerid+1 != pass)
+		{
+			inv_player_delet(playerid, 94, pass, false)
+		}
+
+		local policetoken = search_inv_player_2_parameter(playerid, 10)
+		if (policetoken != 0 && playerid+1 != policetoken)
+		{
+			inv_player_delet(playerid, 10, policetoken, false)
+		}
+
 		if (myPos[0] != 0 && myPos[1] != 0 && myPos[2] != 0)
 		{
 			sqlite3( "UPDATE account SET x = '"+myPos[0]+"', y = '"+myPos[1]+"', z = '"+myPos[2]+"', heal = '"+heal+"', arrest = '"+arrest[playerid]+"', crimes = '"+crimes[playerid]+"', alcohol = '"+alcohol[playerid]+"', satiety = '"+satiety[playerid]+"', hygiene = '"+hygiene[playerid]+"', sleep = '"+sleep[playerid]+"', drugs = '"+drugs[playerid]+"' WHERE name = '"+playername+"'")
@@ -5159,7 +5171,7 @@ function reg_or_login(playerid)
 
 		load_inv(playerid, "player", result[1]["inventory"])
 		inv_player_empty(playerid, 1, 500)
-		inv_player_empty(playerid, 94, 1)
+		inv_player_empty(playerid, 94, playerid+1)
 
 		logged[playerid] = 1
 		alcohol[playerid] = result[1]["alcohol"]
