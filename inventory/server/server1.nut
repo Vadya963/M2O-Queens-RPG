@@ -6097,7 +6097,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 		}
 		else 
 		{
-			sendMessage(playerid, "[ERROR] Багажник пуст", red)
+			//sendMessage(playerid, "[ERROR] Багажник пуст", red)
 		}
 	}
 	else
