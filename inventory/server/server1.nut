@@ -8098,7 +8098,7 @@ function (playerid, id, cash)
 })
 
 addCommandHandler ( "fortune",
-function (playerid, cash, value)
+function (playerid, value, cash)
 {
 	local playername = getPlayerName ( playerid )
 	local myPos = getPlayerPosition(playerid)
@@ -9533,7 +9533,7 @@ function (playerid)
 	}
 
 	local commands = [
-		"/roulette [режим игры (красное, черное, четное, нечетное, 1-18, 19-36, 1-12, 13-24, 25-36, 3-1, 3-2, 3-3, число от 0 до 36)] [сумма] - сыграть в рулетку",
+		"/roulette [режим игры (красное, черное, четное, нечетное, 1-18, 19-36, 1-12, 13-24, 25-36, 3-1, 3-2, 3-3, число от 0 до 36)] [сумма] - игра рулетка",
 		"/slots [сумма] - сыграть в однорукого бандита",
 		"/prison [ИД игрока] - посадить игрока в тюрьму (для полицейских)",
 		"/r [текст] - рация",
@@ -9566,6 +9566,8 @@ function (playerid)
 		"/сс - очистить чат",
 		"/marker [x координата] [y координата] - поставить маркер",
 		"/idpng - ид предметов сервера",
+		"/fortune [выбрать число 1,2,5,10,20,40] [сумма] - игра колесо удачи",
+		"/blackjack invite [ИД игрока] [сумма] - игра блэкджек",
 		"/cmdadm - команды админа",
 	]
 
