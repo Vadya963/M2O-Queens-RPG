@@ -27,6 +27,11 @@ function sqlite3(text)
 
 	return result
 }
+function random(min=0, max=RAND_MAX)
+{
+	srand(getTickCount() * rand())
+	return (rand() % ((max + 1) - min)) + min//функция для получения рандомных чисел
+}
 local element_data = {}
 local pogoda = true //зима(false) или лето(true)
 local hour = 6
@@ -312,6 +317,12 @@ foreach (i,v in craft_table)
 {
 	craft_table[i][0] = info_png[split(v[4], ",")[0].tointeger()][0]+" "+split(v[4], ",")[1]+" "+info_png[split(v[4], ",")[0].tointeger()][1]
 	craft_table[i][1] = info_png[split(v[2], ",")[0].tointeger()][0]+" "+split(v[3], ",")[0]+" "+info_png[split(v[2], ",")[0].tointeger()][1]+" + "+info_png[split(v[2], ",")[1].tointeger()][0]+" "+split(v[3], ",")[1]+" "+info_png[split(v[2], ",")[1].tointeger()][1]
+}
+
+local quest_table = {//--0 название, 1 описание, 2 кол-во, 4 предмет засчитывания, 5 награда $, 6 награда предметом, 7 массив имен кто выполнил квест
+	[1] = ["Мясник", "Обработать ", random(5,10), " кусков мяса", 68, random(1000,5000), [88,10000], []],
+	[2] = ["Рудокоп", "Добыть ", random(5,10), " раз железную руду", 60, random(1000,5000), [0,0], []],
+	[3] = ["Нефтебарон", "Перевезти ", random(1,2), " раз бочки с нефтью", 61, random(1000,5000), [5,25], []],
 }
 
 //цены автосалона
@@ -712,6 +723,7 @@ local coal_pos = [
 	[199.126,-149.583,-19.4556],
 	[-391.621,-748.271,-21.5819],
 	[-280.0,769.465,-19.5924],
+	[264.435,-420.828,-19.2624],
 ]
 
 local taxi_pos = {}//--места для таксистов
@@ -1135,7 +1147,7 @@ function debuginfo ()
 
 		if (crimes[playerid] != 0 && search_inv_player_2_parameter(playerid, 10) != 0)
 		{
-			if (inv_player_delet(playerid, 10, search_inv_player_2_parameter(playerid, 10), true))
+			if (inv_player_delet(playerid, 10, search_inv_player_2_parameter(playerid, 10), true, false))
 			{
 				sendMessage(playerid, "Вы больше не полицейский", yellow)
 
@@ -1466,7 +1478,7 @@ local table_job = {
 							{
 								local randomize = result[1]["price"]
 
-								inv_player_delet(playerid, 81, id2, true)
+								inv_player_delet(playerid, 81, id2, true, false)
 
 								id2 = id2 - 1
 
@@ -1474,7 +1486,7 @@ local table_job = {
 
 								if (id2 == 0)
 								{
-									inv_player_delet(playerid, 81, id2, true)
+									inv_player_delet(playerid, 81, id2, true, false)
 								}
 
 								sqlite3( "UPDATE seagift_db SET warehouse = warehouse + '1', prod = prod - '1', money = money - '"+randomize+"' WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
@@ -1527,7 +1539,7 @@ local table_job = {
 									triggerClientEvent(playerid, "removegps")
 									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
 
-									inv_car_delet(playerid, up_car_subject[5][4], sic2p, true, false)
+									inv_car_delet(playerid, up_car_subject[5][4], sic2p, true, false, false)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
 
@@ -1574,7 +1586,7 @@ local table_job = {
 									triggerClientEvent(playerid, "removegps")
 									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
 
-									inv_car_delet(playerid, up_car_subject[6][4], sic2p, true, false)
+									inv_car_delet(playerid, up_car_subject[6][4], sic2p, true, false, false)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
 
@@ -1611,7 +1623,7 @@ local table_job = {
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 10.0))
 								{
-									inv_player_delet(playerid, up_player_subject[5][4], job_call[playerid], true)
+									inv_player_delet(playerid, up_player_subject[5][4], job_call[playerid], true, false)
 
 									job_call[playerid] = job_call[playerid]+1
 
@@ -1629,7 +1641,7 @@ local table_job = {
 								{
 									local randomize = random(zp_player_busdriver/2,zp_player_busdriver)
 
-									inv_player_delet(playerid, up_player_subject[5][4], job_call[playerid], true)
+									inv_player_delet(playerid, up_player_subject[5][4], job_call[playerid], true, false)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 
@@ -1681,7 +1693,7 @@ local table_job = {
 									triggerClientEvent(playerid, "removegps")
 									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
 
-									inv_car_delet(playerid, up_car_subject[7][4], sic2p, true, false)
+									inv_car_delet(playerid, up_car_subject[7][4], sic2p, true, false, false)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
 
@@ -1765,7 +1777,7 @@ local table_job = {
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 10.0))
 								{
-									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true)
+									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true, false)
 
 									job_call[playerid] = job_call[playerid]+1
 
@@ -1783,7 +1795,7 @@ local table_job = {
 								{
 									local randomize = random(zp_player_show/2,zp_player_show)
 
-									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true)
+									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true, false)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 
@@ -1831,7 +1843,7 @@ local table_job = {
 						{
 							local randomize = random(zp_player_police_car/2,zp_player_police_car)
 
-							inv_player_delet(playerid, 96, job_call[playerid][1], true)
+							inv_player_delet(playerid, 96, job_call[playerid][1], true, false)
 
 							sqlite3( "UPDATE car_db SET theft = '0' WHERE number = '"+job_call[playerid][1]+"'")
 
@@ -2003,12 +2015,6 @@ function ic_chat(playerid, text)
 			sendMessage(player, text, white)
 		}
 	}
-}
-
-function random(min=0, max=RAND_MAX)
-{
-	srand(getTickCount() * rand())
-	return (rand() % ((max + 1) - min)) + min//функция для получения рандомных чисел
 }
 
 function message_chat(playerid, say, r,g,b) 
@@ -2258,7 +2264,7 @@ function inv_player_empty(playerid, id1, id2)//выдача предмета и�
 	return false
 }
 
-function inv_player_delet(playerid, id1, id2, delet_inv)//--удаления предмета игрока
+function inv_player_delet(playerid, id1, id2, delet_inv, quest_bool)//--удаления предмета игрока
 {
 	if(delet_inv)
 	{
@@ -2276,6 +2282,11 @@ function inv_player_delet(playerid, id1, id2, delet_inv)//--удаления п�
 		if (array_player_1[playerid][i] == id1 && array_player_2[playerid][i] == id2)
 		{
 			inv_server_load( playerid, "player", i, 0, 0, playerid )
+
+			if (quest_bool)
+			{
+				quest_player(playerid, id1)
+			}
 
 			return true
 		}
@@ -2550,6 +2561,51 @@ function setPlayerColour_fun(playerid)
 		setPlayerColour(playerid, fromRGB(white[0],white[1],white[2]))
 	}
 }
+
+function quest_player(playerid, id)
+{
+	local playername = getPlayerName(playerid)
+
+	if (getElementData(playerid, "quest_select") != "0:0")
+	{
+		local spl = split(getElementData(playerid, "quest_select"), ":")
+		local quest = spl[0].tointeger()
+		local quest_progress = spl[1].tointeger()
+
+		if (1 <= quest && quest <= 3)
+		{
+			if (id == quest_table[quest][4])
+			{
+				quest_progress = quest_progress+1
+				setElementData(playerid, "quest_select", quest+":"+quest_progress)
+			}
+			
+			if (quest_table[quest][2] <= quest_progress)
+			{
+				if (quest_table[quest][6][0] != 0)
+				{
+					if (!inv_player_empty(playerid, quest_table[quest][6][0], quest_table[quest][6][1]))
+					{
+						sendMessage(playerid, "[ERROR] Для завершения квеста освободите инвентарь", red)
+						return
+					}
+					else
+					{
+						sendMessage(playerid, "[QUEST] Вы получили "+info_png[quest_table[quest][6][0]][0]+" "+quest_table[quest][6][1]+" "+info_png[quest_table[quest][6][0]][1], svetlo_zolotoy)
+					}
+				}
+
+				setElementData(playerid, "quest_select", "0:0")
+
+				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+quest_table[quest][5], playername )
+
+				sendMessage(playerid, "[QUEST] Вы получили "+quest_table[quest][5]+"$", green)
+
+				quest_table[quest][7].push(playername)
+			}
+		}
+	}
+}
 //-------------------------------------------------------------------------------------------------
 
 //---------------------------------------авто------------------------------------------------------
@@ -2680,7 +2736,7 @@ function inv_car_empty(playerid, id1, id2, load_value)//--выдача пред�
 	return count
 }
 
-function inv_car_delet(playerid, id1, id2, delet_inv, unload_value)//--удаления предмета в авто
+function inv_car_delet(playerid, id1, id2, delet_inv, unload_value, quest_bool)//--удаления предмета в авто
 {
 	local playername = getPlayerName ( playerid )
 	local vehicleid = getPlayerVehicle(playerid)
@@ -2699,14 +2755,24 @@ function inv_car_delet(playerid, id1, id2, delet_inv, unload_value)//--удал�
 
 	if(unload_value)
 	{
+		local count = 0
 		for (local i = 0; i < max_inv; i++) 
 		{
 			if (array_car_1[plate][i] == id1 && array_car_2[plate][i] == id2)
 			{
 				array_car_1[plate][i] = 0
 				array_car_2[plate][i] = 0
+				count = count+1
 
 				triggerClientEvent( playerid, "event_inv_load", "car", i, array_car_1[plate][i].tofloat(), array_car_2[plate][i].tofloat() )
+			}
+		}
+
+		if (count >= 20)
+		{
+			if (quest_bool)
+			{
+				quest_player(playerid, id1)
 			}
 		}
 	}
@@ -2718,6 +2784,11 @@ function inv_car_delet(playerid, id1, id2, delet_inv, unload_value)//--удал�
 			{
 				array_car_1[plate][i] = 0
 				array_car_2[plate][i] = 0
+
+				if (quest_bool)
+				{
+					quest_player(playerid, id1)
+				}
 
 				triggerClientEvent( playerid, "event_inv_load", "car", i, array_car_1[plate][i].tofloat(), array_car_2[plate][i].tofloat() )
 				break
@@ -3025,7 +3096,7 @@ function buy_subject_fun( playerid, text, number, value )
 			local text1 = v[0]
 			if (text1 == text)
 			{
-				if (inv_player_empty(playerid, k, 25*search_inv_player_2_parameter(playerid, 10)))
+				if (inv_player_empty(playerid, k, 25))
 				{
 					sendMessage(playerid, "Вы получили "+text, orange)
 				}
@@ -3657,7 +3728,7 @@ function craft_fun( playerid, text )
 						{
 							for (local i = 0; i < len; i++) 
 							{
-								if ( inv_player_delet(playerid, split_sub[i].tointeger(), split_res[i].tointeger(), false) )
+								if ( inv_player_delet(playerid, split_sub[i].tointeger(), split_res[i].tointeger(), false, false) )
 								{
 								}
 							}
@@ -3686,7 +3757,7 @@ function auction_buy_sell(playerid, value, i, id1, id2, money, name_buy)//--пр
 
 	if (value == "sell")
 	{
-		if (inv_player_delet(playerid, id1, id2, true))
+		if (inv_player_delet(playerid, id1, id2, true, false))
 		{
 			while (true)
 			{
@@ -3937,7 +4008,7 @@ function cow_farms(playerid, value, val1, val2)
 			result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 			if (search_inv_player(playerid, 49, 7) != 0) {
-				if (inv_player_delet(playerid, 49, 7, true)) {
+				if (inv_player_delet(playerid, 49, 7, true, false)) {
 					sqlite3( "UPDATE seagift_db SET nalog = nalog + '7' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'")
 
 					sendMessage(playerid, "Вы оплатили налог "+search_inv_player_2_parameter(playerid, doc)+" рыбзавода", yellow)
@@ -3982,7 +4053,7 @@ function cow_farms(playerid, value, val1, val2)
 
 		result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 
-		inv_car_delet(playerid, 83, val2, true, true)
+		inv_car_delet(playerid, 83, val2, true, true, false)
 
 		local money = val1*val2
 
@@ -4021,7 +4092,7 @@ function cow_farms(playerid, value, val1, val2)
 			return true
 		}
 
-		inv_car_delet(playerid, 82, val2, true, true)
+		inv_car_delet(playerid, 82, val2, true, true, false)
 
 		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
 
@@ -4884,6 +4955,7 @@ function( playerid, name, ip, serial )
 
 	setElementData(playerid, "is_chat_open", 0)
 	setElementData(playerid, "afk", "0")
+	setElementData(playerid, "quest_select", "0:0")
 
 	timer(function () {
 		local result = sqlite3( "SELECT COUNT() FROM account WHERE name = '"+playername+"'" )
@@ -4919,13 +4991,13 @@ function playerDisconnect( playerid, reason )
 		local pass = search_inv_player_2_parameter(playerid, 94)
 		if (pass != 0 && playerid+1 != pass)
 		{
-			inv_player_delet(playerid, 94, pass, false)
+			inv_player_delet(playerid, 94, pass, false, false)
 		}
 
 		local policetoken = search_inv_player_2_parameter(playerid, 10)
 		if (policetoken != 0 && playerid+1 != policetoken)
 		{
-			inv_player_delet(playerid, 10, policetoken, false)
+			inv_player_delet(playerid, 10, policetoken, false, false)
 		}
 
 		if (myPos[0] != 0 && myPos[1] != 0 && myPos[2] != 0)
@@ -5212,12 +5284,12 @@ function reg_or_login(playerid)
 
 		load_inv(playerid, "player", result[1]["inventory"])
 
-		if (inv_player_delet(playerid, 94, search_inv_player_2_parameter(playerid, 94), false))
+		if (inv_player_delet(playerid, 94, search_inv_player_2_parameter(playerid, 94), false, false))
 		{
 			inv_player_empty(playerid, 94, playerid+1)
 		}
 
-		if (inv_player_delet(playerid, 10, search_inv_player_2_parameter(playerid, 10), false))
+		if (inv_player_delet(playerid, 10, search_inv_player_2_parameter(playerid, 10), false, false))
 		{
 			inv_player_empty(playerid, 10, playerid+1)
 		}
@@ -5496,7 +5568,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 		{
 			if (isPointInCircle3D(x,y,z, v[0],v[1],v[2], v[3]) && id1 == v[4])//--получение прибыли за предметы
 			{
-				inv_player_delet( playerid, id1, id2, false )
+				inv_player_delet( playerid, id1, id2, false, true )
 				inv_server_load( playerid, value, 0, 1, array_player_2[playerid][0]+id2, tabpanel )
 
 				sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], yellow)
@@ -5511,7 +5583,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 			{
 				local randomize = random(1,v[6])
 
-				inv_player_delet( playerid, id1, id2, true )
+				inv_player_delet( playerid, id1, id2, true, false )
 				inv_player_empty( playerid, v[5], randomize )
 
 				sendMessage(playerid, "Вы получили "+info_png[v[5]][0]+" "+randomize+" "+info_png[v[5]][1], svetlo_zolotoy)
@@ -6064,7 +6136,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 						return
 					}
 
-					inv_car_delet(playerid, id, sic2p, true, true)
+					inv_car_delet(playerid, id, sic2p, true, true, true)
 
 					sqlite3( "UPDATE business_db SET warehouse = warehouse + '"+count+"', money = money - '"+money+"' WHERE number = '"+v["number"]+"'")
 
@@ -6082,7 +6154,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 				{
 					if (!cow_farms(playerid, "unload", count, sic2p) && !cow_farms(playerid, "unload_prod", count, sic2p))
 					{
-						inv_car_delet(playerid, id, sic2p, true, true)
+						inv_car_delet(playerid, id, sic2p, true, true, true)
 
 						money = count*sic2p
 
@@ -7545,7 +7617,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			me_chat(playerid, playername+" открыл(а) "+info_png[id1][0])
 
-			inv_player_delet(playerid, id1, id2, false)
+			inv_player_delet(playerid, id1, id2, false, false)
 			inv_player_empty(playerid, array_weapon[randomize], 25)
 
 			local crimes_plus = zakon_80_crimes
@@ -8686,7 +8758,7 @@ function (playerid, value, id)
 				{
 					me_chat(playerid, playername+" обыскал(а) т/с под номером "+id)
 
-					inv_player_delet(playerid, 86, 2, true)
+					inv_player_delet(playerid, 86, 2, true, false)
 
 					search_inv_car_police( playerid, id.tostring() )
 				}
@@ -8717,7 +8789,7 @@ function (playerid, value, id)
 				{
 					me_chat(playerid, playername+" обыскал(а) дом под номером "+id)
 
-					inv_player_delet(playerid, 86, 3, true)
+					inv_player_delet(playerid, 86, 3, true, false)
 
 					search_inv_house_police( playerid, id )
 				}
@@ -8797,7 +8869,7 @@ function( playerid, id )
 		return
 	}
 
-	inv_player_delet(playerid, 89, search_inv_player_2_parameter(playerid, 89), true)
+	inv_player_delet(playerid, 89, search_inv_player_2_parameter(playerid, 89), true, false)
 
 	inv_player_empty(playerid, 89, id)
 
@@ -8946,7 +9018,7 @@ function (playerid, plate)
 		return
 	}
 
-	if(inv_player_delet(playerid, 95, 1, true))
+	if(inv_player_delet(playerid, 95, 1, true, false))
 	{
 		inv_player_empty(playerid, 96, plate)
 
@@ -9286,7 +9358,7 @@ function (playerid, plate)
 
 			if (search_inv_player(playerid, 50, 7) != 0)
 			{
-				if (inv_player_delet(playerid, 50, 7, true))
+				if (inv_player_delet(playerid, 50, 7, true, false))
 				{
 					sqlite3( "UPDATE car_db SET nalog = '7' WHERE number = '"+plate+"'")
 					car_spawn(plate)
@@ -9524,6 +9596,69 @@ function (playerid, ...)
 	b_chat_player(playerid, "(Ближний OOC) "+getPlayerName( playerid )+" ["+playerid+"]: " + text)
 })
 
+addCommandHandler("quest",//квесты
+function (playerid, ...)
+{
+	if (logged[playerid] == 0) 
+	{
+		return
+	}
+
+	local text = ""
+	for(local i = 0; i < vargv.len(); i++)
+	{
+		text = text+vargv[i]+" "
+	}
+
+	if(text != "" && split(text, " ")[0] == "select")
+	{
+		local id = split(text, " ")[1].tointeger()
+		if(1 <= id && id <= quest_table.len())
+		{
+			foreach (k,v in quest_table[id][7])
+			{
+				if (v == getPlayerName(playerid))
+				{
+					sendMessage(playerid, "[ERROR] Вы выполнили этот квест", red)
+					return
+				}
+			}
+
+			sendMessage(playerid, "Вы взяли квест "+quest_table[id][0], yellow)
+
+			setElementData(playerid, "quest_select", id+":0")
+		}
+	}
+	else
+	{
+		sendMessage(playerid, "====[ КВЕСТЫ ]====", yellow)
+
+		foreach (k, v in quest_table) 
+		{
+			local count = 0
+			foreach (k,v in v[7])
+			{
+				if (v != getPlayerName(playerid))
+				{
+					count = count+1
+				}
+			}
+
+			if (count == v[7].len())
+			{
+				if (split(getElementData(playerid, "quest_select"), ":")[0].tointeger() == k)
+				{
+					sendMessage(playerid, "[ "+k+" - "+v[0]+" - "+v[1]+v[2]+v[3]+" - "+split(getElementData(playerid, "quest_select"), ":")[1]+"/"+v[2]+" - "+v[5]+"$ - "+info_png[ v[6][0] ][0]+" "+v[6][1]+" "+info_png[ v[6][0] ][1]+" ]", green)
+				}
+				else
+				{
+					sendMessage(playerid, "[ "+k+" - "+v[0]+" - "+v[1]+v[2]+v[3]+" - 0/"+v[2]+" - "+v[5]+"$ - "+info_png[ v[6][0] ][0]+" "+v[6][1]+" "+info_png[ v[6][0] ][1]+" ]", yellow)
+				}
+			}
+		}
+	}
+})
+
 addCommandHandler("cmd",//все команды
 function (playerid)
 {
@@ -9568,6 +9703,8 @@ function (playerid)
 		"/idpng - ид предметов сервера",
 		"/fortune [выбрать число 1,2,5,10,20,40] [сумма] - игра колесо удачи",
 		"/blackjack invite [ИД игрока] [сумма] - игра блэкджек",
+		"/quest - посмотреть список квестов",
+		"/quest select [номер квеста] - выбрать квест",
 		"/cmdadm - команды админа",
 	]
 
@@ -9677,7 +9814,7 @@ function(playerid, id, id1, id2)
 		return
 	}
 
-	if (inv_player_delet(id, val1, val2, true))
+	if (inv_player_delet(id, val1, val2, true, false))
 	{
 		admin_chat(playerid, playername+" ["+playerid+"] удалил у "+getPlayerName ( id )+" ["+id+"] "+info_png[val1][0]+" "+val2+" "+info_png[val1][1])
 	}
