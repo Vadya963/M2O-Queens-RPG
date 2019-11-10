@@ -1412,9 +1412,7 @@ local table_job = {
 							triggerClientEvent(playerid, "removegps")
 							triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
 
-							local crimes_plus = zakon_car_theft_crimes
-							crimes[playerid] = crimes[playerid]+crimes_plus
-							sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
+							addcrimes(playerid, zakon_car_theft_crimes)
 						}
 					}
 					else if (job_call[playerid] == 2) 
@@ -2395,7 +2393,6 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 			local y = myPos[1]
 			local z = myPos[2]
 			local playername = getPlayerName ( playerid )
-			local crimes_plus = zakon
 			local cash = random(money/2,money)
 
 			if (isPointInCircle3D(x1,y1,z1, x,y,z, radius))
@@ -2405,8 +2402,7 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 					local id1 = 66
 					if (inv_player_empty(playerid, id1, cash))
 					{
-						crimes[playerid] = crimes[playerid]+crimes_plus
-						sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
+						addcrimes(playerid, zakon)
 
 						sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+cash+" "+info_png[id1][1], svetlo_zolotoy)
 
@@ -2419,8 +2415,7 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 				}
 				else 
 				{
-					crimes[playerid] = crimes[playerid]+crimes_plus
-					sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
+					addcrimes(playerid, zakon)
 
 					sendMessage(playerid, "Вы унесли "+cash+"$", green)
 
@@ -2605,6 +2600,14 @@ function quest_player(playerid, id)
 			}
 		}
 	}
+}
+
+function addcrimes(playerid, value)
+{
+	local crimes_plus = value
+	local playername = getPlayerName(playerid)
+	crimes[playerid] = crimes[playerid]+crimes_plus
+	sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -5067,9 +5070,7 @@ function playerDeath( playerid, attacker )
 
 		if (search_inv_player_2_parameter(attacker, 10) == 0)
 		{
-			local crimes_plus = zakon_kill_crimes
-			crimes[attacker] = crimes[attacker]+crimes_plus
-			sendMessage(attacker, "+"+crimes_plus+" преступление, всего преступлений "+crimes[attacker], blue)
+			addcrimes(attacker, zakon_kill_crimes)
 		}
 		else
 		{
@@ -5083,9 +5084,7 @@ function playerDeath( playerid, attacker )
 			}
 			else 
 			{
-				local crimes_plus = zakon_kill_crimes
-				crimes[attacker] = crimes[attacker]+crimes_plus
-				sendMessage(attacker, "+"+crimes_plus+" преступление, всего преступлений "+crimes[attacker], blue)
+				addcrimes(attacker, zakon_kill_crimes)
 			}
 		}
 
@@ -6810,9 +6809,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if(id1 == 29)//оп
 		{
-			local crimes_plus = id2
-			crimes[playerid] = crimes[playerid]+crimes_plus
-			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
+			addcrimes(playerid, id2)
 			me_chat(playerid, playername+" прочитал(а) "+info_png[id1][0])
 			id2 = 0
 		}
@@ -7214,9 +7211,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (alcohol_test >= zakon_alcohol)
 			{
-				local crimes_plus = zakon_alcohol_crimes
-				crimes[playerid] = crimes[playerid]+crimes_plus
-				sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
+				addcrimes(playerid, zakon_alcohol_crimes)
 			}
 		}
 		else if (id1 == 47)//--наркостестер
@@ -7229,9 +7224,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (drugs_test >= zakon_drugs)
 			{
-				local crimes_plus = zakon_drugs_crimes
-				crimes[playerid] = crimes[playerid]+crimes_plus
-				sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
+				addcrimes(playerid, zakon_drugs_crimes)
 			}
 		}
 		else if (id1 == 48)//--налог дома
@@ -7332,9 +7325,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			sendMessage(playerid, "Вы получили "+randomize+"$", green)
 
-			local crimes_plus = zakon_54_crimes
-			crimes[playerid] = crimes[playerid]+crimes_plus
-			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
+			addcrimes(playerid, zakon_54_crimes)
 
 			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
 		}
@@ -7620,9 +7611,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			inv_player_delet(playerid, id1, id2, false, false)
 			inv_player_empty(playerid, array_weapon[randomize], 25)
 
-			local crimes_plus = zakon_80_crimes
-			crimes[playerid] = crimes[playerid]+crimes_plus
-			sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
+			addcrimes(playerid, zakon_80_crimes)
 
 			return
 		}
