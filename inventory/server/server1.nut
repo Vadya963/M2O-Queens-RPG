@@ -33,7 +33,7 @@ function random(min=0, max=RAND_MAX)
 	return (rand() % ((max + 1) - min)) + min//функция для получения рандомных чисел
 }
 local element_data = {}
-local pogoda = true //зима(false) или лето(true)
+local pogoda = false //зима(false) или лето(true)
 local hour = 6
 local minute = 0
 local earth = {//--слоты земли
@@ -977,8 +977,9 @@ for (local i = 21; i <= 22; i++)
 
 //слоты игрока
 local max_inv = 24
-local array_player_1 = array((getMaxPlayers()+1), 0)
-local array_player_2 = array((getMaxPlayers()+1), 0)
+local max_inv_additional = 1//--дополнительные слоты
+local array_player_1 = array((getMaxPlayers()+max_inv_additional), 0)
+local array_player_2 = array((getMaxPlayers()+max_inv_additional), 0)
 
 local state_inv_player = array(getMaxPlayers(), 0)//состояние инв-ря игрока 0-выкл, 1-вкл
 local state_gui_window = array(getMaxPlayers(), 0)//--состояние гуи окна 0-выкл, 1-вкл
@@ -1730,7 +1731,7 @@ local table_job = {
 							{
 								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], up_car_subject[8][3]) && amount_inv_car_1_parameter(vehicleid, up_car_subject[8][4]) != 0)
 								{
-									local sic2p = amount_inv_car_2_parameter(vehicleid, up_car_subject[8][4])
+									local sic2p = search_inv_car_2_parameter(vehicleid, up_car_subject[8][4])
 									local randomize = random(0,coal_pos.len()-1)
 
 									job_pos[playerid] = [coal_pos[randomize][0],coal_pos[randomize][1],coal_pos[randomize][2]]
@@ -1738,7 +1739,7 @@ local table_job = {
 									triggerClientEvent(playerid, "removegps")
 									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
 
-									inv_car_delet_1_parameter(playerid, up_car_subject[8][4], true)
+									inv_car_delet(playerid, up_car_subject[8][4], sic2p, true, false, false)
 
 									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
 
@@ -2137,7 +2138,7 @@ function save_inv(val, value)
 	if (value == "player")
 	{
 		local text = ""
-		for (local i = 0; i < max_inv+1; i++) 
+		for (local i = 0; i < max_inv+max_inv_additional; i++) 
 		{
 			text = text+array_player_1[val][i]+":"+array_player_2[val][i]+","
 		}
@@ -8914,8 +8915,7 @@ function (playerid, ...)
 	}
 })
 
-addCommandHandler( "let",//смс
-function( playerid, id, ...)
+function message_player( playerid, id, ...)
 {
 	local playername = getPlayerName ( playerid )
 	local id = id.tointeger()
@@ -8951,7 +8951,8 @@ function( playerid, id, ...)
 
 	sendMessage(playerid, "[LETTER TO] "+player_name+" ["+id+"]: "+text, yellow)
 	sendMessage(id, "[LETTER FROM] "+playername+" ["+playerid+"]: "+text, yellow)
-})
+}
+addCommandHandler( "msg", message_player)//смс
 
 addCommandHandler("wc",//выдача чека
 function(playerid, id)
@@ -9662,7 +9663,7 @@ function (playerid)
 		"/prison [ИД игрока] - посадить игрока в тюрьму (для полицейских)",
 		"/r [текст] - рация",
 		"/setchanel [канал] - сменить канал в рации",
-		"/let [ИД игрока] [текст] - отправить письмо игроку",
+		"/msg [ИД игрока] [текст] - отправить сообщение игроку",
 		"/ec [номер т/с] - эвакуция т/с",
 		"/cseat [номер т/с] [место от 1 до 20] - сесть на пассажирское место",
 		"/cexit - выйти из т/с",
