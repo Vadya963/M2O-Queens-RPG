@@ -8685,7 +8685,6 @@ function (playerid, value, id)
 	local z = myPos[2]
 	local id = id.tointeger()
 	local value = value.tostring()
-	local wanted_sub = [20,66,76,78]
 
 	if (logged[playerid] == 0)
 	{
