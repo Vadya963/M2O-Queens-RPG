@@ -306,6 +306,8 @@ local info_png = {
 	[95] = ["пустой бланк", "шт"],
 	[96] = ["заявление на пропажу т/с под номером", ""],
 	[97] = ["колода карт", "шт"],
+	[98] = ["ящик под номером", ""],
+	[99] = ["ключ от ящика под номером", ""],
 }
 
 local craft_table = [//--[предмет 0, рецепт 1, предметы для крафта 2, кол-во предметов для крафта 3, предмет который скрафтится 4] //переписать
@@ -773,7 +775,7 @@ local shop = {
 	[8] = [info_png[8][0], 20, 15],
 	[11] = [info_png[11][0], 1, 25],
 	[26] = [info_png[26][0], 1, 5000],
-	[30] = [info_png[30][0], 1, 100],
+	[30] = [info_png[30][0], 0, 100],
 	[44] = [info_png[44][0], 100, 50],
 	[45] = [info_png[45][0], 100, 100],
 	[52] = [info_png[52][0], 1, 100],
@@ -782,6 +784,7 @@ local shop = {
 	[81] = [info_png[81][0], 100, 100],
 	[89] = [info_png[89][0], 10, 500],
 	[97] = [info_png[97][0], 1, 50],
+	[98] = [info_png[98][0], 0, 2500],
 }
 
 local eda = {
@@ -1031,6 +1034,10 @@ local probeg = {}//пробег
 //слоты дома
 local array_house_1 = {}
 local array_house_2 = {}
+
+//слоты ящика
+local array_box_1 = {}
+local array_box_2 = {}
 
 function debuginfo () 
 {
@@ -2131,6 +2138,15 @@ function load_inv(val, value, text)
 			array_house_2[val][k] = spl[1].tointeger()
 		}
 	}
+	else if( value == "box")
+	{
+		foreach (k, v in split(text, ",")) 
+		{
+			local spl = split(v, ":")
+			array_box_1[val][k] = spl[0].tointeger()
+			array_box_2[val][k] = spl[1].tointeger()
+		}
+	}
 }
 
 function save_inv(val, value)
@@ -2159,6 +2175,15 @@ function save_inv(val, value)
 		for (local i = 0; i < max_inv; i++) 
 		{
 			text = text+array_house_1[val][i]+":"+array_house_2[val][i]+","
+		}
+		return text
+	}
+	else if (value == "box")
+	{
+		local text = ""
+		for (local i = 0; i < max_inv; i++) 
+		{
+			text = text+array_box_1[val][i]+":"+array_box_2[val][i]+","
 		}
 		return text
 	}
@@ -3459,7 +3484,7 @@ function buy_subject_fun( playerid, text, number, value )
 			}
 			else if (value == 2)
 			{
-				local v = [shop[30][0], shop[30][1], shop[30][2]]
+				local v = [shop[30][0], shop[30][1], shop[30][2]]//--покупка лото
 				local k = 30
 				local randomize = random(1,1000)
 				local count = false
@@ -3499,6 +3524,46 @@ function buy_subject_fun( playerid, text, number, value )
 							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
 
 							loto[1].push(randomize)
+						}
+						else
+						{
+							sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+						}
+					}
+					else
+					{
+						sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+					}
+					return
+				}
+
+				local v = [shop[98][0], shop[98][1], shop[98][2]]//--покупка ящика
+				local k = 98
+				local key = 99
+				local result = sqlite3( "SELECT COUNT() FROM box_db")
+				local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
+				if (text1 == text)
+				{
+					if (cash*v[2] <= array_player_2[playerid][0])
+					{
+						if (search_inv_player(playerid, 0, 0) >= 2)
+						{
+							local b = result[1]["COUNT()"]+1
+
+							inv_player_empty(playerid, k, b)
+							inv_player_empty(playerid, key, b)
+
+							array_box_1[b] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+							array_box_2[b] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+							sqlite3( "INSERT INTO box_db (number, inventory) VALUES ('"+b+"', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
+
+							sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", orange)
+							sendMessage(playerid, "Вы получили "+info_png[key][0]+" "+b, orange)
+
+							sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
+
+							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
 						}
 						else
 						{
@@ -4807,6 +4872,19 @@ function()
 	print("[house_number] "+house_number)
 
 
+	local box_number = 0
+	foreach (idx, v in sqlite3( "SELECT * FROM box_db" )) 
+	{
+		array_box_1[v["number"]] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		array_box_2[v["number"]] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+		load_inv(v["number"], "box", v["inventory"])
+
+		box_number++
+	}
+	print("[box_number] "+box_number)
+
+
 	local business_number = 0
 	foreach (idx, v in sqlite3( "SELECT * FROM business_db" )) 
 	{
@@ -5529,6 +5607,17 @@ function tab_down(playerid)
 			}
 		}
 
+		local sic2p = search_inv_player_2_parameter(playerid, 99)
+		if (search_inv_player(playerid, 98, sic2p) != 0)
+		{
+			for (local i = 0; i < max_inv; i++)
+			{
+				triggerClientEvent( playerid, "event_inv_load", "box", i, array_box_1[sic2p][i], array_box_2[sic2p][i] )
+			}
+
+			triggerClientEvent( playerid, "event_tab_load", "box", sic2p )
+		}
+
 		if (isPointInCircle3D( x, y, z, interior_job[5][2],interior_job[5][3],interior_job[5][4], interior_job[5][7]))
 		{
 			enter_job[playerid] = 1
@@ -5541,6 +5630,7 @@ function tab_down(playerid)
 	else if (state_inv_player[playerid] == 1)
 	{
 		triggerClientEvent( playerid, "event_tab_load", "house", "" )
+		triggerClientEvent( playerid, "event_tab_load", "box", "" )
 
 		state_inv_player[playerid] = 0
 		enter_house[playerid] = [0,0]
@@ -5615,6 +5705,11 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 	/*if (enter_house[playerid][1] == id2 && id1 == 25) {//--когда выбрасываешь ключ в инв-ре исчезают картинки(выкл из-за фичи)
 		triggerClientEvent( playerid, "event_tab_load", "house", "" )
 	}*/
+
+	if (id1 == 98 || id1 == 99) //--когда выбрасываешь ключ в инв-ре исчезают картинки
+	{
+		triggerClientEvent( playerid, "event_tab_load", "box", "" )
+	}
 
 	if (isPlayerInVehicle(playerid)) 
 	{
@@ -6183,6 +6278,7 @@ function inv_server_load (playerid, value, id3, id1, id2, tabpanel)//измен�
 	local playername = getPlayerName(playerid)
 	local plate = tabpanel
 	local h = tabpanel
+	local b = tabpanel
 	local id1 = id1.tointeger()
 	local id2 = id2.tointeger()
 
@@ -6221,6 +6317,15 @@ function inv_server_load (playerid, value, id3, id1, id2, tabpanel)//измен�
 		triggerClientEvent( playerid, "event_inv_load", value, id3, array_house_1[h][id3].tofloat(), array_house_2[h][id3].tofloat() )
 
 		sqlite3( "UPDATE house_db SET inventory = '"+save_inv(h, "house")+"' WHERE number = '"+h+"'")
+	}
+	else if (value == "box")
+	{
+		array_box_1[b][id3] = id1
+		array_box_2[b][id3] = id2
+
+		triggerClientEvent( playerid, "event_inv_load", value, id3, array_box_1[b][id3].tofloat(), array_box_2[b][id3].tofloat() )
+
+		sqlite3( "UPDATE box_db SET inventory = '"+save_inv(b, "box")+"' WHERE number = '"+b+"'")
 	}
 }
 addEventHandler( "event_inv_server_load", inv_server_load )

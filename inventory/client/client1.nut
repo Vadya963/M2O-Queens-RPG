@@ -44,6 +44,7 @@ local gui_selection = false//выделение пнг
 local state_inv_player = false//состояние ин-ря игрока
 local state_inv_car = false//состояние ин-ря тс
 local state_inv_house = false//состояние ин-ря дома
+local state_inv_box = false//состояние ин-ря ящика
 
 local info_tab = ""//положение картинки в табе
 local info3 = 0//слот
@@ -52,6 +53,7 @@ local info2 = 0//число
 
 local plate = ""//если в тс
 local house = ""//если около дома
+local box = ""//если есть ящик
 
 local no_use_subject = [-1,0,1]//--нельзя использовать
 local no_select_subject = [-1,0,1]//--нельзя выделить
@@ -163,6 +165,8 @@ local info_png = {
 	[95] = ["пустой бланк", "шт"],
 	[96] = ["заявление на пропажу т/с под номером", ""],
 	[97] = ["колода карт", "шт"],
+	[98] = ["ящик под номером", ""],
+	[99] = ["ключ от ящика под номером", ""],
 }
 
 local craft_table = [//--[предмет 0, рецепт 1, предметы для крафта 2, кол-во предметов для крафта 3, предмет который скрафтится 4] //переписать
@@ -565,7 +569,7 @@ local shop = {
 	[8] = [info_png[8][0], 20, 15],
 	[11] = [info_png[11][0], 1, 25],
 	[26] = [info_png[26][0], 1, 5000],
-	[30] = [info_png[30][0], 1, 100],
+	[30] = [info_png[30][0], 0, 100],
 	[44] = [info_png[44][0], 100, 50],
 	[45] = [info_png[45][0], 100, 100],
 	[52] = [info_png[52][0], 1, 100],
@@ -574,6 +578,7 @@ local shop = {
 	[81] = [info_png[81][0], 100, 100],
 	[89] = [info_png[89][0], 10, 500],
 	[97] = [info_png[97][0], 1, 50],
+	[98] = [info_png[98][0], 0, 2500],
 }
 local shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in shop)
@@ -1117,6 +1122,33 @@ local inv_slot_house = [//инв-рь игрока {пнг картинка 0, �
 	[0,0]
 ]
 
+local inv_slot_box = [//инв-рь игрока {пнг картинка 0, значение 1}
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0],
+	[0,0]
+]
+
 local inv_pos = [//позиция слотов {слот 0, позиция х 1, позиция у 2}
 	[0,10.0,10.0],
 	[1,70.0,10.0],
@@ -1150,7 +1182,8 @@ local inv_pos = [//позиция слотов {слот 0, позиция х 1,
 local button_pos = [//позиция кнопок
 	[0,"PLAYER",10.0,15.0],
 	[1,"CAR",70.0,15.0],
-	[2,"HOUSE",130.0,15.0]
+	[2,"HOUSE",130.0,15.0],
+	[3,"BOX",190.0,15.0]
 ]
 
 gui_fon = guiCreateElement( 2, "фон", 0.0, 0.0, screen[0], screen[1], false )//фон для гуи
@@ -1429,6 +1462,10 @@ function zamena_img()
 	{
 		triggerServerEvent( "event_inv_server_load", "house", info3_selection_1, info1, info2, house )
 	}
+	else if (info_tab == "box")
+	{
+		triggerServerEvent( "event_inv_server_load", "box", info3_selection_1, info1, info2, box )
+	}
 }
 
 local lastTick = getTickCount()
@@ -1437,28 +1474,6 @@ local FPS = 0
 addEventHandler( "onClientFrameRender",
 function( post )
 {
-	local local_param = {
-		[0] = "state_inv_gui "+state_inv_gui,
-		[1] = "gui_selection "+gui_selection,
-		[2] = "state_inv_player "+state_inv_player,
-		[3] = "state_inv_car "+state_inv_car,
-		[4] = "state_inv_house "+state_inv_house,
-		[5] = "info_tab "+info_tab,
-		[6] = "info3 "+info3,
-		[7] = "info1 "+info1,
-		[8] = "info2 "+info2,
-		[9] = "plate "+plate,
-		[10] = "house "+house,
-		[11] = "lmb "+lmb,
-		[12] = "info3_selection_1 "+info3_selection_1,
-		[13] = "info1_selection_1 "+info1_selection_1,
-		[14] = "info2_selection_1 "+info2_selection_1,
-		[15] = "number_business "+number_business,
-		[16] = "value_business "+value_business,
-		[17] = "clothing_menu_value "+clothing_menu_value,
-		[18] = "is_chat_open "+is_chat_open,
-	}
-
 	playerid = getLocalPlayer()
 
 	local myPos = getPlayerPosition(playerid)
@@ -1586,10 +1601,19 @@ function( post )
 			}
 		}
 
+		if (state_inv_box)
+		{
+			for (local i = 0; i < max_inv; i++)
+			{
+				dxDrawTexture(image[inv_slot_box[i][0]], (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
+				dxdrawtext( inv_slot_box[i][1].tostring(), (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+35), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
+			}
+		}
+
 
 		if (gui_selection)//выделение пнг
 		{
-			if (info_tab == "player" && state_inv_player || info_tab == "car" && state_inv_car || info_tab == "house" && state_inv_house)
+			if (info_tab == "player" && state_inv_player || info_tab == "car" && state_inv_car || info_tab == "house" && state_inv_house || info_tab == "box" && state_inv_box)
 			{
 				dxDrawRectangle( (inv_pos[info3][1]+pos_x_3d_image), (inv_pos[info3][2]+pos_y_3d_image), image_w_h, image_w_h, fromRGB( 255, 255, 130, 100 ) )
 			}
@@ -1626,6 +1650,18 @@ function( post )
 			else
 			{
 				dxdrawtext( button_pos[2][1].tostring()+" "+house, (button_pos[2][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[2][3]), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
+			}
+		}
+
+		if (box != "")
+		{
+			if (state_inv_box)
+			{
+				dxdrawtext( button_pos[3][1].tostring()+" "+box, (button_pos[3][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[3][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
+			}
+			else
+			{
+				dxdrawtext( button_pos[3][1].tostring()+" "+box, (button_pos[3][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[3][3]), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
 			}
 		}
 
@@ -1751,6 +1787,7 @@ function tab_down_fun(value)//инв-рь игрока
 		state_inv_player = false
 		state_inv_car = false
 		state_inv_house = false
+		state_inv_box = false
 		gui_selection = false
 		info3 = 0
 		info1 = 0
@@ -2033,6 +2070,73 @@ function( element )
 						lmb = 0
 					}
 				}
+				else if (state_inv_box)
+				{
+					info1 = inv_slot_box[info3][0]
+					info2 = inv_slot_box[info3][1]
+					
+					if (lmb == 0)
+					{
+						foreach (idx, v in no_select_subject)
+						{
+							if (v == info1)
+							{
+								lmb = 0
+								gui_selection = false
+								return
+							}
+						}
+
+						gui_selection = true
+						info_tab = "box"
+						info3_selection_1 = info3
+						info1_selection_1 = info1
+						info2_selection_1 = info2
+						lmb = 1
+					}
+					else
+					{
+						//--------------------------------------------------------------замена куда нажал 2 раз----------------------------------------------------------------------------
+						/*if (inv_slot_box[info3][0] != 0)
+						{*/
+
+							foreach (idx, v in no_change_subject)
+							{
+								if (v == info1)
+								{
+									lmb = 0
+									gui_selection = false
+									return
+								}
+							}
+
+							/*info_tab = "box"
+							info3_selection_1 = info3
+							info1_selection_1 = info1
+							info2_selection_1 = info2
+							return
+						}*/
+
+						foreach (idx, v in no_throw_earth)
+						{
+							if (v == info1_selection_1)
+							{
+								gui_selection = false
+								info_tab = ""
+								lmb = 0
+								return
+							}
+						}
+
+						triggerServerEvent( "event_inv_server_load", "box", info3, info1_selection_1, info2_selection_1, box )
+
+						zamena_img()
+
+						gui_selection = false
+						info_tab = ""
+						lmb = 0
+					}
+				}
 
 			}
 		}
@@ -2042,12 +2146,14 @@ function( element )
 			state_inv_player = true
 			state_inv_car = false
 			state_inv_house = false
+			state_inv_box = false
 		}
 		else if ( plate != "" && ((button_pos[1][2]+pos_x_3d_image)) < pos[0] && ((button_pos[1][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[1][3])) < pos[1] && ((pos_y_3d_image-button_pos[1][3])+button_pos[1][3]) > pos[1] )
 		{
 			state_inv_player = false
 			state_inv_car = true
 			state_inv_house = false
+			state_inv_box = false
 
 			triggerServerEvent("event_setVehiclePartOpen_fun", "true")
 		}
@@ -2056,6 +2162,14 @@ function( element )
 			state_inv_player = false
 			state_inv_car = false
 			state_inv_house = true
+			state_inv_box = false
+		}
+		else if ( box != "" && ((button_pos[3][2]+pos_x_3d_image)) < pos[0] && ((button_pos[3][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[3][3])) < pos[1] && ((pos_y_3d_image-button_pos[3][3])+button_pos[3][3]) > pos[1] )
+		{
+			state_inv_player = false
+			state_inv_car = false
+			state_inv_house = false
+			state_inv_box = true
 		}
 
 		if ( 0.0 < pos[0] && pos_x_3d_image > pos[0] )//использовать предмет
@@ -2109,6 +2223,10 @@ function( element )
 				else if (info_tab == "house" && state_inv_house)
 				{
 					triggerServerEvent( "event_throw_earth_server", "house", info3, info1, info2, house )
+				}
+				else if (info_tab == "box" && state_inv_box)
+				{
+					triggerServerEvent( "event_throw_earth_server", "box", info3, info1, info2, box )
 				}
 
 				gui_selection = false
@@ -2340,6 +2458,11 @@ function( value, id3, id1, id2 )
 		inv_slot_house[id3][0] = id1
 		inv_slot_house[id3][1] = id2
 	}
+	else if (value == "box")
+	{
+		inv_slot_box[id3][0] = id1
+		inv_slot_box[id3][1] = id2
+	}
 })
 
 function tab_load (value, text)//загрузка надписей в табе
@@ -2379,6 +2502,28 @@ function tab_load (value, text)//загрузка надписей в табе
 			{
 				state_inv_player = true
 				state_inv_house = false
+				gui_selection = false
+				info_tab = ""
+				info1 = -1
+				info2 = -1
+				info3 = -1
+				lmb = 0
+			}
+		}
+	}
+	else if (value == "box")
+	{
+		box = text
+
+		if (state_inv_gui)
+		{
+			if (box != "") 
+			{
+			}
+			else 
+			{
+				state_inv_player = true
+				state_inv_box = false
 				gui_selection = false
 				info_tab = ""
 				info1 = -1
