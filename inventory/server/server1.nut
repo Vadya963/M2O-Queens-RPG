@@ -4211,10 +4211,9 @@ function fuel_down()//--система топлива авто
 	{
 		local plate = getVehiclePlateText(vehicleid)
 		local fuel_down_number = 0.0002
-		local result_c = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
 		local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
 
-		if (dviglo[plate] == 1)
+		if (dviglo[plate] == 1 && plate != "0")
 		{
 			if (fuel[plate] <= 0)
 			{
@@ -4236,7 +4235,7 @@ function fuel_down()//--система топлива авто
 
 		setVehicleDirtLevel(vehicleid, 0.0)
 
-		if (result_c[1]["COUNT()"] == 1)
+		if (result.len() != 0)
 		{
 			local count = 0
 			foreach(i, v1 in no_use_wheel_and_engine) 
