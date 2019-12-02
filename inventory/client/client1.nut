@@ -712,8 +712,6 @@ local sub_cops = [
 	[info_png[17][0], 3, 1050, 17],
 	[info_png[18][0], 6, 1500, 18],
 	[info_png[19][0], 9, 1990, 19],
-	[info_png[86][0]+" "+info_png[86][2+1], 2, 86],
-	[info_png[86][0]+" "+info_png[86][3+1], 3, 86],
 	[info_png[95][0], 1, 95],
 ]
 local sub_cops_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)

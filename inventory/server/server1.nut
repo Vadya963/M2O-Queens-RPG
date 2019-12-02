@@ -855,8 +855,6 @@ local mayoralty_shop = [
 local sub_cops = [
 	[info_png[46][0], 1, 46],
 	[info_png[47][0], 1, 47],
-	[info_png[86][0]+" "+info_png[86][2+1], 2, 86],
-	[info_png[86][0]+" "+info_png[86][3+1], 3, 86],
 	[info_png[95][0], 1, 95],
 ]
 
@@ -8831,12 +8829,6 @@ function (playerid, value, id)
 	}
 	else if (value == "car")
 	{
-		if(search_inv_player(playerid, 86, 2) == 0)
-		{
-			sendMessage(playerid, "[ERROR] У вас нет "+info_png[86][0]+" "+info_png[86][2+1], red)
-			return
-		}
-
 		foreach (k, vehicleid in getVehicles()) 
 		{
 			local plate = getVehiclePlateText(vehicleid)
@@ -8850,8 +8842,6 @@ function (playerid, value, id)
 				if (isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
 				{
 					me_chat(playerid, playername+" обыскал(а) т/с под номером "+id)
-
-					inv_player_delet(playerid, 86, 2, true, false)
 
 					search_inv_car_police( playerid, id.tostring() )
 				}
@@ -8868,12 +8858,6 @@ function (playerid, value, id)
 	}
 	else if (value == "house")
 	{
-		if(search_inv_player(playerid, 86, 3) == 0)
-		{
-			sendMessage(playerid, "[ERROR] У вас нет "+info_png[86][0]+" "+info_png[86][3+1], red)
-			return
-		}
-
 		foreach (k, v in sqlite3( "SELECT * FROM house_db" )) 
 		{
 			if (v["number"] == id)
@@ -8881,8 +8865,6 @@ function (playerid, value, id)
 				if (isPointInCircle3D(x,y,z, v["x"],v["y"],v["z"], 10.0))
 				{
 					me_chat(playerid, playername+" обыскал(а) дом под номером "+id)
-
-					inv_player_delet(playerid, 86, 3, true, false)
 
 					search_inv_house_police( playerid, id )
 				}
