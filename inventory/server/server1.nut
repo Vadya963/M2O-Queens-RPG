@@ -979,8 +979,8 @@ for (local i = 21; i <= 22; i++)
 //слоты игрока
 local max_inv = 24
 local max_inv_additional = 1//--дополнительные слоты
-local array_player_1 = array((getMaxPlayers()+max_inv_additional), 0)
-local array_player_2 = array((getMaxPlayers()+max_inv_additional), 0)
+local array_player_1 = array(getMaxPlayers(), 0)
+local array_player_2 = array(getMaxPlayers(), 0)
 
 local state_inv_player = array(getMaxPlayers(), 0)//состояние инв-ря игрока 0-выкл, 1-вкл
 local state_gui_window = array(getMaxPlayers(), 0)//--состояние гуи окна 0-выкл, 1-вкл
@@ -3886,15 +3886,15 @@ function auction_buy_sell(playerid, value, i, id1, id2, money, name_buy)//--пр
 						local result_sell = sqlite3( "SELECT COUNT() FROM account WHERE name = '"+result[1]["name_sell"]+"'" )
 						if (result_sell[1]["COUNT()"] == 1)
 						{
-							array_player_1[50] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-							array_player_2[50] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+							array_player_1[1000] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+							array_player_2[1000] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 							local result_sell = sqlite3( "SELECT * FROM account WHERE name = '"+result[1]["name_sell"]+"'" )
-							load_inv(50, "player", result_sell[1]["inventory"])
+							load_inv(1000, "player", result_sell[1]["inventory"])
 
-							array_player_2[50][0] = array_player_2[50][0]+result[1]["money"]
+							array_player_2[1000][0] = array_player_2[1000][0]+result[1]["money"]
 
-							sqlite3( "UPDATE account SET inventory = '"+save_inv(50, "player")+"' WHERE name = '"+result[1]["name_sell"]+"'")
+							sqlite3( "UPDATE account SET inventory = '"+save_inv(1000, "player")+"' WHERE name = '"+result[1]["name_sell"]+"'")
 						}
 					}
 
@@ -6284,7 +6284,7 @@ function inv_server_load (playerid, value, id3, id1, id2, tabpanel)//измен�
 		array_player_1[playerid][id3] = id1
 		array_player_2[playerid][id3] = id2
 
-		if(id3 != 24)
+		if(id3 < max_inv)
 		{
 			setPlayerColour_fun(playerid)
 			
