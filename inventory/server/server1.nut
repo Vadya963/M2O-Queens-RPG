@@ -3197,8 +3197,24 @@ function buy_subject_fun( playerid, text, number, value )
 			local text1 = v[3]+"("+v[0]+") "+v[1]+"$"
 			if (text1 == text)
 			{
-				local result = sqlite3( "SELECT COUNT() FROM car_db" )
-				local number1 = result[1]["COUNT()"]+1
+				local number1 = 0
+				local randomize = random(1,999999)
+				local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+randomize+"'" )
+
+				while (true)
+				{
+					if (result[1]["COUNT()"] == 0)
+					{
+						number1 = randomize
+						break
+					}
+					else
+					{
+						randomize = random(1,999999)
+						result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+randomize+"'" )
+					}
+				}
+
 				local val1 = 6
 				local val2 = number1
 				id = v[0]
@@ -6786,9 +6802,9 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 						return
 					}
 				}
-
-				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2)
 			}
+
+			me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2)
 
 			return
 		}
