@@ -979,8 +979,8 @@ for (local i = 21; i <= 22; i++)
 //слоты игрока
 local max_inv = 24
 local max_inv_additional = 1//--дополнительные слоты
-local array_player_1 = array((getMaxPlayers()+1), 0)
-local array_player_2 = array((getMaxPlayers()+1), 0)
+local array_player_1 = array((getMaxPlayers()), 0)
+local array_player_2 = array((getMaxPlayers()), 0)
 
 local state_inv_player = array(getMaxPlayers(), 0)//состояние инв-ря игрока 0-выкл, 1-вкл
 local state_gui_window = array(getMaxPlayers(), 0)//--состояние гуи окна 0-выкл, 1-вкл
@@ -3902,15 +3902,16 @@ function auction_buy_sell(playerid, value, i, id1, id2, money, name_buy)//--пр
 						local result_sell = sqlite3( "SELECT COUNT() FROM account WHERE name = '"+result[1]["name_sell"]+"'" )
 						if (result_sell[1]["COUNT()"] == 1)
 						{
-							array_player_1[50] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-							array_player_2[50] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+							local id = getMaxPlayers()
+							array_player_1[id] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+							array_player_2[id] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 							local result_sell = sqlite3( "SELECT * FROM account WHERE name = '"+result[1]["name_sell"]+"'" )
-							load_inv(50, "player", result_sell[1]["inventory"])
+							load_inv(id, "player", result_sell[1]["inventory"])
 
-							array_player_2[50][0] = array_player_2[50][0]+result[1]["money"]
+							array_player_2[id][0] = array_player_2[id][0]+result[1]["money"]
 
-							sqlite3( "UPDATE account SET inventory = '"+save_inv(50, "player")+"' WHERE name = '"+result[1]["name_sell"]+"'")
+							sqlite3( "UPDATE account SET inventory = '"+save_inv(id, "player")+"' WHERE name = '"+result[1]["name_sell"]+"'")
 						}
 					}
 
