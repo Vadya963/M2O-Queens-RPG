@@ -979,8 +979,8 @@ for (local i = 21; i <= 22; i++)
 //слоты игрока
 local max_inv = 24
 local max_inv_additional = 1//--дополнительные слоты
-local array_player_1 = array((getMaxPlayers()), 0)
-local array_player_2 = array((getMaxPlayers()), 0)
+local array_player_1 = array((getMaxPlayers()+1), 0)
+local array_player_2 = array((getMaxPlayers()+1), 0)
 
 local state_inv_player = array(getMaxPlayers(), 0)//состояние инв-ря игрока 0-выкл, 1-вкл
 local state_gui_window = array(getMaxPlayers(), 0)//--состояние гуи окна 0-выкл, 1-вкл
