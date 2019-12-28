@@ -2647,7 +2647,7 @@ function rental_car(playerid, job)
 	local myPos = getPlayerPosition(playerid)
 	local car_pos = [myPos[0]+2,myPos[1],myPos[2],0]
 
-	local car = [//--ид тс 1, цена аренды 2
+	local car = [//--номер работы 0, ид тс 1, цена аренды 2
 		[1, 24, 1000],
 		[2, 35, 1000],
 		[3, 27, 1000],
