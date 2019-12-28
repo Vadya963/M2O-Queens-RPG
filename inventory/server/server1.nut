@@ -33,7 +33,7 @@ function random(min=0, max=RAND_MAX)
 	return (rand() % ((max + 1) - min)) + min//функция для получения рандомных чисел
 }
 local element_data = {}
-local pogoda = false //зима(false) или лето(true)
+local pogoda = true //зима(false) или лето(true)
 local hour = 6
 local minute = 0
 local earth = {//--слоты земли
@@ -349,15 +349,15 @@ local motor_show = [
 	[16,0,90,"Lassister Series 69",3],//копия
 	[17,0,90,"Lassister Series 75 Hollywood",3],//копия
 	[18,51700,90,"Lassister Series 75 Hollywood",3],
-	[19,20000,80,"Milk Truck",1],
-	[20,20000,150,"Parry Bus",20],
+	[19,0,80,"Milk Truck",1],
+	[20,0,150,"Parry Bus",20],
 	[21,0,150,"Parry Bus Prison",20],
 	[22,21000,70,"Potomac Indian",3],
 	[23,20000,60,"Quicksilver Windsor",3],
-	[24,23500,60,"Quicksilver Windsor Taxi",3],
+	[24,0,60,"Quicksilver Windsor Taxi",3],
 	[25,7300,65,"Shubert 38",3],
 	[26,0,65,"Shubert 38",3],//копия
-	[27,40000,100,"Shubert Armored Van",1],
+	[27,0,100,"Shubert Armored Van",1],
 	[28,23000,80,"Shubert Beverly",1],
 	[29,35000,70,"Shubert Frigate",1],
 	[30,0,65,"Shubert Hearse",1],
@@ -365,14 +365,14 @@ local motor_show = [
 	[32,0,65,"Shubert 38 Panel Truck",1],//копия
 	[33,0,65,"Shubert 38 Taxi",3],
 	[34,0,100,"Shubert Truck",1],
-	[35,30000,100,"Shubert Truck Flatbed",1],//копия
+	[35,0,100,"Shubert Truck Flatbed",1],//копия
 	[36,0,100,"Shubert Truck Flatbed",1],
 	[37,0,100,"Shubert Truck Covered",1],
-	[38,20000,100,"Shubert Truck Seagift",1],
-	[39,20000,100,"Shubert Show Plow",1],
+	[38,0,100,"Shubert Truck Seagift",1],
+	[39,0,100,"Shubert Show Plow",1],
 	[40,0,80,"Military Truck",1],
 	[41,21400,80,"Smith Custom 200",3],
-	[42,25000,80,"Smith Custom 200 Police Special",3],
+	[42,0,80,"Smith Custom 200 Police Special",3],
 	[43,4500,50,"Smith Coupe",1],
 	[44,17000,65,"Smith Mainline",1],
 	[45,27000,70,"Smith Thunderbolt",1],
@@ -1015,6 +1015,7 @@ local timer_job = array(getMaxPlayers(), 0)//таймер работ
 local frozen_player = array(getMaxPlayers(), 0)//элементы управления
 local game = array(getMaxPlayers(), 0)//--карты игрока
 local accept_player = array(getMaxPlayers(), 0)//--переменная игры
+local car_rental = array(getMaxPlayers(), 0)//--аренда рабочего тс
 
 //для истории сообщений
 local max_message = 15//максимально отображаемое число сообщений
@@ -2633,6 +2634,65 @@ function addcrimes(playerid, value)
 	crimes[playerid] = crimes[playerid]+crimes_plus
 	sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
 }
+
+function rental_car(playerid, job)
+{
+	local playername = getPlayerName(playerid)
+	local val1 = 6
+	local val2 = random_car_number(999999-getMaxPlayers(),999999)
+	local myPos = getPlayerPosition(playerid)
+	local car_pos = [myPos[0]+2,myPos[1],myPos[2],0]
+
+	local car = [//--ид тс 1, цена аренды 2
+		[1, 24, 1000],
+		[2, 35, 1000],
+		[3, 27, 1000],
+		[7, 19, 1000],
+		[8, 35, 1000],
+		[9, 20, 1000],
+		[10, 27, 1000],
+		[11, 35, 1000],
+		[12, 39, 1000],
+		[13, 42, 1000],
+	]
+
+	foreach (k, v in car) 
+	{
+		if (v[0] == job)
+		{
+			if (v[2] > array_player_2[playerid][0])
+			{
+				sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+				return
+			}
+
+			if (inv_player_empty(playerid, val1, val2))
+			{
+			}
+			else
+			{
+				sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+				return
+			}
+
+			car_rental[playerid] = val2
+
+			sendMessage(playerid, "Вы заплатили за аренду т/с "+v[2]+"$", yellow)
+
+			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-v[2], playername )
+
+			local carcolor = fromRGB(255,255,255)
+
+			local nalog_start = 5
+
+			sendMessage(playerid, "Вы получили "+info_png[val1][0]+" "+val2, orange)
+
+			sqlite3( "INSERT INTO car_db (number, model, nalog, frozen, x, y, z, rot, fuel, car_rgb, tune, wheel, probeg, theft, inventory) VALUES ('"+val2+"', '"+v[1]+"', '"+nalog_start+"', '0', '"+car_pos[0]+"', '"+car_pos[1]+"', '"+car_pos[2]+"', '"+car_pos[3]+"', '"+max_fuel+"', '"+carcolor+"', '0', '0', '0', '0', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
+
+			car_spawn(val2.tostring())
+		}
+	}
+}
 //-------------------------------------------------------------------------------------------------
 
 //---------------------------------------авто------------------------------------------------------
@@ -3085,6 +3145,25 @@ function select_sqlite_t(id1, id2)//--выводит таблицу имен в�
 	}
 }
 
+function random_car_number (int1,int2) 
+{
+	local randomize = random(int1,int2)
+	local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+randomize+"'" )
+
+	while (true)
+	{
+		if (result[1]["COUNT()"] == 0)
+		{
+			return randomize
+		}
+		else
+		{
+			randomize = random(int1,int2)
+			result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+randomize+"'" )
+		}
+	}
+}
+
 function buy_subject_fun( playerid, text, number, value )
 {
 	local playername = getPlayerName(playerid)
@@ -3197,26 +3276,8 @@ function buy_subject_fun( playerid, text, number, value )
 			local text1 = v[3]+"("+v[0]+") "+v[1]+"$"
 			if (text1 == text)
 			{
-				local number1 = 0
-				local randomize = random(1,999999)
-				local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+randomize+"'" )
-
-				while (true)
-				{
-					if (result[1]["COUNT()"] == 0)
-					{
-						number1 = randomize
-						break
-					}
-					else
-					{
-						randomize = random(1,999999)
-						result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+randomize+"'" )
-					}
-				}
-
 				local val1 = 6
-				local val2 = number1
+				local val2 = random_car_number(1,999999-getMaxPlayers()-1)
 				id = v[0]
 
 				if (isPointInCircle3D(x1,y1,z1, interior_job[2][2],interior_job[2][3],interior_job[2][4], interior_job[2][7]))
@@ -4302,6 +4363,24 @@ function job_0( playerid )
 		timer_job[playerid].Kill()
 	}
 
+	if (car_rental[playerid])
+	{
+		local vehicleid = getVehicleidFromPlate( car_rental[playerid] )
+
+		if (vehicleid == getPlayerVehicle(playerid))
+		{
+			removePlayerFromVehicle ( playerid )//--антибаг
+		}
+
+		timer(function()
+		{
+			destroyVehicle(vehicleid)
+			inv_player_delet(playerid, 6, car_rental[playerid], true, false)
+			sqlite3("DELETE FROM car_db WHERE number = '"+car_rental[playerid]+"'")
+			car_rental[playerid] = false
+		}, 1000, 1)
+	}
+
 	triggerClientEvent(playerid, "removegps")
 
 	job[playerid] = 0
@@ -5041,6 +5120,7 @@ function( playerid, name, ip, serial )
 	frozen_player[playerid] = false
 	game[playerid] = []
 	accept_player[playerid] = [false,false,false,false]
+	car_rental[playerid] = false
 
 	//--нужды
 	alcohol[playerid] = 0
@@ -7214,6 +7294,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			else if (job[playerid] != 0)
 			{
 				job_timer2(playerid)
+				rental_car(playerid, job[playerid])
 			}
 
 			return
@@ -9222,7 +9303,7 @@ function (playerid, id)
 	}
 })
 
-function getVehicleIdFromPlate( number )
+function getVehicleidFromPlate( number )
 {
 	local number = number.tostring()
 
@@ -9243,7 +9324,7 @@ function( playerid, plate, seat)
 {
 	local playername = getPlayerName ( playerid )
 	local myPos = getPlayerPosition(playerid)
-	local vehicleid = getVehicleIdFromPlate( plate )
+	local vehicleid = getVehicleidFromPlate( plate )
 	local seat = seat.tointeger()
 
 	if (logged[playerid] == 0)
@@ -10053,17 +10134,27 @@ function ( playerid )
 		return
 	}
 
-	local count = 0
-	foreach (k,v in getVehicles())
+	foreach (k, v in getPlayers())
 	{
-		if ("0" == getVehiclePlateText(v))
+		if(getVehiclePlateText(getPlayerVehicle(k)) == "0")
 		{
-			destroyVehicle(v)
-			count = count+1
+			removePlayerFromVehicle(k)
 		}
 	}
 
-	admin_chat(playerid, playername+" ["+playerid+"] удалил "+count+" т/с")
+	timer(function() {
+		local count = 0
+		foreach (k,v in getVehicles())
+		{
+			if ("0" == getVehiclePlateText(v))
+			{
+				destroyVehicle(v)
+				count = count+1
+			}
+		}
+
+		admin_chat(playerid, playername+" ["+playerid+"] удалил "+count+" т/с")
+	}, 1000, 1)
 })
 
 addCommandHandler("stime",

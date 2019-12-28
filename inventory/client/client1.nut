@@ -210,15 +210,15 @@ local motor_show = [
 	[16,0,90,"Lassister Series 69",3],//копия
 	[17,0,90,"Lassister Series 75 Hollywood",3],//копия
 	[18,51700,90,"Lassister Series 75 Hollywood",3],
-	[19,20000,80,"Milk Truck",1],
-	[20,20000,150,"Parry Bus",20],
+	[19,0,80,"Milk Truck",1],
+	[20,0,150,"Parry Bus",20],
 	[21,0,150,"Parry Bus Prison",20],
 	[22,21000,70,"Potomac Indian",3],
 	[23,20000,60,"Quicksilver Windsor",3],
-	[24,23500,60,"Quicksilver Windsor Taxi",3],
+	[24,0,60,"Quicksilver Windsor Taxi",3],
 	[25,7300,65,"Shubert 38",3],
 	[26,0,65,"Shubert 38",3],//копия
-	[27,40000,100,"Shubert Armored Van",1],
+	[27,0,100,"Shubert Armored Van",1],
 	[28,23000,80,"Shubert Beverly",1],
 	[29,35000,70,"Shubert Frigate",1],
 	[30,0,65,"Shubert Hearse",1],
@@ -226,14 +226,14 @@ local motor_show = [
 	[32,0,65,"Shubert 38 Panel Truck",1],//копия
 	[33,0,65,"Shubert 38 Taxi",3],
 	[34,0,100,"Shubert Truck",1],
-	[35,30000,100,"Shubert Truck Flatbed",1],//копия
+	[35,0,100,"Shubert Truck Flatbed",1],//копия
 	[36,0,100,"Shubert Truck Flatbed",1],
 	[37,0,100,"Shubert Truck Covered",1],
-	[38,20000,100,"Shubert Truck Seagift",1],
-	[39,20000,100,"Shubert Show Plow",1],
+	[38,0,100,"Shubert Truck Seagift",1],
+	[39,0,100,"Shubert Show Plow",1],
 	[40,0,80,"Military Truck",1],
 	[41,21400,80,"Smith Custom 200",3],
-	[42,25000,80,"Smith Custom 200 Police Special",3],
+	[42,0,80,"Smith Custom 200 Police Special",3],
 	[43,4500,50,"Smith Coupe",1],
 	[44,17000,65,"Smith Mainline",1],
 	[45,27000,70,"Smith Thunderbolt",1],
