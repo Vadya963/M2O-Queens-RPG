@@ -1444,69 +1444,8 @@ local table_job = {
 				}
 	},
 
-	[6] = function (playerid,playername) {//--ор на рз
-		local vehicleid = getPlayerVehicle(playerid)
-		local myPos = getPlayerPosition(playerid)
-		local x = myPos[0]
-		local y = myPos[1]
-		local z = myPos[2]
-		if (getPlayerModel(playerid) == 133)
-				{
-					if (job_call[playerid] == 0) 
-					{
-						local randomize = random(0,table_sg_pos.len()-1)
-
-						sendMessage(playerid, "Идите к столу", yellow)
-
-						job_call[playerid] = 1
-						job_pos[playerid] = [table_sg_pos[randomize][0],table_sg_pos[randomize][1],table_sg_pos[randomize][2]]
-
-						triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-					}
-					else if (job_call[playerid] >= 1 && job_call[playerid] <= 11)
-					{
-						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0))
-						{
-							job_call[playerid]++
-						}
-					}
-					else if (job_call[playerid] == 12)
-					{
-						local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
-						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && result[1]["COUNT()"] == 1)
-						{
-							result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
-
-							local id2 = search_inv_player_2_parameter(playerid, 81)
-
-							if (result[1]["warehouse"] < max_sg && result[1]["money"] >= result[1]["price"] && result[1]["nalog"] != 0 && result[1]["prod"] != 0 && id2 != 0)
-							{
-								local randomize = result[1]["price"]
-
-								inv_player_delet(playerid, 81, id2, true, false)
-
-								id2 = id2 - 1
-
-								inv_player_empty(playerid, 81, id2)
-
-								if (id2 == 0)
-								{
-									inv_player_delet(playerid, 81, id2, true, false)
-								}
-
-								sqlite3( "UPDATE seagift_db SET warehouse = warehouse + '1', prod = prod - '1', money = money - '"+randomize+"' WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
-
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
-
-								sendMessage(playerid, "Вы получили "+randomize+"$", green)
-													
-								job_call[playerid] = 0
-
-								triggerClientEvent(playerid, "removegps")
-							}
-						}
-					}
-				}
+	[6] = function (playerid,playername) {//--дальнобойщик
+		
 	},
 
 	[7] = function (playerid,playername) {//--молочник
@@ -1862,6 +1801,71 @@ local table_job = {
 										
 							job_pos[playerid] = 0
 							job_call[playerid] = 0
+						}
+					}
+				}
+	},
+
+	[14] = function (playerid,playername) {//--ор на рз
+		local vehicleid = getPlayerVehicle(playerid)
+		local myPos = getPlayerPosition(playerid)
+		local x = myPos[0]
+		local y = myPos[1]
+		local z = myPos[2]
+		if (getPlayerModel(playerid) == 133)
+				{
+					if (job_call[playerid] == 0) 
+					{
+						local randomize = random(0,table_sg_pos.len()-1)
+
+						sendMessage(playerid, "Идите к столу", yellow)
+
+						job_call[playerid] = 1
+						job_pos[playerid] = [table_sg_pos[randomize][0],table_sg_pos[randomize][1],table_sg_pos[randomize][2]]
+
+						triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
+					}
+					else if (job_call[playerid] >= 1 && job_call[playerid] <= 11)
+					{
+						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0))
+						{
+							job_call[playerid]++
+						}
+					}
+					else if (job_call[playerid] == 12)
+					{
+						local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+						if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 5.0) && result[1]["COUNT()"] == 1)
+						{
+							result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+
+							local id2 = search_inv_player_2_parameter(playerid, 81)
+
+							if (result[1]["warehouse"] < max_sg && result[1]["money"] >= result[1]["price"] && result[1]["nalog"] != 0 && result[1]["prod"] != 0 && id2 != 0)
+							{
+								local randomize = result[1]["price"]
+
+								inv_player_delet(playerid, 81, id2, true, false)
+
+								id2 = id2 - 1
+
+								inv_player_empty(playerid, 81, id2)
+
+								if (id2 == 0)
+								{
+									inv_player_delet(playerid, 81, id2, true, false)
+								}
+
+								sqlite3( "UPDATE seagift_db SET warehouse = warehouse + '1', prod = prod - '1', money = money - '"+randomize+"' WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
+
+								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+
+								sendMessage(playerid, "Вы получили "+randomize+"$", green)
+													
+								job_call[playerid] = 0
+
+								triggerClientEvent(playerid, "removegps")
+							}
 						}
 					}
 				}
@@ -2647,6 +2651,7 @@ function rental_car(playerid, job)
 		[1, 24, 1000],
 		[2, 35, 1000],
 		[3, 27, 1000],
+		[6, 35, 1000],
 		[7, 19, 1000],
 		[8, 35, 1000],
 		[9, 20, 1000],
@@ -7069,7 +7074,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 1
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Таксист")
 				}
@@ -7084,7 +7089,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 2
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Мусоровозчик")
 				}
@@ -7105,7 +7110,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 3
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Инкассатор")
 				}
@@ -7120,7 +7125,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 4
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Связист")
 				}
@@ -7141,9 +7146,24 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 5
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Угонщик")
+				}
+				else
+				{
+					job[playerid] = 0
+
+					me_chat(playerid, playername+" закончил(а) работу")
+				}
+			}
+			else if(id2 == 6)
+			{
+				if (job[playerid] == 0)
+				{
+					job[playerid] = id2
+
+					me_chat(playerid, playername+" вышел(ла) на работу Дальнобойщик")
 				}
 				else
 				{
@@ -7156,7 +7176,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 7
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Молочник")
 				}
@@ -7171,7 +7191,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 8
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Развозчик алкоголя")
 				}
@@ -7186,7 +7206,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 9
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Водитель автобуса")
 				}
@@ -7207,7 +7227,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 10
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Перевозчик оружия")
 				}
@@ -7222,7 +7242,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 11
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Развозчик угля")
 				}
@@ -7243,7 +7263,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 12
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Уборщик снега ЭБ")
 				}
@@ -7274,7 +7294,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (job[playerid] == 0)
 				{
-					job[playerid] = 13
+					job[playerid] = id2
 
 					me_chat(playerid, playername+" вышел(ла) на работу Транспортный детектив")
 				}
@@ -7865,7 +7885,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (job[playerid] == 0)
 			{
-				job[playerid] = 6
+				job[playerid] = 14
 
 				me_chat(playerid, playername+" вышел(ла) на работу Обработчик рыбы на "+id2+" рыбзаводе")
 			}
