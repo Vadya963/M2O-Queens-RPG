@@ -10156,7 +10156,7 @@ function ( playerid )
 
 	foreach (k, v in getPlayers())
 	{
-		if(getVehiclePlateText(getPlayerVehicle(k)) == "0")
+		if(isPlayerInVehicle(k) && getVehiclePlateText(getPlayerVehicle(k)) == "0")
 		{
 			removePlayerFromVehicle(k)
 		}
