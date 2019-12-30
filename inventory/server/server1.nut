@@ -59,6 +59,7 @@ local police_chanel = 1//канал копов
 local admin_chanel = 2//--канал админов
 local loto = [0, [], false]//--лотерея
 local no_throw_earth = []//--нельзя продать
+local delet_subject_radius = 5//радиус разгрузки у бизнесов
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -1214,7 +1215,7 @@ local table_job = {
 								{
 									local randomize = random(zp_player_taxi/2,zp_player_taxi)
 
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
 									sendMessage(playerid, "Вы получили "+randomize+"$", green)
 
@@ -1274,7 +1275,7 @@ local table_job = {
 
 								inv_car_delet_1_parameter(playerid, down_car_subject_pos[0][4], true)
 
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
 								sendMessage(playerid, "Вы получили "+randomize+"$", green)
 
@@ -1333,7 +1334,7 @@ local table_job = {
 
 								inv_car_delet_1_parameter(playerid, down_car_subject_pos[1][4], true)
 
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
 								sendMessage(playerid, "Вы получили "+randomize+"$", green)
 
@@ -1430,7 +1431,7 @@ local table_job = {
 							{
 								local randomize = motor_show[getVehicleModel(vehicleid)][1]*0.05
 
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
 								sendMessage(playerid, "Вы получили "+randomize+"$", green)
 
@@ -1485,7 +1486,7 @@ local table_job = {
 
 									inv_car_delet(playerid, up_car_subject[5][4], sic2p, true, false, false)
 
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
+									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+sic2p, playername )
 
 									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
 								}
@@ -1532,7 +1533,7 @@ local table_job = {
 
 									inv_car_delet(playerid, up_car_subject[6][4], sic2p, true, false, false)
 
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
+									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+sic2p, playername )
 
 									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
 								}
@@ -1587,7 +1588,7 @@ local table_job = {
 
 									inv_player_delet(playerid, up_player_subject[5][4], job_call[playerid], true, false)
 
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
 									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", green)
 
@@ -1639,7 +1640,7 @@ local table_job = {
 
 									inv_car_delet(playerid, up_car_subject[7][4], sic2p, true, false, false)
 
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
+									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+sic2p, playername )
 
 									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
 								}
@@ -1686,7 +1687,7 @@ local table_job = {
 
 									inv_car_delet(playerid, up_car_subject[8][4], sic2p, true, false, false)
 
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+sic2p, playername )
+									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+sic2p, playername )
 
 									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
 								}
@@ -1741,7 +1742,7 @@ local table_job = {
 
 									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true, false)
 
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
 									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", green)
 
@@ -1793,7 +1794,7 @@ local table_job = {
 
 							car_spawn(job_call[playerid][1].tostring())
 
-							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
 							sendMessage(playerid, "Вы получили "+randomize+"$", green)
 
@@ -1858,7 +1859,7 @@ local table_job = {
 
 								sqlite3( "UPDATE seagift_db SET warehouse = warehouse + '1', prod = prod - '1', money = money - '"+randomize+"' WHERE number = '"+search_inv_player_2_parameter(playerid, 85)+"'" )
 
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
 								sendMessage(playerid, "Вы получили "+randomize+"$", green)
 													
@@ -2448,7 +2449,7 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 
 					sendMessage(playerid, "Вы унесли "+cash+"$", green)
 
-					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+cash, playername )
+					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+cash, playername )
 				}
 			}
 			else
@@ -2480,7 +2481,7 @@ function player_hotel (playerid, id)
 {
 	local playername = getPlayerName(playerid)
 
-	if ((price_hotel) <= array_player_2[playerid][0])
+	if ((price_hotel) <= search_inv_player_2_parameter(playerid, 1))
 	{
 		local sleep_hygiene_plus = 100
 
@@ -2499,7 +2500,7 @@ function player_hotel (playerid, id)
 
 		sendMessage(playerid, "Вы заплатили "+(price_hotel)+"$", orange )
 
-		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(price_hotel), playerid )
+		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(price_hotel), playerid )
 					
 		return true
 	}
@@ -2621,7 +2622,7 @@ function quest_player(playerid, id)
 
 				setElementData(playerid, "quest_select", "0:0")
 
-				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+quest_table[quest][5], playername )
+				inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+quest_table[quest][5], playername )
 
 				sendMessage(playerid, "[QUEST] Вы получили "+quest_table[quest][5]+"$", green)
 
@@ -2665,7 +2666,7 @@ function rental_car(playerid, job)
 	{
 		if (v[0] == job)
 		{
-			if (v[2] > array_player_2[playerid][0])
+			if (v[2] > search_inv_player_2_parameter(playerid, 1))
 			{
 				sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
 				return
@@ -2684,7 +2685,7 @@ function rental_car(playerid, job)
 
 			sendMessage(playerid, "Вы заплатили за аренду т/с "+v[2]+"$", yellow)
 
-			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-v[2], playername )
+			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-v[2], playername )
 
 			local carcolor = fromRGB(255,255,255)
 
@@ -3227,7 +3228,7 @@ function buy_subject_fun( playerid, text, number, value )
 			local text1 = v[0]+" "+v[1]+" "+info_png[v[3]][1]+" "+v[2]+"$"
 			if (text1 == text)
 			{
-				if (v[2] <= array_player_2[playerid][0])
+				if (v[2] <= search_inv_player_2_parameter(playerid, 1))
 				{
 					if(v[3] == 10)
 					{
@@ -3235,7 +3236,7 @@ function buy_subject_fun( playerid, text, number, value )
 						{
 							sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange)
 
-							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(v[2]), playername )
+							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(v[2]), playername )
 						}
 						else
 						{
@@ -3248,7 +3249,7 @@ function buy_subject_fun( playerid, text, number, value )
 						{
 							sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange)
 
-							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(v[2]), playername )
+							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(v[2]), playername )
 						}
 						else
 						{
@@ -3296,7 +3297,7 @@ function buy_subject_fun( playerid, text, number, value )
 						}
 					}
 
-					if (v[1] > array_player_2[playerid][0])
+					if (v[1] > search_inv_player_2_parameter(playerid, 1))
 					{
 						sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
 						return
@@ -3311,7 +3312,7 @@ function buy_subject_fun( playerid, text, number, value )
 						return
 					}
 
-					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-v[1], playername )
+					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-v[1], playername )
 
 					sendMessage(playerid, "Вы купили транспортное средство за "+v[1]+"$", orange)
 
@@ -3381,13 +3382,13 @@ function buy_subject_fun( playerid, text, number, value )
 						if (getPlayerModel(playerid) == j)
 						{
 							count = true
-							if (v[2] <= array_player_2[playerid][0])
+							if (v[2] <= search_inv_player_2_parameter(playerid, 1))
 							{
 								if (inv_player_empty(playerid, v[3], v[1]))
 								{
 									sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange)
 
-									inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(v[2]), playername )
+									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(v[2]), playername )
 								}
 								else
 								{
@@ -3408,13 +3409,13 @@ function buy_subject_fun( playerid, text, number, value )
 				}
 				else
 				{
-					if (v[2] <= array_player_2[playerid][0])
+					if (v[2] <= search_inv_player_2_parameter(playerid, 1))
 					{
 						if (inv_player_empty(playerid, v[3], v[1]))
 						{
 							sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange)
 
-							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(v[2]), playername )
+							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(v[2]), playername )
 						}
 						else
 						{
@@ -3500,7 +3501,7 @@ function buy_subject_fun( playerid, text, number, value )
 					local text1 = v[0]+" 25 "+info_png[k][1]+" "+v[2]+"$"
 					if (text1 == text)
 					{
-						if (cash*v[2] <= array_player_2[playerid][0])
+						if (cash*v[2] <= search_inv_player_2_parameter(playerid, 1))
 						{
 							if (inv_player_empty(playerid, k, 25))
 							{
@@ -3508,7 +3509,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
+								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(cash*v[2]), playername )
 							}
 							else
 							{
@@ -3537,7 +3538,7 @@ function buy_subject_fun( playerid, text, number, value )
 						}
 					}
 
-					if (cash <= array_player_2[playerid][0])
+					if (cash <= search_inv_player_2_parameter(playerid, 1))
 					{
 						if (inv_player_empty(playerid, 27, text.tointeger()))
 						{
@@ -3545,7 +3546,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 							sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash+"' WHERE number = '"+number+"'")
 
-							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playername )
+							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-cash, playername )
 						}
 						else
 						{
@@ -3593,7 +3594,7 @@ function buy_subject_fun( playerid, text, number, value )
 				local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
 				if (text1 == text)
 				{
-					if (cash*v[2] <= array_player_2[playerid][0])
+					if (cash*v[2] <= search_inv_player_2_parameter(playerid, 1))
 					{
 						if (inv_player_empty(playerid, k, randomize))
 						{
@@ -3601,7 +3602,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 							sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
-							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
+							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(cash*v[2]), playername )
 
 							loto[1].push(randomize)
 						}
@@ -3624,7 +3625,7 @@ function buy_subject_fun( playerid, text, number, value )
 				local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
 				if (text1 == text)
 				{
-					if (cash*v[2] <= array_player_2[playerid][0])
+					if (cash*v[2] <= search_inv_player_2_parameter(playerid, 1))
 					{
 						if (search_inv_player(playerid, 0, 0) >= 2)
 						{
@@ -3643,7 +3644,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 							sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
-							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
+							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(cash*v[2]), playername )
 						}
 						else
 						{
@@ -3662,7 +3663,7 @@ function buy_subject_fun( playerid, text, number, value )
 					local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
 					if (text1 == text)
 					{
-						if (cash*v[2] <= array_player_2[playerid][0])
+						if (cash*v[2] <= search_inv_player_2_parameter(playerid, 1))
 						{
 							if (inv_player_empty(playerid, k, v[1]))
 							{
@@ -3670,7 +3671,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
+								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(cash*v[2]), playername )
 							}
 							else
 							{
@@ -3691,7 +3692,7 @@ function buy_subject_fun( playerid, text, number, value )
 					local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
 					if (text1 == text)
 					{
-						if (cash*v[2] <= array_player_2[playerid][0])
+						if (cash*v[2] <= search_inv_player_2_parameter(playerid, 1))
 						{
 							if (inv_player_empty(playerid, k, v[1]))
 							{
@@ -3699,7 +3700,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
+								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(cash*v[2]), playername )
 							}
 							else
 							{
@@ -3720,7 +3721,7 @@ function buy_subject_fun( playerid, text, number, value )
 					local text1 = v[0]+" "+v[1]+" "+info_png[v[3]][1]+" "+v[2]+"$"
 					if (text1 == text)
 					{
-						if (cash*v[2] <= array_player_2[playerid][0])
+						if (cash*v[2] <= search_inv_player_2_parameter(playerid, 1))
 						{
 							if (inv_player_empty(playerid, v[3], v[1]))
 							{
@@ -3728,7 +3729,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
+								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(cash*v[2]), playername )
 							}
 							else
 							{
@@ -3749,7 +3750,7 @@ function buy_subject_fun( playerid, text, number, value )
 					local text1 = v[0]+" "+v[1]+" "+info_png[k][1]+" "+v[2]+"$"
 					if (text1 == text)
 					{
-						if (cash*v[2] <= array_player_2[playerid][0])
+						if (cash*v[2] <= search_inv_player_2_parameter(playerid, 1))
 						{
 							if (inv_player_empty(playerid, k, v[1]))
 							{
@@ -3757,7 +3758,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
-								inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*v[2]), playername )
+								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(cash*v[2]), playername )
 							}
 							else
 							{
@@ -3792,7 +3793,7 @@ function till_fun( playerid, number, money, value )
 		{
 			sqlite3( "UPDATE business_db SET money = money - '"+money+"' WHERE number = '"+number+"'")
 
-			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
+			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money, playername )
 
 			sendMessage(playerid, "Вы забрали из кассы "+money+"$", green)
 		}
@@ -3804,11 +3805,11 @@ function till_fun( playerid, number, money, value )
 	else if (value == "deposit")
 	{
 		local result = sqlite3( "SELECT * FROM business_db WHERE number = '"+number+"'" )
-		if (money <= array_player_2[playerid][0])
+		if (money <= search_inv_player_2_parameter(playerid, 1))
 		{
 			sqlite3( "UPDATE business_db SET money = money + '"+money+"' WHERE number = '"+number+"'")
 
-			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-money, playername )
+			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-money, playername )
 
 			sendMessage(playerid, "Вы положили в кассу "+money+"$", orange)
 		}
@@ -3944,20 +3945,20 @@ function auction_buy_sell(playerid, value, i, id1, id2, money, name_buy)//--пр
 				return
 			}
 
-			if (array_player_2[playerid][0] >= result[1]["money"])
+			if (search_inv_player_2_parameter(playerid, 1) >= result[1]["money"])
 			{
 				if (inv_player_empty(playerid, result[1]["id1"], result[1]["id2"]))
 				{
 					sendMessage(playerid, "Вы купили у "+result[1]["name_sell"]+" "+info_png[result[1]["id1"]][0]+" "+result[1]["id2"]+" "+info_png[result[1]["id1"]][1]+" за "+result[1]["money"]+"$", orange)
 
-					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-result[1]["money"], playername )
+					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-result[1]["money"], playername )
 
 					foreach (playerid, v in getPlayers())
 					{
 						if (v == result[1]["name_sell"])
 						{
 							sendMessage(playerid, playername+" купил у вас "+info_png[result[1]["id1"]][0]+" "+result[1]["id2"]+" "+info_png[result[1]["id1"]][1]+" за "+result[1]["money"]+"$", green)
-							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+result[1]["money"], playerid )
+							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+result[1]["money"], playerid )
 							count = count+1
 							break
 						}
@@ -4047,7 +4048,7 @@ function cow_farms(playerid, value, val1, val2)
 	if (value == "buy") {
 		local result = sqlite3( "SELECT COUNT() FROM seagift_db" )
 		result = result[1]["COUNT()"]+1
-		if (cash*result > array_player_2[playerid][0]) {
+		if (cash*result > search_inv_player_2_parameter(playerid, 1)) {
 			sendMessage(playerid, "[ERROR] У вас недостаточно средств, необходимо "+(cash*result)+"$", red)
 			return
 		}
@@ -4055,7 +4056,7 @@ function cow_farms(playerid, value, val1, val2)
 		if (inv_player_empty(playerid, doc, result)) {
 			sqlite3( "INSERT INTO seagift_db (number, price, coef, money, nalog, warehouse, prod) VALUES ('"+result+"', '0', '50', '0', '5', '0', '0')" )
 
-			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash*result, playername )
+			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-cash*result, playername )
 
 			sendMessage(playerid, "Вы купили рыбзавод за "+(cash*result)+"$", orange)
 
@@ -4116,7 +4117,7 @@ function cow_farms(playerid, value, val1, val2)
 				result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 				if ((val2*-1) <= result[1]["money"]) {
-					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+(val2*-1), playername )
+					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+(val2*-1), playername )
 
 					sqlite3( "UPDATE seagift_db SET money = money - '"+(val2*-1)+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
@@ -4129,14 +4130,14 @@ function cow_farms(playerid, value, val1, val2)
 			}
 			else
 			{
-				if (val2 <= array_player_2[playerid][0]) {
+				if (val2 <= search_inv_player_2_parameter(playerid, 1)) {
 					local result = sqlite3( "SELECT COUNT() FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
 					if (result[1]["COUNT()"] == 0) {
 						return
 					}
 
-					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-val2, playername )
+					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-val2, playername )
 
 					sqlite3( "UPDATE seagift_db SET money = money + '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
@@ -4210,7 +4211,7 @@ function cow_farms(playerid, value, val1, val2)
 		local cash2 = money*(100-result[1]["coef"])/100
 		local cash = money*result[1]["coef"]/100
 
-		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+cash, playername )
+		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+cash, playername )
 
 		sendMessage(playerid, "Вы разгрузили из т/с "+info_png[83][0]+" "+val1+" шт за "+cash+"$", green)
 
@@ -4244,7 +4245,7 @@ function cow_farms(playerid, value, val1, val2)
 
 		inv_car_delet(playerid, 82, val2, true, true, false)
 
-		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
+		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money, playername )
 
 		sendMessage(playerid, "Вы разгрузили из т/с "+info_png[82][0]+" "+val1+" шт за "+money+"$", green)
 
@@ -4836,10 +4837,10 @@ function pay_money_gz()
 					if (playerid != -1 && logged[playerid] == 1)
 					{
 						sendMessage(playerid, "Вы получили "+money_gz+"$ за удержание территорий", green)
-						inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money_gz, playername )
+						inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money_gz, playername )
 
 						sendMessage(playerid, "Вы получили "+money_gzb+"$ за крышивание бизнесов", green)
-						inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money_gzb, playername )
+						inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money_gzb, playername )
 					}
 				}
 			}
@@ -5758,7 +5759,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 			if (isPointInCircle3D(x,y,z, v[0],v[1],v[2], v[3]) && id1 == v[4])//--получение прибыли за предметы
 			{
 				inv_player_delet( playerid, id1, id2, false, true )
-				inv_server_load( playerid, value, 0, 1, array_player_2[playerid][0]+id2, tabpanel )
+				inv_server_load( playerid, value, 0, 1, search_inv_player_2_parameter(playerid, 1)+id2, tabpanel )
 
 				sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], yellow)
 
@@ -5892,7 +5893,7 @@ function e_down (playerid)//--подбор предметов с земли
 
 		foreach (k, v in sqlite3( "SELECT * FROM business_db" )) 
 		{
-			if (isPointInCircle3D(x,y,z, v["x"],v["y"],v["z"], house_bussiness_radius))
+			if (isPointInCircle3D(x,y,z, v["x"],v["y"],v["z"], delet_subject_radius))
 			{
 				if (isPlayerInVehicle(playerid)) 
 				{
@@ -6308,7 +6309,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 		{
 			foreach (k, v in sqlite3( "SELECT * FROM business_db" ))
 			{
-				if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius)) 
+				if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, delet_subject_radius)) 
 				{
 					if (id != 24)
 					{
@@ -6334,7 +6335,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 
 					sqlite3( "UPDATE business_db SET warehouse = warehouse + '"+count+"', money = money - '"+money+"' WHERE number = '"+v["number"]+"'")
 
-					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
+					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money, playername )
 
 					sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт за "+money+"$", green)
 
@@ -6352,7 +6353,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 
 						money = count*sic2p
 
-						inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
+						inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money, playername )
 
 						sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт за "+money+"$", green)
 
@@ -7029,7 +7030,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					local randomize = random(zp_loto/2,zp_loto)
 					loto[2] = false
 
-					inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 					sendMessageAll(playerid, "[НОВОСТИ] Лотерея объявляется закрытой, победителем стал "+playername+", выигрыш составил "+randomize+"$", green)
 				}
 
@@ -7548,7 +7549,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			addcrimes(playerid, zakon_54_crimes)
 
-			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 		}
 		else if (id1 == 65) //--двигло
 		{
@@ -7719,7 +7720,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				local randomize = random(zp_player_phone/2,zp_player_phone)
 
-				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+				inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
 				sendMessage(playerid, "Вы получили "+randomize+"$", green)
 									
@@ -7918,7 +7919,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			me_chat(playerid, playername+" обналичил(а) "+info_png[id1][0]+" "+randomize+" "+info_png[id1][1])
 
-			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+randomize, playername )
+			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 		}
 		else if(id1 == 91)//шляпа
 		{
@@ -8005,7 +8006,7 @@ function (playerid)
 		return
 	}
 
-	if(array_player_2[playerid][0] < zakon_price_house)
+	if(search_inv_player_2_parameter(playerid, 1) < zakon_price_house)
 	{
 		sendMessage(playerid, "[ERROR] Стоимость домов составляет "+zakon_price_house+"$", red)
 		return
@@ -8064,7 +8065,7 @@ function (playerid)
 
 			sendMessage(playerid, "Вы получили "+info_png[25][0]+" "+dim+" "+info_png[25][1], orange)
 
-			inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-zakon_price_house, playername )
+			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-zakon_price_house, playername )
 		}
 		else
 		{
@@ -8095,7 +8096,7 @@ function (playerid, id)
 		return
 	}
 
-	if(array_player_2[playerid][0] < zakon_price_business)
+	if(search_inv_player_2_parameter(playerid, 1) < zakon_price_business)
 	{
 		sendMessage(playerid, "[ERROR] Стоимость бизнеса составляет "+zakon_price_house+"$", red)
 		return
@@ -8157,7 +8158,7 @@ function (playerid, id)
 
 				sendMessage(playerid, "Вы получили "+info_png[36][0]+" "+dim+" "+info_png[36][1], orange)
 
-				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-zakon_price_business, playername )
+				inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-zakon_price_business, playername )
 			}
 			else
 			{
@@ -8218,7 +8219,7 @@ function win_roulette( playerid, cash, ratio )
 
 	sendMessage(playerid, "Вы заработали "+money+"$ X"+ratio, green)
 
-	inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+money, playername )
+	inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money, playername )
 }
 
 addCommandHandler ( "roulette",//--играть в рулетку
@@ -8249,7 +8250,7 @@ function (playerid, id, cash)
 		return
 	}
 
-	if (cash > array_player_2[playerid][0])
+	if (cash > search_inv_player_2_parameter(playerid, 1))
 	{
 		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
 		return
@@ -8263,7 +8264,7 @@ function (playerid, id, cash)
 			{
 				roulette(playerid, randomize)
 
-				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playername )
+				inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-cash, playername )
 
 				if (id == "красное")
 				{
@@ -8408,7 +8409,7 @@ function (playerid, value, cash)
 		return
 	}
 
-	if (cash > array_player_2[playerid][0])
+	if (cash > search_inv_player_2_parameter(playerid, 1))
 	{
 		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
 		return
@@ -8419,7 +8420,7 @@ function (playerid, value, cash)
 		sendMessage(playerid, "====[ КОЛЕСО УДАЧИ ]====", yellow)
 		sendMessage(playerid, "Выпало "+wheel_fortune[randomize], yellow)
 
-		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playername )
+		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-cash, playername )
 
 		if (value == wheel_fortune[randomize])
 		{
@@ -8461,7 +8462,7 @@ function blackjack (playerid, value, ...)
 			return
 		}
 
-		if (cash > array_player_2[playerid][0])
+		if (cash > search_inv_player_2_parameter(playerid, 1))
 		{
 			sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
 			return
@@ -8654,7 +8655,7 @@ function blackjack (playerid, value, ...)
 			}
 			else if (point < point2 && point2 <= 21 || point2 == 21)
 			{
-				inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-accept_player[playerid][2], playername )
+				inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-accept_player[playerid][2], playername )
 
 				win_roulette(accept_player[playerid][1], accept_player[playerid][2], 1)
 			}
@@ -8744,7 +8745,7 @@ function (playerid, cash)
 		return
 	}
 
-	if (cash > array_player_2[playerid][0])
+	if (cash > search_inv_player_2_parameter(playerid, 1))
 	{
 		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
 		return
@@ -8755,7 +8756,7 @@ function (playerid, cash)
 		sendMessage(playerid, "====[ ОДНОРУКИЙ БАНДИТ ]====", yellow)
 		sendMessage(playerid, "Выпало "+randomize1+" - "+randomize2+" - "+randomize3, yellow)
 
-		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playername )
+		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-cash, playername )
 
 		if(randomize1 == randomize2 && randomize1 == randomize3)
 		{
@@ -8824,7 +8825,7 @@ function (playerid, id)
 
 		sendMessage(playerid, "Вы получили премию "+(cash*(crimes[id]))+"$", green)
 
-		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]+(cash*(crimes[id])), playername )
+		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+(cash*(crimes[id])), playername )
 	}
 	else
 	{
@@ -8864,7 +8865,7 @@ function (playerid, id)
 
 	if (isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
 	{
-		if (cash*crimes[id] > array_player_2[playerid][0])
+		if (cash*crimes[id] > search_inv_player_2_parameter(playerid, 1))
 		{
 			sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
 			return
@@ -8885,7 +8886,7 @@ function (playerid, id)
 
 		sendMessage(id, "Ждите освобождения", yellow)
 
-		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-(cash*(crimes[id])), playername )
+		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(cash*(crimes[id])), playername )
 	
 		crimes[id] = 1
 	}
@@ -9169,7 +9170,7 @@ function(playerid, id)
 		return
 	}
 
-	if (id > array_player_2[playerid][0])
+	if (id > search_inv_player_2_parameter(playerid, 1))
 	{
 		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
 		return
@@ -9179,7 +9180,7 @@ function(playerid, id)
 	{
 		me_chat(playerid, playername+" выписал(а) "+info_png[88][0]+" "+id+" "+info_png[88][1])
 
-		inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-id, playername )
+		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-id, playername )
 	}
 	else
 	{
@@ -9241,7 +9242,7 @@ function (playerid, id)
 		return
 	}
 
-	if (cash <= array_player_2[playerid][0]) 
+	if (cash <= search_inv_player_2_parameter(playerid, 1)) 
 	{
 		foreach (k, vehicleid in getVehicles())
 		{
@@ -9281,7 +9282,7 @@ function (playerid, id)
 
 							sqlite3( "UPDATE car_db SET x = '"+(myPos[0]+2)+"', y = '"+myPos[1]+"', z = '"+(myPos[2]+0.5)+"' WHERE number = '"+plate+"'")
 
-							inv_server_load( playerid, "player", 0, 1, array_player_2[playerid][0]-cash, playerid )
+							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-cash, playerid )
 
 							sendMessage(playerid, "Вы эвакуировали т/с за "+cash+"$", orange)
 						}
