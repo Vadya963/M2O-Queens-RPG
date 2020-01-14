@@ -59,7 +59,7 @@ local police_chanel = 1//канал копов
 local admin_chanel = 2//--канал админов
 local loto = [0, [], false]//--лотерея
 local no_throw_earth = []//--нельзя продать
-local delet_subject_radius = 5//радиус разгрузки у бизнесов
+local delet_subject_radius = 5.0//радиус разгрузки у бизнесов
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
