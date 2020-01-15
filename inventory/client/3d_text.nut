@@ -138,18 +138,26 @@ local text_3d = [//--3d text
 ]
 
 //----цвета----
-local color_tips = [168,228,160]//--бабушкины яблоки
-local yellow = [255,255,0]//--желтый
-local red = [255,0,0]//--красный
-local blue = [0,150,255]//--синий
-local white = [255,255,255]//--белый
-local green = [0,255,0]//--зеленый
-local turquoise = [0,255,255]//--бирюзовый
-local orange = [255,100,0]//--оранжевый
-local orange_do = [255,150,0]//--оранжевый do
-local pink = [255,100,255]//--розовый
-local lyme = [130,255,0]//--лайм админский цвет
-local svetlo_zolotoy = [255,255,130]//--светло-золотой
+local color_mes = {
+	color_tips = [168,228,160],//бабушкины яблоки
+	yellow = [255,255,0],//желтый
+	red = [255,0,0],//красный
+	red_try = [200,0,0],//красный
+	blue = [0,150,255],//синий
+	white = [255,255,255],//белый
+	green = [0,255,0],//зеленый
+	green_try = [0,200,0],//зеленый
+	turquoise = [0,255,255],//бирюзовый
+	orange = [255,100,0],//оранжевый
+	orange_do = [255,150,0],//оранжевый do
+	pink = [255,100,255],//розовый
+	lyme = [130,255,0],//лайм админский цвет
+	svetlo_zolotoy = [255,255,130],//светло-золотой
+	crimson = [220,20,60],//малиновый
+	purple = [175,0,255],//фиолетовый
+	gray = [150,150,150],//серый
+	green_rc = [115,180,97],//темно зеленый
+}
 
 function dxdrawtext(text, x, y, color, shadow, font, scale)
 {	
@@ -196,7 +204,7 @@ function( post )
 		{
 			local coords = getScreenFromWorld( v[0], v[1], v[2]+1 )
 			local dimensions = dxGetTextDimensions(v[4], 1.0, "tahoma-bold" )
-			dxdrawtext ( v[4], coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+			dxdrawtext ( v[4], coords[0]-(dimensions[0]/2), coords[1], fromRGB( color_mes.svetlo_zolotoy[0], color_mes.svetlo_zolotoy[1], color_mes.svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
 		}
 	}
 
@@ -207,7 +215,7 @@ function( post )
 		{
 			local coords = getScreenFromWorld( v[0], v[1], v[2]+1.0 )
 			local dimensions = dxGetTextDimensions ( "Дом #"+k+"", 1.0, "tahoma-bold" )
-			dxdrawtext ( "Дом #"+k+"", coords[0]-(dimensions[0]/2), coords[1], fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
+			dxdrawtext ( "Дом #"+k+"", coords[0]-(dimensions[0]/2), coords[1], fromRGB ( color_mes.svetlo_zolotoy[0], color_mes.svetlo_zolotoy[1], color_mes.svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
 	}
 
@@ -218,10 +226,10 @@ function( post )
 		{
 			local coords = getScreenFromWorld( v[0], v[1], v[2]+1.0 )
 			local dimensions = dxGetTextDimensions ( "Бизнес #"+k+"", 1.0, "tahoma-bold" )
-			dxdrawtext ( "Бизнес #"+k+"", coords[0]-(dimensions[0]/2), coords[1], fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
+			dxdrawtext ( "Бизнес #"+k+"", coords[0]-(dimensions[0]/2), coords[1], fromRGB ( color_mes.svetlo_zolotoy[0], color_mes.svetlo_zolotoy[1], color_mes.svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
 
 			local dimensions = dxGetTextDimensions ( "(Разгрузить товар - E, Меню - X)", 1.0, "tahoma-bold" )
-			dxdrawtext ( "(Разгрузить товар - E, Меню - X)", coords[0]-(dimensions[0]/2), coords[1]+15.0, fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
+			dxdrawtext ( "(Разгрузить товар - E, Меню - X)", coords[0]-(dimensions[0]/2), coords[1]+15.0, fromRGB ( color_mes.svetlo_zolotoy[0], color_mes.svetlo_zolotoy[1], color_mes.svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0 )
 		}
 	}
 })

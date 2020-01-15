@@ -267,24 +267,26 @@ for (local i = 0; i < motor_show.len(); i++)
 }
 
 //----цвета----
-local color_tips = [168,228,160]//--бабушкины яблоки
-local yellow = [255,255,0]//--желтый
-local red = [255,0,0]//--красный
-local red_try = [200,0,0]//--красный
-local blue = [0,150,255]//--синий
-local white = [255,255,255]//--белый
-local green = [0,255,0]//--зеленый
-local green_try = [0,200,0]//--зеленый
-local turquoise = [0,255,255]//--бирюзовый
-local orange = [255,100,0]//--оранжевый
-local orange_do = [255,150,0]//--оранжевый do
-local pink = [255,100,255]//--розовый
-local lyme = [130,255,0]//--лайм админский цвет
-local svetlo_zolotoy = [255,255,130]//--светло-золотой
-local crimson = [220,20,60]//--малиновый
-local purple = [175,0,255]//--фиолетовый
-local gray = [150,150,150]//--серый
-local green_rc = [115,180,97]//--темно зеленый
+local color_mes = {
+	color_tips = [168,228,160],//бабушкины яблоки
+	yellow = [255,255,0],//желтый
+	red = [255,0,0],//красный
+	red_try = [200,0,0],//красный
+	blue = [0,150,255],//синий
+	white = [255,255,255],//белый
+	green = [0,255,0],//зеленый
+	green_try = [0,200,0],//зеленый
+	turquoise = [0,255,255],//бирюзовый
+	orange = [255,100,0],//оранжевый
+	orange_do = [255,150,0],//оранжевый do
+	pink = [255,100,255],//розовый
+	lyme = [130,255,0],//лайм админский цвет
+	svetlo_zolotoy = [255,255,130],//светло-золотой
+	crimson = [220,20,60],//малиновый
+	purple = [175,0,255],//фиолетовый
+	gray = [150,150,150],//серый
+	green_rc = [115,180,97],//темно зеленый
+}
 
 local color_table = [
 	/*[168,228,160],
@@ -1523,22 +1525,22 @@ function( post )
 		[true, screenWidth-width_need-30, height_need+(20+7.5)*4, ((width_need/100.0)*hygiene), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
 		[true, screenWidth-width_need-30, height_need+(20+7.5)*5, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
 		[true, screenWidth-width_need-30, height_need+(20+7.5)*5, ((width_need/100.0)*sleep), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
-		[true, text, 2.0, 0.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[getPlayerVehicle(playerid) != -1 || false, "plate "+plate+" | kilometrage "+split(getElementData("probeg_data"), ".")[0], 2.0, screen[1]-16.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[getElementData("gps_device_data").tointeger() == 1 || false, "[X  "+split(myPos[0].tostring(), ".")[0]+", Y  "+split(myPos[1].tostring(), ".")[0]+"]", getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )[0]-(dxGetTextDimensions( "[X  "+split(myPos[0].tostring(), ".")[0]+", Y  "+split(myPos[1].tostring(), ".")[0]+"]", 1.0, "tahoma-bold" )[0]/2), getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )[1], fromRGB ( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[true, text, 2.0, 0.0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[getPlayerVehicle(playerid) != -1 || false, "plate "+plate+" | kilometrage "+split(getElementData("probeg_data"), ".")[0], 2.0, screen[1]-16.0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[getElementData("gps_device_data").tointeger() == 1 || false, "[X  "+split(myPos[0].tostring(), ".")[0]+", Y  "+split(myPos[1].tostring(), ".")[0]+"]", getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )[0]-(dxGetTextDimensions( "[X  "+split(myPos[0].tostring(), ".")[0]+", Y  "+split(myPos[1].tostring(), ".")[0]+"]", 1.0, "tahoma-bold" )[0]/2), getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )[1], fromRGB ( color_mes.svetlo_zolotoy[0], color_mes.svetlo_zolotoy[1], color_mes.svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0, "text"],
 		[spl_gz[0].tointeger() == 1 || false, 0.0, screen[1]-16.0*6, 250.0, 16.0*3, fromRGB( 0, 0, 0, 150 ), "rectangle"],
-		[spl_gz[0].tointeger() == 1 || false, "Time: "+spl_gz[6]+" sec | Guns Zone #"+spl_gz[1], 2.0, screen[1]-16*6, fromRGB( white[0], white[1], white[2] ), false, "tahoma-bold", 1.0, "text"],
+		[spl_gz[0].tointeger() == 1 || false, "Time: "+spl_gz[6]+" sec | Guns Zone #"+spl_gz[1], 2.0, screen[1]-16*6, fromRGB( color_mes.white[0], color_mes.white[1], color_mes.white[2] ), false, "tahoma-bold", 1.0, "text"],
 		[spl_gz[0].tointeger() == 1 || false, "Attack "+spl_gz[2]+": "+spl_gz[3]+" points", 2.0, screen[1]-16*5, fromRGB( 255,0,50 ), false, "tahoma-bold", 1.0, "text"],
 		[spl_gz[0].tointeger() == 1 || false, "Defense "+spl_gz[4]+": "+spl_gz[5]+" points", 2.0, screen[1]-16*4, fromRGB( 0,50,255 ), false, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, heal_player[0], screenWidth-width_need-30-30, height_need, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, (alcohol/100).tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*1, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, drugs.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*2, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, satiety.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*3, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, hygiene.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*4, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, sleep.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*5, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, myPos[0]+" "+myPos[1]+" "+myPos[2], 300.0, 40.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, myRot[0]+" "+myRot[1]+" "+myRot[2], 300.0, 55.0, fromRGB ( white[0], white[1], white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, heal_player[0], screenWidth-width_need-30-30, height_need, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, (alcohol/100).tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*1, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, drugs.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*2, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, satiety.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*3, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, hygiene.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*4, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, sleep.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*5, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, myPos[0]+" "+myPos[1]+" "+myPos[2], 300.0, 40.0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, myRot[0]+" "+myRot[1]+" "+myRot[2], 300.0, 55.0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
 		]
 
 		foreach (k, v in split(getElementData("guns_zone"), "|"))//--отображение guns_zone
@@ -1546,7 +1548,7 @@ function( post )
 			local spl = split(v.tostring(), "/")
 			if (isPointInRectangle2D( myPos[0], myPos[1], spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat(), spl[3].tofloat() ))
 			{
-				dgs.push([true, "Guns Zone #"+spl[5]+" - "+spl[4], 2.0, screen[1]-16*2, fromRGB( green[0], green[1], green[2] ), true, "tahoma-bold", 1.0, "text"])
+				dgs.push([true, "Guns Zone #"+spl[5]+" - "+spl[4], 2.0, screen[1]-16*2, fromRGB( color_mes.green[0], color_mes.green[1], color_mes.green[2] ), true, "tahoma-bold", 1.0, "text"])
 			}
 		}
 
@@ -1694,35 +1696,35 @@ function( post )
 				if (area && getElementData("drugs["+i+"]").tofloat() >= getElementData("zakon_drugs").tofloat())
 				{
 					local dimensions = dxGetTextDimensions( "*effect of drugs*", 1.0, "tahoma-bold" )
-					dxdrawtext( "*effect of drugs*", coords[0]-(dimensions[0]/2), coords[1]-60.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+					dxdrawtext( "*effect of drugs*", coords[0]-(dimensions[0]/2), coords[1]-60.0, fromRGB( color_mes.svetlo_zolotoy[0], color_mes.svetlo_zolotoy[1], color_mes.svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
 				}
 
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
 				if (area && (getElementData("alcohol["+i+"]").tofloat()/100) >= getElementData("zakon_alcohol").tofloat())
 				{
 					local dimensions = dxGetTextDimensions( "*effect of alcohol*", 1.0, "tahoma-bold" )
-					dxdrawtext( "*effect of alcohol*", coords[0]-(dimensions[0]/2), coords[1]-45.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+					dxdrawtext( "*effect of alcohol*", coords[0]-(dimensions[0]/2), coords[1]-45.0, fromRGB( color_mes.svetlo_zolotoy[0], color_mes.svetlo_zolotoy[1], color_mes.svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
 				}
 
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
 				if (area && getElementData("is_chat_open["+i+"]").tointeger() == 1)
 				{
 					local dimensions = dxGetTextDimensions( "prints...", 1.0, "tahoma-bold" )
-					dxdrawtext( "prints...", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
+					dxdrawtext( "prints...", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( color_mes.svetlo_zolotoy[0], color_mes.svetlo_zolotoy[1], color_mes.svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0 )
 				}
 
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 10.0 )
 				if (area && getElementData("afk["+i+"]") != "0")
 				{
 					local dimensions = dxGetTextDimensions( "[AFK] "+getElementData("afk["+i+"]")+" sec", 1.0, "tahoma-bold" )
-					dxdrawtext( "[AFK] "+getElementData("afk["+i+"]")+" sec", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( purple[0], purple[1], purple[2] ), true, "tahoma-bold", 1.0 )
+					dxdrawtext( "[AFK] "+getElementData("afk["+i+"]")+" sec", coords[0]-(dimensions[0]/2), coords[1]-30.0, fromRGB( color_mes.purple[0], color_mes.purple[1], color_mes.purple[2] ), true, "tahoma-bold", 1.0 )
 				}
 
 				local area = isPointInCircle3D( myPos[0], myPos[1], myPos[2], Pos[0], Pos[1], Pos[2], 35.0 )
 				if (area && getElementData("crimes["+i+"]") != "0")
 				{
 					local dimensions = dxGetTextDimensions( "WANTED", 1.0, "tahoma-bold" )
-					dxdrawtext( "WANTED", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( red[0], red[1], red[2] ), true, "tahoma-bold", 1.0 )
+					dxdrawtext( "WANTED", coords[0]-(dimensions[0]/2), coords[1]-15.0, fromRGB( color_mes.red[0], color_mes.red[1], color_mes.red[2] ), true, "tahoma-bold", 1.0 )
 				}
 			}
 		}
@@ -1741,7 +1743,7 @@ function( post )
 			{
 				local coords = getScreenFromWorld( spl[0].tofloat(), spl[1].tofloat(), spl[2].tofloat()+0.2 )
 				local dimensions = dxGetTextDimensions("Press E", 1.0-dist*0.05, "tahoma-bold" )
-				dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( svetlo_zolotoy[0], svetlo_zolotoy[1], svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0-dist*0.05 )
+				dxdrawtext ( "Press E", coords[0]-(dimensions[0]/2), coords[1], fromRGB( color_mes.svetlo_zolotoy[0], color_mes.svetlo_zolotoy[1], color_mes.svetlo_zolotoy[2] ), true, "tahoma-bold", 1.0-dist*0.05 )
 			}
 		}
 	}

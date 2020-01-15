@@ -32,6 +32,7 @@ function random(min=0, max=RAND_MAX)
 	srand(getTickCount() * rand())
 	return (rand() % ((max + 1) - min)) + min//функция для получения рандомных чисел
 }
+local no_create_subject = [6,25,98,99]
 local element_data = {}
 local pogoda = true //зима(false) или лето(true)
 local hour = 6
@@ -110,24 +111,26 @@ local guns_zone = {}
 //----------------------------------------------------------------------------------------------------------------
 
 //----цвета----
-local color_tips = [168,228,160]//--бабушкины яблоки
-local yellow = [255,255,0]//--желтый
-local red = [255,0,0]//--красный
-local red_try = [200,0,0]//--красный
-local blue = [0,150,255]//--синий
-local white = [255,255,255]//--белый
-local green = [0,255,0]//--зеленый
-local green_try = [0,200,0]//--зеленый
-local turquoise = [0,255,255]//--бирюзовый
-local orange = [255,100,0]//--оранжевый
-local orange_do = [255,150,0]//--оранжевый do
-local pink = [255,100,255]//--розовый
-local lyme = [130,255,0]//--лайм админский цвет
-local svetlo_zolotoy = [255,255,130]//--светло-золотой
-local crimson = [220,20,60]//--малиновый
-local purple = [175,0,255]//--фиолетовый
-local gray = [150,150,150]//--серый
-local green_rc = [115,180,97]//--темно зеленый
+local color_mes = {
+	color_tips = [168,228,160],//бабушкины яблоки
+	yellow = [255,255,0],//желтый
+	red = [255,0,0],//красный
+	red_try = [200,0,0],//красный
+	blue = [0,150,255],//синий
+	white = [255,255,255],//белый
+	green = [0,255,0],//зеленый
+	green_try = [0,200,0],//зеленый
+	turquoise = [0,255,255],//бирюзовый
+	orange = [255,100,0],//оранжевый
+	orange_do = [255,150,0],//оранжевый do
+	pink = [255,100,255],//розовый
+	lyme = [130,255,0],//лайм админский цвет
+	svetlo_zolotoy = [255,255,130],//светло-золотой
+	crimson = [220,20,60],//малиновый
+	purple = [175,0,255],//фиолетовый
+	gray = [150,150,150],//серый
+	green_rc = [115,180,97],//темно зеленый
+}
 
 local color_table = [
 	/*[168,228,160],
@@ -1067,7 +1070,7 @@ function debuginfo ()
 			{
 				guns_zone[point_guns_zone[1]][4] = point_guns_zone[2]
 
-				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[2]][0]+" захватила Guns Zone #"+point_guns_zone[1], green)
+				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[2]][0]+" захватила Guns Zone #"+point_guns_zone[1], color_mes.green)
 
 				sqlite3( "UPDATE guns_zone SET mafia = '"+point_guns_zone[2]+"' WHERE number = '"+point_guns_zone[1]+"'")
 			}
@@ -1075,7 +1078,7 @@ function debuginfo ()
 			{
 				guns_zone[point_guns_zone[1]][4] = point_guns_zone[4]
 
-				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[4]][0]+" удержала Guns Zone #"+point_guns_zone[1], green)
+				sendMessageAll(0, "[НОВОСТИ] "+name_mafia[point_guns_zone[4]][0]+" удержала Guns Zone #"+point_guns_zone[1], color_mes.green)
 			}
 
 			point_guns_zone[0] = 0
@@ -1157,7 +1160,7 @@ function debuginfo ()
 		{
 			if (inv_player_delet(playerid, 10, search_inv_player_2_parameter(playerid, 10), true, false))
 			{
-				sendMessage(playerid, "Вы больше не полицейский", yellow)
+				sendMessage(playerid, "Вы больше не полицейский", color_mes.yellow)
 
 				if (job[playerid] == 13)
 				{
@@ -1187,7 +1190,7 @@ local table_job = {
 							{
 								local randomize = random(0,taxi_pos.len()-1)
 
-								sendMessage(playerid, "Езжайте на вызов", yellow)
+								sendMessage(playerid, "Езжайте на вызов", color_mes.yellow)
 
 								job_call[playerid] = 1
 								job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
@@ -1200,7 +1203,7 @@ local table_job = {
 								{
 									local randomize = random(0,taxi_pos.len()-1)
 
-									sendMessage(playerid, "Отвезите клиента", yellow)
+									sendMessage(playerid, "Отвезите клиента", color_mes.yellow)
 
 									job_call[playerid] = 2
 									job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
@@ -1217,7 +1220,7 @@ local table_job = {
 
 									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
-									sendMessage(playerid, "Вы получили "+randomize+"$", green)
+									sendMessage(playerid, "Вы получили "+randomize+"$", color_mes.green)
 
 									triggerClientEvent(playerid, "removegps")
 									
@@ -1246,7 +1249,7 @@ local table_job = {
 							{
 								local randomize = random(0,taxi_pos.len()-1)
 
-								sendMessage(playerid, "Соберите мусор, потом доставьте его на свалку (около заброшенной литейной фабрики)", yellow)
+								sendMessage(playerid, "Соберите мусор, потом доставьте его на свалку (около заброшенной литейной фабрики)", color_mes.yellow)
 
 								job_call[playerid] = 1
 								job_pos[playerid] = [taxi_pos[randomize][0],taxi_pos[randomize][1],taxi_pos[randomize][2]]
@@ -1277,7 +1280,7 @@ local table_job = {
 
 								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
-								sendMessage(playerid, "Вы получили "+randomize+"$", green)
+								sendMessage(playerid, "Вы получили "+randomize+"$", color_mes.green)
 
 								triggerClientEvent(playerid, "removegps")
 									
@@ -1305,7 +1308,7 @@ local table_job = {
 							{
 								local randomize = random(0,collector_pos.len()-1)
 
-								sendMessage(playerid, "Соберите деньги, потом доставьте их в банк в Мидтауне", yellow)
+								sendMessage(playerid, "Соберите деньги, потом доставьте их в банк в Мидтауне", color_mes.yellow)
 
 								job_call[playerid] = 1
 								job_pos[playerid] = [collector_pos[randomize][0],collector_pos[randomize][1],collector_pos[randomize][2]]
@@ -1336,7 +1339,7 @@ local table_job = {
 
 								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
-								sendMessage(playerid, "Вы получили "+randomize+"$", green)
+								sendMessage(playerid, "Вы получили "+randomize+"$", color_mes.green)
 
 								triggerClientEvent(playerid, "removegps")
 									
@@ -1360,7 +1363,7 @@ local table_job = {
 					{
 						local randomize = random(0,phohe.len()-1)
 
-						sendMessage(playerid, "Езжайте к телефонной будки", yellow)
+						sendMessage(playerid, "Езжайте к телефонной будки", color_mes.yellow)
 
 						job_call[playerid] = 1
 						job_pos[playerid] = [phohe[randomize][0],phohe[randomize][1],phohe[randomize][2]]
@@ -1393,7 +1396,7 @@ local table_job = {
 							job_vehicleid[playerid] = [vehicleid,pos[0],pos[1],pos[2],rot[0]]
 							job_timer[playerid] = timer(car_theft_fun, (car_theft_time*60000), 1, playerid, false)
 
-							sendMessage(playerid, "Угоните т/с гос.номер "+getVehiclePlateText(job_vehicleid[playerid][0])+", у вас есть "+car_theft_time+" мин", yellow)
+							sendMessage(playerid, "Угоните т/с гос.номер "+getVehiclePlateText(job_vehicleid[playerid][0])+", у вас есть "+car_theft_time+" мин", color_mes.yellow)
 
 							triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
 							triggerClientEvent( playerid, "createHudTimer", (60*car_theft_time).tofloat() )
@@ -1411,7 +1414,7 @@ local table_job = {
 
 							local randomize = random(0,sell_car_theft.len()-1)
 
-							sendMessage(playerid, "Езжайте на свалку Майка Бруски", yellow)
+							sendMessage(playerid, "Езжайте на свалку Майка Бруски", color_mes.yellow)
 
 							police_chat(playerid, "[ДИСПЕТЧЕР] Угон "+motor_show[getVehicleModel(vehicleid)][3]+" гос.номер "+getVehiclePlateText(vehicleid)+", координаты [X  "+x1+", Y  "+y1+"], подозреваемый "+playername)
 
@@ -1433,7 +1436,7 @@ local table_job = {
 
 								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
-								sendMessage(playerid, "Вы получили "+randomize+"$", green)
+								sendMessage(playerid, "Вы получили "+randomize+"$", color_mes.green)
 
 								job_pos[playerid] = 0
 								job_call[playerid] = 3
@@ -1465,7 +1468,7 @@ local table_job = {
 							{
 								local randomize = random(0,milk_pos.len()-1)
 
-								sendMessage(playerid, "Езжайте на молокозавод в Южный Милвилл чтобы загрузить молоко, а потом развезите его по домам и бизнесам", yellow)
+								sendMessage(playerid, "Езжайте на молокозавод в Южный Милвилл чтобы загрузить молоко, а потом развезите его по домам и бизнесам", color_mes.yellow)
 
 								job_call[playerid] = 1
 								job_pos[playerid] = [milk_pos[randomize][0],milk_pos[randomize][1],milk_pos[randomize][2]]
@@ -1488,7 +1491,7 @@ local table_job = {
 
 									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+sic2p, playername )
 
-									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
+									sendMessage(playerid, "Вы получили "+sic2p+"$", color_mes.green)
 								}
 							}
 						}
@@ -1512,7 +1515,7 @@ local table_job = {
 							{
 								local randomize = random(0,ed.len()-1)
 
-								sendMessage(playerid, "Езжайте на cпиртзавод в Сэнд-Айленд чтобы загрузить ящики с виски, а потом развезите их по бизнесам", yellow)
+								sendMessage(playerid, "Езжайте на cпиртзавод в Сэнд-Айленд чтобы загрузить ящики с виски, а потом развезите их по бизнесам", color_mes.yellow)
 
 								job_call[playerid] = 1
 								job_pos[playerid] = [ed[randomize][0],ed[randomize][1],ed[randomize][2]]
@@ -1535,7 +1538,7 @@ local table_job = {
 
 									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+sic2p, playername )
 
-									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
+									sendMessage(playerid, "Вы получили "+sic2p+"$", color_mes.green)
 								}
 							}
 						}
@@ -1557,7 +1560,7 @@ local table_job = {
 						{
 							if (job_call[playerid] == 0) 
 							{
-								sendMessage(playerid, "Езжайте по маршруту", yellow)
+								sendMessage(playerid, "Езжайте по маршруту", color_mes.yellow)
 
 								job_call[playerid] = search_inv_player_2_parameter(playerid, up_player_subject[5][4])
 								job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
@@ -1590,7 +1593,7 @@ local table_job = {
 
 									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
-									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", green)
+									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", color_mes.green)
 
 									triggerClientEvent(playerid, "removegps")
 										
@@ -1619,7 +1622,7 @@ local table_job = {
 							{
 								local randomize = random(0,guns.len()-1)
 
-								sendMessage(playerid, "Езжайте на cклад в Порт чтобы загрузить ящики с оружием, а потом развезите их по аммунациям", yellow)
+								sendMessage(playerid, "Езжайте на cклад в Порт чтобы загрузить ящики с оружием, а потом развезите их по аммунациям", color_mes.yellow)
 
 								job_call[playerid] = 1
 								job_pos[playerid] = [guns[randomize][0],guns[randomize][1],guns[randomize][2]]
@@ -1642,7 +1645,7 @@ local table_job = {
 
 									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+sic2p, playername )
 
-									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
+									sendMessage(playerid, "Вы получили "+sic2p+"$", color_mes.green)
 								}
 							}
 						}
@@ -1666,7 +1669,7 @@ local table_job = {
 							{
 								local randomize = random(0,coal_pos.len()-1)
 
-								sendMessage(playerid, "Езжайте в Северный Милвилл чтобы загрузить уголь, а потом доставьте его по адресу", yellow)
+								sendMessage(playerid, "Езжайте в Северный Милвилл чтобы загрузить уголь, а потом доставьте его по адресу", color_mes.yellow)
 
 								job_call[playerid] = 1
 								job_pos[playerid] = [coal_pos[randomize][0],coal_pos[randomize][1],coal_pos[randomize][2]]
@@ -1689,7 +1692,7 @@ local table_job = {
 
 									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+sic2p, playername )
 
-									sendMessage(playerid, "Вы получили "+sic2p+"$", green)
+									sendMessage(playerid, "Вы получили "+sic2p+"$", color_mes.green)
 								}
 							}
 						}
@@ -1711,7 +1714,7 @@ local table_job = {
 						{
 							if (job_call[playerid] == 0) 
 							{
-								sendMessage(playerid, "Езжайте по маршруту", yellow)
+								sendMessage(playerid, "Езжайте по маршруту", color_mes.yellow)
 
 								job_call[playerid] = search_inv_player_2_parameter(playerid, up_player_subject[6][4])
 								job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
@@ -1744,7 +1747,7 @@ local table_job = {
 
 									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
-									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", green)
+									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", color_mes.green)
 
 									triggerClientEvent(playerid, "removegps")
 										
@@ -1777,7 +1780,7 @@ local table_job = {
 							job_call[playerid] = [1,plate]
 							job_pos[playerid] = [pos[0],pos[1],pos[2]]
 
-							sendMessage(playerid, "Найдите т/с гос.номер "+job_call[playerid][1], yellow)
+							sendMessage(playerid, "Найдите т/с гос.номер "+job_call[playerid][1], color_mes.yellow)
 
 							triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
 						}
@@ -1796,7 +1799,7 @@ local table_job = {
 
 							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
-							sendMessage(playerid, "Вы получили "+randomize+"$", green)
+							sendMessage(playerid, "Вы получили "+randomize+"$", color_mes.green)
 
 							triggerClientEvent(playerid, "removegps")
 										
@@ -1819,7 +1822,7 @@ local table_job = {
 					{
 						local randomize = random(0,table_sg_pos.len()-1)
 
-						sendMessage(playerid, "Идите к столу", yellow)
+						sendMessage(playerid, "Идите к столу", color_mes.yellow)
 
 						job_call[playerid] = 1
 						job_pos[playerid] = [table_sg_pos[randomize][0],table_sg_pos[randomize][1],table_sg_pos[randomize][2]]
@@ -1861,7 +1864,7 @@ local table_job = {
 
 								inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
-								sendMessage(playerid, "Вы получили "+randomize+"$", green)
+								sendMessage(playerid, "Вы получили "+randomize+"$", color_mes.green)
 													
 								job_call[playerid] = 0
 
@@ -1922,7 +1925,7 @@ function me_chat(playerid, text)
 
 		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
 		{
-			sendMessage(player, text, pink)
+			sendMessage(player, text, color_mes.pink)
 		}
 	}
 }
@@ -1937,7 +1940,7 @@ function me_chat_player(playerid, text)
 
 		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
 		{
-			sendMessage(player, "[ME] "+text, pink)
+			sendMessage(player, "[ME] "+text, color_mes.pink)
 		}
 	}
 }
@@ -1952,7 +1955,7 @@ function do_chat(playerid, text)
 
 		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
 		{
-			sendMessage(player, text, orange_do)
+			sendMessage(player, text, color_mes.orange_do)
 		}
 	}
 }
@@ -1967,7 +1970,7 @@ function do_chat_player(playerid, text)
 
 		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
 		{
-			sendMessage(player, "[DO] "+text, orange_do)
+			sendMessage(player, "[DO] "+text, color_mes.orange_do)
 		}
 	}
 }
@@ -1982,7 +1985,7 @@ function b_chat_player(playerid, text)
 
 		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
 		{
-			sendMessage(player, text, gray)
+			sendMessage(player, text, color_mes.gray)
 		}
 	}
 }
@@ -2000,11 +2003,11 @@ function try_chat_player(playerid, text)
 		{
 			if(randomize)
 			{
-				sendMessage(player, "[TRY] "+text+" [УДАЧНО]", green_try)
+				sendMessage(player, "[TRY] "+text+" [УДАЧНО]", color_mes.green_try)
 			}
 			else
 			{
-				sendMessage(player, "[TRY] "+text+" [НЕУДАЧНО]", red_try)
+				sendMessage(player, "[TRY] "+text+" [НЕУДАЧНО]", color_mes.red_try)
 			}
 		}
 	}
@@ -2022,7 +2025,7 @@ function ic_chat(playerid, text)
 
 		if (isPointInCircle3D(myPos[0],myPos[1],myPos[2], Pos[0],Pos[1],Pos[2], me_radius ))
 		{
-			sendMessage(player, text, white)
+			sendMessage(player, text, color_mes.white)
 		}
 	}
 }
@@ -2043,7 +2046,7 @@ function(playerid, text)
 	}
 	else if (text.len() > max_text_len)
 	{
-		sendMessage(playerid, "[ERROR] Максимальная длина сообщения "+max_text_len+" символов", red)
+		sendMessage(playerid, "[ERROR] Максимальная длина сообщения "+max_text_len+" символов", color_mes.red)
 		return
 	}
 
@@ -2381,7 +2384,7 @@ function admin_chat(playerid, text)
 
 		if (search_inv_player_2_parameter(player, 37) != 0 && search_inv_player(player, 89, admin_chanel) != 0)
 		{
-			sendMessage(player, text, lyme)
+			sendMessage(player, text, color_mes.lyme)
 		}
 	}
 }
@@ -2394,7 +2397,7 @@ function police_chat(playerid, text)
 
 		if (search_inv_player_2_parameter(player, 10) != 0 && search_inv_player(player, 89, police_chanel) != 0)
 		{
-			sendMessage(player, text, blue)
+			sendMessage(player, text, color_mes.blue)
 		}
 	}
 }
@@ -2434,27 +2437,27 @@ function robbery(playerid, zakon, money, x1,y1,z1, radius, text)
 					{
 						addcrimes(playerid, zakon)
 
-						sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+cash+" "+info_png[id1][1], svetlo_zolotoy)
+						sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+cash+" "+info_png[id1][1], color_mes.svetlo_zolotoy)
 
-						sendMessage(playerid, "[TIPS] Отвезите украшения в Кингстон к Гарри", color_tips)
+						sendMessage(playerid, "[TIPS] Отвезите украшения в Кингстон к Гарри", color_mes.color_tips)
 					}
 					else 
 					{
-						sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+						sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 					}
 				}
 				else 
 				{
 					addcrimes(playerid, zakon)
 
-					sendMessage(playerid, "Вы унесли "+cash+"$", green)
+					sendMessage(playerid, "Вы унесли "+cash+"$", color_mes.green)
 
 					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+cash, playername )
 				}
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Вы покинули место ограбления", red)
+				sendMessage(playerid, "[ERROR] Вы покинули место ограбления", color_mes.red)
 			}
 
 			robbery_kill( playerid )
@@ -2488,13 +2491,13 @@ function player_hotel (playerid, id)
 		if (id == 44)
 		{
 			hygiene[playerid] = sleep_hygiene_plus
-			sendMessage(playerid, "+"+sleep_hygiene_plus+" ед. чистоплотности", yellow)
+			sendMessage(playerid, "+"+sleep_hygiene_plus+" ед. чистоплотности", color_mes.yellow)
 			me_chat(playerid, playername+" помылся(ась)")
 		}
 		else if (id == 45)
 		{
 			sleep[playerid] = sleep_hygiene_plus
-			sendMessage(playerid, "+"+sleep_hygiene_plus+" ед. сна", yellow)
+			sendMessage(playerid, "+"+sleep_hygiene_plus+" ед. сна", color_mes.yellow)
 			me_chat(playerid, playername+" вздремнул(а)")
 		}
 
@@ -2506,7 +2509,7 @@ function player_hotel (playerid, id)
 	}
 	else 
 	{
-		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+		sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 		return false
 	}
 }
@@ -2532,7 +2535,7 @@ function random_sub (playerid, id)//выпадение предметов
 				local id2 = v[1][randomize1][1]
 				if (inv_player_empty(playerid, id1, id2)) 
 				{
-					sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], svetlo_zolotoy)
+					sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], color_mes.svetlo_zolotoy)
 				}
 			}
 			break
@@ -2611,12 +2614,12 @@ function quest_player(playerid, id)
 				{
 					if (!inv_player_empty(playerid, quest_table[quest][6][0], quest_table[quest][6][1]))
 					{
-						sendMessage(playerid, "[ERROR] Для завершения квеста освободите инвентарь", red)
+						sendMessage(playerid, "[ERROR] Для завершения квеста освободите инвентарь", color_mes.red)
 						return
 					}
 					else
 					{
-						sendMessage(playerid, "[QUEST] Вы получили "+info_png[quest_table[quest][6][0]][0]+" "+quest_table[quest][6][1]+" "+info_png[quest_table[quest][6][0]][1], svetlo_zolotoy)
+						sendMessage(playerid, "[QUEST] Вы получили "+info_png[quest_table[quest][6][0]][0]+" "+quest_table[quest][6][1]+" "+info_png[quest_table[quest][6][0]][1], color_mes.svetlo_zolotoy)
 					}
 				}
 
@@ -2624,7 +2627,7 @@ function quest_player(playerid, id)
 
 				inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+quest_table[quest][5], playername )
 
-				sendMessage(playerid, "[QUEST] Вы получили "+quest_table[quest][5]+"$", green)
+				sendMessage(playerid, "[QUEST] Вы получили "+quest_table[quest][5]+"$", color_mes.green)
 
 				quest_table[quest][7].push(playername)
 			}
@@ -2637,7 +2640,7 @@ function addcrimes(playerid, value)
 	local crimes_plus = value
 	local playername = getPlayerName(playerid)
 	crimes[playerid] = crimes[playerid]+crimes_plus
-	sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], blue)
+	sendMessage(playerid, "+"+crimes_plus+" преступление, всего преступлений "+crimes[playerid], color_mes.blue)
 }
 
 function rental_car(playerid, job)
@@ -2668,7 +2671,7 @@ function rental_car(playerid, job)
 		{
 			if (v[2] > search_inv_player_2_parameter(playerid, 1))
 			{
-				sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+				sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 				return
 			}
 
@@ -2677,13 +2680,13 @@ function rental_car(playerid, job)
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+				sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 				return
 			}
 
 			car_rental[playerid] = val2
 
-			sendMessage(playerid, "Вы заплатили за аренду т/с "+v[2]+"$", yellow)
+			sendMessage(playerid, "Вы заплатили за аренду т/с "+v[2]+"$", color_mes.yellow)
 
 			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-v[2], playername )
 
@@ -2691,7 +2694,7 @@ function rental_car(playerid, job)
 
 			local nalog_start = 5
 
-			sendMessage(playerid, "Вы получили "+info_png[val1][0]+" "+val2, orange)
+			sendMessage(playerid, "Вы получили "+info_png[val1][0]+" "+val2, color_mes.orange)
 
 			sqlite3( "INSERT INTO car_db (number, model, nalog, frozen, x, y, z, rot, fuel, car_rgb, tune, wheel, probeg, theft, inventory) VALUES ('"+val2+"', '"+v[1]+"', '"+nalog_start+"', '0', '"+car_pos[0]+"', '"+car_pos[1]+"', '"+car_pos[2]+"', '"+car_pos[3]+"', '"+max_fuel+"', '"+carcolor+"', '0', '0', '0', '0', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
@@ -3187,11 +3190,11 @@ function buy_subject_fun( playerid, text, number, value )
 			{
 				if (inv_player_empty(playerid, v[2], v[1]))
 				{
-					sendMessage(playerid, "Вы получили "+text, orange)
+					sendMessage(playerid, "Вы получили "+text, color_mes.orange)
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+					sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 				}
 				return
 			}
@@ -3199,7 +3202,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 		if (search_inv_player(playerid, 41, 1) == 0)
 		{
-			sendMessage(playerid, "[ERROR] У вас нет лицензии на оружие, приобрести её можно в Мэрии", red)
+			sendMessage(playerid, "[ERROR] У вас нет лицензии на оружие, приобрести её можно в Мэрии", color_mes.red)
 			return
 		}
 
@@ -3210,11 +3213,11 @@ function buy_subject_fun( playerid, text, number, value )
 			{
 				if (inv_player_empty(playerid, k, 25))
 				{
-					sendMessage(playerid, "Вы получили "+text, orange)
+					sendMessage(playerid, "Вы получили "+text, color_mes.orange)
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+					sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 				}
 			}
 		}
@@ -3234,32 +3237,32 @@ function buy_subject_fun( playerid, text, number, value )
 					{
 						if (inv_player_empty(playerid, v[3], playerid+1))
 						{
-							sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange)
+							sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", color_mes.orange)
 
 							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(v[2]), playername )
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+							sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 						}
 					}
 					else 
 					{
 						if (inv_player_empty(playerid, v[3], v[1]))
 						{
-							sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange)
+							sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", color_mes.orange)
 
 							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(v[2]), playername )
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+							sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 						}
 					}
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+					sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 				}
 			}
 		}
@@ -3292,14 +3295,14 @@ function buy_subject_fun( playerid, text, number, value )
 					{
 						if (v1 == id && search_inv_player_2_parameter(playerid, 10) == 0)
 						{
-							sendMessage(playerid, "[ERROR] Вы не полицейский", red)
+							sendMessage(playerid, "[ERROR] Вы не полицейский", color_mes.red)
 							return
 						}
 					}
 
 					if (v[1] > search_inv_player_2_parameter(playerid, 1))
 					{
-						sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+						sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 						return
 					}
 
@@ -3308,13 +3311,13 @@ function buy_subject_fun( playerid, text, number, value )
 					}
 					else
 					{
-						sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+						sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 						return
 					}
 
 					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-v[1], playername )
 
-					sendMessage(playerid, "Вы купили транспортное средство за "+v[1]+"$", orange)
+					sendMessage(playerid, "Вы купили транспортное средство за "+v[1]+"$", color_mes.orange)
 
 					if(id == 20)
 					{
@@ -3327,7 +3330,7 @@ function buy_subject_fun( playerid, text, number, value )
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Найдите место продажи т/с", red)
+					sendMessage(playerid, "[ERROR] Найдите место продажи т/с", color_mes.red)
 					return
 				}
 
@@ -3335,7 +3338,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 				local nalog_start = 5
 
-				sendMessage(playerid, "Вы получили "+info_png[val1][0]+" "+val2, orange)
+				sendMessage(playerid, "Вы получили "+info_png[val1][0]+" "+val2, color_mes.orange)
 
 				sqlite3( "INSERT INTO car_db (number, model, nalog, frozen, x, y, z, rot, fuel, car_rgb, tune, wheel, probeg, theft, inventory) VALUES ('"+val2+"', '"+id+"', '"+nalog_start+"', '0', '"+car_pos[0]+"', '"+car_pos[1]+"', '"+car_pos[2]+"', '"+car_pos[3]+"', '"+max_fuel+"', '"+carcolor+"', '0', '0', '0', '0', '33:"+val2+",0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
@@ -3386,25 +3389,25 @@ function buy_subject_fun( playerid, text, number, value )
 							{
 								if (inv_player_empty(playerid, v[3], v[1]))
 								{
-									sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange)
+									sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", color_mes.orange)
 
 									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(v[2]), playername )
 								}
 								else
 								{
-									sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+									sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 								}
 							}
 							else
 							{
-								sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+								sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 							}
 						}
 					}
 
 					if (!count)
 					{
-						sendMessage(playerid, "[ERROR] Вы должны быть в одежде "+name_mafia_skin, red)
+						sendMessage(playerid, "[ERROR] Вы должны быть в одежде "+name_mafia_skin, color_mes.red)
 					}
 				}
 				else
@@ -3413,18 +3416,18 @@ function buy_subject_fun( playerid, text, number, value )
 					{
 						if (inv_player_empty(playerid, v[3], v[1]))
 						{
-							sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", orange)
+							sendMessage(playerid, "Вы купили "+text+" за "+v[2]+"$", color_mes.orange)
 
 							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(v[2]), playername )
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+							sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 						}
 					}
 					else
 					{
-						sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+						sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 					}
 				}
 
@@ -3438,32 +3441,32 @@ function buy_subject_fun( playerid, text, number, value )
 	{
 		if ("Штрафстоянка" == text)
 		{
-			sendMessage(playerid, "====[ ШТРАФСТОЯНКА ]====", blue)
-			sendMessage(playerid, "Номера т/с", blue)
+			sendMessage(playerid, "====[ ШТРАФСТОЯНКА ]====", color_mes.blue)
+			sendMessage(playerid, "Номера т/с", color_mes.blue)
 
 			foreach (k, v in sqlite3( "SELECT * FROM car_db WHERE nalog = '0'" ))
 			{
-				sendMessage(playerid, v["number"], blue)
+				sendMessage(playerid, v["number"], color_mes.blue)
 			}
 		}
 		else if ("Аукцион" == text)
 		{
-			sendMessage(playerid, "====[ АУКЦИОН ]====", yellow)
-			sendMessage(playerid, "[ номер лота - имя продавца - предмет - стоимость - имя покупателя ]", yellow)
+			sendMessage(playerid, "====[ АУКЦИОН ]====", color_mes.yellow)
+			sendMessage(playerid, "[ номер лота - имя продавца - предмет - стоимость - имя покупателя ]", color_mes.yellow)
 
 			foreach (k, v in sqlite3( "SELECT * FROM auction" ))
 			{
-				sendMessage(playerid, "[ "+v["i"]+" - "+v["name_sell"]+" - "+info_png[v["id1"]][0]+" "+v["id2"]+" "+info_png[v["id1"]][1]+" - "+v["money"]+"$ - "+v["name_buy"]+" ]", yellow)
+				sendMessage(playerid, "[ "+v["i"]+" - "+v["name_sell"]+" - "+info_png[v["id1"]][0]+" "+v["id2"]+" "+info_png[v["id1"]][1]+" - "+v["money"]+"$ - "+v["name_buy"]+" ]", color_mes.yellow)
 			}
 		}
 		else if ("Рыбзавод" == text)
 		{
-			sendMessage(playerid, "====[ РЫБЗАВОД ]====", yellow)
-			sendMessage(playerid, "[ номер рыбзавода - зарплата - доход от продаж ]", yellow)
+			sendMessage(playerid, "====[ РЫБЗАВОД ]====", color_mes.yellow)
+			sendMessage(playerid, "[ номер рыбзавода - зарплата - доход от продаж ]", color_mes.yellow)
 
 			foreach (k, v in sqlite3( "SELECT * FROM seagift_db" ))
 			{
-				sendMessage(playerid, "[ "+v["number"]+" - "+v["price"]+"$ - "+v["coef"]+" процентов ]", yellow)
+				sendMessage(playerid, "[ "+v["number"]+" - "+v["price"]+"$ - "+v["coef"]+" процентов ]", color_mes.yellow)
 			}
 		}
 
@@ -3478,13 +3481,13 @@ function buy_subject_fun( playerid, text, number, value )
 	{
 		if (cash == 0)
 		{
-			sendMessage(playerid, "[ERROR] Не установлена стоимость товара (надбавка в N раз)", red)
+			sendMessage(playerid, "[ERROR] Не установлена стоимость товара (надбавка в N раз)", color_mes.red)
 			return
 		}
 
 		if (result[1]["nalog"] <= 0)
 		{
-			sendMessage(playerid, "[ERROR] Бизнес арестован за уклонение от уплаты налогов", red)
+			sendMessage(playerid, "[ERROR] Бизнес арестован за уклонение от уплаты налогов", color_mes.red)
 			return
 		}
 
@@ -3492,7 +3495,7 @@ function buy_subject_fun( playerid, text, number, value )
 			{
 				if (search_inv_player(playerid, 41, 1) == 0)
 				{
-					sendMessage(playerid, "[ERROR] У вас нет лицензии на оружие, приобрести её можно в Мэрии", red)
+					sendMessage(playerid, "[ERROR] У вас нет лицензии на оружие, приобрести её можно в Мэрии", color_mes.red)
 					return
 				}
 
@@ -3505,7 +3508,7 @@ function buy_subject_fun( playerid, text, number, value )
 						{
 							if (inv_player_empty(playerid, k, 25))
 							{
-								sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", orange)
+								sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", color_mes.orange)
 
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
@@ -3513,12 +3516,12 @@ function buy_subject_fun( playerid, text, number, value )
 							}
 							else
 							{
-								sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+								sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 							}
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+							sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 						}
 					}
 				}
@@ -3533,7 +3536,7 @@ function buy_subject_fun( playerid, text, number, value )
 					{
 						if (v == text.tointeger())
 						{
-							sendMessage(playerid, "[ERROR] Эта одежда не продается", red)
+							sendMessage(playerid, "[ERROR] Эта одежда не продается", color_mes.red)
 							return
 						}
 					}
@@ -3542,7 +3545,7 @@ function buy_subject_fun( playerid, text, number, value )
 					{
 						if (inv_player_empty(playerid, 27, text.tointeger()))
 						{
-							sendMessage(playerid, "Вы купили "+text+" скин за "+cash+"$", orange)
+							sendMessage(playerid, "Вы купили "+text+" скин за "+cash+"$", color_mes.orange)
 
 							sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash+"' WHERE number = '"+number+"'")
 
@@ -3550,17 +3553,17 @@ function buy_subject_fun( playerid, text, number, value )
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+							sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 						}
 					}
 					else
 					{
-						sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+						sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 					}
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] От 0 до 171", red)
+					sendMessage(playerid, "[ERROR] От 0 до 171", color_mes.red)
 				}
 			}
 			else if (value == 2)
@@ -3598,7 +3601,7 @@ function buy_subject_fun( playerid, text, number, value )
 					{
 						if (inv_player_empty(playerid, k, randomize))
 						{
-							sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", orange)
+							sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", color_mes.orange)
 
 							sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
@@ -3608,12 +3611,12 @@ function buy_subject_fun( playerid, text, number, value )
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+							sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 						}
 					}
 					else
 					{
-						sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+						sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 					}
 					return
 				}
@@ -3639,8 +3642,8 @@ function buy_subject_fun( playerid, text, number, value )
 
 							sqlite3( "INSERT INTO box_db (number, inventory) VALUES ('"+b+"', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
-							sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", orange)
-							sendMessage(playerid, "Вы получили "+info_png[key][0]+" "+b, orange)
+							sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", color_mes.orange)
+							sendMessage(playerid, "Вы получили "+info_png[key][0]+" "+b, color_mes.orange)
 
 							sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
@@ -3648,12 +3651,12 @@ function buy_subject_fun( playerid, text, number, value )
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+							sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 						}
 					}
 					else
 					{
-						sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+						sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 					}
 					return
 				}
@@ -3667,7 +3670,7 @@ function buy_subject_fun( playerid, text, number, value )
 						{
 							if (inv_player_empty(playerid, k, v[1]))
 							{
-								sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", orange)
+								sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", color_mes.orange)
 
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
@@ -3675,12 +3678,12 @@ function buy_subject_fun( playerid, text, number, value )
 							}
 							else
 							{
-								sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+								sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 							}
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+							sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 						}
 					}
 				}
@@ -3696,7 +3699,7 @@ function buy_subject_fun( playerid, text, number, value )
 						{
 							if (inv_player_empty(playerid, k, v[1]))
 							{
-								sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", orange)
+								sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", color_mes.orange)
 
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
@@ -3704,12 +3707,12 @@ function buy_subject_fun( playerid, text, number, value )
 							}
 							else
 							{
-								sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+								sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 							}
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+							sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 						}
 					}
 				}
@@ -3725,7 +3728,7 @@ function buy_subject_fun( playerid, text, number, value )
 						{
 							if (inv_player_empty(playerid, v[3], v[1]))
 							{
-								sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", orange)
+								sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", color_mes.orange)
 
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
@@ -3733,12 +3736,12 @@ function buy_subject_fun( playerid, text, number, value )
 							}
 							else
 							{
-								sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+								sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 							}
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+							sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 						}
 					}
 				}
@@ -3754,7 +3757,7 @@ function buy_subject_fun( playerid, text, number, value )
 						{
 							if (inv_player_empty(playerid, k, v[1]))
 							{
-								sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", orange)
+								sendMessage(playerid, "Вы купили "+text+" за "+cash*v[2]+"$", color_mes.orange)
 
 								sqlite3( "UPDATE business_db SET warehouse = warehouse - '"+prod+"', money = money + '"+cash*v[2]+"' WHERE number = '"+number+"'")
 
@@ -3762,12 +3765,12 @@ function buy_subject_fun( playerid, text, number, value )
 							}
 							else
 							{
-								sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+								sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 							}
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+							sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 						}
 					}
 				}
@@ -3776,7 +3779,7 @@ function buy_subject_fun( playerid, text, number, value )
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] На складе недостаточно товаров", red)
+		sendMessage(playerid, "[ERROR] На складе недостаточно товаров", color_mes.red)
 	}
 }
 addEventHandler ( "event_buy_subject_fun", buy_subject_fun )
@@ -3795,11 +3798,11 @@ function till_fun( playerid, number, money, value )
 
 			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money, playername )
 
-			sendMessage(playerid, "Вы забрали из кассы "+money+"$", green)
+			sendMessage(playerid, "Вы забрали из кассы "+money+"$", color_mes.green)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] В кассе недостаточно средств", red)
+			sendMessage(playerid, "[ERROR] В кассе недостаточно средств", color_mes.red)
 		}
 	}
 	else if (value == "deposit")
@@ -3811,11 +3814,11 @@ function till_fun( playerid, number, money, value )
 
 			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-money, playername )
 
-			sendMessage(playerid, "Вы положили в кассу "+money+"$", orange)
+			sendMessage(playerid, "Вы положили в кассу "+money+"$", color_mes.orange)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+			sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 		}
 	}
 	else if (value == "price")
@@ -3824,7 +3827,7 @@ function till_fun( playerid, number, money, value )
 
 		sqlite3( "UPDATE business_db SET price = '"+money+"' WHERE number = '"+number+"'")
 
-		sendMessage(playerid, "Вы установили стоимость товара "+money+"$", yellow)
+		sendMessage(playerid, "Вы установили стоимость товара "+money+"$", color_mes.yellow)
 	}
 }
 
@@ -3849,7 +3852,7 @@ function craft_fun( playerid, text )
 
 		if(check_house == 0)
 		{
-			sendMessage(playerid, "[ERROR] Вы не около дома или не его владелец", red)
+			sendMessage(playerid, "[ERROR] Вы не около дома или не его владелец", color_mes.red)
 			return
 		}
 
@@ -3883,16 +3886,16 @@ function craft_fun( playerid, text )
 								}
 							}
 
-							sendMessage(playerid, "Вы создали "+v[0], orange)
+							sendMessage(playerid, "Вы создали "+v[0], color_mes.orange)
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+							sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 						}
 					}
 					else
 					{
-						sendMessage(playerid, "[ERROR] Недостаточно ресурсов", red)
+						sendMessage(playerid, "[ERROR] Недостаточно ресурсов", color_mes.red)
 					}
 				}
 			}
@@ -3922,13 +3925,13 @@ function auction_buy_sell(playerid, value, i, id1, id2, money, name_buy)//--пр
 				}
 			}
 
-			sendMessage(playerid, "Вы выставили на аукцион "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" за "+money+"$", green)
+			sendMessage(playerid, "Вы выставили на аукцион "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" за "+money+"$", color_mes.green)
 
 			sqlite3( "INSERT INTO auction (i, name_sell, id1, id2, money, name_buy) VALUES ('"+randomize+"', '"+playername+"', '"+id1+"', '"+id2+"', '"+money+"', '"+name_buy+"')" )
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] У вас нет такого предмета", red)
+			sendMessage(playerid, "[ERROR] У вас нет такого предмета", color_mes.red)
 		}
 	}
 	else if (value == "buy")
@@ -3941,7 +3944,7 @@ function auction_buy_sell(playerid, value, i, id1, id2, money, name_buy)//--пр
 
 			if (result[1]["name_buy"] != playername && result[1]["name_buy"] != "all")
 			{
-				sendMessage(playerid, "[ERROR] Вы не можете купить этот предмет", red)
+				sendMessage(playerid, "[ERROR] Вы не можете купить этот предмет", color_mes.red)
 				return
 			}
 
@@ -3949,7 +3952,7 @@ function auction_buy_sell(playerid, value, i, id1, id2, money, name_buy)//--пр
 			{
 				if (inv_player_empty(playerid, result[1]["id1"], result[1]["id2"]))
 				{
-					sendMessage(playerid, "Вы купили у "+result[1]["name_sell"]+" "+info_png[result[1]["id1"]][0]+" "+result[1]["id2"]+" "+info_png[result[1]["id1"]][1]+" за "+result[1]["money"]+"$", orange)
+					sendMessage(playerid, "Вы купили у "+result[1]["name_sell"]+" "+info_png[result[1]["id1"]][0]+" "+result[1]["id2"]+" "+info_png[result[1]["id1"]][1]+" за "+result[1]["money"]+"$", color_mes.orange)
 
 					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-result[1]["money"], playername )
 
@@ -3957,7 +3960,7 @@ function auction_buy_sell(playerid, value, i, id1, id2, money, name_buy)//--пр
 					{
 						if (v == result[1]["name_sell"])
 						{
-							sendMessage(playerid, playername+" купил у вас "+info_png[result[1]["id1"]][0]+" "+result[1]["id2"]+" "+info_png[result[1]["id1"]][1]+" за "+result[1]["money"]+"$", green)
+							sendMessage(playerid, playername+" купил у вас "+info_png[result[1]["id1"]][0]+" "+result[1]["id2"]+" "+info_png[result[1]["id1"]][1]+" за "+result[1]["money"]+"$", color_mes.green)
 							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+result[1]["money"], playerid )
 							count = count+1
 							break
@@ -3986,17 +3989,17 @@ function auction_buy_sell(playerid, value, i, id1, id2, money, name_buy)//--пр
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+					sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 				}
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+				sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 			}
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Лот не найден", red)
+			sendMessage(playerid, "[ERROR] Лот не найден", color_mes.red)
 		}
 	}
 	else if (value == "return")
@@ -4011,23 +4014,23 @@ function auction_buy_sell(playerid, value, i, id1, id2, money, name_buy)//--пр
 			{
 				if (inv_player_empty(playerid, result[1]["id1"], result[1]["id2"]))
 				{
-					sendMessage(playerid, "Вы забрали "+info_png[result[1]["id1"]][0]+" "+result[1]["id2"]+" "+info_png[result[1]["id1"]][1], orange)
+					sendMessage(playerid, "Вы забрали "+info_png[result[1]["id1"]][0]+" "+result[1]["id2"]+" "+info_png[result[1]["id1"]][1], color_mes.orange)
 
 					sqlite3( "DELETE FROM auction WHERE i = '"+i+"'" )
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+					sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 				}
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Имена не совпадают", red)
+				sendMessage(playerid, "[ERROR] Имена не совпадают", color_mes.red)
 			}
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Лот не найден", red)
+			sendMessage(playerid, "[ERROR] Лот не найден", color_mes.red)
 		}
 	}
 }
@@ -4049,7 +4052,7 @@ function cow_farms(playerid, value, val1, val2)
 		local result = sqlite3( "SELECT COUNT() FROM seagift_db" )
 		result = result[1]["COUNT()"]+1
 		if (cash*result > search_inv_player_2_parameter(playerid, 1)) {
-			sendMessage(playerid, "[ERROR] У вас недостаточно средств, необходимо "+(cash*result)+"$", red)
+			sendMessage(playerid, "[ERROR] У вас недостаточно средств, необходимо "+(cash*result)+"$", color_mes.red)
 			return
 		}
 
@@ -4058,13 +4061,13 @@ function cow_farms(playerid, value, val1, val2)
 
 			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-cash*result, playername )
 
-			sendMessage(playerid, "Вы купили рыбзавод за "+(cash*result)+"$", orange)
+			sendMessage(playerid, "Вы купили рыбзавод за "+(cash*result)+"$", color_mes.orange)
 
-			sendMessage(playerid, "Вы получили "+info_png[doc][0]+" "+result+" "+info_png[doc][1], svetlo_zolotoy)
+			sendMessage(playerid, "Вы получили "+info_png[doc][0]+" "+result+" "+info_png[doc][1], color_mes.svetlo_zolotoy)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+			sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 		}
 	}
 	else if ( value == "menu") 
@@ -4085,7 +4088,7 @@ function cow_farms(playerid, value, val1, val2)
 
 			sqlite3( "UPDATE seagift_db SET price = '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
-			sendMessage(playerid, "Вы установили зарплату "+val2+"$", yellow)
+			sendMessage(playerid, "Вы установили зарплату "+val2+"$", color_mes.yellow)
 		}
 		else if ( val1 == "coef") {
 			if (val2 < 1 || val2 > 100) {
@@ -4100,7 +4103,7 @@ function cow_farms(playerid, value, val1, val2)
 
 			sqlite3( "UPDATE seagift_db SET coef = '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
-			sendMessage(playerid, "Вы установили доход от продаж "+val2+" процентов", yellow)
+			sendMessage(playerid, "Вы установили доход от продаж "+val2+" процентов", color_mes.yellow)
 		}
 		else if ( val1 == "balance") {
 			if (val2 == 0) {
@@ -4121,11 +4124,11 @@ function cow_farms(playerid, value, val1, val2)
 
 					sqlite3( "UPDATE seagift_db SET money = money - '"+(val2*-1)+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
-					sendMessage(playerid, "Вы забрали из кассы "+(val2*-1)+"$", green)
+					sendMessage(playerid, "Вы забрали из кассы "+(val2*-1)+"$", color_mes.green)
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Недостаточно средств на балансе бизнеса", red)
+					sendMessage(playerid, "[ERROR] Недостаточно средств на балансе бизнеса", color_mes.red)
 				}
 			}
 			else
@@ -4141,11 +4144,11 @@ function cow_farms(playerid, value, val1, val2)
 
 					sqlite3( "UPDATE seagift_db SET money = money + '"+val2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'" )
 
-					sendMessage(playerid, "Вы положили в кассу "+val2+"$", orange)
+					sendMessage(playerid, "Вы положили в кассу "+val2+"$", color_mes.orange)
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+					sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 				}
 			}
 		}
@@ -4162,12 +4165,12 @@ function cow_farms(playerid, value, val1, val2)
 				if (inv_player_delet(playerid, 49, 7, true, false)) {
 					sqlite3( "UPDATE seagift_db SET nalog = nalog + '7' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'")
 
-					sendMessage(playerid, "Вы оплатили налог "+search_inv_player_2_parameter(playerid, doc)+" рыбзавода", yellow)
+					sendMessage(playerid, "Вы оплатили налог "+search_inv_player_2_parameter(playerid, doc)+" рыбзавода", color_mes.yellow)
 				}
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] У вас нет "+info_png[49][0]+" 7 "+info_png[49][1], red)
+				sendMessage(playerid, "[ERROR] У вас нет "+info_png[49][0]+" 7 "+info_png[49][1], color_mes.red)
 			}
 		}
 	}
@@ -4183,7 +4186,7 @@ function cow_farms(playerid, value, val1, val2)
 
 		result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 		if ( result[1]["warehouse"]-val1 < 0) {
-			sendMessage(playerid, "[ERROR] Склад пуст", red)
+			sendMessage(playerid, "[ERROR] Склад пуст", color_mes.red)
 			return false
 		}
 
@@ -4213,7 +4216,7 @@ function cow_farms(playerid, value, val1, val2)
 
 		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+cash, playername )
 
-		sendMessage(playerid, "Вы разгрузили из т/с "+info_png[83][0]+" "+val1+" шт за "+cash+"$", green)
+		sendMessage(playerid, "Вы разгрузили из т/с "+info_png[83][0]+" "+val1+" шт за "+cash+"$", color_mes.green)
 
 		sqlite3( "UPDATE seagift_db SET money = money + '"+cash2+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
 
@@ -4235,11 +4238,11 @@ function cow_farms(playerid, value, val1, val2)
 
 		result = sqlite3( "SELECT * FROM seagift_db WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'" )
 		if ( result[1]["money"] < money) {
-			sendMessage(playerid, "[ERROR] Недостаточно средств на балансе бизнеса", red)
+			sendMessage(playerid, "[ERROR] Недостаточно средств на балансе бизнеса", color_mes.red)
 			return true
 		}
 		else if ( result[1]["prod"] >= max_sg) {
-			sendMessage(playerid, "[ERROR] Склад полон", red)
+			sendMessage(playerid, "[ERROR] Склад полон", color_mes.red)
 			return true
 		}
 
@@ -4247,7 +4250,7 @@ function cow_farms(playerid, value, val1, val2)
 
 		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money, playername )
 
-		sendMessage(playerid, "Вы разгрузили из т/с "+info_png[82][0]+" "+val1+" шт за "+money+"$", green)
+		sendMessage(playerid, "Вы разгрузили из т/с "+info_png[82][0]+" "+val1+" шт за "+money+"$", color_mes.green)
 
 		sqlite3( "UPDATE seagift_db SET money = money - '"+money+"', prod = prod + '"+val1+"' WHERE number = '"+search_inv_player_2_parameter(playerid, lic)+"'")
 
@@ -4357,7 +4360,7 @@ function timer_earth_clear()
 
 		foreach(playerid, playername in getPlayers())
 		{
-			sendMessage(playerid, "[НОВОСТИ] Улицы очищенны от мусора", green)
+			sendMessage(playerid, "[НОВОСТИ] Улицы очищенны от мусора", color_mes.green)
 		}
 	}
 }
@@ -4533,7 +4536,7 @@ function timeserver()//время сервера
 			loto[2] = true
 			print("[loto] "+loto[0])
 
-			sendMessageAll(null, "[НОВОСТИ] Лотерея объявляется открытой, быстрее трите свои билеты", green)
+			sendMessageAll(null, "[НОВОСТИ] Лотерея объявляется открытой, быстрее трите свои билеты", color_mes.green)
 
 			timer_earth_clear()//--очистка земли от предметов
 		}
@@ -4670,12 +4673,12 @@ function need()//--нужды
 
 				setplayerhealth( playerid, hp )
 
-				sendMessage(playerid, "-100 хп", yellow)
+				sendMessage(playerid, "-100 хп", color_mes.yellow)
 
 				if (hygiene[playerid]-hygiene_minys >= 0)
 				{
 					hygiene[playerid] = hygiene[playerid]-hygiene_minys
-					sendMessage(playerid, "-"+hygiene_minys+" ед. чистоплотности", yellow)
+					sendMessage(playerid, "-"+hygiene_minys+" ед. чистоплотности", color_mes.yellow)
 				}
 
 				me_chat(playerid, playername+" стошнило")
@@ -4687,7 +4690,7 @@ function need()//--нужды
 				local hp = getplayerhealth(playerid)-max_heal
 
 				setplayerhealth( playerid, hp )
-				sendMessage(playerid, "-720 хп", yellow)
+				sendMessage(playerid, "-720 хп", color_mes.yellow)
 			}
 
 
@@ -4836,10 +4839,10 @@ function pay_money_gz()
 
 					if (playerid != -1 && logged[playerid] == 1)
 					{
-						sendMessage(playerid, "Вы получили "+money_gz+"$ за удержание территорий", green)
+						sendMessage(playerid, "Вы получили "+money_gz+"$ за удержание территорий", color_mes.green)
 						inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money_gz, playername )
 
-						sendMessage(playerid, "Вы получили "+money_gzb+"$ за крышивание бизнесов", green)
+						sendMessage(playerid, "Вы получили "+money_gzb+"$ за крышивание бизнесов", color_mes.green)
 						inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money_gzb, playername )
 					}
 				}
@@ -4901,13 +4904,13 @@ function prison()//--таймер заключения
 
 				setPlayerPosition( playerid, interior_job[0][2],interior_job[0][3],interior_job[0][4] )
 
-				sendMessage(playerid, "Вы свободны, больше не нарушайте", yellow)
+				sendMessage(playerid, "Вы свободны, больше не нарушайте", color_mes.yellow)
 			}
 			else if (crimes[playerid] > 1)
 			{
 				crimes[playerid] = crimes[playerid]-1
 
-				sendMessage(playerid, "Вам сидеть ещё "+(crimes[playerid])+" мин", yellow)
+				sendMessage(playerid, "Вам сидеть ещё "+(crimes[playerid])+" мин", color_mes.yellow)
 			}
 		}
 		else if (arrest[playerid] == 2)
@@ -4918,7 +4921,7 @@ function prison()//--таймер заключения
 
 				setPlayerPosition( playerid, interior_job[0][2],interior_job[0][3],interior_job[0][4] )
 
-				sendMessage(playerid, "Вы свободны, больше не нарушайте", yellow)
+				sendMessage(playerid, "Вы свободны, больше не нарушайте", color_mes.yellow)
 
 				inv_server_load(playerid, "player", 24, 0, 0, playername)
 			}
@@ -4926,7 +4929,7 @@ function prison()//--таймер заключения
 			{
 				array_player_2[playerid][24] = array_player_2[playerid][24]-1
 
-				sendMessage(playerid, "Вам сидеть ещё "+array_player_2[playerid][24]+" мин", yellow)
+				sendMessage(playerid, "Вам сидеть ещё "+array_player_2[playerid][24]+" мин", color_mes.yellow)
 
 				inv_server_load(playerid, "player", 24, 28, array_player_2[playerid][24], playername)
 			}
@@ -5284,11 +5287,11 @@ function playerDeath( playerid, attacker )
 
 	/*if (!playername_a)
 	{
-		sendMessageAll(playerid, "[НОВОСТИ] "+playername+" умер", green)
+		sendMessageAll(playerid, "[НОВОСТИ] "+playername+" умер", color_mes.green)
 	}
 	else
 	{
-		sendMessageAll(playerid, "[НОВОСТИ] "+playername_a+" убил "+playername+" Причина: "+reason.tostring(), green)
+		sendMessageAll(playerid, "[НОВОСТИ] "+playername_a+" убил "+playername+" Причина: "+reason.tostring(), color_mes.green)
 	}*/
 
 	print("[onPlayerDeath] "+playername+" [attacker - "+playername_a.tostring()+", reason - "+reason.tostring()+"]")
@@ -5305,16 +5308,16 @@ function( playerid )
 {
 	if (logged[playerid] == 0)
 	{
-		sendMessage(playerid, "[TIPS] F2 - скрыть или показать худ", color_tips)
-		sendMessage(playerid, "[TIPS] F3 - скрыть или показать список игроков", color_tips)
-		sendMessage(playerid, "[TIPS] TAB - открыть инвентарь, левая часть экрана - использовать предмет, правая - выкинуть", color_tips)
-		sendMessage(playerid, "[TIPS] X - крафт предметов", color_tips)
-		sendMessage(playerid, "[TIPS] Листать чат page up и page down", color_tips)
-		sendMessage(playerid, "[TIPS] /cmd - команды сервера", color_tips)
-		sendMessage(playerid, "[TIPS] Первоначальная работа находится на свалке у Майка Бруски", color_tips)
-		sendMessage(playerid, "[TIPS] Граждане не имеющий дом, могут помыться и выспаться в отеле Титания", color_tips)
-		sendMessage(playerid, "[TIPS] Права можно получить в Мэрии (зеленый пятиугольник)", color_tips)
-		sendMessage(playerid, "[WARNING] Если у вас нету счетчика FPS или 3D текстов, перезайдите!", red)
+		sendMessage(playerid, "[TIPS] F2 - скрыть или показать худ", color_mes.color_tips)
+		sendMessage(playerid, "[TIPS] F3 - скрыть или показать список игроков", color_mes.color_tips)
+		sendMessage(playerid, "[TIPS] TAB - открыть инвентарь, левая часть экрана - использовать предмет, правая - выкинуть", color_mes.color_tips)
+		sendMessage(playerid, "[TIPS] X - крафт предметов", color_mes.color_tips)
+		sendMessage(playerid, "[TIPS] Листать чат page up и page down", color_mes.color_tips)
+		sendMessage(playerid, "[TIPS] /cmd - команды сервера", color_mes.color_tips)
+		sendMessage(playerid, "[TIPS] Первоначальная работа находится на свалке у Майка Бруски", color_mes.color_tips)
+		sendMessage(playerid, "[TIPS] Граждане не имеющий дом, могут помыться и выспаться в отеле Титания", color_mes.color_tips)
+		sendMessage(playerid, "[TIPS] Права можно получить в Мэрии (зеленый пятиугольник)", color_mes.color_tips)
+		sendMessage(playerid, "[WARNING] Если у вас нету счетчика FPS или 3D текстов, перезайдите!", color_mes.red)
 
 		reg_or_login(playerid)
 
@@ -5403,7 +5406,7 @@ function reg_or_login(playerid)
 		if (result[1]["COUNT()"] >= 1) 
 		{	
 			local result = sqlite3( "SELECT * FROM account WHERE reg_serial = '"+serial+"'" )
-			sendMessage(playerid, "[ERROR] Регистрация твинков запрещена, вас кикнет через 10 сек", red)
+			sendMessage(playerid, "[ERROR] Регистрация твинков запрещена, вас кикнет через 10 сек", color_mes.red)
 			setPlayerFrozen(playerid, true)
 			timer(function () 
 			{	
@@ -5434,7 +5437,7 @@ function reg_or_login(playerid)
 		setPlayerModel(playerid, result[1]["skin"])
 		setPlayerPosition( playerid, -575.101,1622.8,-15.6957 )
 
-		sendMessage(playerid, "Вы удачно зарегистрировались!", turquoise)
+		sendMessage(playerid, "Вы удачно зарегистрировались!", color_mes.turquoise)
 
 		//sqlite_save_player_action( "CREATE TABLE "+playername+" (player_action TEXT)" )
 
@@ -5448,7 +5451,7 @@ function reg_or_login(playerid)
 
 		if (result[1]["reg_serial"] != serial)
 		{
-			sendMessage(playerid, "[ERROR] Вы не владелец аккаунта, вас кикнет через 10 сек", red)
+			sendMessage(playerid, "[ERROR] Вы не владелец аккаунта, вас кикнет через 10 сек", color_mes.red)
 			setPlayerFrozen(playerid, true)
 			timer(function () 
 			{
@@ -5485,7 +5488,7 @@ function reg_or_login(playerid)
 		setplayerhealth( playerid, result[1]["heal"] )
 		setPlayerModel(playerid, result[1]["skin"])
 
-		sendMessage(playerid, "Вы удачно зашли!", turquoise)
+		sendMessage(playerid, "Вы удачно зашли!", color_mes.turquoise)
 
 		house_bussiness_job_pos_load( playerid )
 
@@ -5493,7 +5496,7 @@ function reg_or_login(playerid)
 		{
 			//setPlayerFrozen(playerid, true)
 			setPlayerPosition( playerid, -1310.0,-222.0,-23.0 )
-			/*sendMessage(playerid, "[TIPS] Вы заморожены, не открывайте чат", color_tips)
+			/*sendMessage(playerid, "[TIPS] Вы заморожены, не открывайте чат", color_mes.color_tips)
 
 			tp_player_lh[playerid] = timer(function () 
 			{	
@@ -5506,7 +5509,7 @@ function reg_or_login(playerid)
 
 					if((myPos[1]*-1+result[1]["y"]) > -500.0)
 					{
-						sendMessage(playerid, "[TIPS] Прилетели, можно двигаться, спасибо что воспользовались нашими услугами :)", color_tips)
+						sendMessage(playerid, "[TIPS] Прилетели, можно двигаться, спасибо что воспользовались нашими услугами :)", color_mes.color_tips)
 						//setPlayerFrozen(playerid, false)
 						setPlayerPosition( playerid, result[1]["x"],result[1]["y"],result[1]["z"] )
 						print(result[1]["x"]+" "+result[1]["y"]+" "+result[1]["z"])
@@ -5542,7 +5545,7 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 			local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
 			if (result[1]["nalog"] <= 0)
 			{
-				sendMessage(playerid, "[ERROR] Т/с арестован за уклонение от уплаты налогов", red)
+				sendMessage(playerid, "[ERROR] Т/с арестован за уклонение от уплаты налогов", color_mes.red)
 				dviglo[plate] <- 0
 				return
 			}
@@ -5568,7 +5571,7 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 
 			if (fuel[plate] <= 1)
 			{
-				sendMessage(playerid, "[ERROR] Бак пуст", red)
+				sendMessage(playerid, "[ERROR] Бак пуст", color_mes.red)
 				dviglo[plate] <- 0
 				return
 			}
@@ -5577,7 +5580,7 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Чтобы завести т/с надо иметь ключ от т/с и права (можно купить в Мэрии)", red)
+			sendMessage(playerid, "[ERROR] Чтобы завести т/с надо иметь ключ от т/с и права (можно купить в Мэрии)", color_mes.red)
 			dviglo[plate] <- 0
 		}
 	}
@@ -5681,11 +5684,11 @@ function tab_down(playerid)
 
 				if (value["nalog"] <= 0)
 				{
-					sendMessage(playerid, "[ERROR] Дом арестован за уклонение от уплаты налогов", red)
+					sendMessage(playerid, "[ERROR] Дом арестован за уклонение от уплаты налогов", color_mes.red)
 				}
 				else if (value["door"] == 0)
 				{
-					sendMessage(playerid, "[ERROR] Дверь закрыта", red)
+					sendMessage(playerid, "[ERROR] Дверь закрыта", color_mes.red)
 				}
 				else if (count != 0)
 				{
@@ -5761,7 +5764,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 				inv_player_delet( playerid, id1, id2, false, true )
 				inv_server_load( playerid, value, 0, 1, search_inv_player_2_parameter(playerid, 1)+id2, tabpanel )
 
-				sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], yellow)
+				sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], color_mes.yellow)
 
 				return
 			}
@@ -5776,11 +5779,11 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 				inv_player_delet( playerid, id1, id2, true, false )
 				inv_player_empty( playerid, v[5], randomize )
 
-				sendMessage(playerid, "Вы получили "+info_png[v[5]][0]+" "+randomize+" "+info_png[v[5]][1], svetlo_zolotoy)
+				sendMessage(playerid, "Вы получили "+info_png[v[5]][0]+" "+randomize+" "+info_png[v[5]][1], color_mes.svetlo_zolotoy)
 
 				setPlayerFrozen( playerid, true )
 
-				sendMessage(playerid, "[TIPS] Вы заморожены, не открывайте чат", color_tips)
+				sendMessage(playerid, "[TIPS] Вы заморожены, не открывайте чат", color_mes.color_tips)
 
 				triggerClientEvent( playerid, "createHudTimer", (v[7]*1).tofloat() )
 
@@ -5790,7 +5793,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 					{
 						setPlayerFrozen(playerid, false)
 
-						sendMessage(playerid, "[TIPS] Можно двигаться", color_tips)
+						sendMessage(playerid, "[TIPS] Можно двигаться", color_mes.color_tips)
 					}
 				}, (v[7]*1000), 1)
 
@@ -5823,7 +5826,7 @@ function throw_earth_server (playerid, value, id3, id1, id2, tabpanel)//--выб
 	inv_server_load( playerid, value, id3, 0, 0, tabpanel )
 
 	me_chat(playerid, playername+" выбросил(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1])
-	//sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], yellow)
+	//sendMessage(playerid, "Вы выбросили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], color_mes.yellow)
 }
 addEventHandler ( "event_throw_earth_server", throw_earth_server )
 
@@ -5848,7 +5851,7 @@ function e_down (playerid)//--подбор предметов с земли
 				{
 					if (getVehicleModel(vehicleid) != v[5])
 					{
-						sendMessage(playerid, "[ERROR] Вы должны быть в "+motor_show[v[5]][3]+"("+v[5]+")", red)
+						sendMessage(playerid, "[ERROR] Вы должны быть в "+motor_show[v[5]][3]+"("+v[5]+")", color_mes.red)
 						return
 					}
 				}
@@ -5865,7 +5868,7 @@ function e_down (playerid)//--подбор предметов с земли
 				{
 					if (getVehicleModel(vehicleid) != v[5])
 					{
-						sendMessage(playerid, "[ERROR] Вы должны быть в "+motor_show[v[5]][3]+"("+v[5]+")", red)
+						sendMessage(playerid, "[ERROR] Вы должны быть в "+motor_show[v[5]][3]+"("+v[5]+")", color_mes.red)
 						return
 					}
 				}
@@ -5882,7 +5885,7 @@ function e_down (playerid)//--подбор предметов с земли
 				{
 					if (getPlayerModel(playerid) != v[6])
 					{
-						sendMessage(playerid, "[ERROR] Вы должны быть в одежде "+v[6], red)
+						sendMessage(playerid, "[ERROR] Вы должны быть в одежде "+v[6], color_mes.red)
 						return
 					}
 				}
@@ -5899,7 +5902,7 @@ function e_down (playerid)//--подбор предметов с земли
 				{
 					if (getVehicleModel(vehicleid) != down_car_subject[0][5])
 					{
-						sendMessage(playerid, "[ERROR] Вы должны быть в "+motor_show[ down_car_subject[0][5] ][3]+"("+down_car_subject[0][5]+")", red)
+						sendMessage(playerid, "[ERROR] Вы должны быть в "+motor_show[ down_car_subject[0][5] ][3]+"("+down_car_subject[0][5]+")", color_mes.red)
 						return
 					}
 				}
@@ -5926,14 +5929,14 @@ function e_down (playerid)//--подбор предметов с земли
 			}
 
 			if (count && search_inv_player(playerid, v[3], search_inv_player_2_parameter(playerid, v[3])) >= 1) {
-				sendMessage(playerid, "[ERROR] Можно переносить только один предмет", red)
+				sendMessage(playerid, "[ERROR] Можно переносить только один предмет", color_mes.red)
 				return
 			}
 
 			if (inv_player_empty(playerid, v[3], v[4])) 
 			{			
 				me_chat(playerid, playername+" поднял(а) "+info_png[ v[3] ][0]+" "+v[4]+" "+info_png[ v[3] ][1])
-				//sendMessage(playerid, "Вы подняли "+info_png[ v[3] ][0]+" "+v[4]+" "+info_png[ v[3] ][1], svetlo_zolotoy)
+				//sendMessage(playerid, "Вы подняли "+info_png[ v[3] ][0]+" "+v[4]+" "+info_png[ v[3] ][1], color_mes.svetlo_zolotoy)
 
 				delete earth[i]
 
@@ -5944,7 +5947,7 @@ function e_down (playerid)//--подбор предметов с земли
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+				sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 			}
 
 			return
@@ -5956,26 +5959,26 @@ addEventHandler ( "event_e_down", e_down )
 function business_info (playerid, number)
 {
 	local result = sqlite3( "SELECT * FROM business_db WHERE number = '"+number+"'" )
-	sendMessage(playerid, " ", yellow)
+	sendMessage(playerid, " ", color_mes.yellow)
 	local s_sql = select_sqlite(36, result[1]["number"])
 
 	if (s_sql)
 	{
-		sendMessage(playerid, "Владелец бизнеса "+s_sql, yellow)
+		sendMessage(playerid, "Владелец бизнеса "+s_sql, color_mes.yellow)
 	}
 	else
 	{
-		sendMessage(playerid, "Владелец бизнеса нету", yellow)
+		sendMessage(playerid, "Владелец бизнеса нету", color_mes.yellow)
 	}
 
-	sendMessage(playerid, "Тип "+result[1]["type"], yellow)
-	sendMessage(playerid, "Товаров на складе "+result[1]["warehouse"]+" шт", yellow)
-	sendMessage(playerid, "Стоимость товара (надбавка в N раз) "+result[1]["price"]+"$", green)
+	sendMessage(playerid, "Тип "+result[1]["type"], color_mes.yellow)
+	sendMessage(playerid, "Товаров на складе "+result[1]["warehouse"]+" шт", color_mes.yellow)
+	sendMessage(playerid, "Стоимость товара (надбавка в N раз) "+result[1]["price"]+"$", color_mes.green)
 
 	if (search_inv_player(playerid, 36, result[1]["number"]) != 0)
 	{
-		sendMessage(playerid, "Состояние кассы "+split(result[1]["money"].tostring(),".")[0]+"$", green)
-		sendMessage(playerid, "Налог бизнеса оплачен на "+result[1]["nalog"]+" дней", yellow)
+		sendMessage(playerid, "Состояние кассы "+split(result[1]["money"].tostring(),".")[0]+"$", color_mes.green)
+		sendMessage(playerid, "Налог бизнеса оплачен на "+result[1]["nalog"]+" дней", color_mes.yellow)
 	}
 }
 
@@ -6045,7 +6048,7 @@ function x_down (playerid)
 			{
 				if (search_inv_player_2_parameter(playerid, 10) == 0)
 				{
-					sendMessage(playerid, "[ERROR] Вы не полицейский", red)
+					sendMessage(playerid, "[ERROR] Вы не полицейский", color_mes.red)
 					return
 				}
 
@@ -6074,7 +6077,7 @@ function x_down (playerid)
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_giuseppe+" преступлений", red)					
+					sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_giuseppe+" преступлений", color_mes.red)					
 				}
 				return
 			}
@@ -6125,19 +6128,19 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 	{
 		if (search_inv_player(playerid, id1, search_inv_player_2_parameter(playerid, id1)) >= 1) 
 		{
-			sendMessage(playerid, "[ERROR] Можно переносить только один предмет", red)
+			sendMessage(playerid, "[ERROR] Можно переносить только один предмет", color_mes.red)
 			return
 		}
 
 		if (inv_player_empty(playerid, id1, id2)) 
 		{
-			sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], svetlo_zolotoy)
+			sendMessage(playerid, "Вы получили "+info_png[id1][0]+" "+id2+" "+info_png[id1][1], color_mes.svetlo_zolotoy)
 
 			random_sub (playerid, id1)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+			sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 		}
 	}
 	else if (value == "car")//--для работ по перевозке ящиков
@@ -6152,14 +6155,14 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 			}
 			else if(count2 == 0)
 			{
-				sendMessage(playerid, "[ERROR] Багажник заполнен", red)
+				sendMessage(playerid, "[ERROR] Багажник заполнен", color_mes.red)
 				return
 			}
 			else if (id1 == 24 || id1 == 61 || id1 == 87)
 			{
 				if (search_inv_player(playerid, 34, 6) == 0) 
 				{
-					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", red)
+					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", color_mes.red)
 					return
 				}
 			}
@@ -6167,7 +6170,7 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 			{
 				if (search_inv_player(playerid, 34, 7) == 0) 
 				{
-					sendMessage(playerid, "[ERROR] Вы не молочник", red)
+					sendMessage(playerid, "[ERROR] Вы не молочник", color_mes.red)
 					return
 				}
 			}
@@ -6175,7 +6178,7 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 			{
 				if (search_inv_player(playerid, 34, 8) == 0) 
 				{
-					sendMessage(playerid, "[ERROR] Вы не развозчик алкоголя", red)
+					sendMessage(playerid, "[ERROR] Вы не развозчик алкоголя", color_mes.red)
 					return
 				}
 			}
@@ -6183,7 +6186,7 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 			{
 				if (search_inv_player(playerid, 34, 2) == 0) 
 				{
-					sendMessage(playerid, "[ERROR] Вы не водитель мусоровоза", red)
+					sendMessage(playerid, "[ERROR] Вы не водитель мусоровоза", color_mes.red)
 					return
 				}
 			}
@@ -6191,7 +6194,7 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 			{
 				if (search_inv_player(playerid, 34, 3) == 0)
 				{
-					sendMessage(playerid, "[ERROR] Вы не инкассатор", red)
+					sendMessage(playerid, "[ERROR] Вы не инкассатор", color_mes.red)
 					return
 				}
 			}
@@ -6199,7 +6202,7 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 			{
 				if (search_inv_player(playerid, 34, 10) == 0)
 				{
-					sendMessage(playerid, "[ERROR] Вы не перевозчик оружия", red)
+					sendMessage(playerid, "[ERROR] Вы не перевозчик оружия", color_mes.red)
 					return
 				}
 			}
@@ -6207,12 +6210,12 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 			{
 				if (search_inv_player(playerid, 34, 6) == 0) 
 				{
-					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", red)
+					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", color_mes.red)
 					return
 				}
 				else if (search_inv_player(playerid, 85, search_inv_player_2_parameter(playerid, 85)) == 0)
 				{
-					sendMessage(playerid, "[ERROR] Вы не работаете на рыбзаводе", red)
+					sendMessage(playerid, "[ERROR] Вы не работаете на рыбзаводе", color_mes.red)
 					return
 				}
 				else if (!cow_farms(playerid, "load", count2, 0))
@@ -6224,12 +6227,12 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 			{
 				if (search_inv_player(playerid, 34, 6) == 0)
 				{
-					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", red)
+					sendMessage(playerid, "[ERROR] Вы не дальнобойщик", color_mes.red)
 					return
 				}
 				else if (search_inv_player(playerid, 85, search_inv_player_2_parameter(playerid, 85)) == 0)
 				{
-					sendMessage(playerid, "[ERROR] Вы не работаете на рыбзаводе", red)
+					sendMessage(playerid, "[ERROR] Вы не работаете на рыбзаводе", color_mes.red)
 					return
 				}
 			}
@@ -6237,12 +6240,12 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 			{
 				if (search_inv_player(playerid, 34, 11) == 0)
 				{
-					sendMessage(playerid, "[ERROR] Вы не развозчик угля", red)
+					sendMessage(playerid, "[ERROR] Вы не развозчик угля", color_mes.red)
 					return
 				}
 				else if (pogoda)
 				{
-					sendMessage(playerid, "[ERROR] Работа доступна зимой", red)
+					sendMessage(playerid, "[ERROR] Работа доступна зимой", color_mes.red)
 					return
 				}
 			}
@@ -6250,36 +6253,36 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 
 			inv_car_empty(playerid, id1, id2, load_value)
 
-			sendMessage(playerid, "Вы загрузили в т/с "+info_png[id1][0]+" за "+id2+"$", svetlo_zolotoy)
+			sendMessage(playerid, "Вы загрузили в т/с "+info_png[id1][0]+" за "+id2+"$", color_mes.svetlo_zolotoy)
 				
 			if (id1 == 24) 
 			{
-				sendMessage(playerid, "[TIPS] Езжайте в порт или в любой бизнес, чтобы разгрузиться", color_tips)
+				sendMessage(playerid, "[TIPS] Езжайте в порт или в любой бизнес, чтобы разгрузиться", color_mes.color_tips)
 			}
 			else if (id1 == 61) 
 			{
-				sendMessage(playerid, "[TIPS] Езжайте в порт, чтобы разгрузиться", color_tips)
+				sendMessage(playerid, "[TIPS] Езжайте в порт, чтобы разгрузиться", color_mes.color_tips)
 			}
 			else if (id1 == 82) 
 			{
-				sendMessage(playerid, "[TIPS] Езжайте на рыбзавод, чтобы разгрузиться", color_tips)
+				sendMessage(playerid, "[TIPS] Езжайте на рыбзавод, чтобы разгрузиться", color_mes.color_tips)
 			}
 			else if (id1 == 83) 
 			{
-				sendMessage(playerid, "[TIPS] Езжайте в порт, чтобы разгрузиться", color_tips)
+				sendMessage(playerid, "[TIPS] Езжайте в порт, чтобы разгрузиться", color_mes.color_tips)
 			}
 			else if (id1 == 87) 
 			{
-				sendMessage(playerid, "[TIPS] Езжайте на стройплощадку в Хилвуд, чтобы разгрузиться", color_tips)
+				sendMessage(playerid, "[TIPS] Езжайте на стройплощадку в Хилвуд, чтобы разгрузиться", color_mes.color_tips)
 			}
 			else if (id1 == 90)
 			{
-				sendMessage(playerid, "[TIPS] Езжайте на место, чтобы разгрузиться", color_tips)
+				sendMessage(playerid, "[TIPS] Езжайте на место, чтобы разгрузиться", color_mes.color_tips)
 			}
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Вы не в т/с", red)
+			sendMessage(playerid, "[ERROR] Вы не в т/с", color_mes.red)
 		}
 	}
 }
@@ -6313,13 +6316,13 @@ function delet_subject(playerid, id)//--удаление предметов из
 				{
 					if (id != 24)
 					{
-						sendMessage(playerid, "[ERROR] Нужен только "+info_png[24][0], red)
+						sendMessage(playerid, "[ERROR] Нужен только "+info_png[24][0], color_mes.red)
 						return
 					}
 
 					if (v["warehouse"] >= max_business) 
 					{
-						sendMessage(playerid, "[ERROR] Склад полон", red)
+						sendMessage(playerid, "[ERROR] Склад полон", color_mes.red)
 						return
 					}
 
@@ -6327,7 +6330,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 
 					if (v["money"] < money) 
 					{
-						sendMessage(playerid, "[ERROR] Недостаточно средств на балансе бизнеса", red)
+						sendMessage(playerid, "[ERROR] Недостаточно средств на балансе бизнеса", color_mes.red)
 						return
 					}
 
@@ -6337,7 +6340,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 
 					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money, playername )
 
-					sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт за "+money+"$", green)
+					sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт за "+money+"$", color_mes.green)
 
 					return
 				}
@@ -6355,7 +6358,7 @@ function delet_subject(playerid, id)//--удаление предметов из
 
 						inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money, playername )
 
-						sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт за "+money+"$", green)
+						sendMessage(playerid, "Вы разгрузили из т/с "+info_png[id][0]+" "+count+" шт за "+money+"$", color_mes.green)
 
 						return
 					}
@@ -6364,12 +6367,12 @@ function delet_subject(playerid, id)//--удаление предметов из
 		}
 		else 
 		{
-			//sendMessage(playerid, "[ERROR] Багажник пуст", red)
+			//sendMessage(playerid, "[ERROR] Багажник пуст", color_mes.red)
 		}
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Вы не в т/с", red)
+		sendMessage(playerid, "[ERROR] Вы не в т/с", color_mes.red)
 	}
 }
 
@@ -6450,7 +6453,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (getplayerhealth(playerid) == max_heal)
 			{
-				sendMessage(playerid, "[ERROR] У вас полное здоровье", red)
+				sendMessage(playerid, "[ERROR] У вас полное здоровье", color_mes.red)
 				return
 			}
 
@@ -6460,25 +6463,25 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				local hp = max_heal*0.05
 				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
-				sendMessage(playerid, "+"+hp+" хп", yellow)
+				sendMessage(playerid, "+"+hp+" хп", color_mes.yellow)
 			}
 			else if (id1 == 7)
 			{
 				local hp = max_heal*0.10
 				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
-				sendMessage(playerid, "+"+hp+" хп", yellow)
+				sendMessage(playerid, "+"+hp+" хп", color_mes.yellow)
 			}
 			else if (id1 == 8)
 			{
 				local hp = max_heal*0.15
 				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
-				sendMessage(playerid, "+"+hp+" хп", yellow)
+				sendMessage(playerid, "+"+hp+" хп", color_mes.yellow)
 			}
 
 			if (satiety[playerid]+satiety_plus <= max_satiety)
 			{
 				satiety[playerid] = satiety[playerid]+satiety_plus
-				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow)
+				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", color_mes.yellow)
 			}
 
 			me_chat(playerid, playername+" выкурил(а) сигарету")
@@ -6487,14 +6490,14 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if (getplayerhealth(playerid) == max_heal)
 			{
-				sendMessage(playerid, "[ERROR] У вас полное здоровье", red)
+				sendMessage(playerid, "[ERROR] У вас полное здоровье", color_mes.red)
 				return
 			}
 
 			id2 = id2 - 1
 
 			setplayerhealth(playerid, max_heal)
-			sendMessage(playerid, "+"+max_heal+" хп", yellow)
+			sendMessage(playerid, "+"+max_heal+" хп", color_mes.yellow)
 
 			me_chat(playerid, playername+" использовал(а) аптечку")
 		}
@@ -6506,12 +6509,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (getplayerhealth(playerid) == max_heal)
 			{
-				sendMessage(playerid, "[ERROR] У вас полное здоровье", red)
+				sendMessage(playerid, "[ERROR] У вас полное здоровье", color_mes.red)
 				return
 			}
 			else if (drugs[playerid]+drugs_plus > max_drugs)
 			{
-				sendMessage(playerid, "[ERROR] У вас сильная наркозависимость", red)
+				sendMessage(playerid, "[ERROR] У вас сильная наркозависимость", color_mes.red)
 				return
 			}
 
@@ -6519,21 +6522,21 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			local hp = max_heal*0.50
 			setplayerhealth(playerid, getplayerhealth(playerid)+hp)
-			sendMessage(playerid, "+"+hp+" хп",  yellow)
+			sendMessage(playerid, "+"+hp+" хп",  color_mes.yellow)
 
 			drugs[playerid] = drugs[playerid]+drugs_plus
-			sendMessage(playerid, "+"+drugs_plus+" ед. наркозависимости",  yellow)
+			sendMessage(playerid, "+"+drugs_plus+" ед. наркозависимости",  color_mes.yellow)
 
 			if (satiety[playerid]+satiety_plus <= max_satiety)
 			{
 				satiety[playerid] = satiety[playerid]+satiety_plus
-				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow)
+				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", color_mes.yellow)
 			}
 
 			if (sleep[playerid]+sleep_plus <= max_sleep)
 			{
 				sleep[playerid] = sleep[playerid]+sleep_plus
-				sendMessage(playerid, "+"+sleep_plus+" ед. сна", yellow)
+				sendMessage(playerid, "+"+sleep_plus+" ед. сна", color_mes.yellow)
 			}
 
 			me_chat(playerid, playername+" употребил(а) наркотики")
@@ -6545,12 +6548,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (getplayerhealth(playerid) == max_heal)
 			{
-				sendMessage(playerid, "[ERROR] У вас полное здоровье", red)
+				sendMessage(playerid, "[ERROR] У вас полное здоровье", color_mes.red)
 				return
 			}
 			else if (alcohol[playerid]+alcohol_plus > max_alcohol)
 			{
-				sendMessage(playerid, "[ERROR] Вы сильно пьяны", red)
+				sendMessage(playerid, "[ERROR] Вы сильно пьяны", color_mes.red)
 				return
 			}
 
@@ -6561,12 +6564,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				local satiety_plus = 10
 				local hp = max_heal*0.20
 				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
-				sendMessage(playerid, "+"+hp+" хп", yellow)
+				sendMessage(playerid, "+"+hp+" хп", color_mes.yellow)
 
 				if (satiety[playerid]+satiety_plus <= max_satiety)
 				{
 					satiety[playerid] = satiety[playerid]+satiety_plus
-					sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow)
+					sendMessage(playerid, "+"+satiety_plus+" ед. сытости", color_mes.yellow)
 				}
 			}
 			else if (id1 == 22)
@@ -6574,22 +6577,22 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				local satiety_plus = 5
 				local hp = max_heal*0.25
 				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
-				sendMessage(playerid, "+"+hp+" хп", yellow)
+				sendMessage(playerid, "+"+hp+" хп", color_mes.yellow)
 
 				if (satiety[playerid]+satiety_plus <= max_satiety)
 				{
 					satiety[playerid] = satiety[playerid]+satiety_plus
-					sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow)
+					sendMessage(playerid, "+"+satiety_plus+" ед. сытости", color_mes.yellow)
 				}
 			}
 
 			alcohol[playerid] = alcohol[playerid]+alcohol_plus
-			sendMessage(playerid, "+"+(alcohol_plus/100.0)+" промилле", yellow)
+			sendMessage(playerid, "+"+(alcohol_plus/100.0)+" промилле", color_mes.yellow)
 
 			if (hygiene[playerid]-hygiene_minys >= 0)
 			{
 				hygiene[playerid] = hygiene[playerid]-hygiene_minys
-				sendMessage(playerid, "-"+hygiene_minys+" ед. чистоплотности", yellow)
+				sendMessage(playerid, "-"+hygiene_minys+" ед. чистоплотности", color_mes.yellow)
 			}
 
 			me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
@@ -6603,12 +6606,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (getplayerhealth(playerid) == max_heal)
 				{
-					sendMessage(playerid, "[ERROR] У вас полное здоровье", red)
+					sendMessage(playerid, "[ERROR] У вас полное здоровье", color_mes.red)
 					return
 				}
 				else if (alcohol[playerid]+alcohol_plus > max_alcohol)
 				{
-					sendMessage(playerid, "[ERROR] Вы сильно пьяны", red)
+					sendMessage(playerid, "[ERROR] Вы сильно пьяны", color_mes.red)
 					return
 				}
 
@@ -6617,21 +6620,21 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				local satiety_plus = 10
 				local hp = max_heal*0.50
 				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
-				sendMessage(playerid, "+"+hp+" хп", yellow)
+				sendMessage(playerid, "+"+hp+" хп", color_mes.yellow)
 
 				if (satiety[playerid]+satiety_plus <= max_satiety)
 				{
 					satiety[playerid] = satiety[playerid]+satiety_plus
-					sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow)
+					sendMessage(playerid, "+"+satiety_plus+" ед. сытости", color_mes.yellow)
 				}
 
 				alcohol[playerid] = alcohol[playerid]+alcohol_plus
-				sendMessage(playerid, "+"+(alcohol_plus/100.0)+" промилле", yellow)
+				sendMessage(playerid, "+"+(alcohol_plus/100.0)+" промилле", color_mes.yellow)
 
 				if (hygiene[playerid]-hygiene_minys >= 0)
 				{
 					hygiene[playerid] = hygiene[playerid]-hygiene_minys
-					sendMessage(playerid, "-"+hygiene_minys+" ед. чистоплотности", yellow)
+					sendMessage(playerid, "-"+hygiene_minys+" ед. чистоплотности", color_mes.yellow)
 				}
 
 				me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
@@ -6643,12 +6646,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (getplayerhealth(playerid) == max_heal)
 				{
-					sendMessage(playerid, "[ERROR] У вас полное здоровье", red)
+					sendMessage(playerid, "[ERROR] У вас полное здоровье", color_mes.red)
 					return
 				}
 				else if (alcohol[playerid]+alcohol_plus > max_alcohol)
 				{
-					sendMessage(playerid, "[ERROR] Вы сильно пьяны", red)
+					sendMessage(playerid, "[ERROR] Вы сильно пьяны", color_mes.red)
 					return
 				}
 
@@ -6657,21 +6660,21 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				local satiety_plus = 10
 				local hp = max_heal*0.40
 				setplayerhealth(playerid, getplayerhealth(playerid)+hp)
-				sendMessage(playerid, "+"+hp+" хп", yellow)
+				sendMessage(playerid, "+"+hp+" хп", color_mes.yellow)
 
 				if (satiety[playerid]+satiety_plus <= max_satiety)
 				{
 					satiety[playerid] = satiety[playerid]+satiety_plus
-					sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow)
+					sendMessage(playerid, "+"+satiety_plus+" ед. сытости", color_mes.yellow)
 				}
 
 				alcohol[playerid] = alcohol[playerid]+alcohol_plus
-				sendMessage(playerid, "+"+(alcohol_plus/100.0)+" промилле", yellow)
+				sendMessage(playerid, "+"+(alcohol_plus/100.0)+" промилле", color_mes.yellow)
 
 				if (hygiene[playerid]-hygiene_minys >= 0)
 				{
 					hygiene[playerid] = hygiene[playerid]-hygiene_minys
-					sendMessage(playerid, "-"+hygiene_minys+" ед. чистоплотности", yellow)
+					sendMessage(playerid, "-"+hygiene_minys+" ед. чистоплотности", color_mes.yellow)
 				}
 
 				me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
@@ -6687,12 +6690,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (satiety[playerid]+satiety_plus > max_satiety)
 				{
-					sendMessage(playerid, "[ERROR] Вы не голодны", red)
+					sendMessage(playerid, "[ERROR] Вы не голодны", color_mes.red)
 					return
 				}
 
 				satiety[playerid] = satiety[playerid]+satiety_plus
-				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow)
+				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", color_mes.yellow)
 				me_chat(playerid, playername+" съел(а) "+info_png[id1][0])
 			}
 			else if (id1 == 43)
@@ -6701,12 +6704,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (satiety[playerid]+satiety_plus > max_satiety)
 				{
-					sendMessage(playerid, "[ERROR] Вы не голодны", red)
+					sendMessage(playerid, "[ERROR] Вы не голодны", color_mes.red)
 					return
 				}
 
 				satiety[playerid] = satiety[playerid]+satiety_plus
-				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", yellow)
+				sendMessage(playerid, "+"+satiety_plus+" ед. сытости", color_mes.yellow)
 				me_chat(playerid, playername+" съел(а) "+info_png[id1][0])
 			}
 		}
@@ -6714,7 +6717,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if (isPlayerInVehicle(playerid))
 			{
-				sendMessage(playerid, "[ERROR] Вы в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы в т/с", color_mes.red)
 				return
 			}
 			
@@ -6724,7 +6727,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (hygiene[playerid]+sleep_hygiene_plus > max_hygiene)
 				{
-					sendMessage(playerid, "[ERROR] Вы чисты", red)
+					sendMessage(playerid, "[ERROR] Вы чисты", color_mes.red)
 					return
 				}
 
@@ -6732,7 +6735,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				{
 					id2 = id2 - 1
 					hygiene[playerid] = hygiene[playerid]+sleep_hygiene_plus
-					sendMessage(playerid, "+"+sleep_hygiene_plus+" ед. чистоплотности", yellow)
+					sendMessage(playerid, "+"+sleep_hygiene_plus+" ед. чистоплотности", color_mes.yellow)
 					me_chat(playerid, playername+" помылся(ась)")
 				}
 				else if (enter_job[playerid] == 1)
@@ -6748,7 +6751,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				}
 				else 
 				{
-					sendMessage(playerid, "[ERROR] Вы не в доме и не в отеле", red)
+					sendMessage(playerid, "[ERROR] Вы не в доме и не в отеле", color_mes.red)
 					return
 				}
 			}
@@ -6758,7 +6761,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (sleep[playerid]+sleep_hygiene_plus > max_sleep)
 				{
-					sendMessage(playerid, "[ERROR] Вы бодры", red)
+					sendMessage(playerid, "[ERROR] Вы бодры", color_mes.red)
 					return
 				}
 
@@ -6766,7 +6769,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				{
 					id2 = id2 - 1
 					sleep[playerid] = sleep[playerid]+sleep_hygiene_plus
-					sendMessage(playerid, "+"+sleep_hygiene_plus+" ед. сна", yellow)
+					sendMessage(playerid, "+"+sleep_hygiene_plus+" ед. сна", color_mes.yellow)
 					me_chat(playerid, playername+" вздремнул(а)")
 				}
 				else if (enter_job[playerid] == 1)
@@ -6782,7 +6785,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				}
 				else 
 				{
-					sendMessage(playerid, "[ERROR] Вы не в доме и не в отеле", red)
+					sendMessage(playerid, "[ERROR] Вы не в доме и не в отеле", color_mes.red)
 					return
 				}
 			}
@@ -6795,12 +6798,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (drugs[playerid]-drugs_minys < 0)
 			{
-				sendMessage(playerid, "[ERROR] У вас нет наркозависимости", red)
+				sendMessage(playerid, "[ERROR] У вас нет наркозависимости", color_mes.red)
 				return
 			}
 
 			drugs[playerid] = drugs[playerid]-drugs_minys
-			sendMessage(playerid, "-"+drugs_minys+" ед. наркозависимости", yellow)
+			sendMessage(playerid, "-"+drugs_minys+" ед. наркозависимости", color_mes.yellow)
 			me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
 		}
 		else if (id1 == 64)//--антипохмелин
@@ -6811,12 +6814,12 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (alcohol[playerid]-alcohol_minys < 0)
 			{
-				sendMessage(playerid, "[ERROR] Вы не пьяны", red)
+				sendMessage(playerid, "[ERROR] Вы не пьяны", color_mes.red)
 				return
 			}
 
 			alcohol[playerid] = alcohol[playerid]-alcohol_minys
-			sendMessage(playerid, "-"+(alcohol_minys/100.0)+" промилле", yellow)
+			sendMessage(playerid, "-"+(alcohol_minys/100.0)+" промилле", color_mes.yellow)
 			me_chat(playerid, playername+" выпил(а) "+info_png[id1][0])
 		}
 		//-----------------------------------------------------------------------------------------
@@ -6854,19 +6857,19 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					}
 					else
 					{
-						sendMessage(playerid, "[ERROR] Максимальная вместимость бака "+max_fuel+" литров", red)
+						sendMessage(playerid, "[ERROR] Максимальная вместимость бака "+max_fuel+" литров", color_mes.red)
 						return
 					}
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Остановите т/с", red)
+					sendMessage(playerid, "[ERROR] Остановите т/с", color_mes.red)
 					return
 				}
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Вы не в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы не в т/с", color_mes.red)
 				return
 			}
 		}
@@ -6884,7 +6887,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					if (isPointInCircle3D(x,y,z, pos[0], pos[1], pos[2], 10.0) && getVehicleModel(v) == 27 && getVehiclePlateText(v).tointeger() == id2 )
 					{
 						putPlayerInVehicle( playerid, v, 0 )
-						sendMessage(playerid, "[ERROR] Перезайдите в т/с", red)
+						sendMessage(playerid, "[ERROR] Перезайдите в т/с", color_mes.red)
 						car_27[playerid] = true
 						return
 					}
@@ -6914,26 +6917,26 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (pogoda_string_true[1] == 1)
 				{
-					sendMessage(playerid, "[ПОГОДА] Завтра обещают солнечный день", yellow)
+					sendMessage(playerid, "[ПОГОДА] Завтра обещают солнечный день", color_mes.yellow)
 				}
 				else if (pogoda_string_true[1] == 2) 
 				{
-					sendMessage(playerid, "[ПОГОДА] Завтра обещают дождливый день", yellow)
+					sendMessage(playerid, "[ПОГОДА] Завтра обещают дождливый день", color_mes.yellow)
 				}
 				else if (pogoda_string_true[1] == 3) 
 				{
-					sendMessage(playerid, "[ПОГОДА] Завтра обещают туманный день", yellow)
+					sendMessage(playerid, "[ПОГОДА] Завтра обещают туманный день", color_mes.yellow)
 				}
 			}
 			else 
 			{
 				if (pogoda_string_false[1] == 1)
 				{
-					sendMessage(playerid, "[ПОГОДА] Завтра обещают солнечный день", yellow)
+					sendMessage(playerid, "[ПОГОДА] Завтра обещают солнечный день", color_mes.yellow)
 				}
 				else if (pogoda_string_false[1] == 2) 
 				{
-					sendMessage(playerid, "[ПОГОДА] Завтра обещают туманный день", yellow)
+					sendMessage(playerid, "[ПОГОДА] Завтра обещают туманный день", color_mes.yellow)
 				}
 			}
 
@@ -6946,7 +6949,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (getSpeed(vehicleid) > 5)
 				{
-					sendMessage(playerid, "[ERROR] Остановите т/с", red)
+					sendMessage(playerid, "[ERROR] Остановите т/с", color_mes.red)
 					return
 				}
 
@@ -6958,7 +6961,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Вы не в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы не в т/с", color_mes.red)
 				return
 			}
 		}
@@ -7009,7 +7012,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				sendMessage(playerid, "[ERROR] Вы в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы в т/с", color_mes.red)
 				return
 			}
 		}
@@ -7031,14 +7034,14 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					loto[2] = false
 
 					inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
-					sendMessageAll(playerid, "[НОВОСТИ] Лотерея объявляется закрытой, победителем стал "+playername+", выигрыш составил "+randomize+"$", green)
+					sendMessageAll(playerid, "[НОВОСТИ] Лотерея объявляется закрытой, победителем стал "+playername+", выигрыш составил "+randomize+"$", color_mes.green)
 				}
 
 				id2 = 0
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Лотерея закончилась", red)
+				sendMessage(playerid, "[ERROR] Лотерея закончилась", color_mes.red)
 				return
 			}
 		}
@@ -7105,7 +7108,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (crimes[playerid] != 0)
 				{
-					sendMessage(playerid, "[ERROR] У вас плохая репутация", red)
+					sendMessage(playerid, "[ERROR] У вас плохая репутация", color_mes.red)
 					return
 				}
 
@@ -7141,7 +7144,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (crimes[playerid] < crimes_giuseppe)
 				{
-					sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_giuseppe+" преступлений", red)
+					sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_giuseppe+" преступлений", color_mes.red)
 					return
 				}
 
@@ -7222,7 +7225,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (crimes[playerid] != 0)
 				{
-					sendMessage(playerid, "[ERROR] У вас плохая репутация", red)
+					sendMessage(playerid, "[ERROR] У вас плохая репутация", color_mes.red)
 					return
 				}
 
@@ -7258,7 +7261,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (pogoda)
 				{
-					sendMessage(playerid, "[ERROR] Работа доступна зимой", red)
+					sendMessage(playerid, "[ERROR] Работа доступна зимой", color_mes.red)
 					return
 				}
 
@@ -7279,17 +7282,17 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (crimes[playerid] != 0)
 				{
-					sendMessage(playerid, "[ERROR] У вас плохая репутация", red)
+					sendMessage(playerid, "[ERROR] У вас плохая репутация", color_mes.red)
 					return
 				}
 				else if (getPlayerModel(playerid) != 76)
 				{
-					sendMessage(playerid, "[ERROR] Вы должны быть в одежде 76", red)
+					sendMessage(playerid, "[ERROR] Вы должны быть в одежде 76", color_mes.red)
 					return
 				}
 				else if (search_inv_player_2_parameter(playerid, 10) == 0)
 				{
-					sendMessage(playerid, "[ERROR] Вы не детектив полиции", red)
+					sendMessage(playerid, "[ERROR] Вы не детектив полиции", color_mes.red)
 					return
 				}
 
@@ -7329,7 +7332,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (isPlayerInVehicle(playerid))
 			{
-				sendMessage(playerid, "[ERROR] Вы в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы в т/с", color_mes.red)
 				return
 			}
 
@@ -7349,8 +7352,8 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 						me_chat(playerid, playername+" взломал(а) дверь")
 
-						sendMessage(playerid, "Вы начали взлом", yellow)
-						sendMessage(playerid, "[TIPS] Не покидайте место ограбления "+time_rob+" мин", color_tips)
+						sendMessage(playerid, "Вы начали взлом", color_mes.yellow)
+						sendMessage(playerid, "[TIPS] Не покидайте место ограбления "+time_rob+" мин", color_mes.color_tips)
 
 						police_chat(playerid, "[ДИСПЕТЧЕР] Ограбление "+v["number"]+" дома, координаты [X  "+x1+", Y  "+y1+"], подозреваемый "+playername)
 
@@ -7376,8 +7379,8 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 						me_chat(playerid, playername+" взломал(а) дверь")
 
-						sendMessage(playerid, "Вы начали взлом", yellow)
-						sendMessage(playerid, "[TIPS] Не покидайте место ограбления "+time_rob+" мин", color_tips)
+						sendMessage(playerid, "Вы начали взлом", color_mes.yellow)
+						sendMessage(playerid, "[TIPS] Не покидайте место ограбления "+time_rob+" мин", color_mes.color_tips)
 
 						police_chat(playerid, "[ДИСПЕТЧЕР] Ограбление "+v["number"]+" бизнеса, координаты [X  "+x1+", Y  "+y1+"], подозреваемый "+playername)
 
@@ -7401,8 +7404,8 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 					me_chat(playerid, playername+" взломал(а) дверь")
 
-					sendMessage(playerid, "Вы начали взлом", yellow)
-					sendMessage(playerid, "[TIPS] Не покидайте место ограбления "+time_rob+" мин", color_tips)
+					sendMessage(playerid, "Вы начали взлом", color_mes.yellow)
+					sendMessage(playerid, "[TIPS] Не покидайте место ограбления "+time_rob+" мин", color_mes.color_tips)
 
 					police_chat(playerid, "[ДИСПЕТЧЕР] Ограбление Ювелирки в Аркадии, подозреваемый "+playername)
 
@@ -7413,13 +7416,13 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (count == 0)
 				{
-					sendMessage(playerid, "[ERROR] Нужно быть около дома, бизнеса или ювелирки; Вы уже начали ограбление", red)
+					sendMessage(playerid, "[ERROR] Нужно быть около дома, бизнеса или ювелирки; Вы уже начали ограбление", color_mes.red)
 					return
 				}
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Ограбление доступно с 0 до 6 часов игрового времени", red)
+				sendMessage(playerid, "[ERROR] Ограбление доступно с 0 до 6 часов игрового времени", color_mes.red)
 				return
 			}
 		}
@@ -7468,7 +7471,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (count == 0)
 			{
-				sendMessage(playerid, "[ERROR] Вы должны быть около дома", red)
+				sendMessage(playerid, "[ERROR] Вы должны быть около дома", color_mes.red)
 				return
 			}
 		}
@@ -7491,7 +7494,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (count == 0)
 			{
-				sendMessage(playerid, "[ERROR] Вы должны быть около бизнеса", red)
+				sendMessage(playerid, "[ERROR] Вы должны быть около бизнеса", color_mes.red)
 				return
 			}
 		}
@@ -7511,13 +7514,13 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Т/с не найдено", red)
+					sendMessage(playerid, "[ERROR] Т/с не найдено", color_mes.red)
 					return
 				}
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Вы не в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы не в т/с", color_mes.red)
 				return
 			}
 		}
@@ -7545,7 +7548,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			me_chat(playerid, playername+" открыл(а) "+info_png[id1][0])
 
-			sendMessage(playerid, "Вы получили "+randomize+"$", green)
+			sendMessage(playerid, "Вы получили "+randomize+"$", color_mes.green)
 
 			addcrimes(playerid, zakon_54_crimes)
 
@@ -7557,7 +7560,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (getSpeed(vehicleid) > 5)
 				{
-					sendMessage(playerid, "[ERROR] Остановите т/с", red)
+					sendMessage(playerid, "[ERROR] Остановите т/с", color_mes.red)
 					return
 				}
 
@@ -7582,7 +7585,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (count)
 				{
-					sendMessage(playerid, "[ERROR] На это т/с нельзя установить двигатель", red)
+					sendMessage(playerid, "[ERROR] На это т/с нельзя установить двигатель", color_mes.red)
 					return
 				}
 				
@@ -7598,7 +7601,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				sendMessage(playerid, "[ERROR] Вы не в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы не в т/с", color_mes.red)
 				return
 			}
 		}
@@ -7606,7 +7609,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if (isPlayerInVehicle(playerid))
 			{
-				sendMessage(playerid, "[ERROR] Вы в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы в т/с", color_mes.red)
 				return
 			}
 
@@ -7620,7 +7623,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				sendMessage(playerid, "[ERROR] Вы должны быть около ворот мясокомбината", red)
+				sendMessage(playerid, "[ERROR] Вы должны быть около ворот мясокомбината", color_mes.red)
 			}
 
 			return
@@ -7631,7 +7634,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (getSpeed(vehicleid) > 5)
 				{
-					sendMessage(playerid, "[ERROR] Остановите т/с", red)
+					sendMessage(playerid, "[ERROR] Остановите т/с", color_mes.red)
 					return
 				}
 
@@ -7647,7 +7650,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				if (count)
 				{
-					sendMessage(playerid, "[ERROR] На это т/с нельзя установить колеса", red)
+					sendMessage(playerid, "[ERROR] На это т/с нельзя установить колеса", color_mes.red)
 					return
 				}
 				
@@ -7665,7 +7668,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				sendMessage(playerid, "[ERROR] Вы не в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы не в т/с", color_mes.red)
 				return
 			}
 		}
@@ -7675,7 +7678,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (getSpeed(vehicleid) > 5)
 				{
-					sendMessage(playerid, "[ERROR] Остановите т/с", red)
+					sendMessage(playerid, "[ERROR] Остановите т/с", color_mes.red)
 					return
 				}
 				
@@ -7692,7 +7695,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				sendMessage(playerid, "[ERROR] Вы не в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы не в т/с", color_mes.red)
 				return
 			}
 		}
@@ -7700,19 +7703,19 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if(job[playerid] != 4)
 			{
-				sendMessage(playerid, "[ERROR] Вы не Связист", red)
+				sendMessage(playerid, "[ERROR] Вы не Связист", color_mes.red)
 				return
 			}
 
 			if(job_pos[playerid] == 0 || getPlayerModel(playerid) != 12 || job_call[playerid] != 1)
 			{
-				sendMessage(playerid, "[ERROR] Вы должны быть в одежде 12", red)
+				sendMessage(playerid, "[ERROR] Вы должны быть в одежде 12", color_mes.red)
 				return
 			}
 
 			if(isPlayerInVehicle(playerid))
 			{
-				sendMessage(playerid, "[ERROR] Вы в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы в т/с", color_mes.red)
 				return
 			}
 
@@ -7722,7 +7725,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
 
-				sendMessage(playerid, "Вы получили "+randomize+"$", green)
+				sendMessage(playerid, "Вы получили "+randomize+"$", color_mes.green)
 									
 				job_call[playerid] = 0
 
@@ -7730,7 +7733,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else 
 			{
-				sendMessage(playerid, "[ERROR] Вы должны быть около телефонной будки", red)
+				sendMessage(playerid, "[ERROR] Вы должны быть около телефонной будки", color_mes.red)
 				return
 			}
 		}
@@ -7738,7 +7741,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if (isPlayerInVehicle(playerid))
 			{
-				sendMessage(playerid, "[ERROR] Вы в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы в т/с", color_mes.red)
 				return
 			}
 			
@@ -7753,13 +7756,13 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+					sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 					return
 				}
 			}
 			else 
 			{
-				sendMessage(playerid, "[ERROR] Вы должны быть около места ловли рыбы", red)
+				sendMessage(playerid, "[ERROR] Вы должны быть около места ловли рыбы", color_mes.red)
 				return
 			}
 		}
@@ -7786,7 +7789,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			if (!count)
 			{
-				sendMessage(playerid, "[ERROR] Рядом нет инкассаторской машины", red)
+				sendMessage(playerid, "[ERROR] Рядом нет инкассаторской машины", color_mes.red)
 				return
 			}
 		}
@@ -7806,19 +7809,19 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					}
 					else
 					{
-						sendMessage(playerid, "[ERROR] Это не тот т/с", red)
+						sendMessage(playerid, "[ERROR] Это не тот т/с", color_mes.red)
 						return
 					}
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Вы не Угонщик", red)
+					sendMessage(playerid, "[ERROR] Вы не Угонщик", color_mes.red)
 					return
 				}
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Вы не в т/с", red)
+				sendMessage(playerid, "[ERROR] Вы не в т/с", color_mes.red)
 				return
 			}
 		}
@@ -7852,10 +7855,10 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					[result[1]["number"], "Склад", result[1]["prod"]+" свежей рыбы"],
 				]
 					
-				sendMessage(playerid, "====[ ИНФО "+id2+" РЫБЗАВОДА ]====", yellow)
+				sendMessage(playerid, "====[ ИНФО "+id2+" РЫБЗАВОДА ]====", color_mes.yellow)
 
 				foreach (k, v in farms) {
-					sendMessage(playerid, v[1]+" "+v[2], yellow)
+					sendMessage(playerid, v[1]+" "+v[2], color_mes.yellow)
 				}
 			}
 			return
@@ -7864,7 +7867,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if(getPlayerModel(playerid) != 133)
 			{
-				sendMessage(playerid, "[ERROR] Вы должны быть в одежде 133", red)
+				sendMessage(playerid, "[ERROR] Вы должны быть в одежде 133", color_mes.red)
 				return
 			}
 
@@ -7877,10 +7880,10 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					[result[1]["number"], "Доход от продаж", result[1]["coef"]+" процентов"],
 				]
 					
-				sendMessage(playerid, "====[ ИНФО "+id2+" РЫБЗАВОДА ]====", yellow)
+				sendMessage(playerid, "====[ ИНФО "+id2+" РЫБЗАВОДА ]====", color_mes.yellow)
 
 				foreach (k, v in farms) {
-					sendMessage(playerid, v[1]+" "+v[2], yellow)
+					sendMessage(playerid, v[1]+" "+v[2], color_mes.yellow)
 				}
 			}
 
@@ -7909,7 +7912,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		{
 			if (!isPointInCircle3D(myPos[0],myPos[1],myPos[2], interior_job[9][2],interior_job[9][3],interior_job[9][4], interior_job[9][7]))
 			{
-				sendMessage(playerid, "[ERROR] Вы не около банка", red)
+				sendMessage(playerid, "[ERROR] Вы не около банка", color_mes.red)
 				return
 			}
 
@@ -7927,7 +7930,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			local count2 = 0
 			do_chat(playerid, "на голове "+info_png[id1][0]+" "+name_mafia[id2][0]+" - "+playername)
 
-			sendMessage(playerid, "====[ ПОД КОНТРОЛЕМ "+name_mafia[id2][0]+" ]====", yellow)
+			sendMessage(playerid, "====[ ПОД КОНТРОЛЕМ "+name_mafia[id2][0]+" ]====", color_mes.yellow)
 
 			foreach(k,v in guns_zone)
 			{
@@ -7945,8 +7948,8 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				}
 			}
 
-			sendMessage(playerid, "Территорий: "+count+", Доход: "+(count*money_guns_zone)+"$", yellow)
-			sendMessage(playerid, "Бизнесов: "+count2+", Доход: "+(count2*money_guns_zone_business)+"$", yellow)
+			sendMessage(playerid, "Территорий: "+count+", Доход: "+(count*money_guns_zone)+"$", color_mes.yellow)
+			sendMessage(playerid, "Бизнесов: "+count2+", Доход: "+(count2*money_guns_zone_business)+"$", color_mes.yellow)
 			return
 		}
 		else if (id1 == 92) //--адм
@@ -7955,13 +7958,13 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				admin_tp[playerid][0] = 1
 
-				sendMessage(playerid, "перемещение ON", lyme)
+				sendMessage(playerid, "перемещение ON", color_mes.lyme)
 			}
 			else
 			{
 				admin_tp[playerid][0] = 0
 
-				sendMessage(playerid, "перемещение OFF", lyme)
+				sendMessage(playerid, "перемещение OFF", color_mes.lyme)
 			}
 			return
 		}
@@ -8002,13 +8005,13 @@ function (playerid)
 
 	if (search_inv_player(playerid, 38, 1) == 0)
 	{
-		sendMessage(playerid, "[ERROR] Вы не риэлтор", red)
+		sendMessage(playerid, "[ERROR] Вы не риэлтор", color_mes.red)
 		return
 	}
 
 	if(search_inv_player_2_parameter(playerid, 1) < zakon_price_house)
 	{
-		sendMessage(playerid, "[ERROR] Стоимость домов составляет "+zakon_price_house+"$", red)
+		sendMessage(playerid, "[ERROR] Стоимость домов составляет "+zakon_price_house+"$", color_mes.red)
 		return
 	}
 
@@ -8063,18 +8066,18 @@ function (playerid)
 
 			sqlite3( "INSERT INTO house_db (number, door, nalog, x, y, z, inventory) VALUES ('"+dim+"', '0', '5', '"+x+"', '"+y+"', '"+z+"', '32:"+dim+",0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
-			sendMessage(playerid, "Вы получили "+info_png[25][0]+" "+dim+" "+info_png[25][1], orange)
+			sendMessage(playerid, "Вы получили "+info_png[25][0]+" "+dim+" "+info_png[25][1], color_mes.orange)
 
 			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-zakon_price_house, playername )
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+			sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 		}
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Рядом есть бизнес, дом или гос. здание", red)
+		sendMessage(playerid, "[ERROR] Рядом есть бизнес, дом или гос. здание", color_mes.red)
 	}
 })
 
@@ -8098,7 +8101,7 @@ function (playerid, id)
 
 	if(search_inv_player_2_parameter(playerid, 1) < zakon_price_business)
 	{
-		sendMessage(playerid, "[ERROR] Стоимость бизнеса составляет "+zakon_price_house+"$", red)
+		sendMessage(playerid, "[ERROR] Стоимость бизнеса составляет "+zakon_price_house+"$", color_mes.red)
 		return
 	}
 
@@ -8106,7 +8109,7 @@ function (playerid, id)
 	{
 		if (search_inv_player(playerid, 38, 1) == 0)
 		{
-			sendMessage(playerid, "[ERROR] Вы не риэлтор", red)
+			sendMessage(playerid, "[ERROR] Вы не риэлтор", color_mes.red)
 			return
 		}
 
@@ -8156,23 +8159,23 @@ function (playerid, id)
 
 				sqlite3( "INSERT INTO business_db (number, type, price, money, nalog, warehouse, x, y, z, interior) VALUES ('"+dim+"', '"+interior_business[id][1]+"', '0', '0', '5', '0', '"+x+"', '"+y+"', '"+z+"', '"+id+"')" )
 
-				sendMessage(playerid, "Вы получили "+info_png[36][0]+" "+dim+" "+info_png[36][1], orange)
+				sendMessage(playerid, "Вы получили "+info_png[36][0]+" "+dim+" "+info_png[36][1], color_mes.orange)
 
 				inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-zakon_price_business, playername )
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+				sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 			}
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Рядом есть бизнес, дом или гос. здание", red)
+			sendMessage(playerid, "[ERROR] Рядом есть бизнес, дом или гос. здание", color_mes.red)
 		}
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] от 0 до "+(interior_business.len()-1), red)
+		sendMessage(playerid, "[ERROR] от 0 до "+(interior_business.len()-1), color_mes.red)
 	}
 })
 
@@ -8184,12 +8187,12 @@ local to3 = [3,6,9,12,15,18,21,24,27,30,33,36]
 
 function roulette(playerid, randomize)
 {
-	foreach (k, v in Red) 
+	foreach (k, v in color_mes.red) 
 	{
 		if (randomize == v)
 		{
-			sendMessage(playerid, "====[ РУЛЕТКА ]====", yellow)
-			sendMessage(playerid, "Выпало "+randomize+" красное", yellow)
+			sendMessage(playerid, "====[ РУЛЕТКА ]====", color_mes.yellow)
+			sendMessage(playerid, "Выпало "+randomize+" красное", color_mes.yellow)
 			return
 		}
 	}
@@ -8198,16 +8201,16 @@ function roulette(playerid, randomize)
 	{
 		if (randomize == v)
 		{
-			sendMessage(playerid, "====[ РУЛЕТКА ]====", yellow)
-			sendMessage(playerid, "Выпало "+randomize+" черное", yellow)
+			sendMessage(playerid, "====[ РУЛЕТКА ]====", color_mes.yellow)
+			sendMessage(playerid, "Выпало "+randomize+" черное", color_mes.yellow)
 			return
 		}
 	}
 
 	if (randomize == 0)
 	{
-		sendMessage(playerid, "====[ РУЛЕТКА ]====", yellow)
-		sendMessage(playerid, "Выпало ZERO", yellow)
+		sendMessage(playerid, "====[ РУЛЕТКА ]====", color_mes.yellow)
+		sendMessage(playerid, "Выпало ZERO", color_mes.yellow)
 		return
 	}
 }
@@ -8217,7 +8220,7 @@ function win_roulette( playerid, cash, ratio )
 	local playername = getPlayerName ( playerid )
 	local money = cash*ratio
 
-	sendMessage(playerid, "Вы заработали "+money+"$ X"+ratio, green)
+	sendMessage(playerid, "Вы заработали "+money+"$ X"+ratio, color_mes.green)
 
 	inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+money, playername )
 }
@@ -8252,7 +8255,7 @@ function (playerid, id, cash)
 
 	if (cash > search_inv_player_2_parameter(playerid, 1))
 	{
-		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+		sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 		return
 	}
 
@@ -8268,7 +8271,7 @@ function (playerid, id, cash)
 
 				if (id == "красное")
 				{
-					foreach (k, v in Red) 
+					foreach (k, v in color_mes.red) 
 					{
 						if (randomize == v)
 						{
@@ -8376,7 +8379,7 @@ function (playerid, id, cash)
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Вы не в казино(кубок на карте)", red)
+		sendMessage(playerid, "[ERROR] Вы не в казино(кубок на карте)", color_mes.red)
 	}
 })
 
@@ -8400,7 +8403,7 @@ function (playerid, value, cash)
 
 	if (!isPointInCircle3D( x, y, z, interior_job[3][2],interior_job[3][3],interior_job[3][4], interior_job[3][7] ))
 	{
-		sendMessage(playerid, "[ERROR] Вы не в казино(кубок на карте)", red)
+		sendMessage(playerid, "[ERROR] Вы не в казино(кубок на карте)", color_mes.red)
 		return
 	}
 
@@ -8411,14 +8414,14 @@ function (playerid, value, cash)
 
 	if (cash > search_inv_player_2_parameter(playerid, 1))
 	{
-		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+		sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 		return
 	}
 
 	if(value == 1 || value == 2 || value == 5 || value == 10 || value == 20 || value == 40)
 	{
-		sendMessage(playerid, "====[ КОЛЕСО УДАЧИ ]====", yellow)
-		sendMessage(playerid, "Выпало "+wheel_fortune[randomize], yellow)
+		sendMessage(playerid, "====[ КОЛЕСО УДАЧИ ]====", color_mes.yellow)
+		sendMessage(playerid, "Выпало "+wheel_fortune[randomize], color_mes.yellow)
 
 		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-cash, playername )
 
@@ -8429,7 +8432,7 @@ function (playerid, value, cash)
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Выберите число из предложенных 1,2,5,10,20,40", red)
+		sendMessage(playerid, "[ERROR] Выберите число из предложенных 1,2,5,10,20,40", color_mes.red)
 	}
 })
 
@@ -8448,7 +8451,7 @@ function blackjack (playerid, value, ...)
 	}
 	else if (search_inv_player(playerid, 97, 1) == 0)
 	{
-		sendMessage(playerid, "[ERROR] У вас нет "+info_png[97][0], red)
+		sendMessage(playerid, "[ERROR] У вас нет "+info_png[97][0], color_mes.red)
 		return
 	}
 
@@ -8464,7 +8467,7 @@ function blackjack (playerid, value, ...)
 
 		if (cash > search_inv_player_2_parameter(playerid, 1))
 		{
-			sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+			sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 			return
 		}
 			
@@ -8478,27 +8481,27 @@ function blackjack (playerid, value, ...)
 			{
 				if (arrest[id] != 0)
 				{
-					sendMessage(playerid, "[ERROR] Игрок в тюрьме", red)
+					sendMessage(playerid, "[ERROR] Игрок в тюрьме", color_mes.red)
 					return
 				}
 				else if (accept_player[id][0] == true)
 				{
-					sendMessage(playerid, "[ERROR] Игрок играет", red)
+					sendMessage(playerid, "[ERROR] Игрок играет", color_mes.red)
 					return
 				}
 				else if (accept_player[playerid][0] == true)
 				{
-					sendMessage(playerid, "[ERROR] Вы играете", red)
+					sendMessage(playerid, "[ERROR] Вы играете", color_mes.red)
 					return
 				}
 				else if (cash > array_player_2[id][0])
 				{
-					sendMessage(playerid, "[ERROR] У игрока недостаточно средств", red)
+					sendMessage(playerid, "[ERROR] У игрока недостаточно средств", color_mes.red)
 					return
 				}
 				else if (playerid == id)
 				{
-					sendMessage(playerid, "[ERROR] На столько всё плохо?", red)
+					sendMessage(playerid, "[ERROR] На столько всё плохо?", color_mes.red)
 					return
 				}
 
@@ -8506,34 +8509,34 @@ function blackjack (playerid, value, ...)
 				accept_player[playerid] = [false, id, cash, false]
 
 				me_chat(playerid, playername+" предложил(а) "+getPlayerName(id)+" сыграть в блэкджек на сумму "+cash+"$")
-				sendMessage(id, "/accept yes - согласиться", yellow)
-				sendMessage(id, "/accept no - отказаться", yellow)
+				sendMessage(id, "/accept yes - согласиться", color_mes.yellow)
+				sendMessage(id, "/accept no - отказаться", color_mes.yellow)
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] Игрок далеко", red)
+				sendMessage(playerid, "[ERROR] Игрок далеко", color_mes.red)
 			}
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+			sendMessage(playerid, "[ERROR] Такого игрока нет", color_mes.red)
 		}
 	}
 	else if (value == "take")
 	{
 		if (accept_player[playerid][0] == false)
 		{
-			sendMessage(playerid, "[ERROR] Вы не играете", red)
+			sendMessage(playerid, "[ERROR] Вы не играете", color_mes.red)
 			return
 		}
 		else if (accept_player[playerid][3] == true)
 		{
-			sendMessage(playerid, "[ERROR] Вы готовы вскрыть карты", red)
+			sendMessage(playerid, "[ERROR] Вы готовы вскрыть карты", color_mes.red)
 			return
 		}
 		else if (game[playerid].len() == 5)
 		{
-			sendMessage(playerid, "[ERROR] У вас 5 карт", red)
+			sendMessage(playerid, "[ERROR] У вас 5 карт", color_mes.red)
 			return
 		}
 
@@ -8545,13 +8548,13 @@ function blackjack (playerid, value, ...)
 			local z1 = myPos1[2]
 			if (!isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
 			{
-				sendMessage(playerid, "[ERROR] Игрок далеко", red)
+				sendMessage(playerid, "[ERROR] Игрок далеко", color_mes.red)
 				return
 			}
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Игрок далеко", red)
+			sendMessage(playerid, "[ERROR] Игрок далеко", color_mes.red)
 			return
 		}
 
@@ -8590,7 +8593,7 @@ function blackjack (playerid, value, ...)
 			point = point+split(v, ":")[1].tointeger()
 		}
 
-		sendMessage(playerid, "Вы взяли "+split(spl, ":")[0]+", у вас "+point+" очков", yellow)
+		sendMessage(playerid, "Вы взяли "+split(spl, ":")[0]+", у вас "+point+" очков", color_mes.yellow)
 
 		if (point >= 21)
 		{
@@ -8601,7 +8604,7 @@ function blackjack (playerid, value, ...)
 	{
 		if (accept_player[playerid][0] == false)
 		{
-			sendMessage(playerid, "[ERROR] Вы не играете", red)
+			sendMessage(playerid, "[ERROR] Вы не играете", color_mes.red)
 			return
 		}
 
@@ -8613,13 +8616,13 @@ function blackjack (playerid, value, ...)
 			local z1 = myPos1[2]
 			if (!isPointInCircle3D(x,y,z, x1,y1,z1, 10.0))
 			{
-				sendMessage(playerid, "[ERROR] Игрок далеко", red)
+				sendMessage(playerid, "[ERROR] Игрок далеко", color_mes.red)
 				return
 			}
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Игрок далеко", red)
+			sendMessage(playerid, "[ERROR] Игрок далеко", color_mes.red)
 			return
 		}
 
@@ -8692,7 +8695,7 @@ function accept (playerid, value)
 	}
 	else if (accept_player[playerid][1] == false)
 	{
-		sendMessage(playerid, "[ERROR] У вас нет предложений", red)
+		sendMessage(playerid, "[ERROR] У вас нет предложений", color_mes.red)
 		return
 	}
 
@@ -8700,7 +8703,7 @@ function accept (playerid, value)
 	{
 		if (accept_player[playerid][0] == true)
 		{
-			sendMessage(playerid, "[ERROR] Вы играете", red)
+			sendMessage(playerid, "[ERROR] Вы играете", color_mes.red)
 			return
 		}
 
@@ -8709,8 +8712,8 @@ function accept (playerid, value)
 
 		me_chat(playerid, playername+" согласился(ась) с "+getPlayerName(accept_player[playerid][1])+" сыграть в блэкджек на сумму "+accept_player[playerid][2]+"$")
 
-		sendMessage(playerid, "/blackjack take - взять карту", yellow)
-		sendMessage(playerid, "/blackjack open - вскрыть карты", yellow)
+		sendMessage(playerid, "/blackjack take - взять карту", color_mes.yellow)
+		sendMessage(playerid, "/blackjack open - вскрыть карты", color_mes.yellow)
 	}
 	else if (value == "no")
 	{
@@ -8747,14 +8750,14 @@ function (playerid, cash)
 
 	if (cash > search_inv_player_2_parameter(playerid, 1))
 	{
-		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+		sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 		return
 	}
 
 	if (isPointInCircle3D( x, y, z, interior_job[3][2],interior_job[3][3],interior_job[3][4], interior_job[3][7] ))
 	{
-		sendMessage(playerid, "====[ ОДНОРУКИЙ БАНДИТ ]====", yellow)
-		sendMessage(playerid, "Выпало "+randomize1+" - "+randomize2+" - "+randomize3, yellow)
+		sendMessage(playerid, "====[ ОДНОРУКИЙ БАНДИТ ]====", color_mes.yellow)
+		sendMessage(playerid, "Выпало "+randomize1+" - "+randomize2+" - "+randomize3, color_mes.yellow)
 
 		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-cash, playername )
 
@@ -8765,7 +8768,7 @@ function (playerid, cash)
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Вы не в казино(кубок на карте)", red)
+		sendMessage(playerid, "[ERROR] Вы не в казино(кубок на карте)", color_mes.red)
 	}
 })
 
@@ -8790,13 +8793,13 @@ function (playerid, id)
 	}
 	else if(logged[id] == 0)
 	{
-		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+		sendMessage(playerid, "[ERROR] Такого игрока нет", color_mes.red)
 		return
 	}
 
 	if (search_inv_player_2_parameter(playerid, 10) == 0)
 	{
-		sendMessage(playerid, "[ERROR] Вы не полицейский", red)
+		sendMessage(playerid, "[ERROR] Вы не полицейский", color_mes.red)
 		return
 	}
 
@@ -8809,13 +8812,13 @@ function (playerid, id)
 	{
 		if (crimes[id] == 0)
 		{
-			sendMessage(playerid, "[ERROR] Гражданин чист перед законом", red)
+			sendMessage(playerid, "[ERROR] Гражданин чист перед законом", color_mes.red)
 			return
 		}
 
 		if (arrest[id] != 0)
 		{
-			sendMessage(playerid, "[ERROR] Игрок в тюрьме", red)
+			sendMessage(playerid, "[ERROR] Игрок в тюрьме", color_mes.red)
 			return
 		}
 
@@ -8823,13 +8826,13 @@ function (playerid, id)
 
 		arrest[id] = 1
 
-		sendMessage(playerid, "Вы получили премию "+(cash*(crimes[id]))+"$", green)
+		sendMessage(playerid, "Вы получили премию "+(cash*(crimes[id]))+"$", color_mes.green)
 
 		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+(cash*(crimes[id])), playername )
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Игрок далеко", red)
+		sendMessage(playerid, "[ERROR] Игрок далеко", color_mes.red)
 	}
 })
 
@@ -8854,7 +8857,7 @@ function (playerid, id)
 	}
 	else if(logged[id] == 0)
 	{
-		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+		sendMessage(playerid, "[ERROR] Такого игрока нет", color_mes.red)
 		return
 	}
 
@@ -8867,24 +8870,24 @@ function (playerid, id)
 	{
 		if (cash*crimes[id] > search_inv_player_2_parameter(playerid, 1))
 		{
-			sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+			sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 			return
 		}
 
 		if (arrest[id] == 0 || arrest[id] == 2)
 		{
-			sendMessage(playerid, "[ERROR] Игрок не в тюрьме", red)
+			sendMessage(playerid, "[ERROR] Игрок не в тюрьме", color_mes.red)
 			return
 		}
 		else if (crimes[id] == 1)
 		{
-			sendMessage(playerid, "[ERROR] Маленький срок заключения", red)
+			sendMessage(playerid, "[ERROR] Маленький срок заключения", color_mes.red)
 			return
 		}
 
 		me_chat(playerid, playername+" заплатил(а) залог за "+getPlayerName(id)+" в размере "+(cash*(crimes[id]))+"$")
 
-		sendMessage(id, "Ждите освобождения", yellow)
+		sendMessage(id, "Ждите освобождения", color_mes.yellow)
 
 		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(cash*(crimes[id])), playername )
 	
@@ -8892,7 +8895,7 @@ function (playerid, id)
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Игрок далеко", red)
+		sendMessage(playerid, "[ERROR] Игрок далеко", color_mes.red)
 	}
 })
 
@@ -8914,7 +8917,7 @@ function (playerid, value, id)
 
 	if (search_inv_player_2_parameter(playerid, 10) == 0)
 	{
-		sendMessage(playerid, "[ERROR] Вы не полицейский", red)
+		sendMessage(playerid, "[ERROR] Вы не полицейский", color_mes.red)
 		return
 	}
 
@@ -8926,7 +8929,7 @@ function (playerid, value, id)
 		}
 		else if(logged[id] == 0)
 		{
-			sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+			sendMessage(playerid, "[ERROR] Такого игрока нет", color_mes.red)
 			return
 		}
 
@@ -8943,7 +8946,7 @@ function (playerid, value, id)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Игрок далеко", red)
+			sendMessage(playerid, "[ERROR] Игрок далеко", color_mes.red)
 		}
 	}
 	else if (value == "car")
@@ -8966,14 +8969,14 @@ function (playerid, value, id)
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Т/с далеко", red)
+					sendMessage(playerid, "[ERROR] Т/с далеко", color_mes.red)
 				}
 
 				return
 			}
 		}
 
-		sendMessage(playerid, "[ERROR] Т/с не найдено", red)
+		sendMessage(playerid, "[ERROR] Т/с не найдено", color_mes.red)
 	}
 	else if (value == "house")
 	{
@@ -8989,14 +8992,14 @@ function (playerid, value, id)
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Дом далеко", red)
+					sendMessage(playerid, "[ERROR] Дом далеко", color_mes.red)
 				}
 
 				return
 			}
 		}
 
-		sendMessage(playerid, "[ERROR] Дом не найден", red)
+		sendMessage(playerid, "[ERROR] Дом не найден", color_mes.red)
 	}
 })
 
@@ -9020,7 +9023,7 @@ function (playerid, id)
 	{
 		if (logged[id] == 0 || !isPlayerInVehicle(id))
 		{
-			sendMessage(playerid, "[ERROR] Игрок не в т/с", red)
+			sendMessage(playerid, "[ERROR] Игрок не в т/с", color_mes.red)
 			return
 		}
 
@@ -9034,12 +9037,12 @@ function (playerid, id)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Игрок далеко", red)
+			sendMessage(playerid, "[ERROR] Игрок далеко", color_mes.red)
 		}
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Вы не полицейский", red)
+		sendMessage(playerid, "[ERROR] Вы не полицейский", color_mes.red)
 	}
 })
 
@@ -9059,7 +9062,7 @@ function( playerid, id )
 	}
 	else if (amount_inv_player_1_parameter(playerid, 89) == 0)
 	{
-		sendMessage(playerid, "[ERROR] У вас нет рации", red)
+		sendMessage(playerid, "[ERROR] У вас нет рации", color_mes.red)
 		return
 	}
 
@@ -9082,7 +9085,7 @@ function (playerid, ...)
 	}
 	else if (amount_inv_player_1_parameter(playerid, 89) == 0)
 	{
-		sendMessage(playerid, "[ERROR] У вас нет рации", red)
+		sendMessage(playerid, "[ERROR] У вас нет рации", color_mes.red)
 		return
 	}
 
@@ -9093,7 +9096,7 @@ function (playerid, ...)
 
 	if (text.len() > max_text_len)
 	{
-		sendMessage(playerid, "[ERROR] Максимальная длина сообщения "+max_text_len+" символов", red)
+		sendMessage(playerid, "[ERROR] Максимальная длина сообщения "+max_text_len+" символов", color_mes.red)
 		return
 	}
 
@@ -9115,7 +9118,7 @@ function (playerid, ...)
 	}
 	else
 	{
-		radio_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] "+playername+" ["+playerid+"]: "+text, green_rc)	
+		radio_chat(playerid, "[РАЦИЯ "+radio_chanel+" K] "+playername+" ["+playerid+"]: "+text, color_mes.green_rc)	
 	}
 })
 
@@ -9135,7 +9138,7 @@ function message_player( playerid, id, ...)
 
 	if(logged[id] == 0)
 	{
-		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+		sendMessage(playerid, "[ERROR] Такого игрока нет", color_mes.red)
 		return
 	}
 	
@@ -9147,14 +9150,14 @@ function message_player( playerid, id, ...)
 
 	if (text.len() > max_text_len)
 	{
-		sendMessage(playerid, "[ERROR] Максимальная длина сообщения "+max_text_len+" символов", red)
+		sendMessage(playerid, "[ERROR] Максимальная длина сообщения "+max_text_len+" символов", color_mes.red)
 		return
 	}
 
 	local player_name = getPlayerName ( id )
 
-	sendMessage(playerid, "[LETTER TO] "+player_name+" ["+id+"]: "+text, yellow)
-	sendMessage(id, "[LETTER FROM] "+playername+" ["+playerid+"]: "+text, yellow)
+	sendMessage(playerid, "[LETTER TO] "+player_name+" ["+id+"]: "+text, color_mes.yellow)
+	sendMessage(id, "[LETTER FROM] "+playername+" ["+playerid+"]: "+text, color_mes.yellow)
 }
 addCommandHandler( "msg", message_player)//смс
 
@@ -9172,7 +9175,7 @@ function(playerid, id)
 
 	if (id > search_inv_player_2_parameter(playerid, 1))
 	{
-		sendMessage(playerid, "[ERROR] У вас недостаточно средств", red)
+		sendMessage(playerid, "[ERROR] У вас недостаточно средств", color_mes.red)
 		return
 	}
 
@@ -9184,7 +9187,7 @@ function(playerid, id)
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+		sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 	}
 })
 
@@ -9203,12 +9206,12 @@ function (playerid, plate)
 	}
 	else if (result_count[1]["COUNT()"] == 0)
 	{
-		sendMessage(playerid, "[ERROR] Т/с не найдено", red)
+		sendMessage(playerid, "[ERROR] Т/с не найдено", color_mes.red)
 		return
 	}
 	else if (result[1]["theft"] == 0)
 	{
-		sendMessage(playerid, "[ERROR] Т/с не в угоне", red)
+		sendMessage(playerid, "[ERROR] Т/с не в угоне", color_mes.red)
 		return
 	}
 
@@ -9220,7 +9223,7 @@ function (playerid, plate)
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] У вас нет "+info_png[95][0], red)
+		sendMessage(playerid, "[ERROR] У вас нет "+info_png[95][0], color_mes.red)
 	}
 })
 
@@ -9259,7 +9262,7 @@ function (playerid, id)
 						{
 							if (player_in_car_theft(id.tostring()) != 0)
 							{
-								sendMessage(playerid, "[ERROR] Т/с угнали", red)
+								sendMessage(playerid, "[ERROR] Т/с угнали", color_mes.red)
 								return
 							}
 
@@ -9284,21 +9287,21 @@ function (playerid, id)
 
 							inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-cash, playerid )
 
-							sendMessage(playerid, "Вы эвакуировали т/с за "+cash+"$", orange)
+							sendMessage(playerid, "Вы эвакуировали т/с за "+cash+"$", color_mes.orange)
 						}
 						else
 						{
-							sendMessage(playerid, "[ERROR] У вас нет ключа от этого т/с", red)
+							sendMessage(playerid, "[ERROR] У вас нет ключа от этого т/с", color_mes.red)
 						}
 					}
 					else 
 					{
-						sendMessage(playerid, "[ERROR] Т/с оштрафовали", red)
+						sendMessage(playerid, "[ERROR] Т/с оштрафовали", color_mes.red)
 					}
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] Т/с не найдено", red)
+					sendMessage(playerid, "[ERROR] Т/с не найдено", color_mes.red)
 				}
 
 				return
@@ -9311,16 +9314,16 @@ function (playerid, id)
 			result = sqlite3( "SELECT * FROM car_db WHERE number = '"+id+"'" )
 			if (result[1]["theft"] == 1)
 			{
-				sendMessage(playerid, "[ERROR] Т/с в угоне", red)
+				sendMessage(playerid, "[ERROR] Т/с в угоне", color_mes.red)
 				return
 			}
 		}
 
-		sendMessage(playerid, "[ERROR] Т/с не найдено", red)
+		sendMessage(playerid, "[ERROR] Т/с не найдено", color_mes.red)
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Нужно иметь "+cash+"$", red)
+		sendMessage(playerid, "[ERROR] Нужно иметь "+cash+"$", color_mes.red)
 	}
 })
 
@@ -9354,7 +9357,7 @@ function( playerid, plate, seat)
 	}
 	else if (seat <= 0 || seat >= 21)
 	{
-		sendMessage(playerid, "[ERROR] От 1 до 20", red)
+		sendMessage(playerid, "[ERROR] От 1 до 20", color_mes.red)
 		return
 	}
 
@@ -9363,7 +9366,7 @@ function( playerid, plate, seat)
 		local model = getVehicleModel(vehicleid)
 		if(motor_show[model][4] < seat || motor_show[model][4] == 0)
 		{
-			sendMessage(playerid, "[ERROR] Неверное место", red)
+			sendMessage(playerid, "[ERROR] Неверное место", color_mes.red)
 			return
 		}
 
@@ -9377,12 +9380,12 @@ function( playerid, plate, seat)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Т/с далеко", red)
+			sendMessage(playerid, "[ERROR] Т/с далеко", color_mes.red)
 		}		
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Т/с не найдено", red)
+		sendMessage(playerid, "[ERROR] Т/с не найдено", color_mes.red)
 	}
 })
 
@@ -9409,7 +9412,7 @@ function( playerid )
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Вы не в т/с", red)
+		sendMessage(playerid, "[ERROR] Вы не в т/с", color_mes.red)
 	}
 })
 
@@ -9495,7 +9498,7 @@ function (playerid, value, ...)
 					{
 						if (v == spl[0].tointeger())
 						{
-							sendMessage(playerid, "[ERROR] Этот предмет не продается", red)
+							sendMessage(playerid, "[ERROR] Этот предмет не продается", color_mes.red)
 							return
 						}
 					}
@@ -9504,14 +9507,14 @@ function (playerid, value, ...)
 				}
 				else
 				{
-					sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red)
+					sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), color_mes.red)
 				}
 			}
 			return
 		}
 	}
 
-	sendMessage(playerid, "[ERROR] Вы должны быть около телефонной будки", red)
+	sendMessage(playerid, "[ERROR] Вы должны быть около телефонной будки", color_mes.red)
 })
 
 addCommandHandler("takecar",//забрать тачку со штрафстоянки
@@ -9546,7 +9549,7 @@ function (playerid, plate)
 
 			if (count == 1 || result[1]["COUNT()"] == 0)
 			{
-				sendMessage(playerid, "[ERROR] Т/с в городе", red)
+				sendMessage(playerid, "[ERROR] Т/с в городе", color_mes.red)
 				return
 			}
 
@@ -9557,18 +9560,18 @@ function (playerid, plate)
 					sqlite3( "UPDATE car_db SET nalog = '7' WHERE number = '"+plate+"'")
 					car_spawn(plate)
 
-					sendMessage(playerid, "Вы забрали т/с под номером "+plate, yellow)
+					sendMessage(playerid, "Вы забрали т/с под номером "+plate, color_mes.yellow)
 				}
 			}
 			else
 			{
-				sendMessage(playerid, "[ERROR] У вас нет "+info_png[50][0]+" 7 "+info_png[50][1], red)
+				sendMessage(playerid, "[ERROR] У вас нет "+info_png[50][0]+" 7 "+info_png[50][1], color_mes.red)
 			}
 			return
 		}
 	}
 
-	sendMessage(playerid, "[ERROR] Вы должны быть около телефонной будки", red)
+	sendMessage(playerid, "[ERROR] Вы должны быть около телефонной будки", color_mes.red)
 })
 
 addCommandHandler("sg",//меню рыбзавода
@@ -9630,17 +9633,17 @@ function (playerid)
 	}
 	else if(mafia == 0)
 	{
-		sendMessage(playerid, "[ERROR] Вы не состоите в мафии", red)
+		sendMessage(playerid, "[ERROR] Вы не состоите в мафии", color_mes.red)
 		return
 	}
 	else if(point_guns_zone[0] == 1)
 	{
-		sendMessage(playerid, "[ERROR] Идет захват территории", red)
+		sendMessage(playerid, "[ERROR] Идет захват территории", color_mes.red)
 		return
 	}
 	else if(crimes[playerid] < crimes_capture)
 	{
-		sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_capture+" преступлений", red)
+		sendMessage(playerid, "[ERROR] Нужно иметь "+crimes_capture+" преступлений", color_mes.red)
 		return
 	}
 	
@@ -9656,7 +9659,7 @@ function (playerid)
 
 	if (!skin)
 	{
-		sendMessage(playerid, "[ERROR] Вы должны быть в одежде своей банды", red)
+		sendMessage(playerid, "[ERROR] Вы должны быть в одежде своей банды", color_mes.red)
 		return
 	}
 
@@ -9673,7 +9676,7 @@ function (playerid)
 			point_guns_zone[4] = v[4]
 			point_guns_zone[5] = 0
 
-			sendMessageAll(playerid, "[НОВОСТИ] "+playername+" из "+name_mafia[search_inv_player_2_parameter(playerid, 91)][0]+" захватывает Guns Zone #"+k+" - "+name_mafia[v[4]][0], green)
+			sendMessageAll(playerid, "[НОВОСТИ] "+playername+" из "+name_mafia[search_inv_player_2_parameter(playerid, 91)][0]+" захватывает Guns Zone #"+k+" - "+name_mafia[v[4]][0], color_mes.green)
 			return
 		}
 	}
@@ -9687,11 +9690,11 @@ function (playerid)
 		return
 	}
 
-	sendMessage(playerid, "====[ ПРЕДМЕТЫ ]====", white)
+	sendMessage(playerid, "====[ ПРЕДМЕТЫ ]====", color_mes.white)
 
 	for (local i = 1; i < info_png.len(); i++) 
 	{
-		sendMessage(playerid, "["+i+"] "+info_png[i][0]+" 0 "+info_png[i][1], white)
+		sendMessage(playerid, "["+i+"] "+info_png[i][0]+" 0 "+info_png[i][1], color_mes.white)
 	}
 })
 
@@ -9813,19 +9816,19 @@ function (playerid, ...)
 			{
 				if (v == getPlayerName(playerid))
 				{
-					sendMessage(playerid, "[ERROR] Вы выполнили этот квест", red)
+					sendMessage(playerid, "[ERROR] Вы выполнили этот квест", color_mes.red)
 					return
 				}
 			}
 
-			sendMessage(playerid, "Вы взяли квест "+quest_table[id][0], yellow)
+			sendMessage(playerid, "Вы взяли квест "+quest_table[id][0], color_mes.yellow)
 
 			setElementData(playerid, "quest_select", id+":0")
 		}
 	}
 	else
 	{
-		sendMessage(playerid, "====[ КВЕСТЫ ]====", yellow)
+		sendMessage(playerid, "====[ КВЕСТЫ ]====", color_mes.yellow)
 
 		foreach (k, v in quest_table) 
 		{
@@ -9842,11 +9845,11 @@ function (playerid, ...)
 			{
 				if (split(getElementData(playerid, "quest_select"), ":")[0].tointeger() == k)
 				{
-					sendMessage(playerid, "[ "+k+" - "+v[0]+" - "+v[1]+v[2]+v[3]+" - "+split(getElementData(playerid, "quest_select"), ":")[1]+"/"+v[2]+" - "+v[5]+"$ - "+info_png[ v[6][0] ][0]+" "+v[6][1]+" "+info_png[ v[6][0] ][1]+" ]", green)
+					sendMessage(playerid, "[ "+k+" - "+v[0]+" - "+v[1]+v[2]+v[3]+" - "+split(getElementData(playerid, "quest_select"), ":")[1]+"/"+v[2]+" - "+v[5]+"$ - "+info_png[ v[6][0] ][0]+" "+v[6][1]+" "+info_png[ v[6][0] ][1]+" ]", color_mes.green)
 				}
 				else
 				{
-					sendMessage(playerid, "[ "+k+" - "+v[0]+" - "+v[1]+v[2]+v[3]+" - 0/"+v[2]+" - "+v[5]+"$ - "+info_png[ v[6][0] ][0]+" "+v[6][1]+" "+info_png[ v[6][0] ][1]+" ]", yellow)
+					sendMessage(playerid, "[ "+k+" - "+v[0]+" - "+v[1]+v[2]+v[3]+" - 0/"+v[2]+" - "+v[5]+"$ - "+info_png[ v[6][0] ][0]+" "+v[6][1]+" "+info_png[ v[6][0] ][1]+" ]", color_mes.yellow)
 				}
 			}
 		}
@@ -9902,11 +9905,11 @@ function (playerid)
 		"/cmdadm - команды админа",
 	]
 
-	sendMessage(playerid, "====[ КОМАНДЫ ]====", white)
+	sendMessage(playerid, "====[ КОМАНДЫ ]====", color_mes.white)
 
 	foreach (idx, value in commands) 
 	{
-		sendMessage(playerid, value, white)
+		sendMessage(playerid, value, color_mes.white)
 	}
 })
 
@@ -9933,11 +9936,11 @@ function (playerid)
 		"/delv - удалить тс созданные через /v",
 	]
 
-	sendMessage(playerid, "====[ КОМАНДЫ ]====", white)
+	sendMessage(playerid, "====[ КОМАНДЫ ]====", color_mes.white)
 
 	foreach (idx, value in commands) 
 	{
-		sendMessage(playerid, value, white)
+		sendMessage(playerid, value, color_mes.white)
 	}
 })
 
@@ -9960,14 +9963,23 @@ function(playerid, id, id1, id2)
 	}
 	else if (logged[id] == 0)
 	{
-		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+		sendMessage(playerid, "[ERROR] Такого игрока нет", color_mes.red)
 		return
 	}
 
 	if (val1 > (info_png.len()-1) || val1 < 2)
 	{
-		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red)
+		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), color_mes.red)
 		return
+	}
+	
+	foreach (idx, value in no_create_subject) 
+	{
+		if (val1 == value)
+		{
+			sendMessage(playerid, "[ERROR] Этот предмет нельзя создать", color_mes.red)
+			return
+		}
 	}
 
 	if (inv_player_empty(id, val1, val2))
@@ -9976,7 +9988,7 @@ function(playerid, id, id1, id2)
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+		sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 	}
 })
 
@@ -9998,13 +10010,13 @@ function(playerid, id, id1, id2)
 	}
 	else if (logged[id] == 0)
 	{
-		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+		sendMessage(playerid, "[ERROR] Такого игрока нет", color_mes.red)
 		return
 	}
 
 	if (val1 > (info_png.len()-1) || val1 < 2)
 	{
-		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red)
+		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), color_mes.red)
 		return
 	}
 
@@ -10014,7 +10026,7 @@ function(playerid, id, id1, id2)
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Предмет не найден", red)
+		sendMessage(playerid, "[ERROR] Предмет не найден", color_mes.red)
 	}
 })
 
@@ -10033,13 +10045,22 @@ function (playerid, id1, id2 )
 
 	if (val1 > (info_png.len()-1) || val1 < 2)
 	{
-		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red)
+		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), color_mes.red)
 		return
+	}
+
+	foreach (idx, value in no_create_subject) 
+	{
+		if (val1 == value)
+		{
+			sendMessage(playerid, "[ERROR] Этот предмет нельзя создать", color_mes.red)
+			return
+		}
 	}
 
 	if (!isPlayerInVehicle(playerid)) 
 	{
-		sendMessage(playerid, "[ERROR] Вы не в т/с", red)
+		sendMessage(playerid, "[ERROR] Вы не в т/с", color_mes.red)
 		return
 	}
 
@@ -10049,7 +10070,7 @@ function (playerid, id1, id2 )
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Инвентарь полон", red)
+		sendMessage(playerid, "[ERROR] Инвентарь полон", color_mes.red)
 	}
 })
 
@@ -10070,8 +10091,17 @@ function (playerid, id1, id2, count )
 
 	if (val1 > (info_png.len()-1) || val1 < 2)
 	{
-		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), red)
+		sendMessage(playerid, "[ERROR] от 2 до "+(info_png.len()-1), color_mes.red)
 		return
+	}
+
+	foreach (idx, value in no_create_subject) 
+	{
+		if (val1 == value)
+		{
+			sendMessage(playerid, "[ERROR] Этот предмет нельзя создать", color_mes.red)
+			return
+		}
 	}
 
 	for (local i = 0; i < count; i++) 
@@ -10112,11 +10142,11 @@ function (playerid, id, time, ...)
 
 	if (logged[id] == 0)
 	{
-		sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+		sendMessage(playerid, "[ERROR] Такого игрока нет", color_mes.red)
 		return
 	}
 
-	sendMessageAll(playerid, "Администратор "+playername+" посадил в тюрьму "+getPlayerName ( id )+" на "+time+" мин. Причина: "+reason, lyme)
+	sendMessageAll(playerid, "Администратор "+playername+" посадил в тюрьму "+getPlayerName ( id )+" на "+time+" мин. Причина: "+reason, color_mes.lyme)
 
 	arrest[id] = 2
 	inv_server_load (playerid, "player", 24, 28, time, playername)
@@ -10199,7 +10229,7 @@ function(playerid, id1, id2)
 	}
 	else
 	{
-		sendMessage(playerid, "[ERROR] Часы от 0 до 23, Минуты от 0 до 59", red)
+		sendMessage(playerid, "[ERROR] Часы от 0 до 23, Минуты от 0 до 59", color_mes.red)
 	}
 })
 
@@ -10240,7 +10270,7 @@ function ( playerid, ... )
 		text = text+vargv[i]+" "
 	}
 
-	sendMessageAll(0, "[ADMIN] "+playername+": "+text, lyme)
+	sendMessageAll(0, "[ADMIN] "+playername+": "+text, color_mes.lyme)
 })
 
 addCommandHandler ( "hp",
@@ -10362,11 +10392,11 @@ function (playerid, value, id)
 				triggerClientEvent(playerid, "event_save_player_action", text)
 			}
 
-			sendMessage(playerid, "Инвентарь "+value+"-"+id+" загружен и сохранен в core.log", lyme)
+			sendMessage(playerid, "Инвентарь "+value+"-"+id+" загружен и сохранен в core.log", color_mes.lyme)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+			sendMessage(playerid, "[ERROR] Такого игрока нет", color_mes.red)
 		}
 	}
 	else if (value == "car")
@@ -10387,11 +10417,11 @@ function (playerid, value, id)
 				triggerClientEvent(playerid, "event_save_player_action", text)
 			}
 
-			sendMessage(playerid, "Инвентарь "+value+"-"+id+" загружен и сохранен в core.log", lyme)
+			sendMessage(playerid, "Инвентарь "+value+"-"+id+" загружен и сохранен в core.log", color_mes.lyme)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Такого т/с нет", red)
+			sendMessage(playerid, "[ERROR] Такого т/с нет", color_mes.red)
 		}
 	}
 	else if (value == "house")
@@ -10412,11 +10442,11 @@ function (playerid, value, id)
 				triggerClientEvent(playerid, "event_save_player_action", text)
 			}
 
-			sendMessage(playerid, "Инвентарь "+value+"-"+id+" загружен и сохранен в core.log", lyme)
+			sendMessage(playerid, "Инвентарь "+value+"-"+id+" загружен и сохранен в core.log", color_mes.lyme)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Такого дома нет", red)
+			sendMessage(playerid, "[ERROR] Такого дома нет", color_mes.red)
 		}
 	}
 })
@@ -10443,7 +10473,7 @@ function (playerid, value, id)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Такого игрока нет", red)
+			sendMessage(playerid, "[ERROR] Такого игрока нет", color_mes.red)
 		}
 	}
 	else if (value == "business")
@@ -10455,11 +10485,11 @@ function (playerid, value, id)
 
 			setPlayerPosition(playerid, result[1]["x"],result[1]["y"],result[1]["z"])
 
-			sendMessage(playerid, "Вы телепортировались к "+id+" бизнесу", lyme)
+			sendMessage(playerid, "Вы телепортировались к "+id+" бизнесу", color_mes.lyme)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Такого бизнеса нет", red)
+			sendMessage(playerid, "[ERROR] Такого бизнеса нет", color_mes.red)
 		}
 	}
 	else if (value == "house")
@@ -10471,11 +10501,11 @@ function (playerid, value, id)
 
 			setPlayerPosition(playerid, result[1]["x"],result[1]["y"],result[1]["z"])
 
-			sendMessage(playerid, "Вы телепортировались к "+id+" дому", lyme)
+			sendMessage(playerid, "Вы телепортировались к "+id+" дому", color_mes.lyme)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Такого дома нет", red)
+			sendMessage(playerid, "[ERROR] Такого дома нет", color_mes.red)
 		}
 	}
 	else if (value == "interior")
@@ -10484,11 +10514,11 @@ function (playerid, value, id)
 		{
 			setPlayerPosition(playerid, interior_job[id][2],interior_job[id][3],interior_job[id][4])
 
-			sendMessage(playerid, "Вы телепортировались к "+interior_job[id][1], lyme)
+			sendMessage(playerid, "Вы телепортировались к "+interior_job[id][1], color_mes.lyme)
 		}
 		else
 		{
-			sendMessage(playerid, "[ERROR] Такого здания нет", red)
+			sendMessage(playerid, "[ERROR] Такого здания нет", color_mes.red)
 		}
 	}
 })
@@ -10547,6 +10577,6 @@ function(command, params)
 		{
 			text += chat(q.slice( (0+(i*1)), (1+(i*1)) ))
 		}
-		sendMessageAll(0, "[ADMIN] "+text, lyme)
+		sendMessageAll(0, "[ADMIN] "+text, color_mes.lyme)
 	}
 })
