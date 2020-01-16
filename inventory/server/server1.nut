@@ -32,7 +32,7 @@ function random(min=0, max=RAND_MAX)
 	srand(getTickCount() * rand())
 	return (rand() % ((max + 1) - min)) + min//функция для получения рандомных чисел
 }
-local no_create_subject = [6,25,98,99]
+local no_create_subject = [6,25,32,33,37,98,99]//предметы которые нельзя создать
 local element_data = {}
 local pogoda = true //зима(false) или лето(true)
 local hour = 6
@@ -61,6 +61,8 @@ local admin_chanel = 2//--канал админов
 local loto = [0, [], false]//--лотерея
 local no_throw_earth = []//--нельзя продать
 local delet_subject_radius = 5.0//радиус разгрузки у бизнесов
+local update_db_rang = 2//ранг основателя
+local admin = "Paolo_Ricchi"//разраб
 //нужды
 local max_alcohol = 500
 local max_satiety = 100
@@ -214,7 +216,7 @@ for (local i = 200; i >= 50; i-=50) {
 local info_png = {
 	[0] = ["", ""],
 	[1] = ["чековая книжка", "$ в банке"],
-	[2] = ["права", "шт"],
+	[2] = ["права", "номер"],
 	[3] = ["сигареты Big Break Red", "сигарет"],
 	[4] = ["аптечка", "шт"],
 	[5] = ["канистра с бензином", "лит."],
@@ -253,7 +255,7 @@ local info_png = {
 	[38] = ["риэлторская лицензия", "шт"],
 	[39] = ["тушка свиньи", "шт"],
 	[40] = ["молоток", "шт"],
-	[41] = ["лицензия на оружие", "шт"],
+	[41] = ["лицензия на оружие", "номер"],
 	[42] = ["гамбургер", "шт"],
 	[43] = ["пицца", "шт"],
 	[44] = ["мыло", "процентов"],
@@ -2570,15 +2572,15 @@ function setPlayerColour_fun(playerid)
 {
 	if (search_inv_player_2_parameter(playerid, 37) != 0)
 	{
-		setPlayerColour(playerid, fromRGB(lyme[0],lyme[1],lyme[2]))
+		setPlayerColour(playerid, fromRGB(color_mes.lyme[0],color_mes.lyme[1],color_mes.lyme[2]))
 	}
 	else if (search_inv_player(playerid, 38, 1) != 0)
 	{
-		setPlayerColour(playerid, fromRGB(green[0],green[1],green[2]))
+		setPlayerColour(playerid, fromRGB(color_mes.green[0],color_mes.green[1],color_mes.green[2]))
 	}
 	else if (search_inv_player_2_parameter(playerid, 10) != 0)
 	{
-		setPlayerColour(playerid, fromRGB(blue[0],blue[1],blue[2]))
+		setPlayerColour(playerid, fromRGB(color_mes.blue[0],color_mes.blue[1],color_mes.blue[2]))
 	}
 	else if (search_inv_player_2_parameter(playerid, 91) != 0)
 	{
@@ -3233,7 +3235,7 @@ function buy_subject_fun( playerid, text, number, value )
 			{
 				if (v[2] <= search_inv_player_2_parameter(playerid, 1))
 				{
-					if(v[3] == 10)
+					if(v[3] == 10 || v[3] == 2 || v[3] == 41)
 					{
 						if (inv_player_empty(playerid, v[3], playerid+1))
 						{
@@ -5185,6 +5187,18 @@ function playerDisconnect( playerid, reason )
 			inv_player_delet(playerid, 10, policetoken, false, false)
 		}
 
+		local rights = search_inv_player_2_parameter(playerid, 2)
+		if (rights != 0 && playerid+1 != rights)
+		{
+			inv_player_delet(playerid, 2, rights, false, false)
+		}
+
+		local lic_weapon = search_inv_player_2_parameter(playerid, 41)
+		if (lic_weapon != 0 && playerid+1 != lic_weapon)
+		{
+			inv_player_delet(playerid, 41, lic_weapon, false, false)
+		}
+
 		if (myPos[0] != 0 && myPos[1] != 0 && myPos[2] != 0)
 		{
 			sqlite3( "UPDATE account SET x = '"+myPos[0]+"', y = '"+myPos[1]+"', z = '"+myPos[2]+"', heal = '"+heal+"', arrest = '"+arrest[playerid]+"', crimes = '"+crimes[playerid]+"', alcohol = '"+alcohol[playerid]+"', satiety = '"+satiety[playerid]+"', hygiene = '"+hygiene[playerid]+"', sleep = '"+sleep[playerid]+"', drugs = '"+drugs[playerid]+"' WHERE name = '"+playername+"'")
@@ -5473,6 +5487,16 @@ function reg_or_login(playerid)
 		if (inv_player_delet(playerid, 10, search_inv_player_2_parameter(playerid, 10), false, false))
 		{
 			inv_player_empty(playerid, 10, playerid+1)
+		}
+
+		if (inv_player_delet(playerid, 2, search_inv_player_2_parameter(playerid, 2), false, false))
+		{
+			inv_player_empty(playerid, 2, playerid+1)
+		}
+
+		if (inv_player_delet(playerid, 41, search_inv_player_2_parameter(playerid, 41), false, false))
+		{
+			inv_player_empty(playerid, 41, playerid+1)
 		}
 
 		logged[playerid] = 1
@@ -6898,16 +6922,24 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 			return
 		}
-		else if (id1 == 10 || id1 == 94) //--документы копа, паспорт
+		else if (id1 == 10 || id1 == 94 || id1 == 2 || id1 == 41) //--документы копа, паспорт, права, лиц на оружие
 		{	
 			local id = getPlayerName(id2-1)
 			if (id)
 			{
 				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" на имя "+id)
 			}
-			else 
+			else if (id1 == 10 || id1 == 94)
 			{
 				me_chat(playerid, playername+" показал(а) чужой "+info_png[id1][0])
+			}
+			else if (id1 == 2)
+			{
+				me_chat(playerid, playername+" показал(а) чужие "+info_png[id1][0])
+			}
+			else if (id1 == 41)
+			{
+				me_chat(playerid, playername+" показал(а) чужую "+info_png[id1][0])
 			}
 			return
 		}
@@ -9973,12 +10005,20 @@ function(playerid, id, id1, id2)
 		return
 	}
 	
-	foreach (idx, value in no_create_subject) 
+	if (val1 == 37 && val2 == update_db_rang && admin != playername) 
 	{
-		if (val1 == value)
+		sendMessage(playerid, "Вы не основатель", color_mes.red)
+		return
+	}
+	else if(val1 != 37)
+	{
+		foreach (idx, value in no_create_subject) 
 		{
-			sendMessage(playerid, "[ERROR] Этот предмет нельзя создать", color_mes.red)
-			return
+			if (val1 == value)
+			{
+				sendMessage(playerid, "[ERROR] Этот предмет нельзя создать", color_mes.red)
+				return
+			}
 		}
 	}
 
