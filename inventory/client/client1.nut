@@ -20,9 +20,9 @@ local value_business = -1//тип бизнеса
 local width_need = (screen[0]/5.04)//--ширина нужд 271
 local height_need = (screen[1]/5.68)//--высота нужд 135
 local screenWidth = screen[0]
-local zakon_nalog_car = 500
-local zakon_nalog_house = 1000
-local zakon_nalog_business = 2000
+local zakon_taxation_car = 500
+local zakon_taxation_house = 1000
+local zakon_taxation_business = 2000
 local is_chat_open = 0//чат: 0-закрыт, 1-открыт
 local afk = 0//--сколько минут в афк
 
@@ -672,7 +672,7 @@ foreach (k,v in eda)
 }
 guiSetVisibleGridList (eda_menu, false)
 
-local day_nalog = 7
+local day_taxation = 7
 local mayoralty_shop = [
 	[info_png[2][0], 1, 1000, 2],
 	[info_png[10][0], 1, 50000, 10],
@@ -690,9 +690,9 @@ local mayoralty_shop = [
 	[info_png[34][0]+" Уборщик снега ЭБ", 12, 5000, 34],
 	[info_png[34][0]+" Транспортный детектив", 13, 5000, 34],
 	[info_png[67][0], 1, 10, 67],
-	["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog), 48],
-	["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog), 49],
-	["квитанция для оплаты т/с на", day_nalog, (zakon_nalog_car*day_nalog), 50],
+	["квитанция для оплаты дома на", day_taxation, (zakon_taxation_house*day_taxation), 48],
+	["квитанция для оплаты бизнеса на", day_taxation, (zakon_taxation_business*day_taxation), 49],
+	["квитанция для оплаты т/с на", day_taxation, (zakon_taxation_car*day_taxation), 50],
 ]
 local mayoralty_shop_menu = guiCreateGridList((screen[0]/2)-(400.0/2), (screen[1]/2)-(320.0/2), 400.0, 320.0)
 foreach (k,v in mayoralty_shop)
@@ -1526,7 +1526,7 @@ function( post )
 		[true, screenWidth-width_need-30, height_need+(20+7.5)*5, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
 		[true, screenWidth-width_need-30, height_need+(20+7.5)*5, ((width_need/100.0)*sleep), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
 		[true, text, 2.0, 0.0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[getPlayerVehicle(playerid) != -1 || false, "plate "+plate+" | kilometrage "+split(getElementData("probeg_data"), ".")[0], 2.0, screen[1]-16.0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[getPlayerVehicle(playerid) != -1 || false, "plate "+plate+" | kilometrage "+split(getElementData("kilometrage_data"), ".")[0], 2.0, screen[1]-16.0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
 		[getElementData("gps_device_data").tointeger() == 1 || false, "[X  "+split(myPos[0].tostring(), ".")[0]+", Y  "+split(myPos[1].tostring(), ".")[0]+"]", getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )[0]-(dxGetTextDimensions( "[X  "+split(myPos[0].tostring(), ".")[0]+", Y  "+split(myPos[1].tostring(), ".")[0]+"]", 1.0, "tahoma-bold" )[0]/2), getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )[1], fromRGB ( color_mes.svetlo_zolotoy[0], color_mes.svetlo_zolotoy[1], color_mes.svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0, "text"],
 		[spl_gz[0].tointeger() == 1 || false, 0.0, screen[1]-16.0*6, 250.0, 16.0*3, fromRGB( 0, 0, 0, 150 ), "rectangle"],
 		[spl_gz[0].tointeger() == 1 || false, "Time: "+spl_gz[6]+" sec | Guns Zone #"+spl_gz[1], 2.0, screen[1]-16*6, fromRGB( color_mes.white[0], color_mes.white[1], color_mes.white[2] ), false, "tahoma-bold", 1.0, "text"],

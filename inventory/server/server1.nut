@@ -54,7 +54,7 @@ local crimes_giuseppe = 25//прес-ия для джузеппе
 local crimes_capture = crimes_giuseppe*2//--прес-ия для захвата
 local business_pos = {}//--позиции бизнесов
 local house_pos = {}//--позиции домов
-local day_nalog = 7//кол-во дней для оплаты налога
+local day_taxation = 7//кол-во дней для оплаты налога
 local no_use_wheel_and_engine = [20,27,35,37,38,39]
 local police_chanel = 1//канал копов
 local admin_chanel = 2//--канал админов
@@ -79,9 +79,9 @@ local zakon_robbery_crimes = 1
 local zakon_54_crimes = 1
 local zakon_80_crimes = 1
 local zakon_car_theft_crimes = 1
-local zakon_nalog_car = 500
-local zakon_nalog_house = 1000
-local zakon_nalog_business = 2000
+local zakon_taxation_car = 500
+local zakon_taxation_house = 1000
+local zakon_taxation_business = 2000
 local zakon_price_house = 300000
 local zakon_price_business = 300000
 //зп
@@ -854,9 +854,9 @@ local mayoralty_shop = [
 	[info_png[34][0]+" Уборщик снега ЭБ", 12, 5000, 34],
 	[info_png[34][0]+" Транспортный детектив", 13, 5000, 34],
 	[info_png[67][0], 1, 10, 67],
-	["квитанция для оплаты дома на", day_nalog, (zakon_nalog_house*day_nalog), 48],
-	["квитанция для оплаты бизнеса на", day_nalog, (zakon_nalog_business*day_nalog), 49],
-	["квитанция для оплаты т/с на", day_nalog, (zakon_nalog_car*day_nalog), 50],
+	["квитанция для оплаты дома на", day_taxation, (zakon_taxation_house*day_taxation), 48],
+	["квитанция для оплаты бизнеса на", day_taxation, (zakon_taxation_business*day_taxation), 49],
+	["квитанция для оплаты т/с на", day_taxation, (zakon_taxation_car*day_taxation), 50],
 ]
 
 local sub_cops = [
@@ -1040,7 +1040,7 @@ local array_car_2 = {
 local fuel = {//--топливный бак
 	["0"] = 50,
 }
-local probeg = {//--пробег
+local kilometrage = {//--пробег
 	["0"] = 0,
 }
 local dviglo = {}//--двигло вкл или выкл
@@ -1122,7 +1122,7 @@ function debuginfo ()
 		setElementData(playerid, "sleep_data", sleep[playerid])
 		setElementData(playerid, "drugs_data", drugs[playerid])
 		//setElementData(playerid, "fuel_data", 0)
-		setElementData(playerid, "probeg_data", 0)
+		setElementData(playerid, "kilometrage_data", 0)
 		setElementData(playerid, "gps_device_data", gps_device[playerid])
 		setElementData(playerid, "zakon_alcohol", zakon_alcohol)
 		setElementData(playerid, "zakon_drugs", zakon_drugs)
@@ -1164,7 +1164,7 @@ function debuginfo ()
 		{
 			local plate = getVehiclePlateText(vehicleid)
 			//setElementData(playerid, "fuel_data", fuel[plate])
-			setElementData(playerid, "probeg_data", probeg[plate])
+			setElementData(playerid, "kilometrage_data", kilometrage[plate])
 		}
 
 		if (crimes[playerid] != 0 && search_inv_player_2_parameter(playerid, 10) != 0)
@@ -1856,7 +1856,7 @@ local table_job = {
 
 							local id2 = search_inv_player_2_parameter(playerid, 81)
 
-							if (result[1]["warehouse"] < max_sg && result[1]["money"] >= result[1]["price"] && result[1]["nalog"] != 0 && result[1]["prod"] != 0 && id2 != 0)
+							if (result[1]["warehouse"] < max_sg && result[1]["money"] >= result[1]["price"] && result[1]["taxation"] != 0 && result[1]["prod"] != 0 && id2 != 0)
 							{
 								local randomize = result[1]["price"]
 
@@ -2703,11 +2703,11 @@ function rental_car(playerid, job)
 
 			local carcolor = fromRGB(255,255,255)
 
-			local nalog_start = 5
+			local taxation_start = 5
 
 			sendMessage(playerid, "Вы получили "+info_png[val1][0]+" "+val2, color_mes.orange)
 
-			sqlite3( "INSERT INTO car_db (number, model, nalog, frozen, x, y, z, rot, fuel, car_rgb, tune, wheel, probeg, theft, inventory) VALUES ('"+val2+"', '"+v[1]+"', '"+nalog_start+"', '0', '"+car_pos[0]+"', '"+car_pos[1]+"', '"+car_pos[2]+"', '"+car_pos[3]+"', '"+max_fuel+"', '"+carcolor+"', '0', '0', '0', '0', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
+			sqlite3( "INSERT INTO car_db (number, model, taxation, frozen, x, y, z, rot, fuel, car_rgb, tune, wheel, kilometrage, theft, inventory) VALUES ('"+val2+"', '"+v[1]+"', '"+taxation_start+"', '0', '"+car_pos[0]+"', '"+car_pos[1]+"', '"+car_pos[2]+"', '"+car_pos[3]+"', '"+max_fuel+"', '"+carcolor+"', '0', '0', '0', '0', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
 			car_spawn(val2.tostring())
 		}
@@ -3347,11 +3347,11 @@ function buy_subject_fun( playerid, text, number, value )
 
 				local carcolor = fromRGB(255,255,255)
 
-				local nalog_start = 5
+				local taxation_start = 5
 
 				sendMessage(playerid, "Вы получили "+info_png[val1][0]+" "+val2, color_mes.orange)
 
-				sqlite3( "INSERT INTO car_db (number, model, nalog, frozen, x, y, z, rot, fuel, car_rgb, tune, wheel, probeg, theft, inventory) VALUES ('"+val2+"', '"+id+"', '"+nalog_start+"', '0', '"+car_pos[0]+"', '"+car_pos[1]+"', '"+car_pos[2]+"', '"+car_pos[3]+"', '"+max_fuel+"', '"+carcolor+"', '0', '0', '0', '0', '33:"+val2+",0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
+				sqlite3( "INSERT INTO car_db (number, model, taxation, frozen, x, y, z, rot, fuel, car_rgb, tune, wheel, kilometrage, theft, inventory) VALUES ('"+val2+"', '"+id+"', '"+taxation_start+"', '0', '"+car_pos[0]+"', '"+car_pos[1]+"', '"+car_pos[2]+"', '"+car_pos[3]+"', '"+max_fuel+"', '"+carcolor+"', '0', '0', '0', '0', '33:"+val2+",0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
 				car_spawn(val2.tostring())
 				return
@@ -3455,7 +3455,7 @@ function buy_subject_fun( playerid, text, number, value )
 			sendMessage(playerid, "====[ ШТРАФСТОЯНКА ]====", color_mes.blue)
 			sendMessage(playerid, "Номера т/с", color_mes.blue)
 
-			foreach (k, v in sqlite3( "SELECT * FROM car_db WHERE nalog = '0'" ))
+			foreach (k, v in sqlite3( "SELECT * FROM car_db WHERE taxation = '0'" ))
 			{
 				sendMessage(playerid, v["number"], color_mes.blue)
 			}
@@ -3496,7 +3496,7 @@ function buy_subject_fun( playerid, text, number, value )
 			return
 		}
 
-		if (result[1]["nalog"] <= 0)
+		if (result[1]["taxation"] <= 0)
 		{
 			sendMessage(playerid, "[ERROR] Бизнес арестован за уклонение от уплаты налогов", color_mes.red)
 			return
@@ -4068,7 +4068,7 @@ function cow_farms(playerid, value, val1, val2)
 		}
 
 		if (inv_player_empty(playerid, doc, result)) {
-			sqlite3( "INSERT INTO seagift_db (number, price, coef, money, nalog, warehouse, prod) VALUES ('"+result+"', '0', '50', '0', '5', '0', '0')" )
+			sqlite3( "INSERT INTO seagift_db (number, price, coef, money, taxation, warehouse, prod) VALUES ('"+result+"', '0', '50', '0', '5', '0', '0')" )
 
 			inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-cash*result, playername )
 
@@ -4174,7 +4174,7 @@ function cow_farms(playerid, value, val1, val2)
 
 			if (search_inv_player(playerid, 49, 7) != 0) {
 				if (inv_player_delet(playerid, 49, 7, true, false)) {
-					sqlite3( "UPDATE seagift_db SET nalog = nalog + '7' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'")
+					sqlite3( "UPDATE seagift_db SET taxation = taxation + '7' WHERE number = '"+search_inv_player_2_parameter(playerid, doc)+"'")
 
 					sendMessage(playerid, "Вы оплатили налог "+search_inv_player_2_parameter(playerid, doc)+" рыбзавода", color_mes.yellow)
 				}
@@ -4324,7 +4324,7 @@ function fuel_down()//--система топлива авто
 				else
 				{
 					fuel[plate] <- fuel[plate] - (fuel_down_number*getSpeed(vehicleid))
-					probeg[plate] <- probeg[plate] + (getSpeed(vehicleid)/3600)
+					kilometrage[plate] <- kilometrage[plate] + (getSpeed(vehicleid)/3600)
 				}
 			}
 		}
@@ -4429,7 +4429,7 @@ function car_theft_fun(playerid, car_theft_win)
 			local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
 			if (result[1]["COUNT()"] == 1)
 			{
-				sqlite3( "UPDATE car_db SET x = '"+job_vehicleid[playerid][1]+"', y = '"+job_vehicleid[playerid][2]+"', z = '"+job_vehicleid[playerid][3]+"', rot = '"+job_vehicleid[playerid][4]+"', fuel = '"+fuel[plate]+"', probeg = '"+probeg[plate]+"' WHERE number = '"+plate+"'")
+				sqlite3( "UPDATE car_db SET x = '"+job_vehicleid[playerid][1]+"', y = '"+job_vehicleid[playerid][2]+"', z = '"+job_vehicleid[playerid][3]+"', rot = '"+job_vehicleid[playerid][4]+"', fuel = '"+fuel[plate]+"', kilometrage = '"+kilometrage[plate]+"' WHERE number = '"+plate+"'")
 			}
 
 			if (car_theft_win)
@@ -4756,7 +4756,7 @@ function need()//--нужды
 	}
 }
 
-function pay_nalog()
+function pay_taxation()
 {
 	local date = split(getDateTime(), ": ")//установка времени
 	local chas = date[3].tointeger()
@@ -4768,40 +4768,40 @@ function pay_nalog()
 		local result = sqlite3( "SELECT * FROM car_db" )
 		foreach (k, v in result) 
 		{
-			if (v["nalog"] > 0)
+			if (v["taxation"] > 0)
 			{
-				sqlite3( "UPDATE car_db SET nalog = nalog - '1' WHERE number = '"+v["number"]+"'")
+				sqlite3( "UPDATE car_db SET taxation = taxation - '1' WHERE number = '"+v["number"]+"'")
 			}
 		}
 
 		local result = sqlite3( "SELECT * FROM house_db" )
 		foreach (k, v in result) 
 		{
-			if (v["nalog"] > 0)
+			if (v["taxation"] > 0)
 			{
-				sqlite3( "UPDATE house_db SET nalog = nalog - '1' WHERE number = '"+v["number"]+"'")
+				sqlite3( "UPDATE house_db SET taxation = taxation - '1' WHERE number = '"+v["number"]+"'")
 			}
 		}
 
 		local result = sqlite3( "SELECT * FROM business_db" )
 		foreach (k, v in result) 
 		{
-			if (v["nalog"] > 0)
+			if (v["taxation"] > 0)
 			{
-				sqlite3( "UPDATE business_db SET nalog = nalog - '1' WHERE number = '"+v["number"]+"'")
+				sqlite3( "UPDATE business_db SET taxation = taxation - '1' WHERE number = '"+v["number"]+"'")
 			}
 		}
 
 		local result = sqlite3( "SELECT * FROM seagift_db" )
 		foreach (k, v in result) 
 		{
-			if (v["nalog"] > 0)
+			if (v["taxation"] > 0)
 			{
-				sqlite3( "UPDATE seagift_db SET nalog = nalog - '1' WHERE number = '"+v["number"]+"'")
+				sqlite3( "UPDATE seagift_db SET taxation = taxation - '1' WHERE number = '"+v["number"]+"'")
 			}
 		}
 
-		print("[pay_nalog]")
+		print("[pay_taxation]")
 	}
 
 	if(min == 0)
@@ -4960,7 +4960,7 @@ function()
 	timer( element_data_push_client, 1000, -1)//--элементдата
 	timer( timeserver, 1000, -1 )//время сервера 1 игровой час = 1 мин реальных
 	timer(need, 60000, -1)//--уменьшение потребностей
-	timer(pay_nalog, 60000, -1)//--списание налогов
+	timer(pay_taxation, 60000, -1)//--списание налогов
 	timer(prison, 60000, -1)//--таймер заключения в тюрьме
 	timer(prison_timer, 1000, -1)//--античит если не в тюрьме
 	timer(custom_seat_car, 500, -1)//--синхра пасс-их мест
@@ -5076,7 +5076,7 @@ function()
 function car_spawn(number)
 {
 	local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+number+"'" )
-	if (result[1]["nalog"] != 0 && result[1]["theft"] == 0)
+	if (result[1]["taxation"] != 0 && result[1]["theft"] == 0)
 	{
 		local color = toRGBA(result[1]["car_rgb"])
 		local vehicleid = createVehicle( result[1]["model"], result[1]["x"], result[1]["y"], result[1]["z"] + 0.0, result[1]["rot"], 0.0, 0.0 )
@@ -5090,7 +5090,7 @@ function car_spawn(number)
 
 		fuel[number] <- result[1]["fuel"]
 		dviglo[number] <- 0
-		probeg[number] <- result[1]["probeg"]
+		kilometrage[number] <- result[1]["kilometrage"]
 
 		load_inv(number, "car", result[1]["inventory"])
 
@@ -5576,7 +5576,7 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 		if (result[1]["COUNT()"] == 1)
 		{
 			local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
-			if (result[1]["nalog"] <= 0)
+			if (result[1]["taxation"] <= 0)
 			{
 				sendMessage(playerid, "[ERROR] Т/с арестован за уклонение от уплаты налогов", color_mes.red)
 				dviglo[plate] <- 0
@@ -5635,7 +5635,7 @@ function PlayerVehicleExit( playerid, vehicleid, seat )
 		local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
 		if (result[1]["COUNT()"] == 1)
 		{	
-			sqlite3( "UPDATE car_db SET x = '"+carpos[0]+"', y = '"+carpos[1]+"', z = '"+carpos[2]+"', rot = '"+carrot[0]+"', fuel = '"+fuel[plate]+"', probeg = '"+probeg[plate]+"' WHERE number = '"+plate+"'")
+			sqlite3( "UPDATE car_db SET x = '"+carpos[0]+"', y = '"+carpos[1]+"', z = '"+carpos[2]+"', rot = '"+carrot[0]+"', fuel = '"+fuel[plate]+"', kilometrage = '"+kilometrage[plate]+"' WHERE number = '"+plate+"'")
 		}
 
 		triggerClientEvent( playerid, "event_tab_load", "car", "" )
@@ -5715,7 +5715,7 @@ function tab_down(playerid)
 					}
 				}
 
-				if (value["nalog"] <= 0)
+				if (value["taxation"] <= 0)
 				{
 					sendMessage(playerid, "[ERROR] Дом арестован за уклонение от уплаты налогов", color_mes.red)
 				}
@@ -6011,7 +6011,7 @@ function business_info (playerid, number)
 	if (search_inv_player(playerid, 36, result[1]["number"]) != 0)
 	{
 		sendMessage(playerid, "Состояние кассы "+split(result[1]["money"].tostring(),".")[0]+"$", color_mes.green)
-		sendMessage(playerid, "Налог бизнеса оплачен на "+result[1]["nalog"]+" дней", color_mes.yellow)
+		sendMessage(playerid, "Налог бизнеса оплачен на "+result[1]["taxation"]+" дней", color_mes.yellow)
 	}
 }
 
@@ -6882,7 +6882,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 						if (result[1]["COUNT()"] == 1)
 						{
 							local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
-							if (result[1]["nalog"] != 0 && search_inv_player(playerid, 6, plate.tointeger()) != 0 && search_inv_player(playerid, 2, 1) != 0 && sead[playerid] == 0)
+							if (result[1]["taxation"] != 0 && search_inv_player(playerid, 6, plate.tointeger()) != 0 && search_inv_player(playerid, 2, 1) != 0 && sead[playerid] == 0)
 							{
 								dviglo[plate] <- 1
 							}
@@ -7095,7 +7095,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2)
 
-				do_chat(playerid, "Налог дома оплачен на "+result[1]["nalog"]+" дней - "+playername)
+				do_chat(playerid, "Налог дома оплачен на "+result[1]["taxation"]+" дней - "+playername)
 			}
 			return
 		}
@@ -7108,7 +7108,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 
 				me_chat(playerid, playername+" показал(а) "+info_png[id1][0]+" "+id2)
 
-				do_chat(playerid, "Налог т/с оплачен на "+result[1]["nalog"]+" дней - "+playername)
+				do_chat(playerid, "Налог т/с оплачен на "+result[1]["taxation"]+" дней - "+playername)
 				do_chat(playerid, "Установлен "+result[1]["tune"]+" уровень тюнинга - "+playername)
 			}
 			return
@@ -7500,7 +7500,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius))
 				{
-					sqlite3( "UPDATE house_db SET nalog = nalog + '"+id2+"' WHERE number = '"+v["number"]+"'")
+					sqlite3( "UPDATE house_db SET taxation = taxation + '"+id2+"' WHERE number = '"+v["number"]+"'")
 					
 					me_chat(playerid, playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" и оплатил(а) "+v["number"]+" дом")
 
@@ -7523,7 +7523,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			{
 				if (isPointInCircle3D(v["x"],v["y"],v["z"], x,y,z, house_bussiness_radius))
 				{
-					sqlite3( "UPDATE business_db SET nalog = nalog + '"+id2+"' WHERE number = '"+v["number"]+"'")
+					sqlite3( "UPDATE business_db SET taxation = taxation + '"+id2+"' WHERE number = '"+v["number"]+"'")
 					
 					me_chat(playerid, playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" и оплатил(а) "+v["number"]+" бизнес")
 
@@ -7547,7 +7547,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 				local result = sqlite3( "SELECT COUNT() FROM car_db WHERE number = '"+plate+"'" )
 				if (result[1]["COUNT()"] == 1)
 				{
-					sqlite3( "UPDATE car_db SET nalog = nalog + '"+id2+"' WHERE number = '"+plate+"'")
+					sqlite3( "UPDATE car_db SET taxation = taxation + '"+id2+"' WHERE number = '"+plate+"'")
 
 					me_chat(playerid, playername+" использовал(а) "+info_png[id1][0]+" "+id2+" "+info_png[id1][1]+" и оплатил(а) "+plate+" авто")
 
@@ -7891,7 +7891,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					[result[1]["number"], "Зарплата", result[1]["price"]+"$"],
 					[result[1]["number"], "Баланс", split(result[1]["money"].tostring(),".")[0]+"$"],
 					[result[1]["number"], "Доход от продаж", result[1]["coef"]+" процентов"],
-					[result[1]["number"], "Налог", result[1]["nalog"]+" дней"],
+					[result[1]["number"], "Налог", result[1]["taxation"]+" дней"],
 					[result[1]["number"], "Склад", result[1]["warehouse"]+" ящиков с рыбным филе"],
 					[result[1]["number"], "Склад", result[1]["prod"]+" свежей рыбы"],
 				]
@@ -8105,7 +8105,7 @@ function (playerid)
 			taxi_pos[taxi_pos.len()] <- [x, y, z]
 			milk_pos[milk_pos.len()] <- [x, y, z]
 
-			sqlite3( "INSERT INTO house_db (number, door, nalog, x, y, z, inventory) VALUES ('"+dim+"', '0', '5', '"+x+"', '"+y+"', '"+z+"', '32:"+dim+",0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
+			sqlite3( "INSERT INTO house_db (number, door, taxation, x, y, z, inventory) VALUES ('"+dim+"', '0', '5', '"+x+"', '"+y+"', '"+z+"', '32:"+dim+",0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
 			sendMessage(playerid, "Вы получили "+info_png[25][0]+" "+dim+" "+info_png[25][1], color_mes.orange)
 
@@ -8198,7 +8198,7 @@ function (playerid, id)
 
 				business_pos[dim] <- [x, y, z]
 
-				sqlite3( "INSERT INTO business_db (number, type, price, money, nalog, warehouse, x, y, z, interior) VALUES ('"+dim+"', '"+interior_business[id][1]+"', '0', '0', '5', '0', '"+x+"', '"+y+"', '"+z+"', '"+id+"')" )
+				sqlite3( "INSERT INTO business_db (number, type, price, money, taxation, warehouse, x, y, z, interior) VALUES ('"+dim+"', '"+interior_business[id][1]+"', '0', '0', '5', '0', '"+x+"', '"+y+"', '"+z+"', '"+id+"')" )
 
 				sendMessage(playerid, "Вы получили "+info_png[36][0]+" "+dim+" "+info_png[36][1], color_mes.orange)
 
@@ -9577,7 +9577,7 @@ function (playerid, plate)
 		if ( isPointInCircle3D(v[0],v[1],v[2], x,y,z, 5.0) )
 		{
 			local count = 0
-			local result = sqlite3( "SELECT COUNT() FROM car_db WHERE nalog = '0' AND number = '"+plate+"'" )
+			local result = sqlite3( "SELECT COUNT() FROM car_db WHERE taxation = '0' AND number = '"+plate+"'" )
 
 			foreach(vehicleid, v in getVehicles())
 			{
@@ -9598,7 +9598,7 @@ function (playerid, plate)
 			{
 				if (inv_player_delet(playerid, 50, 7, true, false))
 				{
-					sqlite3( "UPDATE car_db SET nalog = '7' WHERE number = '"+plate+"'")
+					sqlite3( "UPDATE car_db SET taxation = '7' WHERE number = '"+plate+"'")
 					car_spawn(plate)
 
 					sendMessage(playerid, "Вы забрали т/с под номером "+plate, color_mes.yellow)
