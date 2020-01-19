@@ -732,6 +732,7 @@ local coal_pos = [
 	[-391.621,-748.271,-21.5819],
 	[-280.0,769.465,-19.5924],
 	[264.435,-420.828,-19.2624],
+	[-119.454,744.23,-20.0905],
 ]
 
 local taxi_pos = {}//--места для таксистов
@@ -1030,11 +1031,19 @@ local min_chat = array(getMaxPlayers(), 0)
 local message = {}//сообщения
 
 //слоты тс
-local array_car_1 = {}
-local array_car_2 = {}
-local fuel = {}//--топливный бак
+local array_car_1 = {
+	["0"] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+}
+local array_car_2 = {
+	["0"] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+}
+local fuel = {//--топливный бак
+	["0"] = 50,
+}
+local probeg = {//--пробег
+	["0"] = 0,
+}
 local dviglo = {}//--двигло вкл или выкл
-local probeg = {}//пробег
 
 //слоты дома
 local array_house_1 = {}
@@ -10205,11 +10214,6 @@ function(playerid, id)
 	local pos = getPlayerPosition( playerid )
 	local vehicleid = createVehicle( id.tointeger(), pos[0] + 2.0, pos[1], pos[2] + 1.0, 0.0, 0.0, 0.0 )
 	setVehiclePlateText(vehicleid, "0")
-	fuel["0"] <- max_fuel
-	dviglo["0"] <- 0
-	probeg["0"] <- 0
-	array_car_1["0"] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	array_car_2["0"] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	/*local blipid = createBlip( -300.0, 120.0, 0, 1 )
 	attachBlipToVehicle(blipid, vehicleid)*/
 	admin_chat(playerid, playername+" ["+playerid+"] создал т/с")
