@@ -34,7 +34,7 @@ function random(min=0, max=RAND_MAX)
 }
 local no_create_subject = [6,25,32,33,37,98,99]//предметы которые нельзя создать
 local element_data = {}
-local pogoda = true //зима(false) или лето(true)
+local weather = true //зима(false) или лето(true)
 local hour = 6
 local minute = 0
 local earth = {//--слоты земли
@@ -89,7 +89,7 @@ local zp_player_taxi = 2500
 local zp_player_busdriver = 24000
 local zp_player_fish = 50
 local zp_player_phone = 500
-local zp_player_show = 24000
+local zp_player_show = 5000
 local money_guns_zone = 5000
 local money_guns_zone_business = 1000
 local zp_player_police_car = 5000
@@ -411,20 +411,20 @@ for (local i = 0; i < motor_show.len(); i++)
 	}
 }
 
-local pogoda_string_true = [1,1]
+local weather_string_true = [1,1]
 local weather_server_true = {
 	[1] =["DT_RTRclear_day_night", "DT_RTRclear_day_morning", "DT_RTRclear_day_afternoon", "DT_RTRclear_day_evening"],
 	[2] =["DT_RTRrainy_day_night", "DT_RTRrainy_day_morning", "DT_RTRrainy_day_afternoon", "DT_RTRrainy_day_evening"],
 	[3] =["DT_RTRfoggy_day_night", "DT_RTRfoggy_day_morning", "DT_RTRfoggy_day_afternoon", "DT_RTRfoggy_day_evening"],
 }
 
-local pogoda_string_false = [1,1]
+local weather_string_false = [1,1]
 local weather_server_false = {
 	[1] =["DT04part02", "DT05part01JoesFlat", "DT05part03HarrysGunshop", "DT02part02JoesFlat"],
 	[2] =["DT02NewStart2", "DT05part04Distillery", "DT05part05ElGreco", "DT03part02FreddysBar"],
 }
 
-local pogoda_leto = [
+local weather_summer = [
 	["DT_RTRclear_day_night"],
 	["DT07part04night_bordel"],
 	["DT_RTRrainy_day_night"],
@@ -491,7 +491,7 @@ local pogoda_leto = [
 	["DT_RTRrainy_day_late_even"],
 ]
 
-local pogoda_zima = [
+local weather_winter = [
 	["DTFreeRideNightSnow"],
 	["DT04part02"],
 	["DT05part01JoesFlat"],
@@ -897,7 +897,7 @@ local up_player_subject = [//--{x,y,z, радиус 3, ид пнг 4, зп 5, с
 	[26.051,1828.37,-16.9628, 2.0, 39, 1, 131],//--мясокомбинат
 	[1234.46,1188.59,0.489151, 5.0, 59, 1, 134],//--рудокоп
 	[-422.731,485.439,0.10922, 5.0, 75, 1, 171],//автобусное депо
-	[-422.731,473.258,0.109216, 5.0, 93, 1, 0],//автобусное депо уборка снега
+	[-422.731,473.258,1000.109216, 5.0, 93, 1, 0],//автобусное депо уборка снега
 ]
 
 //--места сброса предметов
@@ -1043,7 +1043,9 @@ local fuel = {//--топливный бак
 local kilometrage = {//--пробег
 	["0"] = 0,
 }
-local dviglo = {}//--двигло вкл или выкл
+local engine = {//--двигло вкл или выкл
+	["0"] = 0,
+}
 
 //слоты дома
 local array_house_1 = {}
@@ -1718,57 +1720,41 @@ local table_job = {
 		local y = myPos[1]
 		local z = myPos[2]
 		if (isPlayerInVehicle(playerid))
+		{
+			if (getVehicleModel(vehicleid) == 39)
+			{
+				if (getSpeed(vehicleid) < 41*1.61)
 				{
-					if (getVehicleModel(vehicleid) == 39)
+					if (job_call[playerid] == 0) 
 					{
-						if (getSpeed(vehicleid) < 41*1.6 && search_inv_player_2_parameter(playerid, up_player_subject[6][4]) != 0)
+						local randomize = random(1,5)
+						job_call[playerid] = [1,randomize,0]
+
+						sendMessage(playerid, "Очистите "+randomize+" км дороги", color_mes.yellow)
+					}
+					else if (job_call[playerid][0] == 1)
+					{
+						local dist = (getSpeed(vehicleid)/3600)
+						job_call[playerid][2] = job_call[playerid][2]+dist
+
+						if (job_call[playerid][1] <= job_call[playerid][2])
 						{
-							if (job_call[playerid] == 0) 
-							{
-								sendMessage(playerid, "Езжайте по маршруту", color_mes.yellow)
-
-								job_call[playerid] = search_inv_player_2_parameter(playerid, up_player_subject[6][4])
-								job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
-
-								triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-							}
-							else if (job_call[playerid] >= 1 && job_call[playerid] <= 19) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 10.0))
-								{
-									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true, false)
-
-									job_call[playerid] = job_call[playerid]+1
-
-									inv_player_empty(playerid, up_player_subject[6][4], job_call[playerid])
-
-									job_pos[playerid] = [busdriver_pos[ job_call[playerid]-1 ][0],busdriver_pos[ job_call[playerid]-1 ][1],busdriver_pos[ job_call[playerid]-1 ][2]]
-
-									triggerClientEvent(playerid, "removegps")
-									triggerClientEvent(playerid, "job_gps", job_pos[playerid][0],job_pos[playerid][1])
-								}
-							}
-							else if (job_call[playerid] == 20) 
-							{
-								if (isPointInCircle3D(x,y,z, job_pos[playerid][0],job_pos[playerid][1],job_pos[playerid][2], 15.0))
-								{
-									local randomize = random(zp_player_show/2,zp_player_show)
-
-									inv_player_delet(playerid, up_player_subject[6][4], job_call[playerid], true, false)
-
-									inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
-
-									sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", color_mes.green)
-
-									triggerClientEvent(playerid, "removegps")
-										
-									job_pos[playerid] = 0
-									job_call[playerid] = 0
-								}
-							}
+							job_call[playerid][0] = 2
 						}
 					}
+					else if (job_call[playerid][0] == 2)
+					{
+						local randomize = random(zp_player_show*job_call[playerid][1]/2,zp_player_show*job_call[playerid][1])
+
+						inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)+randomize, playername )
+
+						sendMessage(playerid, "Вы получили за маршрут "+randomize+"$", color_mes.green)
+
+						job_call[playerid] = 0
+					}
 				}
+			}
+		}
 	},
 
 	[13] = function (playerid,playername) {//--работа транспортный детектив
@@ -4277,7 +4263,7 @@ function EngineState()//двигатель вкл или выкл
 	{
 		local plate = getVehiclePlateText(vehicleid)
 			
-		if(dviglo[plate] == 1)
+		if(engine[plate] == 1 || plate == "0")
 		{
 			setVehicleFuel(vehicleid, (motor_show[getVehicleModel(vehicleid)][2]/max_fuel)*fuel[plate])
 		}
@@ -4309,11 +4295,11 @@ function fuel_down()//--система топлива авто
 		local fuel_down_number = 0.0002
 		local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
 
-		if (dviglo[plate] == 1 && plate != "0")
+		if (engine[plate] == 1 && plate != "0")
 		{
 			if (fuel[plate] <= 0)
 			{
-				dviglo[plate] <- 0
+				engine[plate] <- 0
 			}
 			else
 			{
@@ -4528,19 +4514,19 @@ function timeserver()//время сервера
 		{
 			hour = 0
 
-			if (pogoda)
+			if (weather)
 			{
-				pogoda_string_true[0] = pogoda_string_true[1]
-				pogoda_string_true[1] = random(1,3)
+				weather_string_true[0] = weather_string_true[1]
+				weather_string_true[1] = random(1,3)
 
-				print("[timeserver] pogoda_string_true "+pogoda_string_true[1])
+				print("[timeserver] weather_string_true "+weather_string_true[1])
 			}
 			else 
 			{
-				pogoda_string_false[0] = pogoda_string_false[1]
-				pogoda_string_false[1] = random(1,2)
+				weather_string_false[0] = weather_string_false[1]
+				weather_string_false[1] = random(1,2)
 
-				print("[timeserver] pogoda_string_false "+pogoda_string_false[1])
+				print("[timeserver] weather_string_false "+weather_string_false[1])
 			}
 
 			loto[0] = random(1,1000)
@@ -4558,84 +4544,84 @@ function timeserver()//время сервера
 
 function random_weather (hour) 
 {	
-	if (pogoda)
+	if (weather)
 	{
 		if (hour == 0)
 		{
-			setWeather( weather_server_true[pogoda_string_true[0]][0] )
+			setWeather( weather_server_true[weather_string_true[0]][0] )
 		}
 		else if (hour == 6) 
 		{
-			setWeather( weather_server_true[pogoda_string_true[0]][1] )
+			setWeather( weather_server_true[weather_string_true[0]][1] )
 		}
 		else if (hour == 12) 
 		{
-			setWeather( weather_server_true[pogoda_string_true[0]][2] )
+			setWeather( weather_server_true[weather_string_true[0]][2] )
 		}
 		else if (hour == 18) 
 		{
-			setWeather( weather_server_true[pogoda_string_true[0]][3] )
+			setWeather( weather_server_true[weather_string_true[0]][3] )
 		}
 	}
 	else 
 	{
 		if (hour == 0)
 		{
-			setWeather( weather_server_false[pogoda_string_false[0]][0] )
+			setWeather( weather_server_false[weather_string_false[0]][0] )
 		}
 		else if (hour == 6) 
 		{
-			setWeather( weather_server_false[pogoda_string_false[0]][1] )
+			setWeather( weather_server_false[weather_string_false[0]][1] )
 		}
 		else if (hour == 12) 
 		{
-			setWeather( weather_server_false[pogoda_string_false[0]][2] )
+			setWeather( weather_server_false[weather_string_false[0]][2] )
 		}
 		else if (hour == 18) 
 		{
-			setWeather( weather_server_false[pogoda_string_false[0]][3] )
+			setWeather( weather_server_false[weather_string_false[0]][3] )
 		}
 	}
 }
 
 function spawn_weather (hour) 
 {	
-	if (pogoda)
+	if (weather)
 	{
 		if (hour >= 0 && hour <= 5)
 		{
-			setWeather( weather_server_true[pogoda_string_true[0]][0] )
+			setWeather( weather_server_true[weather_string_true[0]][0] )
 		}
 		else if (hour >= 6 && hour <= 11)
 		{
-			setWeather( weather_server_true[pogoda_string_true[0]][1] )
+			setWeather( weather_server_true[weather_string_true[0]][1] )
 		}
 		else if (hour >= 12 && hour <= 17)
 		{
-			setWeather( weather_server_true[pogoda_string_true[0]][2] )
+			setWeather( weather_server_true[weather_string_true[0]][2] )
 		}
 		else if (hour >= 18 && hour <= 23)
 		{
-			setWeather( weather_server_true[pogoda_string_true[0]][3] )
+			setWeather( weather_server_true[weather_string_true[0]][3] )
 		}
 	}
 	else 
 	{
 		if (hour >= 0 && hour <= 5)
 		{
-			setWeather( weather_server_false[pogoda_string_false[0]][0] )
+			setWeather( weather_server_false[weather_string_false[0]][0] )
 		}
 		else if (hour >= 6 && hour <= 11)
 		{
-			setWeather( weather_server_false[pogoda_string_false[0]][1] )
+			setWeather( weather_server_false[weather_string_false[0]][1] )
 		}
 		else if (hour >= 12 && hour <= 17)
 		{
-			setWeather( weather_server_false[pogoda_string_false[0]][2] )
+			setWeather( weather_server_false[weather_string_false[0]][2] )
 		}
 		else if (hour >= 18 && hour <= 23)
 		{
-			setWeather( weather_server_false[pogoda_string_false[0]][3] )
+			setWeather( weather_server_false[weather_string_false[0]][3] )
 		}
 	}
 }
@@ -4951,7 +4937,7 @@ function prison()//--таймер заключения
 addEventHandler( "onScriptInit",
 function()
 {	
-	setSummer(pogoda)
+	setSummer(weather)
 	setGameModeText( "discord.gg/000000" )//ссылка на дискорд
 
 	timer( EngineState, 1000, -1 )//двигатель машины
@@ -5089,7 +5075,7 @@ function car_spawn(number)
 		array_car_2[number] <- [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 		fuel[number] <- result[1]["fuel"]
-		dviglo[number] <- 0
+		engine[number] <- 0
 		kilometrage[number] <- result[1]["kilometrage"]
 
 		load_inv(number, "car", result[1]["inventory"])
@@ -5579,14 +5565,14 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 			if (result[1]["taxation"] <= 0)
 			{
 				sendMessage(playerid, "[ERROR] Т/с арестован за уклонение от уплаты налогов", color_mes.red)
-				dviglo[plate] <- 0
+				engine[plate] <- 0
 				return
 			}
 		}
 
 		if (car_27[playerid])
 		{
-			dviglo[plate] <- 0
+			engine[plate] <- 0
 			return
 		}
 
@@ -5605,16 +5591,16 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 			if (fuel[plate] <= 1)
 			{
 				sendMessage(playerid, "[ERROR] Бак пуст", color_mes.red)
-				dviglo[plate] <- 0
+				engine[plate] <- 0
 				return
 			}
 
-			dviglo[plate] <- 1
+			engine[plate] <- 1
 		}
 		else
 		{
 			sendMessage(playerid, "[ERROR] Чтобы завести т/с надо иметь ключ от т/с и права (можно купить в Мэрии)", color_mes.red)
-			dviglo[plate] <- 0
+			engine[plate] <- 0
 		}
 	}
 }
@@ -5640,7 +5626,7 @@ function PlayerVehicleExit( playerid, vehicleid, seat )
 
 		triggerClientEvent( playerid, "event_tab_load", "car", "" )
 
-		dviglo[plate] <- 0
+		engine[plate] <- 0
 		car_27[playerid] = false
 	}
 }
@@ -6276,7 +6262,7 @@ function give_subject( playerid, value, id1, id2, load_value )//--выдача �
 					sendMessage(playerid, "[ERROR] Вы не развозчик угля", color_mes.red)
 					return
 				}
-				else if (pogoda)
+				else if (weather)
 				{
 					sendMessage(playerid, "[ERROR] Работа доступна зимой", color_mes.red)
 					return
@@ -6884,7 +6870,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 							local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
 							if (result[1]["taxation"] != 0 && search_inv_player(playerid, 6, plate.tointeger()) != 0 && search_inv_player(playerid, 2, 1) != 0 && sead[playerid] == 0)
 							{
-								dviglo[plate] <- 1
+								engine[plate] <- 1
 							}
 						}
 					}
@@ -6954,28 +6940,28 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 		}
 		else if (id1 == 11)//--газета
 		{
-			if (pogoda)
+			if (weather)
 			{
-				if (pogoda_string_true[1] == 1)
+				if (weather_string_true[1] == 1)
 				{
 					sendMessage(playerid, "[ПОГОДА] Завтра обещают солнечный день", color_mes.yellow)
 				}
-				else if (pogoda_string_true[1] == 2) 
+				else if (weather_string_true[1] == 2) 
 				{
 					sendMessage(playerid, "[ПОГОДА] Завтра обещают дождливый день", color_mes.yellow)
 				}
-				else if (pogoda_string_true[1] == 3) 
+				else if (weather_string_true[1] == 3) 
 				{
 					sendMessage(playerid, "[ПОГОДА] Завтра обещают туманный день", color_mes.yellow)
 				}
 			}
 			else 
 			{
-				if (pogoda_string_false[1] == 1)
+				if (weather_string_false[1] == 1)
 				{
 					sendMessage(playerid, "[ПОГОДА] Завтра обещают солнечный день", color_mes.yellow)
 				}
-				else if (pogoda_string_false[1] == 2) 
+				else if (weather_string_false[1] == 2) 
 				{
 					sendMessage(playerid, "[ПОГОДА] Завтра обещают туманный день", color_mes.yellow)
 				}
@@ -7300,7 +7286,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 			}
 			else if(id2 == 12)
 			{
-				if (pogoda)
+				if (weather)
 				{
 					sendMessage(playerid, "[ERROR] Работа доступна зимой", color_mes.red)
 					return
@@ -7844,7 +7830,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 					{
 						id2 = id2-1
 
-						dviglo[getVehiclePlateText(vehicleid)] <- 1
+						engine[getVehiclePlateText(vehicleid)] <- 1
 
 						me_chat(playerid, playername+" использовал(а) "+info_png[id1][0])
 					}
@@ -9073,7 +9059,7 @@ function (playerid, id)
 		{
 			if(try_chat_player(playerid, playername+" попытался(ась) выстрелить в двигатель"))
 			{
-				dviglo[getVehiclePlateText(getPlayerVehicle(id))] <- 0
+				engine[getVehiclePlateText(getPlayerVehicle(id))] <- 0
 			}
 		}
 		else
