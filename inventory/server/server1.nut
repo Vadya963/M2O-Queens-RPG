@@ -3197,7 +3197,7 @@ function buy_subject_fun( playerid, text, number, value )
 			}
 		}
 
-		if (search_inv_player(playerid, 41, 1) == 0)
+		if (search_inv_player_2_parameter(playerid, 41) != playerid+1)
 		{
 			sendMessage(playerid, "[ERROR] У вас нет лицензии на оружие, приобрести её можно в Мэрии", color_mes.red)
 			return
@@ -3490,7 +3490,7 @@ function buy_subject_fun( playerid, text, number, value )
 
 			if (value == 0)
 			{
-				if (search_inv_player(playerid, 41, 1) == 0)
+				if (search_inv_player_2_parameter(playerid, 41) != playerid+1)
 				{
 					sendMessage(playerid, "[ERROR] У вас нет лицензии на оружие, приобрести её можно в Мэрии", color_mes.red)
 					return
@@ -5576,7 +5576,7 @@ function playerEnteredVehicle( playerid, vehicleid, seat )
 			return
 		}
 
-		if (search_inv_player(playerid, 6, plate.tointeger()) != 0 && search_inv_player(playerid, 2, 1) != 0)
+		if (search_inv_player(playerid, 6, plate.tointeger()) != 0 && search_inv_player_2_parameter(playerid, 2) == playerid+1)
 		{
 			if (plate.tointeger() != 0)
 			{
@@ -6868,7 +6868,7 @@ function use_inv (playerid, value, id3, id_1, id_2 )//--использовани
 						if (result[1]["COUNT()"] == 1)
 						{
 							local result = sqlite3( "SELECT * FROM car_db WHERE number = '"+plate+"'" )
-							if (result[1]["taxation"] != 0 && search_inv_player(playerid, 6, plate.tointeger()) != 0 && search_inv_player(playerid, 2, 1) != 0 && sead[playerid] == 0)
+							if (result[1]["taxation"] != 0 && search_inv_player(playerid, 6, plate.tointeger()) != 0 && search_inv_player_2_parameter(playerid, 2) == playerid+1 && sead[playerid] == 0)
 							{
 								engine[plate] <- 1
 							}
