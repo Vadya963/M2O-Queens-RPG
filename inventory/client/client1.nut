@@ -1,7 +1,7 @@
 local playerid = -1
 local screen = getScreenSize()
-local width_hd = (screen[0]/1366)//--адаптация размеров
-local height_hd = (screen[1]/768)//--адаптация размеров
+local width_hd = (screen[0]/1366.0)//--адаптация размеров
+local height_hd = (screen[1]/768.0)//--адаптация размеров
 local max_inv = 24
 local width = 370.0
 local height = 250.0
@@ -19,9 +19,8 @@ local sync_timer = false
 local sync_timer2 = false
 local number_business = -1//номер бизнеса
 local value_business = -1//тип бизнеса
-local width_need = 270*width_hd//--ширина нужд
-local height_need = 150*height_hd//--высота нужд
-local screenWidth = screen[0]
+local width_need = 270.0*width_hd//--ширина нужд
+local height_need = 150.0*height_hd//--высота нужд
 local zakon_taxation_car = 500
 local zakon_taxation_house = 1000
 local zakon_taxation_business = 2000
@@ -1512,21 +1511,21 @@ function( post )
 		local dgs = [
 		[false, (screen[0]/2)-(dxGetTextDimensions("test dgss", 1.0, "tahoma-bold" )[0]/2),(screen[1]/2)-(10.0/2), dxGetTextDimensions("test dgss", 1.0, "tahoma-bold" )[0],10.0 fromRGB(0,0,0,255), "rectangle"],
 		[false, "test dgss", (screen[0]/2)-(dxGetTextDimensions("test dgss", 1.0, "tahoma-bold" )[0]/2),(screen[1]/2)-(15.0/2), fromRGB(255,0,0,255), true, "tahoma-bold", 1.0, "text"],
-		[true, alcohol_png, screen[0]-30.0, height_need-7.5+(20+7.5)*1, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
-		[true, drugs_png, screen[0]-30.0, height_need-7.5+(20+7.5)*2, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
-		[true, satiety_png, screen[0]-30.0, height_need-7.5+(20+7.5)*3, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
-		[true, hygiene_png, screen[0]-30.0, height_need-7.5+(20+7.5)*4, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
-		[true, sleep_png, screen[0]-30.0, height_need-7.5+(20+7.5)*5, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
-		[true, screenWidth-width_need-30, height_need+(20+7.5)*1, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
-		[true, screenWidth-width_need-30, height_need+(20+7.5)*1, ((width_need/500.0)*alcohol), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
-		[true, screenWidth-width_need-30, height_need+(20+7.5)*2, width_need, 15.0 fromRGB ( 0, 0, 0, 200 ), "rectangle"],
-		[true, screenWidth-width_need-30, height_need+(20+7.5)*2, ((width_need/100.0)*drugs), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
-		[true, screenWidth-width_need-30, height_need+(20+7.5)*3, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
-		[true, screenWidth-width_need-30, height_need+(20+7.5)*3,( (width_need/100.0)*satiety), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
-		[true, screenWidth-width_need-30, height_need+(20+7.5)*4, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
-		[true, screenWidth-width_need-30, height_need+(20+7.5)*4, ((width_need/100.0)*hygiene), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
-		[true, screenWidth-width_need-30, height_need+(20+7.5)*5, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
-		[true, screenWidth-width_need-30, height_need+(20+7.5)*5, ((width_need/100.0)*sleep), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
+		[true, alcohol_png, screen[0]-30.0, height_need-7.5+(20+7.5)*0, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
+		[true, drugs_png, screen[0]-30.0, height_need-7.5+(20+7.5)*1, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
+		[true, satiety_png, screen[0]-30.0, height_need-7.5+(20+7.5)*2, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
+		[true, hygiene_png, screen[0]-30.0, height_need-7.5+(20+7.5)*3, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
+		[true, sleep_png, screen[0]-30.0, height_need-7.5+(20+7.5)*4, 0.93,0.93, 0.0,0.0,0.0, 255, "texture"],
+		[true, screen[0]-width_need-30, height_need+(20+7.5)*0, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
+		[true, screen[0]-width_need-30, height_need+(20+7.5)*0, ((width_need/500.0)*alcohol), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
+		[true, screen[0]-width_need-30, height_need+(20+7.5)*1, width_need, 15.0 fromRGB ( 0, 0, 0, 200 ), "rectangle"],
+		[true, screen[0]-width_need-30, height_need+(20+7.5)*1, ((width_need/100.0)*drugs), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
+		[true, screen[0]-width_need-30, height_need+(20+7.5)*2, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
+		[true, screen[0]-width_need-30, height_need+(20+7.5)*2,( (width_need/100.0)*satiety), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
+		[true, screen[0]-width_need-30, height_need+(20+7.5)*3, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
+		[true, screen[0]-width_need-30, height_need+(20+7.5)*3, ((width_need/100.0)*hygiene), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
+		[true, screen[0]-width_need-30, height_need+(20+7.5)*4, width_need, 15.0, fromRGB ( 0, 0, 0, 200 ), "rectangle"],
+		[true, screen[0]-width_need-30, height_need+(20+7.5)*4, ((width_need/100.0)*sleep), 15.0, fromRGB ( 90, 151, 107, 255 ), "rectangle"],
 		[true, text, 2.0, 0.0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
 		[getPlayerVehicle(playerid) != -1 || false, "plate "+plate+" | kilometrage "+split(getElementData("kilometrage_data"), ".")[0], 2.0, screen[1]-16.0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
 		[getElementData("gps_device_data").tointeger() == 1 || false, "[X  "+split(myPos[0].tostring(), ".")[0]+", Y  "+split(myPos[1].tostring(), ".")[0]+"]", getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )[0]-(dxGetTextDimensions( "[X  "+split(myPos[0].tostring(), ".")[0]+", Y  "+split(myPos[1].tostring(), ".")[0]+"]", 1.0, "tahoma-bold" )[0]/2), getScreenFromWorld( myPos[0], myPos[1], myPos[2]+1 )[1], fromRGB ( color_mes.svetlo_zolotoy[0], color_mes.svetlo_zolotoy[1], color_mes.svetlo_zolotoy[2], 255 ), true, "tahoma-bold", 1.0, "text"],
@@ -1535,12 +1534,11 @@ function( post )
 		[spl_gz[0].tointeger() == 1 || false, "Attack "+spl_gz[2]+": "+spl_gz[3]+" points", 2.0, screen[1]-16*5, fromRGB( 255,0,50 ), false, "tahoma-bold", 1.0, "text"],
 		[spl_gz[0].tointeger() == 1 || false, "Defense "+spl_gz[4]+": "+spl_gz[5]+" points", 2.0, screen[1]-16*4, fromRGB( 0,50,255 ), false, "tahoma-bold", 1.0, "text"],
 		[isCursorShowing, pos[0]+", "+pos[1], pos[0]+15.0, pos[1], fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, heal_player[0], screenWidth-width_need-30-30, height_need, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, (alcohol/100).tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*1, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, drugs.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*2, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, satiety.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*3, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, hygiene.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*4, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
-		[isCursorShowing, sleep.tostring(), screenWidth-width_need-30-30, height_need+(20+7.5)*5, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, (alcohol/100).tostring(), screen[0]-width_need-30-30, height_need+(20+7.5)*0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, drugs.tostring(), screen[0]-width_need-30-30, height_need+(20+7.5)*1, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, satiety.tostring(), screen[0]-width_need-30-30, height_need+(20+7.5)*2, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, hygiene.tostring(), screen[0]-width_need-30-30, height_need+(20+7.5)*3, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
+		[isCursorShowing, sleep.tostring(), screen[0]-width_need-30-30, height_need+(20+7.5)*4, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
 		[isCursorShowing, myPos[0]+" "+myPos[1]+" "+myPos[2], 300.0, 40.0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
 		[isCursorShowing, myRot[0]+" "+myRot[1]+" "+myRot[2], 300.0, 55.0, fromRGB ( color_mes.white[0], color_mes.white[1], color_mes.white[2], 255 ), true, "tahoma-bold", 1.0, "text"],
 		]
