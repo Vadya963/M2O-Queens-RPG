@@ -2065,7 +2065,7 @@ function(playerid, text)
 	
 	if (count == 0)
 	{
-		sendMessageAll( playerid, say, gray )
+		sendMessageAll( playerid, say, color_mes.gray )
 
 		print("[CHAT] "+say)
 	}
