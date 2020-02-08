@@ -2583,7 +2583,7 @@ function setPlayerColour_fun(playerid)
 	}
 	else 
 	{
-		setPlayerColour(playerid, fromRGB(white[0],white[1],white[2]))
+		setPlayerColour(playerid, fromRGB(color_mes.white[0],color_mes.white[1],color_mes.white[2]))
 	}
 }
 
