@@ -32,6 +32,7 @@ function random(min=0, max=RAND_MAX)
 	srand(getTickCount() * rand())
 	return (rand() % ((max + 1) - min)) + min//функция для получения рандомных чисел
 }
+local spawn_pos = [-575.101,1622.8,-15.6957]//--стартовая позиция
 local no_create_subject = [6,25,32,33,37,98,99]//предметы которые нельзя создать
 local element_data = {}
 local weather = true //зима(false) или лето(true)
@@ -5427,7 +5428,7 @@ function reg_or_login(playerid)
 			return
 		}
 		
-		local result = sqlite3( "INSERT INTO account (name, ban, reason, x, y, z, reg_ip, reg_serial, heal, alcohol, satiety, hygiene, sleep, drugs, skin, arrest, crimes, inventory) VALUES ('"+playername+"', '0', '0', '0', '0', '0', '"+ip+"', '"+serial+"', '"+max_heal+"', '0', '100', '100', '100', '0', '81', '0', '0', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
+		local result = sqlite3( "INSERT INTO account (name, ban, reason, x, y, z, reg_ip, reg_serial, heal, alcohol, satiety, hygiene, sleep, drugs, skin, arrest, crimes, inventory) VALUES ('"+playername+"', '0', '0', '"+spawn_pos[0]+"', '"+spawn_pos[1]+"', '"+spawn_pos[2]+"', '"+ip+"', '"+serial+"', '"+max_heal+"', '0', '100', '100', '100', '0', '81', '0', '0', '0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,0:0,')" )
 
 		local result = sqlite3( "SELECT * FROM account WHERE name = '"+playername+"'" )
 
@@ -5444,7 +5445,7 @@ function reg_or_login(playerid)
 
 		setplayerhealth( playerid, result[1]["heal"] )
 		setPlayerModel(playerid, result[1]["skin"])
-		setPlayerPosition( playerid, -575.101,1622.8,-15.6957 )
+		setPlayerPosition( playerid, spawn_pos[0],spawn_pos[1],spawn_pos[2] )
 
 		sendMessage(playerid, "Вы удачно зарегистрировались!", color_mes.turquoise)
 
