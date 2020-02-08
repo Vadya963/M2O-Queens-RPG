@@ -2499,7 +2499,7 @@ function player_hotel (playerid, id)
 			me_chat(playerid, playername+" вздремнул(а)")
 		}
 
-		sendMessage(playerid, "Вы заплатили "+(price_hotel)+"$", orange )
+		sendMessage(playerid, "Вы заплатили "+(price_hotel)+"$", color_mes.orange )
 
 		inv_server_load( playerid, "player", 0, 1, search_inv_player_2_parameter(playerid, 1)-(price_hotel), playerid )
 					
@@ -5270,7 +5270,7 @@ function playerDeath( playerid, attacker )
 			{
 				arrest[playerid] = 1
 
-				sendMessage(attacker, "Вы получили премию "+(cash*(crimes[playerid]))+"$", green )
+				sendMessage(attacker, "Вы получили премию "+(cash*(crimes[playerid]))+"$", color_mes.green )
 
 				inv_server_load( attacker, "player", 0, 1, array_player_2[attacker][0]+(cash*(crimes[playerid])), attacker )
 			}
