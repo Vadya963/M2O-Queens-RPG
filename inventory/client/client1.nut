@@ -816,7 +816,7 @@ function tune_close ()//--закрытие окна
 	number_business = -1
 	value_business = -1
 
-	showCursor( false )
+	showcursor( false )
 	guiSetVisible( shop_menu_button, false )
 	guiSetVisible( shop_menu_button2, false )
 	guiSetVisible( shop_menu_button3, false )
@@ -842,7 +842,7 @@ function shop_menu_fun(number, value)//--создание окна магази�
 	number_business = number
 	value_business = value
 
-	showCursor( true )
+	showcursor( true )
 
 	if (value_business == 0)
 	{
@@ -1251,6 +1251,27 @@ function blip_create(x, y, lib, icon, r)
 }
 addEventHandler ( "event_blip_create", blip_create )
 
+function showcursor (bool) {
+	showCursor(bool)
+	isCursorShowing = bool
+}
+
+function isInSlot(dX, dY, dSZ, dM)
+{
+	if (isCursorShowing)
+	{
+		local pos = getMousePosition()
+		if(pos[0] >= dX && pos[0] <= dX+dSZ && pos[1] >= dY && pos[1] <= dY+dM)
+		{
+			return [true, pos[0], pos[1]]
+		}
+		else
+		{
+			return false
+		}
+	}
+}
+
 //-----------эвенты------------------------------------------------------------------------
 //сохранение действий игрока
 function save_player_action (text)
@@ -1313,8 +1334,7 @@ function f1_down()
 		return
 	}
 
-	isCursorShowing = !isCursorShowing
-	showCursor( isCursorShowing )
+	showcursor( !isCursorShowing )
 }
 
 function f2_down()
@@ -1338,14 +1358,14 @@ function f3_down()
 
 	if(guiGetVisibleGridList(player_menu))
 	{
-		showCursor( false )
+		showcursor( false )
 		guiSetVisibleGridList (player_menu, false)
 		guiSetVisible( shop_menu_button4, false )
 		guiSetVisible( shop_menu_button5, false )
 	}
 	else
 	{
-		showCursor( true )
+		showcursor( true )
 
 		local pos = guiGetSize( player_menu[0] )
 		gridlist_button_width_height = [pos[0],pos[1]+60.0]
@@ -1797,7 +1817,7 @@ function tab_down_fun(value)//инв-рь игрока
 		info1_selection_1 = -1
 		info2_selection_1 = -1
 		lmb = 0
-		showCursor( false )
+		showcursor( false )
 
 		guiSetVisible( gui_fon, false )
 
@@ -1807,7 +1827,7 @@ function tab_down_fun(value)//инв-рь игрока
 	{
 		state_inv_gui = true
 		state_inv_player = true
-		showCursor( true )
+		showcursor( true )
 
 		guiSetVisible( gui_fon, true )
 	}
@@ -1865,7 +1885,7 @@ function( element )
 	{
 		for (local i = 0; i < max_inv; i++) 
 		{
-			if ( ((inv_pos[i][1]+pos_x_3d_image)) < pos[0] && ((inv_pos[i][1]+pos_x_3d_image)+image_w_h) > pos[0] && ((inv_pos[i][2]+pos_y_3d_image)) < pos[1] && ((inv_pos[i][2]+pos_y_3d_image)+image_w_h) > pos[1] )
+			if ( isInSlot((inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), image_w_h, image_w_h) )
 			{
 				info3 = i
 
@@ -2141,14 +2161,14 @@ function( element )
 			}
 		}
 
-		if ( ((button_pos[0][2]+pos_x_3d_image)) < pos[0] && ((button_pos[0][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[0][3])) < pos[1] && ((pos_y_3d_image-button_pos[0][3])+button_pos[0][3]) > pos[1] )
+		if ( isInSlot((button_pos[0][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[0][3]), image_w_h, button_pos[0][3]) )
 		{
 			state_inv_player = true
 			state_inv_car = false
 			state_inv_house = false
 			state_inv_box = false
 		}
-		else if ( plate != "" && ((button_pos[1][2]+pos_x_3d_image)) < pos[0] && ((button_pos[1][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[1][3])) < pos[1] && ((pos_y_3d_image-button_pos[1][3])+button_pos[1][3]) > pos[1] )
+		else if ( plate != "" && isInSlot((button_pos[1][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[1][3]), image_w_h, button_pos[1][3]) )
 		{
 			state_inv_player = false
 			state_inv_car = true
@@ -2157,14 +2177,14 @@ function( element )
 
 			triggerServerEvent("event_setVehiclePartOpen_fun", "true")
 		}
-		else if ( house != "" && ((button_pos[2][2]+pos_x_3d_image)) < pos[0] && ((button_pos[2][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[2][3])) < pos[1] && ((pos_y_3d_image-button_pos[2][3])+button_pos[2][3]) > pos[1] )
+		else if ( house != "" && isInSlot((button_pos[2][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[2][3]), image_w_h, button_pos[2][3]) )
 		{
 			state_inv_player = false
 			state_inv_car = false
 			state_inv_house = true
 			state_inv_box = false
 		}
-		else if ( box != "" && ((button_pos[3][2]+pos_x_3d_image)) < pos[0] && ((button_pos[3][2]+pos_x_3d_image)+image_w_h) > pos[0] && ((pos_y_3d_image-button_pos[3][3])) < pos[1] && ((pos_y_3d_image-button_pos[3][3])+button_pos[3][3]) > pos[1] )
+		else if ( box != "" && isInSlot((button_pos[3][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[3][3]), image_w_h, button_pos[3][3]) )
 		{
 			state_inv_player = false
 			state_inv_car = false
@@ -2172,7 +2192,7 @@ function( element )
 			state_inv_box = true
 		}
 
-		if ( 0.0 < pos[0] && pos_x_3d_image > pos[0] )//использовать предмет
+		if ( isInSlot(0.0, 0.0, pos_x_3d_image, screen[1]) )//использовать предмет
 		{
 			if (lmb == 1)
 			{
@@ -2197,7 +2217,7 @@ function( element )
 				lmb = 0
 			}
 		}
-		else if ( (screen[0]-pos_x_3d_image) < pos[0] && (screen[0]+pos_x_3d_image) > pos[0] )//выкинуть предмет
+		else if ( isInSlot((screen[0]-pos_x_3d_image), 0.0, screen[0], screen[1]) )//выкинуть предмет
 		{
 			if (lmb == 1)
 			{
