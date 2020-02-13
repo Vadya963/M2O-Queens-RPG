@@ -7,8 +7,8 @@ local width = 370.0
 local height = 250.0
 local image_w_h = 50.0
 local dxDrawTexture_width_height = 0.78
-local pos_x_3d_image = (screen[0]/2)-(width/2)
-local pos_y_3d_image = (screen[1]/2)-(height/2)
+local pos_x_image = (screen[0]/2)-(width/2)
+local pos_y_image = (screen[1]/2)-(height/2)
 local time_game = 0//--сколько минут играешь
 local element_data = {}
 local isCursorShowing = false//+дебагинфа
@@ -1592,14 +1592,14 @@ function( post )
 
 	if (state_inv_gui)//инв-рь
 	{
-		dxDrawRectangle( pos_x_3d_image, (pos_y_3d_image-(10.0+button_pos[0][3])), width, height+(10.0+button_pos[0][3]), fromRGB( 0, 0, 0, 255 ) )
+		dxDrawRectangle( pos_x_image, (pos_y_image-(10.0+button_pos[0][3])), width, height+(10.0+button_pos[0][3]), fromRGB( 0, 0, 0, 255 ) )
 
 		if (state_inv_player)
 		{
 			for (local i = 0; i < max_inv; i++)
 			{
-				dxDrawTexture(image[inv_slot_player[i][0]], (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
-				dxdrawtext( split(inv_slot_player[i][1].tostring(),".")[0], (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+35), fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
+				dxDrawTexture(image[inv_slot_player[i][0]], (inv_pos[i][1]+pos_x_image), (inv_pos[i][2]+pos_y_image), dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
+				dxdrawtext( split(inv_slot_player[i][1].tostring(),".")[0], (inv_pos[i][1]+pos_x_image), (inv_pos[i][2]+pos_y_image+35), fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
 			}
 		}
 
@@ -1607,8 +1607,8 @@ function( post )
 		{
 			for (local i = 0; i < max_inv; i++)
 			{
-				dxDrawTexture(image[inv_slot_car[i][0]], (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
-				dxdrawtext( inv_slot_car[i][1].tostring(), (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+35), fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
+				dxDrawTexture(image[inv_slot_car[i][0]], (inv_pos[i][1]+pos_x_image), (inv_pos[i][2]+pos_y_image), dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
+				dxdrawtext( inv_slot_car[i][1].tostring(), (inv_pos[i][1]+pos_x_image), (inv_pos[i][2]+pos_y_image+35), fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
 			}
 		}
 
@@ -1616,8 +1616,8 @@ function( post )
 		{
 			for (local i = 0; i < max_inv; i++)
 			{
-				dxDrawTexture(image[inv_slot_house[i][0]], (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
-				dxdrawtext( inv_slot_house[i][1].tostring(), (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+35), fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
+				dxDrawTexture(image[inv_slot_house[i][0]], (inv_pos[i][1]+pos_x_image), (inv_pos[i][2]+pos_y_image), dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
+				dxdrawtext( inv_slot_house[i][1].tostring(), (inv_pos[i][1]+pos_x_image), (inv_pos[i][2]+pos_y_image+35), fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
 			}
 		}
 
@@ -1625,8 +1625,8 @@ function( post )
 		{
 			for (local i = 0; i < max_inv; i++)
 			{
-				dxDrawTexture(image[inv_slot_box[i][0]], (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
-				dxdrawtext( inv_slot_box[i][1].tostring(), (inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image+35), fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
+				dxDrawTexture(image[inv_slot_box[i][0]], (inv_pos[i][1]+pos_x_image), (inv_pos[i][2]+pos_y_image), dxDrawTexture_width_height, dxDrawTexture_width_height, 0.0, 0.0, 0.0, 255)
+				dxdrawtext( inv_slot_box[i][1].tostring(), (inv_pos[i][1]+pos_x_image), (inv_pos[i][2]+pos_y_image+35), fromRGB( 255, 255, 255 ), true, "tahoma-bold", 1.0 )
 			}
 		}
 
@@ -1635,29 +1635,29 @@ function( post )
 		{
 			if (info_tab == "player" && state_inv_player || info_tab == "car" && state_inv_car || info_tab == "house" && state_inv_house || info_tab == "box" && state_inv_box)
 			{
-				dxDrawRectangle( (inv_pos[info3][1]+pos_x_3d_image), (inv_pos[info3][2]+pos_y_3d_image), image_w_h, image_w_h, fromRGB( 255, 255, 130, 100 ) )
+				dxDrawRectangle( (inv_pos[info3][1]+pos_x_image), (inv_pos[info3][2]+pos_y_image), image_w_h, image_w_h, fromRGB( 255, 255, 130, 100 ) )
 			}
 		}
 
 
 		if (state_inv_player)
 		{
-			dxdrawtext( button_pos[0][1].tostring(), (button_pos[0][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[0][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
+			dxdrawtext( button_pos[0][1].tostring(), (button_pos[0][2]+pos_x_image), (pos_y_image-button_pos[0][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
 		}
 		else
 		{
-			dxdrawtext( button_pos[0][1].tostring(), (button_pos[0][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[0][3]), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
+			dxdrawtext( button_pos[0][1].tostring(), (button_pos[0][2]+pos_x_image), (pos_y_image-button_pos[0][3]), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
 		}
 
 		if (plate != "")
 		{
 			if (state_inv_car)
 			{
-				dxdrawtext( button_pos[1][1].tostring()+" "+plate, (button_pos[1][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[1][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
+				dxdrawtext( button_pos[1][1].tostring()+" "+plate, (button_pos[1][2]+pos_x_image), (pos_y_image-button_pos[1][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
 			}
 			else
 			{
-				dxdrawtext( button_pos[1][1].tostring()+" "+plate, (button_pos[1][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[1][3]), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
+				dxdrawtext( button_pos[1][1].tostring()+" "+plate, (button_pos[1][2]+pos_x_image), (pos_y_image-button_pos[1][3]), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
 			}
 		}
 
@@ -1665,11 +1665,11 @@ function( post )
 		{
 			if (state_inv_house)
 			{
-				dxdrawtext( button_pos[2][1].tostring()+" "+house, (button_pos[2][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[2][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
+				dxdrawtext( button_pos[2][1].tostring()+" "+house, (button_pos[2][2]+pos_x_image), (pos_y_image-button_pos[2][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
 			}
 			else
 			{
-				dxdrawtext( button_pos[2][1].tostring()+" "+house, (button_pos[2][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[2][3]), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
+				dxdrawtext( button_pos[2][1].tostring()+" "+house, (button_pos[2][2]+pos_x_image), (pos_y_image-button_pos[2][3]), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
 			}
 		}
 
@@ -1677,11 +1677,11 @@ function( post )
 		{
 			if (state_inv_box)
 			{
-				dxdrawtext( button_pos[3][1].tostring()+" "+box, (button_pos[3][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[3][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
+				dxdrawtext( button_pos[3][1].tostring()+" "+box, (button_pos[3][2]+pos_x_image), (pos_y_image-button_pos[3][3]), fromRGB( 255, 255, 130 ), false, "tahoma-bold", 1.0 )
 			}
 			else
 			{
-				dxdrawtext( button_pos[3][1].tostring()+" "+box, (button_pos[3][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[3][3]), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
+				dxdrawtext( button_pos[3][1].tostring()+" "+box, (button_pos[3][2]+pos_x_image), (pos_y_image-button_pos[3][3]), fromRGB( 255, 255, 255 ), false, "tahoma-bold", 1.0 )
 			}
 		}
 
@@ -1885,7 +1885,7 @@ function( element )
 	{
 		for (local i = 0; i < max_inv; i++) 
 		{
-			if ( isInSlot((inv_pos[i][1]+pos_x_3d_image), (inv_pos[i][2]+pos_y_3d_image), image_w_h, image_w_h) )
+			if ( isInSlot((inv_pos[i][1]+pos_x_image), (inv_pos[i][2]+pos_y_image), image_w_h, image_w_h) )
 			{
 				info3 = i
 
@@ -2161,14 +2161,14 @@ function( element )
 			}
 		}
 
-		if ( isInSlot((button_pos[0][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[0][3]), image_w_h, button_pos[0][3]) )
+		if ( isInSlot((button_pos[0][2]+pos_x_image), (pos_y_image-button_pos[0][3]), image_w_h, button_pos[0][3]) )
 		{
 			state_inv_player = true
 			state_inv_car = false
 			state_inv_house = false
 			state_inv_box = false
 		}
-		else if ( plate != "" && isInSlot((button_pos[1][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[1][3]), image_w_h, button_pos[1][3]) )
+		else if ( plate != "" && isInSlot((button_pos[1][2]+pos_x_image), (pos_y_image-button_pos[1][3]), image_w_h, button_pos[1][3]) )
 		{
 			state_inv_player = false
 			state_inv_car = true
@@ -2177,14 +2177,14 @@ function( element )
 
 			triggerServerEvent("event_setVehiclePartOpen_fun", "true")
 		}
-		else if ( house != "" && isInSlot((button_pos[2][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[2][3]), image_w_h, button_pos[2][3]) )
+		else if ( house != "" && isInSlot((button_pos[2][2]+pos_x_image), (pos_y_image-button_pos[2][3]), image_w_h, button_pos[2][3]) )
 		{
 			state_inv_player = false
 			state_inv_car = false
 			state_inv_house = true
 			state_inv_box = false
 		}
-		else if ( box != "" && isInSlot((button_pos[3][2]+pos_x_3d_image), (pos_y_3d_image-button_pos[3][3]), image_w_h, button_pos[3][3]) )
+		else if ( box != "" && isInSlot((button_pos[3][2]+pos_x_image), (pos_y_image-button_pos[3][3]), image_w_h, button_pos[3][3]) )
 		{
 			state_inv_player = false
 			state_inv_car = false
@@ -2192,7 +2192,7 @@ function( element )
 			state_inv_box = true
 		}
 
-		if ( isInSlot(0.0, 0.0, pos_x_3d_image, screen[1]) )//использовать предмет
+		if ( isInSlot(0.0, 0.0, pos_x_image, screen[1]) )//использовать предмет
 		{
 			if (lmb == 1)
 			{
@@ -2217,7 +2217,7 @@ function( element )
 				lmb = 0
 			}
 		}
-		else if ( isInSlot((screen[0]-pos_x_3d_image), 0.0, screen[0], screen[1]) )//выкинуть предмет
+		else if ( isInSlot((screen[0]-pos_x_image), 0.0, screen[0], screen[1]) )//выкинуть предмет
 		{
 			if (lmb == 1)
 			{
