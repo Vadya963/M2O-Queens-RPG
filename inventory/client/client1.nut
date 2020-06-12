@@ -28,8 +28,10 @@ local is_chat_open = 0//чат: 0-закрыт, 1-открыт
 local afk = 0//--сколько минут в афк
 
 //---------------------грайдлист-------------------------
-local gridlist_table_window = {}//таблица созданных окон
-local gridlist_table_text = {}//таблица созданных текстов
+local gridlist_table = {
+["window"] = {},//таблица созданных окон
+["text"] = {},//таблица созданных текстов
+}
 local gridlist_window = false//окно в котором выделяется текст
 local gridlist_lable = false//текст который будет выделяться
 local gridlist_row = -1//номер текста который будет выделяться
@@ -407,10 +409,10 @@ function guiCreateGridList (x,y, width, height)
 
 	if (window)
 	{
-		local table_len = gridlist_table_window.len()
+		local table_len = gridlist_table["window"].len()
 
-		gridlist_table_window[table_len] <- window
-		gridlist_table_text[table_len] <- {}
+		gridlist_table["window"][table_len] <- window
+		gridlist_table["text"][table_len] <- {}
 		return [window,table_len]
 	}
 	else 
@@ -423,11 +425,11 @@ function guiGridListAddRow (window, text)
 {
 	if (window[0])
 	{
-		local table_len = gridlist_table_text[ window[1] ].len()
+		local table_len = gridlist_table["text"][ window[1] ].len()
 		local guiSize_window = guiGetSize( window[0] )
 		local text_gui = guiCreateElement( 6, text, 10.0, (15.0*table_len), guiSize_window[0], 15.0, false, window[0] )
 
-		gridlist_table_text[ window[1] ][ table_len ] <- text_gui
+		gridlist_table["text"][ window[1] ][ table_len ] <- text_gui
 		return true
 	}
 	else 
@@ -492,7 +494,7 @@ function guiGetCountGridList (window)
 {
 	if (window)
 	{		
-		return gridlist_table_text[ window[1] ].len()
+		return gridlist_table["text"][ window[1] ].len()
 	}
 	else 
 	{
@@ -504,7 +506,7 @@ function guiSetTextGridList (window, slot, text)
 {
 	if (window)
 	{
-		return guiSetText(gridlist_table_text[ window[1] ][ slot ], text )
+		return guiSetText(gridlist_table["text"][ window[1] ][ slot ], text )
 	}
 	else 
 	{
@@ -2260,13 +2262,13 @@ function( element )
 	}
 
 
-	foreach (idx, value in gridlist_table_window) 
+	foreach (idx, value in gridlist_table["window"]) 
 	{	
-		foreach (idx2, value2 in gridlist_table_text[idx])
+		foreach (idx2, value2 in gridlist_table["text"][idx])
 		{	
 			if (element == value2)
 			{
-				gridlist_window = gridlist_table_window[idx]
+				gridlist_window = gridlist_table["window"][idx]
 				gridlist_lable = element
 				gridlist_row = idx2
 				gridlist_select = true
