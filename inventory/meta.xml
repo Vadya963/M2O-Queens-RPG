@@ -3,6 +3,7 @@
 	<script type="client">3d_text.nut</script>
 	
 	<script type="server">server1.nut</script>
+	<script type="server">ini.nut</script>
 	
 	<file>0.png</file>
 	<file>1.png</file>
