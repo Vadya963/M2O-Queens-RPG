@@ -1900,6 +1900,23 @@ function sendMessage(playerid, text, color)
 	min_chat[playerid] = max_chat[playerid] - max_message
 }
 
+function table_concat (vargv) {
+	local text = ""
+	for(local i = 0; i < vargv.len(); i++)
+	{
+		if(vargv.len()-1 == i)
+		{
+			text = text+vargv[i]
+		}
+		else
+		{
+			text = text+vargv[i]+" "
+		}
+	}
+
+	return text
+}
+
 function sendMessageAll (playerid, text, color) 
 {
 	foreach (player, playername in getPlayers())
@@ -9105,7 +9122,7 @@ addCommandHandler ( "r",//рация
 function (playerid, ...)
 {
 	local playername = getPlayerName ( playerid )
-	local text = ""
+	local text = table_concat(vargv)
 
 	if (logged[playerid] == 0)
 	{
@@ -9115,11 +9132,6 @@ function (playerid, ...)
 	{
 		sendMessage(playerid, "[ERROR] У вас нет рации", color_mes.red)
 		return
-	}
-
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		text = text+vargv[i]+" "
 	}
 
 	if (text.len() > max_text_len)
@@ -9170,11 +9182,7 @@ function message_player( playerid, id, ...)
 		return
 	}
 	
-	local text = ""
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		text = text+vargv[i]+" "
-	}
+	local text = table_concat(vargv)
 
 	if (text.len() > max_text_len)
 	{
@@ -9489,11 +9497,7 @@ function (playerid, value, ...)
 		return
 	}
 
-	local auc_text = ""
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		auc_text = auc_text+vargv[i]+" "
-	}
+	local auc_text = table_concat(vargv)
 
 	local spl = split(auc_text, " ")
 
@@ -9616,11 +9620,7 @@ function (playerid, value, ...)
 		return
 	}
 
-	local factory_text = ""
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		factory_text = factory_text+vargv[i]+" "
-	}
+	local factory_text = table_concat(vargv)
 
 	local spl = split(factory_text, " ")
 
@@ -9755,11 +9755,7 @@ function (playerid, ...)
 		return
 	}
 
-	local text = ""
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		text = text+vargv[i]+" "
-	}
+	local text = table_concat(vargv)
 
 	me_chat_player(playerid, playername+" "+text)
 })
@@ -9774,11 +9770,7 @@ function (playerid, ...)
 		return
 	}
 
-	local text = ""
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		text = text+vargv[i]+" "
-	}
+	local text = table_concat(vargv)
 
 	do_chat_player(playerid, text+"- "+playername)
 })
@@ -9793,11 +9785,7 @@ function (playerid, ...)
 		return
 	}
 
-	local text = ""
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		text = text+vargv[i]+" "
-	}
+	local text = table_concat(vargv)
 
 	try_chat_player(playerid, playername+" "+text)
 })
@@ -9812,11 +9800,7 @@ function (playerid, ...)
 		return
 	}
 
-	local text = ""
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		text = text+vargv[i]+" "
-	}
+	local text = table_concat(vargv)
 
 	b_chat_player(playerid, "(Ближний OOC) "+getPlayerName( playerid )+" ["+playerid+"]: " + text)
 })
@@ -9829,11 +9813,7 @@ function (playerid, ...)
 		return
 	}
 
-	local text = ""
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		text = text+vargv[i]+" "
-	}
+	local text = table_concat(vargv)
 
 	if(text != "" && split(text, " ")[0] == "select")
 	{
@@ -10153,14 +10133,9 @@ addCommandHandler ( "prisonplayer",//--(посадить игрока в тюр�
 function (playerid, id, time, ...)
 {
 	local playername = getPlayerName ( playerid )
-	local reason = ""
+	local reason = table_concat(vargv)
 	local time = time.tointeger()
 	local id = id.tointeger()
-
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		reason = reason+vargv[i]+" "
-	}
 
 	if (id < 0 || id >= getMaxPlayers()) 
 	{
@@ -10269,16 +10244,11 @@ function ( playerid, ... )
 {
 	local playername = getPlayerName ( playerid )
 	local pos = getPlayerPosition( playerid )
-	local text = ""
+	local text = table_concat(vargv)
 
 	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
 	{
 		return
-	}
-
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		text = text+vargv[i]+" "
 	}
 
 	local result = sqlite3( "INSERT INTO position (description, pos) VALUES ('"+text+"', '["+pos[0]+","+pos[1]+","+pos[2]+"],')" )
@@ -10289,16 +10259,11 @@ addCommandHandler ( "global",
 function ( playerid, ... )
 {
 	local playername = getPlayerName ( playerid )
-	local text = ""
+	local text = table_concat(vargv)
 
 	if (logged[playerid] == 0 || search_inv_player(playerid, 37, 1) == 0)
 	{
 		return
-	}
-
-	for(local i = 0; i < vargv.len(); i++)
-	{
-		text = text+vargv[i]+" "
 	}
 
 	sendMessageAll(0, "[ADMIN] "+playername+": "+text, color_mes.lyme)
