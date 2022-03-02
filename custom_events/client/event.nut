@@ -220,7 +220,7 @@ function triggerEventM2O (eventName, ...)//максимум 5 аргументо
 		}
 	}
 
-	if (eventName.find("onPlayer") == 0 || eventName.find("onVehicle") == 0)
+	if (eventName.find("onGui") == 0)
 	{
 		if (event_t[eventName].rawin(vargv[0]))
 		{
@@ -255,104 +255,164 @@ function triggerEventM2O (eventName, ...)//максимум 5 аргументо
 	}
 }
 
-addEventHandler ("onPlayerConnect", 
-function (playerid, name, ip, serial) 
+addEventHandler ("onClientPlayerConnect", 
+function (playerid, nickname) 
 {
-	triggerEventM2O ("onPlayerConnect", playerid, name, ip, serial)
+	triggerEventM2O ("onClientPlayerConnect", playerid, nickname)
 })
 
-addEventHandler ("onPlayerDisconnect", 
-function (playerid, reason) 
-{
-	triggerEventM2O ("onPlayerDisconnect", playerid, reason)
-})
-
-addEventHandler ("onPlayerSpawn", 
+addEventHandler ("onClientPlayerDisconnect", 
 function (playerid) 
 {
-	triggerEventM2O ("onPlayerSpawn", playerid)
+	triggerEventM2O ("onClientPlayerDisconnect", playerid)
 })
 
-addEventHandler ("onPlayerDeath", 
-function (playerid, killerid) 
+addEventHandler ("onClientPlayerMoveStateChange", 
+function (playerid, oldMoveState, newMoveState) 
 {
-	triggerEventM2O ("onPlayerDeath", playerid, killerid)
+	triggerEventM2O ("onClientPlayerMoveStateChange", playerid, oldMoveState, newMoveState)
 })
 
-addEventHandler ("onPlayerChat", 
-function (playerid, text) 
+addEventHandler ("onClientPlayerDeath", 
+function (playerid) 
 {
-	triggerEventM2O ("onPlayerChat", playerid, text)
+	triggerEventM2O ("onClientPlayerDeath", playerid)
 })
 
-addEventHandler ("onPlayerChangeHealth", 
-function (playerid, newhealth, oldhealth) 
+/*addEventHandler ("onClientChat", //перестают работать серверные команды
+function (text, isCommand) 
 {
-	triggerEventM2O ("onPlayerChangeHealth", playerid, newhealth, oldhealth)
-})
+	triggerEventM2O ("onClientChat", text, isCommand)
+})*/
 
-addEventHandler ("onPlayerChangeNick", 
-function (playerid, newNickname, oldNickname) 
-{
-	triggerEventM2O ("onPlayerChangeNick", playerid, newNickname, oldNickname)
-})
-
-addEventHandler ("onPlayerChangeWeapon", 
-function (playerid, newweapon, oldweapon) 
-{
-	triggerEventM2O ("onPlayerChangeWeapon", playerid, newweapon, oldweapon)
-})
-
-addEventHandler ("onPlayerConnectionRejected", 
-function (playerid, reason) 
-{
-	triggerEventM2O ("onPlayerConnectionRejected", playerid, reason)
-})
-
-addEventHandler ("onPlayerVehicleEnter", 
-function (playerid, vehicleid, seat) 
-{
-	triggerEventM2O ("onPlayerVehicleEnter", playerid, vehicleid, seat)
-})
-
-addEventHandler ("onPlayerVehicleExit", 
-function (playerid, vehicleid, seat) 
-{
-	triggerEventM2O ("onPlayerVehicleExit", playerid, vehicleid, seat)
-})
-
-addEventHandler ("onVehicleSpawn", 
-function (vehicleid) 
-{
-	triggerEventM2O ("onVehicleSpawn", vehicleid)
-})
-
-addEventHandler ("onServerPulse", 
+addEventHandler ("onClientProcess", 
 function () 
 {
-	triggerEventM2O ("onServerPulse")
+	triggerEventM2O ("onClientProcess")
 })
 
-addEventHandler ("onScriptInit", 
+addEventHandler ("onClientChangeNick", 
+function (newNickname, oldNickname) 
+{
+	triggerEventM2O ("onClientChangeNick", newNickname, oldNickname)
+})
+
+addEventHandler ("onClientScreenshot", 
+function (name, path) 
+{
+	triggerEventM2O ("onClientScreenshot", name, path)
+})
+
+addEventHandler ("onClientCloseMap", 
 function () 
 {
-	triggerEventM2O ("onScriptInit")
+	triggerEventM2O ("onClientCloseMap")
 })
 
-addEventHandler ("onScriptExit", 
+addEventHandler ("onClientDeviceReset", 
 function () 
 {
-	triggerEventM2O ("onScriptExit")
+	triggerEventM2O ("onClientDeviceReset")
 })
 
-addEventHandler ("onScriptError", 
-function (type, line, column, error) 
+addEventHandler ("onClientFocusChange", 
+function (lost) 
 {
-	triggerEventM2O ("onScriptError", type, line, column, error)
+	triggerEventM2O ("onClientFocusChange", lost)
 })
 
-addEventHandler ("onConsoleInput", 
-function (command, params) 
+addEventHandler ("onClientFramePreRender", 
+function () 
 {
-	triggerEventM2O ("onConsoleInput", command, params)
+	triggerEventM2O ("onClientFramePreRender")
+})
+
+addEventHandler ("onClientFrameRender", 
+function (post) 
+{
+	triggerEventM2O ("onClientFrameRender", post)
+})
+
+addEventHandler ("onClientOpenMap", 
+function () 
+{
+	triggerEventM2O ("onClientOpenMap")
+})
+
+addEventHandler ("onClientScriptExit", 
+function () 
+{
+	triggerEventM2O ("onClientScriptExit")
+})
+
+addEventHandler ("onClientScriptInit", 
+function () 
+{
+	triggerEventM2O ("onClientScriptInit")
+})
+
+addEventHandler ("onGuiElementClick", 
+function (element) 
+{
+	triggerEventM2O ("onGuiElementClick", element)
+})
+
+addEventHandler ("onGuiElementMouseEnter", 
+function (element) 
+{
+	triggerEventM2O ("onGuiElementMouseEnter", element)
+})
+
+addEventHandler ("onGuiElementMouseLeave", 
+function (element) 
+{
+	triggerEventM2O ("onGuiElementMouseLeave", element)
+})
+
+addEventHandler ("onGuiElementMove", 
+function (element) 
+{
+	triggerEventM2O ("onGuiElementMove", element)
+})
+
+addEventHandler ("onGuiElementResize", 
+function (element) 
+{
+	triggerEventM2O ("onGuiElementResize", element)
+})
+
+addEventHandler ("onGuiElementSelectionChange", 
+function (element) 
+{
+	triggerEventM2O ("onGuiElementSelectionChange", element)
+})
+
+addEventHandler ("onGuiElementSortColumn", 
+function (element) 
+{
+	triggerEventM2O ("onGuiElementSortColumn", element)
+})
+
+addEventHandler ("onGuiElementTabChange", 
+function (element) 
+{
+	triggerEventM2O ("onGuiElementTabChange", element)
+})
+
+addEventHandler ("onGuiElementTextAccept", 
+function (element) 
+{
+	triggerEventM2O ("onGuiElementTextAccept", element)
+})
+
+addEventHandler ("onGuiElementTextChange", 
+function (element) 
+{
+	triggerEventM2O ("onGuiElementTextChange", element)
+})
+
+addEventHandler ("onHudTimerComplete", 
+function () 
+{
+	triggerEventM2O ("onHudTimerComplete")
 })
