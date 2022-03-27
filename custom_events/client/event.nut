@@ -1,10 +1,9 @@
-print("SCRIPT CUSTOM_EVENTS LOADED")
+print("CLIENT SCRIPTS LOADED")
 
 local event_t = {}
 
 function _addEventHandler (eventName, attachedTo, handlerFunction, getPropagated = true)//string eventName, id,ud or "root" attachedTo, function handlerFunction, bool getPropagated = true
 {
-	//print("_addEventHandler "+eventName+" "+attachedTo+" "+getPropagated)
 	if (!event_t.rawin(eventName))
 	{
 		event_t[eventName] <- {}
@@ -20,7 +19,6 @@ function _addEventHandler (eventName, attachedTo, handlerFunction, getPropagated
 
 function _removeEventHandler (eventName, attachedTo, handlerFunction)//string eventName, element attachedTo, function handlerFunction
 {
-	//print("_removeEventHandler "+eventName+" "+attachedTo)
 	if (event_t.rawin(eventName) && event_t[eventName].rawin(attachedTo))
 	{
 		foreach (idx, v in event_t[eventName][attachedTo]) 
@@ -42,8 +40,6 @@ function triggerEvent (eventName, baseElement, ...)//string eventName, id,ud or 
 	{
 		return
 	}
-
-	//print("triggerEvent "+eventName+" "+baseElement)
 
 	if (baseElement == "root" && event_t[eventName].rawin("root"))
 	{
@@ -169,8 +165,6 @@ function triggerEventM2O (eventName, ...)//максимум 5 аргументо
 		return
 	}
 
-	//print("triggerEventM2O "+eventName)
-
 	if (event_t[eventName].rawin("root"))
 	{
 		foreach (idx, v in event_t[eventName]["root"]) 
@@ -284,6 +278,18 @@ function (text, isCommand)
 {
 	triggerEventM2O ("onClientChat", text, isCommand)
 })*/
+
+/*addEventHandler ("onTakeDamage", //игрок перестаёт получать урон
+function () 
+{
+	triggerEventM2O ("onTakeDamage")
+})*/
+
+addEventHandler ("onClientVehicleRespawn", 
+function (vehicleid) 
+{
+	triggerEventM2O ("onClientVehicleRespawn", vehicleid)
+})
 
 addEventHandler ("onClientProcess", 
 function () 

@@ -4,7 +4,6 @@ local event_t = {}
 
 function _addEventHandler (eventName, attachedTo, handlerFunction, getPropagated = true)//string eventName, id,ud or "root" attachedTo, function handlerFunction, bool getPropagated = true
 {
-	//print("_addEventHandler "+eventName+" "+attachedTo+" "+getPropagated)
 	if (!event_t.rawin(eventName))
 	{
 		event_t[eventName] <- {}
@@ -20,7 +19,6 @@ function _addEventHandler (eventName, attachedTo, handlerFunction, getPropagated
 
 function _removeEventHandler (eventName, attachedTo, handlerFunction)//string eventName, element attachedTo, function handlerFunction
 {
-	//print("_removeEventHandler "+eventName+" "+attachedTo)
 	if (event_t.rawin(eventName) && event_t[eventName].rawin(attachedTo))
 	{
 		foreach (idx, v in event_t[eventName][attachedTo]) 
@@ -42,8 +40,6 @@ function triggerEvent (eventName, baseElement, ...)//string eventName, id,ud or 
 	{
 		return
 	}
-
-	//print("triggerEvent "+eventName+" "+baseElement)
 
 	if (baseElement == "root" && event_t[eventName].rawin("root"))
 	{
@@ -168,8 +164,6 @@ function triggerEventM2O (eventName, ...)//максимум 5 аргументо
 	{
 		return
 	}
-
-	//print("triggerEventM2O "+eventName)
 
 	if (event_t[eventName].rawin("root"))
 	{
@@ -355,4 +349,10 @@ addEventHandler ("onConsoleInput",
 function (command, params) 
 {
 	triggerEventM2O ("onConsoleInput", command, params)
+})
+
+addEventHandler ("onWebRequest", 
+function (ip, port, file, method) 
+{
+	triggerEventM2O ("onWebRequest", ip, port, file, method)
 })
