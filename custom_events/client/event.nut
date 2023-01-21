@@ -309,12 +309,6 @@ function (name, path)
 	triggerEventM2O ("onClientScreenshot", name, path)
 })
 
-addEventHandler ("onClientCloseMap", 
-function () 
-{
-	triggerEventM2O ("onClientCloseMap")
-})
-
 addEventHandler ("onClientDeviceReset", 
 function () 
 {
@@ -327,23 +321,30 @@ function (lost)
 	triggerEventM2O ("onClientFocusChange", lost)
 })
 
-addEventHandler ("onClientFramePreRender", 
+/*addEventHandler ("onClientFramePreRender", 
 function () 
 {
 	triggerEventM2O ("onClientFramePreRender")
-})
+})*/
 
-addEventHandler ("onClientFrameRender", 
+/*addEventHandler ("onClientFrameRender", вызывает проблемы squirrel
 function (post) 
 {
 	triggerEventM2O ("onClientFrameRender", post)
-})
+})*/
 
-addEventHandler ("onClientOpenMap", 
+/*addEventHandler ("onClientOpenMap",
 function () 
 {
 	triggerEventM2O ("onClientOpenMap")
+	openMap()//если не добавить перестанет открываться карта
 })
+
+addEventHandler ("onClientCloseMap", 
+function () 
+{
+	triggerEventM2O ("onClientCloseMap")
+})*/
 
 addEventHandler ("onClientScriptExit", 
 function () 
@@ -415,6 +416,12 @@ addEventHandler ("onGuiElementTextChange",
 function (element) 
 {
 	triggerEventM2O ("onGuiElementTextChange", element)
+})
+
+addEventHandler ("onGuiElementDoubleClick", 
+function (element) 
+{
+	triggerEventM2O ("onGuiElementDoubleClick", element)
 })
 
 addEventHandler ("onHudTimerComplete", 
