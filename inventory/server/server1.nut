@@ -8232,7 +8232,7 @@ local to3 = [3,6,9,12,15,18,21,24,27,30,33,36]
 
 function roulette(playerid, randomize)
 {
-	foreach (k, v in color_mes.red) 
+	foreach (k, v in Red) 
 	{
 		if (randomize == v)
 		{
@@ -8316,7 +8316,7 @@ function (playerid, id, cash)
 
 				if (id == "красное")
 				{
-					foreach (k, v in color_mes.red) 
+					foreach (k, v in Red) 
 					{
 						if (randomize == v)
 						{
